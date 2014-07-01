@@ -1,3 +1,7 @@
+module TZCompile
+
+using Dates
+
 # Convenience type for working with HH:MM
 immutable HourMin
     hour::Int
@@ -289,9 +293,9 @@ function generate_tzdata(olsen_path::String,dest_path::String)
     files = [:africa,:antarctica,:asia,:australasia,
              :europe,:northamerica,:southamerica]
     for f in files
-        for (name,zone) in tzparse(olsen_path*string(f))[1]
-            open(dest_path*zone_symbol(zone),"w") do x
-                serialize(x,(zone.name,millis(zone.gmtoffset),zone.abbr,zone.dst))
+        for (name,zone) in tzparse(joinpath(olsen_path,string(f)))[1]
+            open(joinpath(dest_path,zone_symbol(zone)),"w") do x
+                serialize(x,zone)
             end
         end
     end
@@ -303,3 +307,4 @@ end
  #generate common abbreviation typealiases
  #fix abbreviation for kiev? antarctica
  #use etcetera file for generic offsets?
+end # module
