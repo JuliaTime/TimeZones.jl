@@ -1,9 +1,11 @@
 
 dir = dirname(@__FILE__)
-dir = "C:/Users/karbarcca/.julia/v0.3/TimeZones/deps/"
-cd("C:\\Users\\karbarcca\\.julia\\v0.3\\TimeZones\\deps")
 tz = joinpath(dir,"tzdata")
 com = joinpath(dir,"compiled")
+
+isdir(tz)  || mkdir(tz)
+isdir(com) || mkdir(com)
+
 
 for f in (tz,com)
     for file in readdir(f)
