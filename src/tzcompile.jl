@@ -1,6 +1,6 @@
 module TZCompile
 
-using Dates
+using Base.Dates
 
 # Convenience type for working with HH:MM
 immutable HourMin
@@ -55,9 +55,9 @@ const MINDATE = DateTime(1917,1,1)
 const MAXDATE = DateTime(2038,12,31)
 
 # Helper functions/data
-const MONTHS = ["Jan"=>1,"Feb"=>2,"Mar"=>3,"Apr"=>4,"May"=>5,"Jun"=>6,
-                "Jul"=>7,"Aug"=>8,"Sep"=>9,"Oct"=>10,"Nov"=>11,"Dec"=>12]
-const DAYS = ["Mon"=>1,"Tue"=>2,"Wed"=>3,"Thu"=>4,"Fri"=>5,"Sat"=>6,"Sun"=>7]
+const MONTHS = Dict("Jan"=>1,"Feb"=>2,"Mar"=>3,"Apr"=>4,"May"=>5,"Jun"=>6,
+                "Jul"=>7,"Aug"=>8,"Sep"=>9,"Oct"=>10,"Nov"=>11,"Dec"=>12)
+const DAYS = Dict("Mon"=>1,"Tue"=>2,"Wed"=>3,"Thu"=>4,"Fri"=>5,"Sat"=>6,"Sun"=>7)
 for d in collect(keys(DAYS))
     sym = symbol("last" * d)
     dayofweek = get(DAYS,d,1)
@@ -92,7 +92,14 @@ function parsedate(periods,offset,save)
         l = length(periods)
         f = l == 1 ? "yyyy" : l == 2 ? "yyyy uuu" : 
             l == 3 ? "yyyy uuu dd" : l == 4 ? "yyyy uuu dd HH:MM" : error("couldn't parse date")
-        dt = DateTime(s,f)
+        periods = Dates.parse(s,Dates.DateFormat(f))
+        if length(periods) > 3
+            if periods[4] == Hour(24)
+                periods[4] = Hour(0)
+                periods[3] += Day(1)
+            end
+        end
+        dt = DateTime(periods...)
     end
     # If the time is UTC, we add back the offset and any saved amount
     # If it's local standard time, we just need to add any saved amount
@@ -192,7 +199,13 @@ function zoneparse(zone,lines,rulesets)
                     # We start at the Rule month, hour, minute
                     # And apply our boolean "on" function until we
                     # arrive at the right transition instant
-                    dt = DateTime(year(y),r.month,1,r.at.hour,r.at.min)
+                    h = r.at.hour
+                    d = 1
+                    if h == 24
+                        h = 0
+                        d += 1
+                    end
+                    dt = DateTime(year(y),r.month,d,h,r.at.min)
                     ff = 1
                     while true
                         (r.on(dt) || ff == 1000) && break
@@ -225,8 +238,8 @@ function zoneparse(zone,lines,rulesets)
 end
 
 function tzparse(tzfile::String)
-    rulelines = (String=>Array{String,1})[]
-    zonelines = (String=>Array{String,1})[]
+    rulelines = Dict{String,Array{String,1}}()
+    zonelines = Dict{String,Array{String,1}}()
     open(tzfile) do x
         z = ""
         for line in eachline(x)
@@ -245,12 +258,12 @@ function tzparse(tzfile::String)
         end
     end
     # Rule pass
-    rulesets = (String=>RuleSet)[] # RuleSet.name=>RuleSet for easy lookup
+    rulesets = Dict{String,RuleSet}() # RuleSet.name=>RuleSet for easy lookup
     for (rule,lines) in rulelines
         rulesets[rule] = rulesetparse(rule,lines)
     end
     # Zone pass
-    zones = (String=>Zone)[]
+    zones = Dict{String,Zone}()
     for (zone,lines) in zonelines
         zones[zone] = zoneparse(zone,lines,rulesets)
     end
@@ -272,8 +285,8 @@ function generate_tzinfo(olsen_path::String,dest_path::String)
         append!(zones,tzparse(olsen_path*string(f))[1])
     end
     z_syms = [symbol(zone_symbol(x)) for x in zones]
-    z_s = {a.name=>b for (a,b) in zip(zones,z_syms)}
-    s_z = {a=>b.name for (a,b) in zip(z_syms,zones)}
+    z_s = [a.name=>b for (a,b) in zip(zones,z_syms)]
+    s_z = [a=>b.name for (a,b) in zip(z_syms,zones)]
     open(dest_path * "tzinfo.jl","w") do f
         write(f,"### AUTO-GENERATED FILE ###\n\n")
         # Zone Definitions
@@ -295,7 +308,7 @@ function generate_tzdata(olsen_path::String,dest_path::String)
     for f in files
         for (name,zone) in tzparse(joinpath(olsen_path,string(f)))[1]
             open(joinpath(dest_path,zone_symbol(zone)),"w") do x
-                serialize(x,zone)
+                serialize(x,zone.dst)
             end
         end
     end
