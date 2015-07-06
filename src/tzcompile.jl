@@ -1,6 +1,7 @@
 module TZCompile
 
 using Base.Dates
+import Compat: parse
 
 # Convenience type for working with HH:MM
 immutable HourMin
@@ -14,9 +15,9 @@ function HourMin(s::String)
     # "-" represents 0:00 for some DST rules
     ismatch(r"\d",s) || return ZERO
     # handle single number as # of hours
-    length(s) == 1 && return HourMin(int(s),0)
-    ss = split(s,':')
-    return HourMin(int(ss[1]),int(ss[2]))
+    length(s) == 1 && return HourMin(parse(Int, s), 0)
+    ss = split(s, ':')
+    return HourMin(parse(Int, ss[1]), parse(Int, ss[2]))
 end
 
 millis(hm::HourMin) = hm.min*60000 + 3600000*hm.hour
@@ -124,7 +125,7 @@ function rulesetparse(rule,lines)
             # For the first day of the week after or before a given day
             # i.e. Sun>=8 refers to the 1st Sunday after the 8th of the month
             # or in other words, the 2nd Sunday
-            zday = int(match(r"\d\d?",spl[7]).match)
+            zday = parse(Int, match(r"\d\d?",spl[7]).match)
             dow = DAYS[match(r"\w\w\w",spl[7]).match]
             if ismatch(r"<=",spl[7])
                 on = @eval (x->day(x) <= $zday && dayofweek(x) == $dow)
@@ -133,7 +134,7 @@ function rulesetparse(rule,lines)
             end
         elseif ismatch(r"\d\d?",spl[7])
             # Matches just a plain old day of the month
-            zday = int(spl[7])
+            zday = parse(Int, spl[7])
             on = @eval (x->day(x) == $zday)
         else
             error("Can't parse day of month for DST change")
@@ -145,8 +146,8 @@ function rulesetparse(rule,lines)
         at_flag = c == 'u' ? 1 : c == 's' ? 2 : 0
         save = HourMin(spl[9])
         letter = spl[10]
-        from = spl[3] == "min" ? year(MINDATE) : int(spl[3])
-        to = spl[4] == "only" ? from : spl[4] == "max" ? year(MAXDATE) : int(spl[4])
+        from = spl[3] == "min" ? year(MINDATE) : parse(Int, spl[3])
+        to = spl[4] == "only" ? from : spl[4] == "max" ? year(MAXDATE) : parse(Int, spl[4])
         # Now we've finally parsed everything we need
         push!(ruleset.rules,Rule(from,to,month,on,at,at_flag,save,letter))
     end
