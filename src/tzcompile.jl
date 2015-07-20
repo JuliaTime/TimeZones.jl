@@ -283,12 +283,12 @@ function generate_tzinfo(olsen_path::String,dest_path::String)
              :europe,:northamerica,:southamerica]
     zones = Zone[]
     for f in files
-        append!(zones,tzparse(olsen_path*string(f))[1])
+        append!(zones,tzparse(joinpath(olsen_path,string(f)))[1])
     end
     z_syms = [symbol(zone_symbol(x)) for x in zones]
     z_s = [a.name=>b for (a,b) in zip(zones,z_syms)]
     s_z = [a=>b.name for (a,b) in zip(z_syms,zones)]
-    open(dest_path * "tzinfo.jl"),"w") do f
+    open(joinpath(dest_path, "tzinfo.jl"), "w") do f
         write(f,"### AUTO-GENERATED FILE ###\n\n")
         # Zone Definitions
         write(f,"#Define zone immutable for each timezone in Olson tz database\n")
