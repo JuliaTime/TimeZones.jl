@@ -15,8 +15,15 @@ end
 
 regions = ["africa","antarctica","asia","australasia",
            "europe","northamerica","southamerica"]
-for reg in regions
-    download("ftp://ftp.iana.org/tz/data/"*reg,joinpath(tz,reg))
+
+#=
+Need to make this code more reliable
+
+LoadError: failed process: Process(`curl -o /Users/omus/.julia/v0.4/Timezones/deps/tzdata/asia -L ftp://ftp.iana.org/tz/data/asia`, ProcessExited(56)) [56]
+while loading /Users/omus/.julia/v0.4/Timezones/deps/build.jl, in expression starting on line 18
+=#
+@sync for reg in regions
+    @async download("ftp://ftp.iana.org/tz/data/"*reg,joinpath(tz,reg))
 end
 
 include("../src/TZCompile.jl")

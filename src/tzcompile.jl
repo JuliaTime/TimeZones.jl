@@ -58,6 +58,7 @@ const MAXDATE = DateTime(2038,12,31)
 # Helper functions/data
 const MONTHS = Dict("Jan"=>1,"Feb"=>2,"Mar"=>3,"Apr"=>4,"May"=>5,"Jun"=>6,
                 "Jul"=>7,"Aug"=>8,"Sep"=>9,"Oct"=>10,"Nov"=>11,"Dec"=>12)
+
 const DAYS = Dict("Mon"=>1,"Tue"=>2,"Wed"=>3,"Thu"=>4,"Fri"=>5,"Sat"=>6,"Sun"=>7)
 for d in collect(keys(DAYS))
     sym = symbol("last" * d)
@@ -114,40 +115,40 @@ function rulesetparse(rule,lines)
     for line in lines
         spl = split(line,' ')
         # Get the month. Easy.
-        month = MONTHS[spl[6]]
+        month = MONTHS[spl[4]]
         # Now we need to get the right anonymous function
         # for determining the right day for transitioning
-        if ismatch(r"last\w\w\w",spl[7])
+        if ismatch(r"last\w\w\w",spl[5])
             # We pre-built these functions above
             # They follow the format "lastSun","lastMon"
-            on = eval(symbol(spl[7]))
-        elseif ismatch(r"\w\w\w[<>]=\d\d?",spl[7])
+            on = eval(symbol(spl[5]))
+        elseif ismatch(r"\w\w\w[<>]=\d\d?",spl[5])
             # For the first day of the week after or before a given day
             # i.e. Sun>=8 refers to the 1st Sunday after the 8th of the month
             # or in other words, the 2nd Sunday
-            zday = parse(Int, match(r"\d\d?",spl[7]).match)
-            dow = DAYS[match(r"\w\w\w",spl[7]).match]
-            if ismatch(r"<=",spl[7])
+            zday = parse(Int, match(r"\d\d?",spl[5]).match)
+            dow = DAYS[match(r"\w\w\w",spl[5]).match]
+            if ismatch(r"<=",spl[5])
                 on = @eval (x->day(x) <= $zday && dayofweek(x) == $dow)
             else
                 on = @eval (x->day(x) >= $zday && dayofweek(x) == $dow)
             end
-        elseif ismatch(r"\d\d?",spl[7])
+        elseif ismatch(r"\d\d?",spl[5])
             # Matches just a plain old day of the month
-            zday = parse(Int, spl[7])
+            zday = parse(Int, spl[5])
             on = @eval (x->day(x) == $zday)
         else
             error("Can't parse day of month for DST change")
         end
         # Now we get the time of the transition
-        c = spl[8][end]
-        at = isalpha(c) ? HourMin(spl[8][1:end-1]) : HourMin(spl[8])
+        c = spl[6][end]
+        at = isalpha(c) ? HourMin(spl[6][1:end-1]) : HourMin(spl[6])
         # 0 for Local Wall time, 1 for UTC, 2 for Local Standard time
         at_flag = c == 'u' ? 1 : c == 's' ? 2 : 0
-        save = HourMin(spl[9])
-        letter = spl[10]
-        from = spl[3] == "min" ? year(MINDATE) : parse(Int, spl[3])
-        to = spl[4] == "only" ? from : spl[4] == "max" ? year(MAXDATE) : parse(Int, spl[4])
+        save = HourMin(spl[7])
+        letter = spl[8]
+        from = spl[1] == "min" ? year(MINDATE) : parse(Int, spl[1])
+        to = spl[2] == "only" ? from : spl[2] == "max" ? year(MAXDATE) : parse(Int, spl[2])
         # Now we've finally parsed everything we need
         push!(ruleset.rules,Rule(from,to,month,on,at,at_flag,save,letter))
     end
@@ -239,30 +240,38 @@ function zoneparse(zone,lines,rulesets)
 end
 
 function tzparse(tzfile::String)
-    rulelines = Dict{String,Array{String,1}}()
-    zonelines = Dict{String,Array{String,1}}()
-    open(tzfile) do x
-        z = ""
-        for line in eachline(x)
-            line = replace(strip(replace(chomp(line),r"#.*$","")),r"\s+"," ")
-            (line == "" || line[1] == '#' ||
-             ismatch(r"^Zone\s(EST|MST|HST|EST5EDT|CST6CDT|MST7MDT|PST8PDT|WET|CET|MET|EET)",line) ||
-             ismatch(r"^Link",line)) && continue
-            if ismatch(r"^Rule",line)
-                m = match(r"(?<=^Rule\s)\b.+?(?=\s)",line).match
-                rulelines[m] = push!(get(rulelines,m,String[]),line)
-            else
-                z = !ismatch(r"^Zone",line) ? z : match(r"(?<=^Zone\s)\b.+?(?=\s)",line).match
-                ismatch(r"^Zone",line) && continue
-                zonelines[z] = push!(get(zonelines,z,String[]),line)
+    rulelines = Dict{String,Array{String}}()
+    zonelines = Dict{String,Array{String}}()
+
+    # For the intial pass we'll collect the zone and rule lines.
+    open(tzfile) do fp
+        kind, name = nothing, nothing
+        for line in eachline(fp)
+            line = strip(replace(chomp(line), r"#.*$", ""))
+            length(line) > 0 || continue
+            line = replace(line, r"\s+", " ")
+
+            # Remove type and name from the line if they exist otherwise persist
+            # the last occurence.
+            parts = split(line, ' '; limit=3)
+            if parts[1] in ("Rule", "Zone")
+                kind, name, line = parts
+            end
+
+            if kind == "Rule"
+                rulelines[name] = push!(get(rulelines, name, String[]), line)
+            elseif kind == "Zone"
+                zonelines[name] = push!(get(zonelines, name, String[]), line)
             end
         end
     end
+
     # Rule pass
     rulesets = Dict{String,RuleSet}() # RuleSet.name=>RuleSet for easy lookup
     for (rule,lines) in rulelines
         rulesets[rule] = rulesetparse(rule,lines)
     end
+
     # Zone pass
     zones = Dict{String,Zone}()
     for (zone,lines) in zonelines
