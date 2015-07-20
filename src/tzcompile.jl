@@ -72,8 +72,8 @@ end
 # Olsen timezone dates can be a single year (1900), yyyy-mm-dd (1900-Jan-01),
 # or minute-precision (1900-Jan-01 2:00).
 # They can also be given in Local Wall Time, UTC time (u), or Local Standard time (s)
-function parsedate(periods,offset,save)
-    s = join(periods,' ')
+function parsedate(s,offset,save)
+    periods = split(s, ' ')
     s,letter = length(periods) > 3 ? isalpha(s[end]) ? (s[1:end-1],s[end]) : (s,' ') : (s,' ')
     if contains(s,"lastSun")
         dt = DateTime(replace(s,"lastSun","1",1),"yyyy uuu d H:MM")
@@ -168,15 +168,17 @@ function zoneparse(zone,lines,rulesets)
     offset = ZERO
     abbr = ""
     for line in lines
-        spl = split(line,' ')
+        spl = split(line, ' '; limit=4)
+
         # Sometimes there are "LMT" lines which we don't care about
         length(split(spl[1],':')) > 2 && continue #TODO: this may be too aggressive
+
         # Get our offset and abbreviation string for this period
         offset = HourMin(spl[1])
         abbr = spl[3] == "zzz" ? "" : spl[3]
         # Parse the date the line rule applies up to
         # If it's blank, then we're at the last line, so go to MAXDATE
-        until = (length(spl) < 4 || spl[4] == "") ? MAXDATE : parsedate(spl[4:end],offset,save)
+        until = (length(spl) < 4 || spl[4] == "") ? MAXDATE : parsedate(spl[4],offset,save)
 
         if spl[2] == "-" || ismatch(r"\d",spl[2])
             save = HourMin(spl[2])
