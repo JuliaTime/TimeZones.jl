@@ -16,9 +16,9 @@ function parse(x::String,format::String;locale#=::String=#="english")
     tz_dt_ind = first(rsearch(x,tr))
     dt_string = x[1:tz_dt_ind]
     dt = Dates.DateTime(dt_string,df)
-    # 
+    #
     tz = parsetimezone(x[tz_dt_ind:end])
-    
+
 end
 
 

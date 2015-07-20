@@ -91,7 +91,7 @@ function parsedate(periods,offset,save)
         end
     else
         l = length(periods)
-        f = l == 1 ? "yyyy" : l == 2 ? "yyyy uuu" : 
+        f = l == 1 ? "yyyy" : l == 2 ? "yyyy uuu" :
             l == 3 ? "yyyy uuu dd" : l == 4 ? "yyyy uuu dd HH:MM" : error("couldn't parse date")
         periods = Dates.parse(s,Dates.DateFormat(f))
         if length(periods) > 3
@@ -245,8 +245,8 @@ function tzparse(tzfile::String)
         z = ""
         for line in eachline(x)
             line = replace(strip(replace(chomp(line),r"#.*$","")),r"\s+"," ")
-            (line == "" || line[1] == '#' || 
-             ismatch(r"^Zone\s(EST|MST|HST|EST5EDT|CST6CDT|MST7MDT|PST8PDT|WET|CET|MET|EET)",line) || 
+            (line == "" || line[1] == '#' ||
+             ismatch(r"^Zone\s(EST|MST|HST|EST5EDT|CST6CDT|MST7MDT|PST8PDT|WET|CET|MET|EET)",line) ||
              ismatch(r"^Link",line)) && continue
             if ismatch(r"^Rule",line)
                 m = match(r"(?<=^Rule\s)\b.+?(?=\s)",line).match
@@ -288,7 +288,7 @@ function generate_tzinfo(olsen_path::String,dest_path::String)
     z_syms = [symbol(zone_symbol(x)) for x in zones]
     z_s = [a.name=>b for (a,b) in zip(zones,z_syms)]
     s_z = [a=>b.name for (a,b) in zip(z_syms,zones)]
-    open(dest_path * "tzinfo.jl","w") do f
+    open(dest_path * "tzinfo.jl"),"w") do f
         write(f,"### AUTO-GENERATED FILE ###\n\n")
         # Zone Definitions
         write(f,"#Define zone immutable for each timezone in Olson tz database\n")
@@ -317,7 +317,7 @@ end
 
 #TODO
  #spot check times/offsets/abbrs
- #handle timezone link names 
+ #handle timezone link names
  #generate common abbreviation typealiases
  #fix abbreviation for kiev? antarctica
  #use etcetera file for generic offsets?
