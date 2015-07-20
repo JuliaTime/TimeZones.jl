@@ -60,13 +60,16 @@ const MONTHS = Dict("Jan"=>1,"Feb"=>2,"Mar"=>3,"Apr"=>4,"May"=>5,"Jun"=>6,
                 "Jul"=>7,"Aug"=>8,"Sep"=>9,"Oct"=>10,"Nov"=>11,"Dec"=>12)
 
 const DAYS = Dict("Mon"=>1,"Tue"=>2,"Wed"=>3,"Thu"=>4,"Fri"=>5,"Sat"=>6,"Sun"=>7)
-for d in collect(keys(DAYS))
-    sym = symbol("last" * d)
-    dayofweek = get(DAYS,d,1)
-    @eval (function $sym(dt)
+
+# Create adjuster functions such as "lastSun".
+for (abbr, dayofweek) in DAYS
+    sym = symbol("last" * abbr)
+    @eval (
+        function $sym(dt)
             return dayofweek(dt) == $dayofweek &&
             dayofweekofmonth(dt) == daysofweekinmonth(dt)
-        end)
+        end
+    )
 end
 
 # Olsen timezone dates can be a single year (1900), yyyy-mm-dd (1900-Jan-01),
@@ -76,25 +79,19 @@ function parsedate(s,offset,save)
     periods = split(s, ' ')
     s,letter = length(periods) > 3 ? isalpha(s[end]) ? (s[1:end-1],s[end]) : (s,' ') : (s,' ')
     if contains(s,"lastSun")
-        dt = DateTime(replace(s,"lastSun","1",1),"yyyy uuu d H:MM")
-        while !lastSun(dt)
-            dt += Day(1)
-        end
+        dt = DateTime(replace(s, "lastSun", "1", 1), "yyyy uuu d H:MM")
+        dt = tonext(lastSun, dt; same=true)
     elseif contains(s,"lastSat")
-        dt = DateTime(replace(s,"lastSat","1",1),"yyyy uuu d H:MM")
-        while !lastSat(dt)
-            dt += Day(1)
-        end
+        dt = DateTime(replace(s, "lastSat", "1", 1), "yyyy uuu d H:MM")
+        dt = tonext(lastSat, dt; same=true)
     elseif contains(s,"Sun>=1")
-        dt = DateTime(replace(s,"Sun>=","",1),"yyyy uuu d H:MM")
-        while dayofweek(dt) != 7
-            dt += Day(1)
-        end
+        dt = DateTime(replace(s,"Sun>=", "", 1),"yyyy uuu d H:MM")
+        dt = tonext(d -> dayofweek(d) == Sun, dt; same=true)
     else
-        l = length(periods)
-        f = l == 1 ? "yyyy" : l == 2 ? "yyyy uuu" :
-            l == 3 ? "yyyy uuu dd" : l == 4 ? "yyyy uuu dd HH:MM" : error("couldn't parse date")
-        periods = Dates.parse(s,Dates.DateFormat(f))
+        f = join(split("yyyy uuu dd HH:MM", ' ')[1:length(periods)], ' ')
+        periods = Dates.parse(s, Dates.DateFormat(f))
+
+        # Deal with zone "Pacific/Apia" which has a 24:00 datetime.
         if length(periods) > 3
             if periods[4] == Hour(24)
                 periods[4] = Hour(0)
@@ -103,6 +100,8 @@ function parsedate(s,offset,save)
         end
         dt = DateTime(periods...)
     end
+
+    # TODO: I feel like there are issues here.
     # If the time is UTC, we add back the offset and any saved amount
     # If it's local standard time, we just need to add any saved amount
     return letter == 's' ? (dt - save) : (dt - offset - save)
