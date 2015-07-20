@@ -120,18 +120,18 @@ function rulesetparse(rule,lines)
         # for determining the right day for transitioning
         if ismatch(r"last\w\w\w",spl[5])
             # We pre-built these functions above
-            # They follow the format "lastSun","lastMon"
+            # They follow the format: "lastSun", "lastMon".
             on = eval(symbol(spl[5]))
         elseif ismatch(r"\w\w\w[<>]=\d\d?",spl[5])
-            # For the first day of the week after or before a given day
-            # i.e. Sun>=8 refers to the 1st Sunday after the 8th of the month
-            # or in other words, the 2nd Sunday
-            zday = parse(Int, match(r"\d\d?",spl[5]).match)
+            # The first day of the week that occurs before or after a given day of month.
+            # i.e. Sun>=8 refers to the Sunday after the 8th of the month
+            # or in other words, the 2nd Sunday.
             dow = DAYS[match(r"\w\w\w",spl[5]).match]
+            dom = parse(Int, match(r"\d\d?",spl[5]).match)
             if ismatch(r"<=",spl[5])
-                on = @eval (x->day(x) <= $zday && dayofweek(x) == $dow)
+                on = @eval (dt -> day(dt) <= $dom && dayofweek(dt) == $dow)
             else
-                on = @eval (x->day(x) >= $zday && dayofweek(x) == $dow)
+                on = @eval (dt -> day(dt) >= $dom && dayofweek(dt) == $dow)
             end
         elseif ismatch(r"\d\d?",spl[5])
             # Matches just a plain old day of the month
