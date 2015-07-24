@@ -145,7 +145,7 @@ function rulesetparse(rule,lines)
         # 0 for Local Wall time, 1 for UTC, 2 for Local Standard time
         at_flag = c == 'u' ? 1 : c == 's' ? 2 : 0
         save = HourMin(spl[7])
-        letter = spl[8]
+        letter = spl[8] == "-" ? "" : spl[8]
         from = spl[1] == "min" ? year(MINDATE) : parse(Int, spl[1])
         to = spl[2] == "only" ? from : spl[2] == "max" ? year(MAXDATE) : parse(Int, spl[2])
         # Now we've finally parsed everything we need
@@ -193,11 +193,10 @@ function zoneparse(zone,lines,rulesets)
             while y < until
                 # We need to check all Rules to see if they apply
                 # for the given year
-                for n = 1:length(ruleset.rules)
-                    r = ruleset.rules[n]
+                for r in ruleset.rules
                     # If the Rule is out of range, skip it
-                    r.from > year(y) && continue
-                    r.to   < year(y) && continue
+                    r.from <= year(y) <= r.to || continue
+
                     # Now we need to deterimine the transition day
                     # We start at the Rule month, hour, minute
                     # And apply our boolean "on" function until we
@@ -209,6 +208,15 @@ function zoneparse(zone,lines,rulesets)
                         d += 1
                     end
                     dt = DateTime(year(y),r.month,d,h,r.at.min)
+                    # TODO: Alternatively this code could be rewritten as:
+                    # try
+                    #     dt = tonext(r.on, dt; limit=1000)
+                    # catch e
+                    #     if isa(e, ArgumentError)
+                    #         @show zone, DateTime(year(y),r.month,1,r.at.hour,r.at.min)
+                    #         error("throwy")
+                    #     end
+                    # end
                     ff = 1
                     while true
                         (r.on(dt) || ff == 1000) && break
@@ -224,8 +232,12 @@ function zoneparse(zone,lines,rulesets)
                          r.at_flag == 0 ? dt - offset - save : dt - r.save
 
                     push!(dst,dt.instant.periods.value)
-                    push!(offs,millis(HourMin(spl[1])+r.save))
-                    push!(abbrs,replace(abbr,"%s",r.letter == "-" ? "" : r.letter,1))
+                    push!(offs,millis(offset + r.save))
+
+                    # Using @sprintf would be best but it doesn't accept a format as a
+                    # variable.
+                    push!(abbrs,replace(abbr,"%s",r.letter,1))
+
                     save = r.save != ZERO ? r.save : ZERO
                     r.save == ZERO && (default_letter = r.letter)
                 end
