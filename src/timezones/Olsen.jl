@@ -3,6 +3,8 @@ module Olsen
 using Base.Dates
 import Compat: parse
 
+import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
+
 # Convenience type for working with HH:MM
 immutable HourMin
     hour::Int
@@ -156,10 +158,9 @@ end
 
 # Takes string array, and Dict{RuleSet.name=>RuleSet} for Zone parsing
 function zoneparse(zone,lines,rulesets)
-    # These 3 arrays will hold our DST_matrices
-    dst = Int64[]    # DST transition instants in milliseconds
-    offs = Int64[]   # Offset from UTC for the time leading up to dst_instant
-    abbrs = String[] # Abbreviation for period up to dst_instant
+    # zones = Set{FixedTimeZone}()
+    transitions = Transition[]
+
     # Set some default values and starting DateTime increment and away we go...
     y = MINDATE
     default_letter = "S"
@@ -182,9 +183,13 @@ function zoneparse(zone,lines,rulesets)
         if spl[2] == "-" || ismatch(r"\d",spl[2])
             save = HourMin(spl[2])
             y = y - offset - save
-            push!(dst,y.instant.periods.value)
-            push!(offs,millis(offset+save))
-            push!(abbrs,abbr)
+
+            tz = FixedTimeZone(
+                abbr,
+                millis(offset+save),
+            )
+            push!(transitions, Transition(dt, tz))
+
             y = until
         else
             # Get the Rule that applies for this period
@@ -231,12 +236,24 @@ function zoneparse(zone,lines,rulesets)
                     dt = r.at_flag == 1 ? dt :
                          r.at_flag == 0 ? dt - offset - save : dt - r.save
 
-                    push!(dst,dt.instant.periods.value)
-                    push!(offs,millis(offset + r.save))
 
                     # Using @sprintf would be best but it doesn't accept a format as a
                     # variable.
-                    push!(abbrs,replace(abbr,"%s",r.letter,1))
+                    tz = FixedTimeZone(
+                        replace(abbr,"%s",r.letter,1),
+                        millis(offset + r.save)
+                    )
+
+                    # TODO: We can maybe reduce memory usage by reusing the same
+                    # FixedTimeZone object.
+                    # Note: By default pushing onto a set will replace objects.
+                    # if !(tz in zones)
+                    #     push!(zones, tz)
+                    # else
+                    #     tz = first(intersect(zones, Set([tz])))
+                    # end
+
+                    push!(transitions, Transition(dt, tz))
 
                     save = r.save != ZERO ? r.save : ZERO
                     r.save == ZERO && (default_letter = r.letter)
@@ -247,9 +264,9 @@ function zoneparse(zone,lines,rulesets)
         until == MAXDATE && break
     end
     abbr = replace(abbr,r"%\w",default_letter,1)
-    dst_matrix = [dst offs abbrs]
-    sortinds = sortperm(dst_matrix[:,1])
-    return Zone(zone,offset,abbr,dst_matrix[sortinds,:])
+    sort!(transitions)
+
+    return VariableTimeZone(zone, transitions)
 end
 
 function tzparse(tzfile::String)
@@ -286,7 +303,7 @@ function tzparse(tzfile::String)
     end
 
     # Zone pass
-    zones = Dict{String,Zone}()
+    zones = Dict{String,TimeZone}()
     for (zone,lines) in zonelines
         zones[zone] = zoneparse(zone,lines,rulesets)
     end

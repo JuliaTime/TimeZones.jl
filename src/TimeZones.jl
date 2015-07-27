@@ -1,7 +1,6 @@
 module TimeZones
 
-using Dates
-
+include("timezones/types.jl")
 include("timezones/Olsen.jl")
 
 # Timezones.parse(dt::String,format::String) --> (DateTime,tz::String)
@@ -23,6 +22,6 @@ function parse(x::String,format::String;locale#=::String=#="english")
 
 end
 
-
+export TimeZone, FixedTimeZone, VariableTimeZone, Transition
 
 end # module
