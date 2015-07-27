@@ -1,4 +1,4 @@
-module Timezones
+module TimeZones
 
 using Dates
 
