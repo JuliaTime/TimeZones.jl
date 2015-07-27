@@ -26,6 +26,6 @@ while loading /Users/omus/.julia/v0.4/Timezones/deps/build.jl, in expression sta
     @async download("ftp://ftp.iana.org/tz/data/"*reg,joinpath(tz,reg))
 end
 
-include("../src/TZCompile.jl")
-TZCompile.generate_tzdata(tz,com)
+include("../src/TimeZones.jl")
+TimeZones.Olsen.generate_tzdata(tz,com)
 println("=========Timezone Database Successfully Compiled=========")

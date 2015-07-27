@@ -1,4 +1,4 @@
-module TZCompile
+module Olsen
 
 using Base.Dates
 import Compat: parse

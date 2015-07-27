@@ -2,6 +2,8 @@ module TimeZones
 
 using Dates
 
+include("timezones/Olsen.jl")
+
 # Timezones.parse(dt::String,format::String) --> (DateTime,tz::String)
 # Timezones.format(dt,format::String) --> dt::String
 function parse(x::String,format::String;locale#=::String=#="english")
