@@ -22,6 +22,6 @@ function parse(x::String,format::String;locale#=::String=#="english")
 
 end
 
-export TimeZone, FixedTimeZone, VariableTimeZone, Transition
+export TimeZone, FixedTimeZone, VariableTimeZone, Transition, ZonedDateTime
 
 end # module

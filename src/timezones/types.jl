@@ -1,9 +1,9 @@
 
 # import Base.Dates: UTInstant, DateTime, TimeZone, Millisecond
 using Base.Dates
-import Base.Dates: UTInstant, UTM
+import Base.Dates: UTInstant, UTM, Millisecond
 
-# Using type Symbol instead of AbstractString for name since
+# Using type Symbol instead of AbstractString for name since it
 # gets us ==, and hash for free.
 immutable FixedTimeZone <: TimeZone
     name::Symbol
@@ -13,7 +13,7 @@ end
 FixedTimeZone(name::String, offset::Int) = FixedTimeZone(symbol(name), UTM(offset))
 
 immutable Transition
-    utc_datetime::DateTime
+    utc_datetime::DateTime  # Instant where new zone applies
     zone::FixedTimeZone
 end
 
@@ -33,3 +33,9 @@ function VariableTimeZone(name::String, transitions::Vector{Transition})
 end
 
 Base.show(io::IO, tz::VariableTimeZone) = print(io, string(tz.name))
+
+immutable ZonedDateTime <: TimeType
+    utc_datetime::DateTime
+    timezone::TimeZone
+    zone::FixedTimeZone  # The current zone for the utc_datetime.
+end
