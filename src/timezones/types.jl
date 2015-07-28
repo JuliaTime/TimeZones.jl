@@ -1,18 +1,37 @@
 
 # import Base.Dates: UTInstant, DateTime, TimeZone, Millisecond
 using Base.Dates
-
-# Using type Symbol instead of AbstractString for name since it
-# gets us ==, and hash for free.
+import Base.Dates: value
 
 # Note: The Olsen Database rounds offset precision to the nearest second
 # See "America/New_York" notes for an example.
-immutable FixedTimeZone <: TimeZone
+
+abstract FixedTimeZone <: TimeZone
+
+# Using type Symbol instead of AbstractString for name since it
+# gets us ==, and hash for free.
+immutable OffsetTimeZone <: FixedTimeZone
     name::Symbol
     offset::Second
 end
 
-FixedTimeZone(name::String, offset::Int) = FixedTimeZone(symbol(name), Second(offset))
+immutable DaylightSavingTimeZone <: FixedTimeZone
+    name::Symbol
+    utc_offset::Second  # Standard offset from UTC
+    dst_offset::Second  # Addition offset applied to UTC offset
+end
+
+function FixedTimeZone(name::Symbol, utc_offset::Second, dst_offset::Second)
+    if value(dst_offset) == 0
+        OffsetTimeZone(name, utc_offset)
+    else
+        DaylightSavingTimeZone(name, utc_offset, dst_offset)
+    end
+end
+
+function FixedTimeZone(name::String, utc_offset::Int, dst_offset::Int=0)
+    FixedTimeZone(symbol(name), Second(utc_offset), Second(dst_offset))
+end
 
 immutable Transition
     utc_datetime::DateTime  # Instant where new zone applies
@@ -25,6 +44,9 @@ Base.isless(x::Transition,y::Transition) = isless(x.utc_datetime,y.utc_datetime)
 #     return "$(t.utc_datetime), $(t.zone.name), $(t.zone.offset)"
 # end
 
+"""
+A TimeZone that has a variable offset from UTC.
+"""
 immutable VariableTimeZone <: TimeZone
     name::Symbol
     transitions::Vector{Transition}
@@ -67,7 +89,7 @@ function possible_dates(local_dt::DateTime, tz::VariableTimeZone)
 
     n = length(t)
     while i <= n && t[i].utc_datetime < latest
-        utc_dt = local_dt - t[i].zone.offset
+        utc_dt = local_dt - tzoffset(t[i].zone)
 
         if utc_dt >= t[i].utc_datetime && (i == n || utc_dt < t[i + 1].utc_datetime)
             push!(possible, (utc_dt, t[i].zone))
@@ -101,26 +123,6 @@ end
 # TODO: Need to refactor to make this function possible
 # function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
 # end
-
-function Base.string(dt::ZonedDateTime)
-    offset = dt.zone.offset
-
-    v = offset.value
-    h, v = divrem(v, 3600)
-    m, s  = divrem(abs(v), 60)
-
-    hh = @sprintf("%+03i", h)
-    mm = lpad(m, 2, "0")
-    ss = s != 0 ? lpad(s, 2, "0") : ""
-
-    local_dt = dt.utc_datetime + offset
-    return "$local_dt$hh:$mm$(ss)"
-end
-Base.show(io::IO,dt::ZonedDateTime) = print(io,string(dt))
-
-utc_datetime(dt::ZonedDateTime) = dt.utc_datetime
-local_datetime(dt::ZonedDateTime) = dt.utc_datetime + dt.zone.offset
-
 
 type AmbiguousTimeError <: Exception
     dt::DateTime

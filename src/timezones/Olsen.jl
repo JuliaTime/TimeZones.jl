@@ -186,7 +186,8 @@ function zoneparse(zone,lines,rulesets)
 
             tz = FixedTimeZone(
                 abbr,
-                second(offset+save),
+                second(offset),
+                second(save),
             )
             push!(transitions, Transition(y, tz))
 
@@ -241,7 +242,8 @@ function zoneparse(zone,lines,rulesets)
                     # variable.
                     tz = FixedTimeZone(
                         replace(abbr,"%s",r.letter,1),
-                        second(offset + r.save)
+                        second(offset),
+                        second(r.save),
                     )
 
                     # TODO: We can maybe reduce memory usage by reusing the same
