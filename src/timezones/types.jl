@@ -1,16 +1,18 @@
 
 # import Base.Dates: UTInstant, DateTime, TimeZone, Millisecond
 using Base.Dates
-import Base.Dates: UTInstant, UTM, Millisecond
 
 # Using type Symbol instead of AbstractString for name since it
 # gets us ==, and hash for free.
+
+# Note: The Olsen Database rounds offset precision to the nearest second
+# See "America/New_York" notes for an example.
 immutable FixedTimeZone <: TimeZone
     name::Symbol
-    offset::UTInstant{Millisecond}  # Maybe just Second?
+    offset::Second
 end
 
-FixedTimeZone(name::String, offset::Int) = FixedTimeZone(symbol(name), UTM(offset))
+FixedTimeZone(name::String, offset::Int) = FixedTimeZone(symbol(name), Second(offset))
 
 immutable Transition
     utc_datetime::DateTime  # Instant where new zone applies

@@ -22,7 +22,7 @@ function HourMin(s::String)
     return HourMin(parse(Int, ss[1]), parse(Int, ss[2]))
 end
 
-millis(hm::HourMin) = hm.min*60000 + 3600000*hm.hour
+second(hm::HourMin) = hm.hour * 3600 + hm.min * 60
 (+)(x::HourMin,y::HourMin) = HourMin(x.hour+y.hour,x.min+y.min)
 (-)(x::HourMin,y::HourMin) = HourMin(x.hour-y.hour,x.min-y.min)
 (+)(x::DateTime,y::HourMin) = x + Hour(y.hour) + Minute(y.min)
@@ -186,7 +186,7 @@ function zoneparse(zone,lines,rulesets)
 
             tz = FixedTimeZone(
                 abbr,
-                millis(offset+save),
+                second(offset+save),
             )
             push!(transitions, Transition(dt, tz))
 
@@ -241,7 +241,7 @@ function zoneparse(zone,lines,rulesets)
                     # variable.
                     tz = FixedTimeZone(
                         replace(abbr,"%s",r.letter,1),
-                        millis(offset + r.save)
+                        second(offset + r.save)
                     )
 
                     # TODO: We can maybe reduce memory usage by reusing the same
