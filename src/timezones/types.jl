@@ -42,49 +42,65 @@ immutable ZonedDateTime <: TimeType
     zone::FixedTimeZone  # The current zone for the utc_datetime.
 end
 
-# dt is expected to be in localtime
-function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, occurrence::Int=0)
+"""
+Produces a list of possible UTC DateTimes given a local DateTime
+and a timezone. Results are returned in ascending order.
+"""
+function possible_dates(local_dt::DateTime, tz::VariableTimeZone)
+    possible = sizehint!(Tuple{DateTime,FixedTimeZone}[], 2)
+    t = tz.transitions
+
     # Determine the earliest and latest possible UTC DateTime
     # that this local DateTime could be.
     # TODO: Maybe look at the range of offsets available within
     # this TimeZone?
-    earliest = dt - Hour(12)
-    latest = dt + Hour(14)
+    earliest = local_dt - Hour(12)
+    latest = local_dt + Hour(14)
 
+    # Determine the earliest transition the local DateTime could
+    # occur within.
     i = searchsortedlast(
-        tz.transitions, earliest,
+        t, earliest,
         by=v -> typeof(v) == Transition ? v.utc_datetime : v,
     )
+    i = max(i, 1)
 
-    possible = Tuple{DateTime,FixedTimeZone}[]
-
-    t = tz.transitions
     n = length(t)
     while i <= n && t[i].utc_datetime < latest
-        utc_dt = dt - t[i].zone.offset
+        utc_dt = local_dt - t[i].zone.offset
 
-        if t[i].utc_datetime <= utc_dt && (i == n || utc_dt < t[i + 1].utc_datetime)
-            zone = t[i].zone
-            push!(possible, (utc_dt, zone))
+        if utc_dt >= t[i].utc_datetime && (i == n || utc_dt < t[i + 1].utc_datetime)
+            push!(possible, (utc_dt, t[i].zone))
         end
+
         i += 1
     end
+
+    return possible
+end
+
+function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, occurrence::Int=0)
+    possible = possible_dates(local_dt, tz)
 
     num = length(possible)
     if num == 1
         utc_dt, zone = possible[1]
         return ZonedDateTime(utc_dt, tz, zone)
     elseif num == 0
-        throw(NonExistentTimeError(dt, tz))
+        throw(NonExistentTimeError(local_dt, tz))
         # error("Non-existent DateTime")  # NonExistentTimeError
     elseif occurrence > 0
         utc_dt, zone = possible[occurrence]
         return ZonedDateTime(utc_dt, tz, zone)
     else
-        throw(AmbiguousTimeError(dt, tz))
+        throw(AmbiguousTimeError(local_dt, tz))
         # error("Ambiguous DateTime")  # AmbiguousTimeError
     end
 end
+
+# TODO: Need to refactor to make this function possible
+# function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
+# end
 
 function Base.string(dt::ZonedDateTime)
     offset = dt.zone.offset
