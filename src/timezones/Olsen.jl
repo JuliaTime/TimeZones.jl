@@ -188,7 +188,7 @@ function zoneparse(zone,lines,rulesets)
                 abbr,
                 second(offset+save),
             )
-            push!(transitions, Transition(dt, tz))
+            push!(transitions, Transition(y, tz))
 
             y = until
         else
