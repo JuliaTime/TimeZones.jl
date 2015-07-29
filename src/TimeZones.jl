@@ -6,6 +6,6 @@ include("timezones/io.jl")
 include("timezones/Olsen.jl")
 
 export TimeZone, FixedTimeZone, VariableTimeZone, Transition, ZonedDateTime
-export tzoffset
+export AmbiguousTimeError, NonExistentTimeError
 
 end # module

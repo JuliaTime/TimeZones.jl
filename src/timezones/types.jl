@@ -89,7 +89,7 @@ function possible_dates(local_dt::DateTime, tz::VariableTimeZone)
 
     n = length(t)
     while i <= n && t[i].utc_datetime < latest
-        utc_dt = local_dt - tzoffset(t[i].zone)
+        utc_dt = local_dt - total_offset(t[i].zone)
 
         if utc_dt >= t[i].utc_datetime && (i == n || utc_dt < t[i + 1].utc_datetime)
             push!(possible, (utc_dt, t[i].zone))
@@ -121,8 +121,30 @@ function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, occurrence::Int
 end
 
 # TODO: Need to refactor to make this function possible
-# function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
-# end
+function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
+    possible = possible_dates(local_dt, tz)
+
+    num = length(possible)
+    if num == 1
+        utc_dt, zone = possible[1]
+        return ZonedDateTime(utc_dt, tz, zone)
+    elseif num == 0
+        throw(NonExistentTimeError(local_dt, tz))
+        # error("Non-existent DateTime")  # NonExistentTimeError
+    elseif num == 2
+        mask = [dst_offset(zone) > Second(0) for (utc_dt, zone) in possible]
+
+        # Mask is expected to be unambiguous.
+        !($)(mask...) && throw(AmbiguousTimeError(local_dt, tz))
+
+        occurrence = is_dst ? findfirst(mask) : findfirst(!mask)
+        utc_dt, zone = possible[occurrence]
+        return ZonedDateTime(utc_dt, tz, zone)
+    else
+        throw(AmbiguousTimeError(local_dt, tz))
+        # error("Ambiguous DateTime")  # AmbiguousTimeError
+    end
+end
 
 type AmbiguousTimeError <: Exception
     dt::DateTime

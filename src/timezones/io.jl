@@ -1,5 +1,5 @@
 function Base.string(dt::ZonedDateTime)
-    offset = tzoffset(dt.zone)
+    offset = total_offset(dt.zone)
 
     v = offset.value
     h, v = divrem(v, 3600)
@@ -32,3 +32,4 @@ function parse(x::String,format::String;locale#=::String=#="english")
     tz = parsetimezone(x[tz_dt_ind:end])
 
 end
+
