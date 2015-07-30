@@ -277,23 +277,28 @@ function tzparse(tzfile::String)
 
     # For the intial pass we'll collect the zone and rule lines.
     open(tzfile) do fp
-        kind, name = nothing, nothing
+        kind = name = ""
         for line in eachline(fp)
+            # Lines that start with whitespace can be considered a "continuation line"
+            # which means the last found kind/name should persist.
+            persist = ismatch(r"^\s", line)
+
             line = strip(replace(chomp(line), r"#.*$", ""))
             length(line) > 0 || continue
             line = replace(line, r"\s+", " ")
 
-            # Remove type and name from the line if they exist otherwise persist
-            # the last occurence.
-            parts = split(line, ' '; limit=3)
-            if parts[1] in ("Rule", "Zone")
-                kind, name, line = parts
+            if !persist
+                kind, name, line = split(line, ' '; limit=3)
             end
 
             if kind == "Rule"
                 rulelines[name] = push!(get(rulelines, name, String[]), line)
             elseif kind == "Zone"
                 zonelines[name] = push!(get(zonelines, name, String[]), line)
+            elseif kind == "Link"
+                # TODO: Handle Links
+            else
+                warn("Unhandled line found with type: $kind")
             end
         end
     end
