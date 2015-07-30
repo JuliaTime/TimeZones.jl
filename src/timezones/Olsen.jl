@@ -6,52 +6,48 @@ import Compat: parse
 import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
 
 # Convenience type for working with HH:MM
-immutable HourMin
+immutable Time
     hour::Int
-    min::Int
+    minute::Int
+    second::Int
+
+    Time(hour::Int=0, minute::Int=0, second::Int=0) = new(hour, minute, second)
 end
+const ZERO = Time(0,0,0)
 
-const ZERO = HourMin(0,0)
-
-function HourMin(s::String)
+function Time(s::String)
     # "-" represents 0:00 for some DST rules
-    ismatch(r"\d",s) || return ZERO
-    # handle single number as # of hours
-    length(s) == 1 && return HourMin(parse(Int, s), 0)
-    ss = split(s, ':')
-    return HourMin(parse(Int, ss[1]), parse(Int, ss[2]))
+    s == "-" && return ZERO
+    return Time(map(n -> parse(Int, n), split(s, ':'))...)
 end
 
-second(hm::HourMin) = hm.hour * 3600 + hm.min * 60
-(+)(x::HourMin,y::HourMin) = HourMin(x.hour+y.hour,x.min+y.min)
-(-)(x::HourMin,y::HourMin) = HourMin(x.hour-y.hour,x.min-y.min)
-(+)(x::DateTime,y::HourMin) = x + Hour(y.hour) + Minute(y.min)
-(-)(x::DateTime,y::HourMin) = x - Hour(y.hour) - Minute(y.min)
+second(t::Time) = t.hour * 3600 + t.minute * 60 + t.second
+(+)(x::Time,y::Time) = Time(x.hour + y.hour, x.minute + y.minute, x.second + y.second)
+(-)(x::Time,y::Time) = Time(x.hour - y.hour, x.minute - y.minute, x.second - y.second)
+(+)(x::DateTime,y::Time) = x + Hour(y.hour) + Minute(y.minute) + Second(y.second)
+(-)(x::DateTime,y::Time) = x - Hour(y.hour) - Minute(y.minute) - Second(y.second)
 
 # Zone type maps to an Olsen Timezone database entity
 type Zone
-    name::String        # of the form "America/Chicago", etc.
-    gmtoffset::HourMin  # Default offset: most recent is used as default
-    abbr::String        # Default abbreviation: Most recent "Standard" abbr is used
-    dst::Array{Any,2}   # nx3 matrix [DST_Millisecond_Instant offset abbr]
+    gmtoffset::Time
+    save::Time
+    rules::String
+    format::String
+    until::Nullable{DateTime}
+    until_flag::Int
 end
+
 # Rules govern how Daylight Savings transitions happen for a given timezone
 type Rule
-    from::Int       # First year rule applies
-    to::Int         # Rule applies up until, but not including this year
-    month::Int      # Month in which DST transition happens
-    on::Function    # Anonymous boolean function to determine day
-    at::HourMin     # Hour and minute at which the transition happens
-    at_flag::Int    # 0, 1, 2 = Local wall time, UTC time, Local Standard time
-    save::HourMin   # How much time is "saved" in daylight savings transition
-    letter::String  # Timezone abbreviation letter change; i.e CST => CDT
+    from::Nullable{Int}  # First year rule applies
+    to::Nullable{Int}    # Rule applies up until, but not including this year
+    month::Int           # Month in which DST transition happens
+    on::Function         # Anonymous boolean function to determine day
+    at::Time             # Hour and minute at which the transition happens
+    at_flag::Int         # 0, 1, 2 = Local wall time ('w' or blank), UTC time ('u'), Local Standard time ('s')
+    save::Time           # How much time is "saved" in daylight savings transition
+    letter::String       # Timezone abbreviation letter change; i.e CST => CDT
 end
-# Rules are collected in RuleSets
-type RuleSet
-    name::String
-    rules::Vector{Rule}
-end
-RuleSet(n::String) = RuleSet(n,Rule[])
 
 # Max date that we create DST transition instants for
 const MINDATE = DateTime(1917,1,1)
@@ -74,31 +70,43 @@ for (abbr, dayofweek) in DAYS
     )
 end
 
+
+function parseflag(s::String)
+    if s == "" || s == "w"
+        return 0
+    elseif s == "u"
+        return 1
+    elseif s == "s"
+        return 2
+    else
+        error("Unhanbled flag $s")
+    end
+end
+
 # Olsen timezone dates can be a single year (1900), yyyy-mm-dd (1900-Jan-01),
 # or minute-precision (1900-Jan-01 2:00).
 # They can also be given in Local Wall Time, UTC time (u), or Local Standard time (s)
-function parsedate(s,offset,save)
-    periods = split(s, ' ')
-    s,letter = length(periods) > 3 ? isalpha(s[end]) ? (s[1:end-1],s[end]) : (s,' ') : (s,' ')
+function parsedate(s::String)
+    s = replace(s, r"\s+", " ")
+    num_periods = length(split(s, " "))
+    s, letter = num_periods > 3 && isalpha(s[end]) ? (s[1:end-1], s[end:end]) : (s, "")
     if contains(s,"lastSun")
-        dt = DateTime(replace(s, "lastSun", "1", 1), "yyyy uuu d H:MM")
+        dt = DateTime(replace(s, "lastSun", "1", 1), "yyyy uuu d H:MM:SS")
         dt = tonext(lastSun, dt; same=true)
     elseif contains(s,"lastSat")
-        dt = DateTime(replace(s, "lastSat", "1", 1), "yyyy uuu d H:MM")
+        dt = DateTime(replace(s, "lastSat", "1", 1), "yyyy uuu d H:MM:SS")
         dt = tonext(lastSat, dt; same=true)
     elseif contains(s,"Sun>=1")
-        dt = DateTime(replace(s,"Sun>=", "", 1),"yyyy uuu d H:MM")
+        dt = DateTime(replace(s,"Sun>=", "", 1),"yyyy uuu d H:MM:SS")
         dt = tonext(d -> dayofweek(d) == Sun, dt; same=true)
     else
-        f = join(split("yyyy uuu dd HH:MM", ' ')[1:length(periods)], ' ')
-        periods = Dates.parse(s, Dates.DateFormat(f))
+        format = join(split("yyyy uuu dd HH:MM:SS", " ")[1:num_periods], ' ')
+        periods = Dates.parse(s, DateFormat(format))
 
         # Deal with zone "Pacific/Apia" which has a 24:00 datetime.
-        if length(periods) > 3
-            if periods[4] == Hour(24)
-                periods[4] = Hour(0)
-                periods[3] += Day(1)
-            end
+        if length(periods) > 3 && periods[4] == Hour(24)
+            periods[4] = Hour(0)
+            periods[3] += Day(1)
         end
         dt = DateTime(periods...)
     end
@@ -106,82 +114,105 @@ function parsedate(s,offset,save)
     # TODO: I feel like there are issues here.
     # If the time is UTC, we add back the offset and any saved amount
     # If it's local standard time, we just need to add any saved amount
-    return letter == 's' ? (dt - save) : (dt - offset - save)
+    # return letter == 's' ? (dt - save) : (dt - offset - save)
+
+    return dt, parseflag(letter)
 end
 
-# Takes a string array of Rule lines and parses a RuleSet
-function rulesetparse(rule,lines)
-    ruleset = RuleSet(rule)
-    # And away we go...
-    for line in lines
-        spl = split(line,' ')
-        # Get the month. Easy.
-        month = MONTHS[spl[4]]
-        # Now we need to get the right anonymous function
-        # for determining the right day for transitioning
-        if ismatch(r"last\w\w\w",spl[5])
-            # We pre-built these functions above
-            # They follow the format: "lastSun", "lastMon".
-            on = eval(symbol(spl[5]))
-        elseif ismatch(r"\w\w\w[<>]=\d\d?",spl[5])
-            # The first day of the week that occurs before or after a given day of month.
-            # i.e. Sun>=8 refers to the Sunday after the 8th of the month
-            # or in other words, the 2nd Sunday.
-            dow = DAYS[match(r"\w\w\w",spl[5]).match]
-            dom = parse(Int, match(r"\d\d?",spl[5]).match)
-            if ismatch(r"<=",spl[5])
-                on = @eval (dt -> day(dt) <= $dom && dayofweek(dt) == $dow)
-            else
-                on = @eval (dt -> day(dt) >= $dom && dayofweek(dt) == $dow)
-            end
-        elseif ismatch(r"\d\d?",spl[5])
-            # Matches just a plain old day of the month
-            zday = parse(Int, spl[5])
-            on = @eval (x->day(x) == $zday)
+
+function ruleparse(from, to, rule_type, month, on, at, save, letter)
+    from_int = Nullable{Int}(from == "min" ? nothing : parse(Int, from))
+    to_int = Nullable{Int}(to == "only" ? from_int : to == "max" ? nothing : parse(Int, to))
+    month_int = MONTHS[month]
+
+    # Now we need to get the right anonymous function
+    # for determining the right day for transitioning
+    if ismatch(r"last\w\w\w", on)
+        # We pre-built these functions above
+        # They follow the format: "lastSun", "lastMon".
+        on_func = eval(symbol(on))
+    elseif ismatch(r"\w\w\w[<>]=\d\d?", on)
+        # The first day of the week that occurs before or after a given day of month.
+        # i.e. Sun>=8 refers to the Sunday after the 8th of the month
+        # or in other words, the 2nd Sunday.
+        dow = DAYS[match(r"\w\w\w", on).match]
+        dom = parse(Int, match(r"\d\d?", on).match)
+        if ismatch(r"<=", on)
+            on_func = @eval (dt -> day(dt) <= $dom && dayofweek(dt) == $dow)
         else
-            error("Can't parse day of month for DST change")
+            on_func = @eval (dt -> day(dt) >= $dom && dayofweek(dt) == $dow)
         end
-        # Now we get the time of the transition
-        c = spl[6][end]
-        at = isalpha(c) ? HourMin(spl[6][1:end-1]) : HourMin(spl[6])
-        # 0 for Local Wall time, 1 for UTC, 2 for Local Standard time
-        at_flag = c == 'u' ? 1 : c == 's' ? 2 : 0
-        save = HourMin(spl[7])
-        letter = spl[8] == "-" ? "" : spl[8]
-        from = spl[1] == "min" ? year(MINDATE) : parse(Int, spl[1])
-        to = spl[2] == "only" ? from : spl[2] == "max" ? year(MAXDATE) : parse(Int, spl[2])
-        # Now we've finally parsed everything we need
-        push!(ruleset.rules,Rule(from,to,month,on,at,at_flag,save,letter))
+    elseif ismatch(r"\d\d?", on)
+        # Matches just a plain old day of the month
+        dom = parse(Int, on)
+        on_func = @eval (dt -> day(dt) == $dom)
+    else
+        error("Can't parse day of month for DST change")
     end
-    return ruleset
+    # Now we get the time of the transition
+    c = at[end:end]
+    at_hm = Time(isalpha(c) ? at[1:end-1] : at)
+    at_flag = parseflag(isalpha(c) ? c : "")
+    save_hm = Time(save)
+    letter = letter == "-" ? "" : letter
+
+    # Now we've finally parsed everything we need
+    return Rule(
+        from_int,
+        to_int,
+        month_int,
+        on_func,
+        at_hm,
+        at_flag,
+        save_hm,
+        letter,
+    )
 end
 
-# Takes string array, and Dict{RuleSet.name=>RuleSet} for Zone parsing
-function zoneparse(zone,lines,rulesets)
+function zoneparse(gmtoff, rules, format, until="")
+    # Get our offset and abbreviation string for this period
+    offset = Time(gmtoff)
+    format = format == "zzz" ? "" : format
+
+    # Parse the date the line rule applies up to
+    until_tuple = until == "" ? (nothing, 0) : parsedate(until)
+    until_dt, until_flag = Nullable{DateTime}(until_tuple[1]), until_tuple[2]
+
+    if rules == "-" || ismatch(r"\d",rules)
+        save = Time(rules)
+        rules = ""
+    else
+        save = ZERO
+    end
+
+    return Zone(
+        offset,
+        save,
+        rules,
+        format,
+        until_dt,
+        until_flag,
+    )
+end
+
+
+function resolve(zone_name, zonesets, rulesets)
     # zones = Set{FixedTimeZone}()
     transitions = Transition[]
 
     # Set some default values and starting DateTime increment and away we go...
-    y = MINDATE
+    y = get(zonesets[zone_name][1].until)  # MINDATE
     default_letter = "S"
     save = ZERO
     offset = ZERO
-    abbr = ""
-    for line in lines
-        spl = split(line, ' '; limit=4)
 
-        # Sometimes there are "LMT" lines which we don't care about
-        length(split(spl[1],':')) > 2 && continue #TODO: this may be too aggressive
+    for zone in zonesets[zone_name]
+        offset = zone.gmtoffset
+        abbr = zone.format
+        until = get(zone.until, MAXDATE)
 
-        # Get our offset and abbreviation string for this period
-        offset = HourMin(spl[1])
-        abbr = spl[3] == "zzz" ? "" : spl[3]
-        # Parse the date the line rule applies up to
-        # If it's blank, then we're at the last line, so go to MAXDATE
-        until = (length(spl) < 4 || spl[4] == "") ? MAXDATE : parsedate(spl[4],offset,save)
-
-        if spl[2] == "-" || ismatch(r"\d",spl[2])
-            save = HourMin(spl[2])
+        if zone.rules == ""
+            save = zone.save
             y = y - offset - save
 
             tz = FixedTimeZone(
@@ -193,15 +224,19 @@ function zoneparse(zone,lines,rulesets)
 
             y = until
         else
+
             # Get the Rule that applies for this period
-            ruleset = rulesets[spl[2]]
+            ruleset = rulesets[zone.rules]
             # Now we iterate thru the years until we reach UNTIL
             while y < until
                 # We need to check all Rules to see if they apply
                 # for the given year
-                for r in ruleset.rules
+                for r in ruleset
                     # If the Rule is out of range, skip it
-                    r.from <= year(y) <= r.to || continue
+                    # r.from <= year(y) <= r.to || continue
+
+                    !isnull(r.from) && year(y) >= get(r.from) || continue
+                    !isnull(r.to) && year(y) <= get(r.to) || continue
 
                     # Now we need to deterimine the transition day
                     # We start at the Rule month, hour, minute
@@ -213,24 +248,13 @@ function zoneparse(zone,lines,rulesets)
                         h = 0
                         d += 1
                     end
-                    dt = DateTime(year(y),r.month,d,h,r.at.min)
-                    # TODO: Alternatively this code could be rewritten as:
-                    # try
-                    #     dt = tonext(r.on, dt; limit=1000)
-                    # catch e
-                    #     if isa(e, ArgumentError)
-                    #         @show zone, DateTime(year(y),r.month,1,r.at.hour,r.at.min)
-                    #         error("throwy")
-                    #     end
-                    # end
-                    ff = 1
-                    while true
-                        (r.on(dt) || ff == 1000) && break
-                        ff += 1; dt += Day(1)
-                    end
-                    if ff == 1000
-                        @show zone, DateTime(year(y),r.month,1,r.at.hour,r.at.min)
-                        error("throwy")
+                    dt = DateTime(year(y),r.month,d,h,r.at.minute)
+                    try
+                        dt = tonext(r.on, dt; limit=1000)
+                    catch e
+                        if isa(e, ArgumentError)
+                            error("Unable to find matching day for $zone_name $dt")
+                        end
                     end
                     # If our time was given in UTC, add back offset and save
                     # if local standard time, add back any saved amount
@@ -265,15 +289,13 @@ function zoneparse(zone,lines,rulesets)
         end
         until == MAXDATE && break
     end
-    abbr = replace(abbr,r"%\w",default_letter,1)
     sort!(transitions)
-
-    return VariableTimeZone(zone, transitions)
+    return VariableTimeZone(zone_name, transitions)
 end
 
 function tzparse(tzfile::String)
-    rulelines = Dict{String,Array{String}}()
-    zonelines = Dict{String,Array{String}}()
+    rules = Dict{String,Array{Rule}}()
+    zones = Dict{String,Array{Zone}}()
 
     # For the intial pass we'll collect the zone and rule lines.
     open(tzfile) do fp
@@ -292,9 +314,11 @@ function tzparse(tzfile::String)
             end
 
             if kind == "Rule"
-                rulelines[name] = push!(get(rulelines, name, String[]), line)
+                rule = ruleparse(split(line, ' ')...)
+                rules[name] = push!(get(rules, name, Rule[]), rule)
             elseif kind == "Zone"
-                zonelines[name] = push!(get(zonelines, name, String[]), line)
+                zone = zoneparse(split(line, ' '; limit=4)...)
+                zones[name] = push!(get(zones, name, Zone[]), zone)
             elseif kind == "Link"
                 # TODO: Handle Links
             else
@@ -303,18 +327,7 @@ function tzparse(tzfile::String)
         end
     end
 
-    # Rule pass
-    rulesets = Dict{String,RuleSet}() # RuleSet.name=>RuleSet for easy lookup
-    for (rule,lines) in rulelines
-        rulesets[rule] = rulesetparse(rule,lines)
-    end
-
-    # Zone pass
-    zones = Dict{String,TimeZone}()
-    for (zone,lines) in zonelines
-        zones[zone] = zoneparse(zone,lines,rulesets)
-    end
-    return zones, rulesets
+    return zones, rules
 end
 
 function zone_symbol(z::Zone)
