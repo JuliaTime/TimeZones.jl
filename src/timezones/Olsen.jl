@@ -10,8 +10,12 @@ immutable Time
     hour::Int
     minute::Int
     second::Int
+    sign::Int
 
-    Time(hour::Int=0, minute::Int=0, second::Int=0) = new(hour, minute, second)
+    function Time(hour::Int=0, minute::Int=0, second::Int=0)
+        (minute < 0 || second < 0) && error("Only hour can be negative")
+        new(abs(hour), minute, second, signbit(hour) ? -1 : 1)
+    end
 end
 const ZERO = Time(0,0,0)
 
@@ -21,11 +25,21 @@ function Time(s::String)
     return Time(map(n -> parse(Int, n), split(s, ':'))...)
 end
 
-second(t::Time) = t.hour * 3600 + t.minute * 60 + t.second
-(+)(x::Time,y::Time) = Time(x.hour + y.hour, x.minute + y.minute, x.second + y.second)
-(-)(x::Time,y::Time) = Time(x.hour - y.hour, x.minute - y.minute, x.second - y.second)
-(+)(x::DateTime,y::Time) = x + Hour(y.hour) + Minute(y.minute) + Second(y.second)
-(-)(x::DateTime,y::Time) = x - Hour(y.hour) - Minute(y.minute) - Second(y.second)
+function Time(seconds::Int)
+    h, r = divrem(seconds, 3600)
+    m, s = divrem(abs(r), 60)
+    Time(h, m, s)
+end
+
+# https://en.wikipedia.org/wiki/ISO_8601#Times
+# @show Time -HH:MM:SS
+
+second(t::Time) = t.sign * (t.hour * 3600 + t.minute * 60 + t.second)
+period(t::Time) = Hour(t.hour * t.sign) + Minute(t.minute * t.sign) + Second(t.second * t.sign)
+(+)(x::Time,y::Time) = Time(second(x) + second(y))
+(-)(x::Time,y::Time) = Time(second(x) - second(y))
+(+)(x::DateTime,y::Time) = x + period(y)
+(-)(x::DateTime,y::Time) = x - period(y)
 
 # Zone type maps to an Olsen Timezone database entity
 type Zone
