@@ -278,13 +278,9 @@ function resolve(zone_name, zonesets, rulesets)
                     # We start at the Rule month, hour, minute
                     # And apply our boolean "on" function until we
                     # arrive at the right transition instant
-                    h = hour(r.at)
-                    d = 1
-                    if h == 24
-                        h = 0
-                        d += 1
-                    end
-                    dt = DateTime(year(y),r.month,d,h,minute(r.at))
+
+                    # Add at since it could be larger than 23:59:59.
+                    dt = DateTime(year(y),r.month) + r.at
                     try
                         dt = tonext(r.on, dt; limit=1000)
                     catch e
