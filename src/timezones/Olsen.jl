@@ -237,30 +237,40 @@ function resolve(zone_name, zonesets, rulesets)
     transitions = Transition[]
 
     # Set some default values and starting DateTime increment and away we go...
-    y = get(zonesets[zone_name][1].until)  # MINDATE
-    default_letter = "S"
+    # y = get(zonesets[zone_name][1].until)  # MINDATE
+    y = DateTime(1800,1,1)
     save = ZERO
     offset = ZERO
+    letter = Nullable{String}()
 
     for zone in zonesets[zone_name]
         offset = zone.gmtoffset
-        abbr = zone.format
+        format = zone.format
         until = get(zone.until, MAXDATE)
 
+        if isnull(letter) && zone.rules != ""
+            for rule in rulesets[zone.rules]
+                if rule.save == ZERO
+                    letter = Nullable{String}(rule.letter)
+                    break
+                end
+            end
+        end
+
+        # @show y, until, format, letter, zone.rules
+
+        # save = zone.save
+
+        tz = FixedTimeZone(
+            replace(format,"%s",get(letter,""),1),
+            as_seconds(offset),
+            as_seconds(save),
+        )
+        push!(transitions, Transition(y, tz))
+
         if zone.rules == ""
-            save = zone.save
-            y = y - offset - save
-
-            tz = FixedTimeZone(
-                abbr,
-                as_seconds(offset),
-                as_seconds(save),
-            )
-            push!(transitions, Transition(y, tz))
-
-            y = until
+            y = until - offset - save
         else
-
             # Get the Rule that applies for this period
             ruleset = rulesets[zone.rules]
             # Now we iterate thru the years until we reach UNTIL
@@ -271,8 +281,8 @@ function resolve(zone_name, zonesets, rulesets)
                     # If the Rule is out of range, skip it
                     # r.from <= year(y) <= r.to || continue
 
-                    !isnull(r.from) && year(y) >= get(r.from) || continue
-                    !isnull(r.to) && year(y) <= get(r.to) || continue
+                    (isnull(r.from) || year(y) >= get(r.from)) || continue
+                    (isnull(r.to) || year(y) <= get(r.to)) || continue
 
                     # Now we need to deterimine the transition day
                     # We start at the Rule month, hour, minute
@@ -282,22 +292,30 @@ function resolve(zone_name, zonesets, rulesets)
                     # Add at since it could be larger than 23:59:59.
                     dt = DateTime(year(y),r.month) + r.at
                     try
-                        dt = tonext(r.on, dt; limit=1000)
+                        dt = tonext(r.on, dt; same=true, limit=1000)
                     catch e
                         if isa(e, ArgumentError)
                             error("Unable to find matching day for $zone_name $dt")
                         end
                     end
+
+                    # 0, 1, 2 = Local wall time ('w' or blank), UTC time ('u'), Local Standard time ('s')
+
                     # If our time was given in UTC, add back offset and save
                     # if local standard time, add back any saved amount
                     dt = r.at_flag == 1 ? dt :
-                         r.at_flag == 0 ? dt - offset - save : dt - r.save
+                         r.at_flag == 0 ? dt - offset - save : dt - offset
 
+                    # if year(y) < 1930
+                    #     @show year(y), r.month, r.at, dt
+                    # end
+
+                    letter = Nullable{String}(r.letter)
 
                     # Using @sprintf would be best but it doesn't accept a format as a
                     # variable.
                     tz = FixedTimeZone(
-                        replace(abbr,"%s",r.letter,1),
+                        replace(format,"%s",get(letter,""),1),
                         as_seconds(offset),
                         as_seconds(r.save),
                     )
@@ -314,7 +332,6 @@ function resolve(zone_name, zonesets, rulesets)
                     push!(transitions, Transition(dt, tz))
 
                     save = r.save != ZERO ? r.save : ZERO
-                    r.save == ZERO && (default_letter = r.letter)
                 end
                 y += Year(1)
             end
