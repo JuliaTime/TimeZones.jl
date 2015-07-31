@@ -7,39 +7,61 @@ import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
 
 # Convenience type for working with HH:MM
 immutable Time
-    hour::Int
-    minute::Int
-    second::Int
-    sign::Int
-
-    function Time(hour::Int=0, minute::Int=0, second::Int=0)
-        (minute < 0 || second < 0) && error("Only hour can be negative")
-        new(abs(hour), minute, second, signbit(hour) ? -1 : 1)
-    end
+    seconds::Int
 end
-const ZERO = Time(0,0,0)
+const ZERO = Time(0)
+
+function Time(hour::Int, minute::Int, second::Int)
+    Time(hour * 3600 + minute * 60 + second)
+end
 
 function Time(s::String)
     # "-" represents 0:00 for some DST rules
     s == "-" && return ZERO
-    return Time(map(n -> parse(Int, n), split(s, ':'))...)
+    parsed = map(n -> parse(Int, n), split(s, ':'))
+
+    # Only can handle up to hour, minute, second.
+    length(parsed) > 3 && error("Invalid Time string")
+    any(parsed[2:end] .< 0) && error("Invalid Time string")
+
+    # Handle variations where minutes and seconds may be excluded.
+    values = [0,0,0]
+    values[1:length(parsed)] = parsed
+
+    if values[1] < 0
+        for i in 2:length(values)
+            values[i] = -values[i]
+        end
+    end
+
+    return Time(values...)
 end
 
-function Time(seconds::Int)
-    h, r = divrem(seconds, 3600)
-    m, s = divrem(abs(r), 60)
-    Time(h, m, s)
+hour(t::Time) = div(t.seconds, 3600)
+minute(t::Time) = rem(div(t.seconds, 60), 60)
+second(t::Time) = rem(t.seconds, 60)
+
+function hourminutesecond(t::Time)
+    h, r = divrem(t.seconds, 3600)
+    m, s = divrem(r, 60)
+    return h, m, s
 end
+
+as_seconds(t::Time) = t.seconds
+(+)(x::Time,y::Time) = Time(as_seconds(x) + as_seconds(y))
+(-)(x::Time,y::Time) = Time(as_seconds(x) - as_seconds(y))
+(+)(x::DateTime,y::Time) = x + Second(as_seconds(y))
+(-)(x::DateTime,y::Time) = x - Second(as_seconds(y))
 
 # https://en.wikipedia.org/wiki/ISO_8601#Times
-# @show Time -HH:MM:SS
+function Base.string(t::Time)
+    neg = as_seconds(t) < 0 ? "-" : ""
+    h, m, s = map(abs, hourminutesecond(t))
+    @sprintf("%s%02d:%02d:%02d", neg, h, m, s)
+end
 
-second(t::Time) = t.sign * (t.hour * 3600 + t.minute * 60 + t.second)
-period(t::Time) = Hour(t.hour * t.sign) + Minute(t.minute * t.sign) + Second(t.second * t.sign)
-(+)(x::Time,y::Time) = Time(second(x) + second(y))
-(-)(x::Time,y::Time) = Time(second(x) - second(y))
-(+)(x::DateTime,y::Time) = x + period(y)
-(-)(x::DateTime,y::Time) = x - period(y)
+Base.show(io::IO, t::Time) = print(io, string(t))
+
 
 # Zone type maps to an Olsen Timezone database entity
 type Zone
@@ -231,8 +253,8 @@ function resolve(zone_name, zonesets, rulesets)
 
             tz = FixedTimeZone(
                 abbr,
-                second(offset),
-                second(save),
+                as_seconds(offset),
+                as_seconds(save),
             )
             push!(transitions, Transition(y, tz))
 
@@ -256,13 +278,13 @@ function resolve(zone_name, zonesets, rulesets)
                     # We start at the Rule month, hour, minute
                     # And apply our boolean "on" function until we
                     # arrive at the right transition instant
-                    h = r.at.hour
+                    h = hour(r.at)
                     d = 1
                     if h == 24
                         h = 0
                         d += 1
                     end
-                    dt = DateTime(year(y),r.month,d,h,r.at.minute)
+                    dt = DateTime(year(y),r.month,d,h,minute(r.at))
                     try
                         dt = tonext(r.on, dt; limit=1000)
                     catch e
@@ -280,8 +302,8 @@ function resolve(zone_name, zonesets, rulesets)
                     # variable.
                     tz = FixedTimeZone(
                         replace(abbr,"%s",r.letter,1),
-                        second(offset),
-                        second(r.save),
+                        as_seconds(offset),
+                        as_seconds(r.save),
                     )
 
                     # TODO: We can maybe reduce memory usage by reusing the same
