@@ -48,9 +48,11 @@ zone["EEST"] = TimeZones.DaylightSavingTimeZone("EEST", 7200, 3600)
 @test warsaw.transitions[12] == Transition(DateTime(1922,5,31,22,0), zone["CET"])
 @test warsaw.transitions[13] == Transition(DateTime(1940,6,23,1,0), zone["CEST"])
 
-
-
-
+@test warsaw.transitions[14] == Transition(DateTime(1942, 11, 2, 1, 0), zone["CET"])
+@test warsaw.transitions[15] == Transition(DateTime(1943, 3, 29, 1, 0), zone["CEST"])
+@test warsaw.transitions[16] == Transition(DateTime(1943, 10, 4, 1, 0), zone["CET"])
+@test warsaw.transitions[17] == Transition(DateTime(1944, 4, 3, 1, 0), zone["CEST"]) #
+@test warsaw.transitions[18] == Transition(DateTime(1944, 9, 30, 22, 0), zone["CEST"]) #
 
 
 # import Base.Dates: year

@@ -22,11 +22,12 @@ immutable DaylightSavingTimeZone <: FixedTimeZone
 end
 
 function FixedTimeZone(name::Symbol, utc_offset::Second, dst_offset::Second)
-    if value(dst_offset) == 0
-        OffsetTimeZone(name, utc_offset)
-    else
-        DaylightSavingTimeZone(name, utc_offset, dst_offset)
-    end
+    # if value(dst_offset) == 0
+    #     OffsetTimeZone(name, utc_offset)
+    # else
+    #     DaylightSavingTimeZone(name, utc_offset, dst_offset)
+    # end
+    DaylightSavingTimeZone(name, utc_offset, dst_offset)
 end
 
 function FixedTimeZone(name::String, utc_offset::Int, dst_offset::Int=0)
