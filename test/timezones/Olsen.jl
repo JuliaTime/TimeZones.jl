@@ -26,7 +26,7 @@ t = Time(1,-23,-45)
 @test as_seconds(t) == 2175
 
 # Time String constructor
-@test Time("1") == Time(1,0,0)
+@test Time("1") == Time(1,0,0)  # See Pacific/Apia rules for an example.
 @test Time("1:23") == Time(1,23,0)
 @test Time("1:23:45") == Time(1,23,45)
 @test Time("-1") == Time(-1,0,0)
@@ -91,3 +91,5 @@ t = Time(1,-23,-45)
 
 # Actual until date found in Zone "Pacific/Apia"
 @test parsedate("2011 Dec 29 24:00") == (DateTime(2011,12,30), 0)
+
+

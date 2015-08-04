@@ -158,6 +158,18 @@ function parsedate(s::String)
     return dt, parseflag(letter)
 end
 
+function asutc(dt::DateTime, flag::Int, offset::Time, save::Time)
+    if flag == 1
+        # In UTC
+        return dt
+    elseif flag == 0
+        # In local wall time, add back offset and saved amount
+        return dt - offset - save
+    else
+        # In local standard time, add back any saved amount
+        return dt - offset
+    end
+end
 
 function ruleparse(from, to, rule_type, month, on, at, save, letter)
     from_int = Nullable{Int}(from == "min" ? nothing : parse(Int, from))
@@ -259,7 +271,6 @@ function order_rules(rules::Array{Rule})
     for rule in rules
         # Replicate the rule for each year that it is effective.
         for rule_year in get(rule.from, MINYEAR):get(rule.to, MAXYEAR)
-
             # Determine the rule transition day by starting at the
             # beginning of the month and applying our "on" function
             # until we reach the correct day.
@@ -314,13 +325,24 @@ function resolve(zone_name, zonesets, rulesets)
         rule_name = zone.rules
         until = get(zone.until, MAXDATETIME)
 
-        if rule_name != ""
+        if rule_name == ""
+            save = zone.save
+            abbr = format
+
+            println("Zone Start $rule_name, $(zone.gmtoffset), $save, $start_utc 1, $until $(zone.until_flag), $abbr")
+
+            tz = FixedTimeZone(
+                abbr,
+                as_seconds(offset),
+                as_seconds(save),
+            )
+            push!(transitions, Transition(start_utc, tz))
+        else
             if !haskey(ordered_rules, rule_name)
                 ordered_rules[rule_name] = order_rules(rulesets[rule_name])
             end
 
             rules = ordered_rules[rule_name]
-
             index = searchsortedlast(rules, start_utc, by=el -> isa(el, Tuple) ? el[1] : el)
 
             if index == 0
@@ -332,59 +354,55 @@ function resolve(zone_name, zonesets, rulesets)
                         break
                     end
                 end
-                index = 1
             else
                 date, rule = rules[index]
                 save = rule.save
                 letter = rule.letter
             end
-        else
-            save = zone.save
-            letter = ""
-        end
 
-        abbr = replace(format,"%s",letter,1)
-        println("Zone Start $rule_name, $(zone.gmtoffset), $(zone.save), $start_utc 1, $until $(zone.until_flag), $abbr")
+            abbr = replace(format,"%s",letter,1)
 
-        tz = FixedTimeZone(
-            abbr,
-            as_seconds(offset),
-            as_seconds(save),
-        )
-        push!(transitions, Transition(start_utc, tz))
+            println("Zone Start $rule_name, $(zone.gmtoffset), $save, $start_utc 1, $until $(zone.until_flag), $abbr")
 
-        if zone.rules != ""
-            # Get the Rule that applies for this period
-            ruleset = rulesets[zone.rules]
-            # Now we iterate thru the years until we reach UNTIL
+            tz = FixedTimeZone(
+                abbr,
+                as_seconds(offset),
+                as_seconds(save),
+            )
+            push!(transitions, Transition(start_utc, tz))
 
-            # Iterate by months since rules could be out of order:
-            # Rule    Poland  1918    1919    -   Sep 16  2:00s   0   -
-            # Rule    Poland  1919    only    -   Apr 15  2:00s   1:00    S
-
-            for (date, rule) in rules[index:end]
+            for (date, rule) in rules[max(index,1):end]
+                # TODO: Problematic if rule date close to until and offset is a large positive.
                 date > until && break
 
                 # Add "at" since it could be larger than 23:59:59.
                 dt = DateTime(date) + rule.at
 
-                # If our time was given in UTC, add back offset and save
-                # if local standard time, add back any saved amount
-                dt_utc = rule.at_flag == 1 ? dt :
-                         rule.at_flag == 0 ? dt - offset - save : dt - offset
+                # Convert rule and until datetimes into UTC using the latest
+                # offset and save values that occurred prior to this rule.
+                dt_utc = asutc(dt, rule.at_flag, offset, save)
+                until_utc = asutc(until, zone.until_flag, offset, save)
 
-                until_utc = zone.until_flag == 1 ? until :
-                            zone.until_flag == 0 ? until - offset - save : until - offset
-
-                # TODO: Still continue?
-                start_utc <= dt_utc < until_utc || continue
+                dt_utc < until_utc || break
 
                 save = rule.save
                 letter = rule.letter
+
+                # TMP
                 abbr = replace(format,"%s",letter,1)
+                if start_utc <= dt_utc
+                    println("Rule $(year(date)), $dt $(rule.at_flag), $dt_utc 1, $save, $abbr")
+                else
+                    println("Skip $(year(date)), $dt $(rule.at_flag), $dt_utc 1, $save, $abbr")
+                end
+
+                # TODO: Is start_utc exclusive or inclusive?
+                start_utc <= dt_utc || continue
 
                 # Using @sprintf would be best but it doesn't accept a format as a
                 # variable.
+                abbr = replace(format,"%s",letter,1)
+
                 tz = FixedTimeZone(
                     abbr,
                     as_seconds(offset),
@@ -402,15 +420,13 @@ function resolve(zone_name, zonesets, rulesets)
 
                 push!(transitions, Transition(dt_utc, tz))
 
-                println("Rule $(year(date)), $dt $(rule.at_flag), $dt_utc 1, $save, $abbr")
+                # println("Rule $(year(date)), $dt $(rule.at_flag), $dt_utc 1, $save, $abbr")
             end
         end
 
-        until_utc = zone.until_flag == 1 ? until :
-                    zone.until_flag == 0 ? until - offset - save : until - offset
-        start_utc = until_utc
+        start_utc = asutc(until, zone.until_flag, offset, save)
 
-        println("Zone End   $rule_name, $offset, $save, $until_utc 1")
+        println("Zone End   $rule_name, $offset, $save, $start_utc 1")
         start_utc >= MAXDATETIME && break
     end
 
