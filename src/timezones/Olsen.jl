@@ -5,7 +5,7 @@ import Compat: parse
 
 import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
 
-# Convenience type for working with HH:MM
+# Convenience type for working with HH:MM:SS.
 immutable Time
     seconds::Int
 end
@@ -37,31 +37,36 @@ function Time(s::String)
     return Time(values...)
 end
 
-hour(t::Time) = div(t.seconds, 3600)
-minute(t::Time) = rem(div(t.seconds, 60), 60)
-second(t::Time) = rem(t.seconds, 60)
+toseconds(t::Time) = t.seconds
+hour(t::Time) = div(toseconds(t), 3600)
+minute(t::Time) = rem(div(toseconds(t), 60), 60)
+second(t::Time) = rem(toseconds(t), 60)
 
 function hourminutesecond(t::Time)
-    h, r = divrem(t.seconds, 3600)
+    h, r = divrem(toseconds(t), 3600)
     m, s = divrem(r, 60)
     return h, m, s
 end
 
-as_seconds(t::Time) = t.seconds
-(+)(x::Time,y::Time) = Time(as_seconds(x) + as_seconds(y))
-(-)(x::Time,y::Time) = Time(as_seconds(x) - as_seconds(y))
-(+)(x::DateTime,y::Time) = x + Second(as_seconds(y))
-(-)(x::DateTime,y::Time) = x - Second(as_seconds(y))
+Base.abs(t::Time) = Time(abs(toseconds(t)))
+Base.isless(x::Time,y::Time) = isless(toseconds(x), toseconds(y))
+(+)(x::Time,y::Time) = Time(toseconds(x) + toseconds(y))
+(-)(x::Time,y::Time) = Time(toseconds(x) - toseconds(y))
+(+)(x::DateTime,y::Time) = x + Second(toseconds(y))
+(-)(x::DateTime,y::Time) = x - Second(toseconds(y))
+
+Base.convert(::Type{Second}, t::Time) = Second(toseconds(t))
+Base.promote_rule{T<:Period}(::Type{T}, ::Type{Time}) = Second
+Base.isless(x::Time, y::Period) = isless(promote(x, y)...)
 
 # https://en.wikipedia.org/wiki/ISO_8601#Times
 function Base.string(t::Time)
-    neg = as_seconds(t) < 0 ? "-" : ""
+    neg = toseconds(t) < 0 ? "-" : ""
     h, m, s = map(abs, hourminutesecond(t))
     @sprintf("%s%02d:%02d:%02d", neg, h, m, s)
 end
 
 Base.show(io::IO, t::Time) = print(io, string(t))
-
 
 # Zone type maps to an Olsen Timezone database entity
 type Zone
@@ -333,8 +338,8 @@ function resolve(zone_name, zonesets, rulesets)
 
             tz = FixedTimeZone(
                 abbr,
-                as_seconds(offset),
-                as_seconds(save),
+                toseconds(offset),
+                toseconds(save),
             )
             push!(transitions, Transition(start_utc, tz))
         else
@@ -366,8 +371,8 @@ function resolve(zone_name, zonesets, rulesets)
 
             tz = FixedTimeZone(
                 abbr,
-                as_seconds(offset),
-                as_seconds(save),
+                toseconds(offset),
+                toseconds(save),
             )
             push!(transitions, Transition(start_utc, tz))
 
@@ -405,8 +410,8 @@ function resolve(zone_name, zonesets, rulesets)
 
                 tz = FixedTimeZone(
                     abbr,
-                    as_seconds(offset),
-                    as_seconds(save),
+                    toseconds(offset),
+                    toseconds(save),
                 )
 
                 # TODO: We can maybe reduce memory usage by reusing the same
