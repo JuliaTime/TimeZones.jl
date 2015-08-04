@@ -85,10 +85,12 @@ type Rule
     letter::String       # Timezone abbreviation letter change; i.e CST => CDT
 end
 
-# Max date that we create DST transition instants for
-const MINDATE = DateTime(1917,1,1)
-const MAXDATE = DateTime(2038,12,31)
-# const MAXDATE = DateTime(1950)
+# Min and max years that we create DST transition instants for (inclusive)
+const MINYEAR = 1800
+const MAXYEAR = 2038
+
+const MINDATETIME = DateTime(MINYEAR,1,1)
+const MAXDATETIME = DateTime(MAXYEAR,12,31)
 
 # Helper functions/data
 const MONTHS = Dict("Jan"=>1,"Feb"=>2,"Mar"=>3,"Apr"=>4,"May"=>5,"Jun"=>6,
@@ -232,80 +234,124 @@ function zoneparse(gmtoff, rules, format, until="")
     )
 end
 
+"""
+Rules are typically ordered by the "from" than "in" fields. Since rules also
+contain a "to" field the written ordering can be problematic for resolving
+timezone transitions.
+
+Example:
+
+    # Rule  NAME    FROM    TO  TYPE    IN  ON  AT      SAVE    LETTER/S
+    Rule    Poland  1918    1919    -   Sep 16  2:00s   0       -
+    Rule    Poland  1919    only    -   Apr 15  2:00s   1:00    S
+    Rule    Poland  1944    only    -   Apr  3  2:00s   1:00    S
+
+    # ON         AT      SAVE    LETTER/S
+    1918-09-16   2:00s   0       -
+    1919-04-15   2:00s   1:00    S
+    1919-09-16   2:00s   0       -
+    1944-04-03   2:00s   1:00    S
+"""
+function order_rules(rules::Array{Rule})
+    date_rules = Tuple{Date,Rule}[]
+
+    # Note: Typically rules are orderd by "from" and "in". Unfortunately
+    for rule in rules
+        # Replicate the rule for each year that it is effective.
+        for rule_year in get(rule.from, MINYEAR):get(rule.to, MAXYEAR)
+
+            # Determine the rule transition day by starting at the
+            # beginning of the month and applying our "on" function
+            # until we reach the correct day.
+            date = Date(rule_year, rule.month)
+            try
+                # The "on" function should evaluate to a day within the current month.
+                date = tonext(rule.on, date; same=true, limit=daysinmonth(date))
+            catch e
+                if isa(e, ArgumentError)
+                    error("Unable to find matching day for $zone_name in month $(year(date))/$(month(date))")
+                else
+                    rethrow(e)
+                end
+            end
+            push!(date_rules, (date, rule))
+        end
+    end
+
+    sort!(date_rules, by=el -> el[1])
+
+    # Since we are not yet taking offsets or flags into account yet
+    # there is a small chance that the results are not ordered correctly.
+    last_date = typemin(Date)
+    for (i, (date, rule)) in enumerate(date_rules)
+        if i > 1 && last_date >= date - Day(1)
+            error("Dates are probably not in order")
+        end
+        last_date = date
+    end
+
+    return date_rules
+end
+
 
 function resolve(zone_name, zonesets, rulesets)
-    # zones = Set{FixedTimeZone}()
     transitions = Transition[]
 
     # Set some default values and starting DateTime increment and away we go...
-    # y = get(zonesets[zone_name][1].until)  # MINDATE
-    y = until_utc = last_until = DateTime(1800,1,1)
-    save = ZERO
+    start_utc = MINDATETIME
     offset = ZERO
+    save = ZERO
     letter = ""
-    start = DateTime(1800,1,1)  # Always in UTC
-    new_start = start
+
+    ordered_rules = Dict{String,Array{Tuple{Date,Rule}}}()
+    # zones = Set{FixedTimeZone}()
 
     # TODO: Make sure zonesets are ordered.
-    until = nothing
-
-    state = Dict{String,Tuple{DateTime,Time,String}}()
-
     for zone in zonesets[zone_name]
         offset = zone.gmtoffset
         format = zone.format
         # save = zone.save
         rule_name = zone.rules
-        until = get(zone.until, MAXDATE)
-
-        # println("start $start, $until, $offset, $save")
+        until = get(zone.until, MAXDATETIME)
 
         if rule_name != ""
-            if haskey(state, rule_name)
-                current, save, letter = state[rule_name]
-            else
+            if !haskey(ordered_rules, rule_name)
+                ordered_rules[rule_name] = order_rules(rulesets[rule_name])
+            end
+
+            rules = ordered_rules[rule_name]
+
+            index = searchsortedlast(rules, start_utc, by=el -> isa(el, Tuple) ? el[1] : el)
+
+            if index == 0
+                #
                 save = ZERO
-                current = DateTime(1800,1)
-                for rule in rulesets[zone.rules]
+                for (date, rule) in rules
                     if rule.save == save
                         letter = rule.letter
                         break
                     end
                 end
+                index = 1
+            else
+                date, rule = rules[index]
+                save = rule.save
+                letter = rule.letter
             end
         else
             save = zone.save
+            letter = ""
         end
-
-
-        if rule_name != ""
-            println("START CATCHUP $rule_name, $(year(current))/$(month(current)), $save, '$letter'")
-            ruleset = rulesets[rule_name]
-            while current < DateTime(year(start), month(start))
-                for r in ruleset
-                    (isnull(r.from) || year(current) >= get(r.from)) || continue
-                    (isnull(r.to) || year(current) <= get(r.to)) || continue
-                    r.month == month(current) || continue
-
-                    save = r.save
-                    letter = r.letter
-                    println("    $(year(current))/$(month(current)) $save, '$letter'")
-                end
-                current += Month(1)
-            end
-            println("END CATCHUP $rule_name, $(year(current))/$(month(current)), $save, '$letter'")
-        end
-
 
         abbr = replace(format,"%s",letter,1)
-        println("Zone Start $rule_name, $(zone.gmtoffset), $(zone.save), $start 1, $until $(zone.until_flag), $abbr")
+        println("Zone Start $rule_name, $(zone.gmtoffset), $(zone.save), $start_utc 1, $until $(zone.until_flag), $abbr")
 
         tz = FixedTimeZone(
             abbr,
             as_seconds(offset),
             as_seconds(save),
         )
-        push!(transitions, Transition(start, tz))
+        push!(transitions, Transition(start_utc, tz))
 
         if zone.rules != ""
             # Get the Rule that applies for this period
@@ -316,101 +362,59 @@ function resolve(zone_name, zonesets, rulesets)
             # Rule    Poland  1918    1919    -   Sep 16  2:00s   0   -
             # Rule    Poland  1919    only    -   Apr 15  2:00s   1:00    S
 
-            while current <= until
-                # We need to check all Rules to see if they apply
-                # for the given year
-                for r in ruleset
-                    # If the Rule is out of range, skip it
-                    # r.from <= year(y) <= r.to || continue
+            for (date, rule) in rules[index:end]
+                date > until && break
 
-                    (isnull(r.from) || year(current) >= get(r.from)) || continue
-                    (isnull(r.to) || year(current) <= get(r.to)) || continue
-                    r.month == month(current) || continue
+                # Add "at" since it could be larger than 23:59:59.
+                dt = DateTime(date) + rule.at
 
-                    # Now we need to deterimine the transition day
-                    # We start at the Rule month, hour, minute
-                    # And apply our boolean "on" function until we
-                    # arrive at the right transition instant
+                # If our time was given in UTC, add back offset and save
+                # if local standard time, add back any saved amount
+                dt_utc = rule.at_flag == 1 ? dt :
+                         rule.at_flag == 0 ? dt - offset - save : dt - offset
 
-                    # Add at since it could be larger than 23:59:59.
-                    dt = DateTime(year(current),r.month) + r.at
-                    try
-                        dt = tonext(r.on, dt; same=true, limit=1000)
-                    catch e
-                        if isa(e, ArgumentError)
-                            error("Unable to find matching day for $zone_name $dt")
-                        end
-                    end
+                until_utc = zone.until_flag == 1 ? until :
+                            zone.until_flag == 0 ? until - offset - save : until - offset
 
-                    # If our time was given in UTC, add back offset and save
-                    # if local standard time, add back any saved amount
-                    dt_utc = r.at_flag == 1 ? dt :
-                         r.at_flag == 0 ? dt - offset - save : dt - offset
+                # TODO: Still continue?
+                start_utc <= dt_utc < until_utc || continue
 
-                    until_utc = zone.until_flag == 1 ? until :
-                                zone.until_flag == 0 ? until - offset - save : until - offset
+                save = rule.save
+                letter = rule.letter
+                abbr = replace(format,"%s",letter,1)
 
-                    # Make sure rule still applies to zone.
-                    # TODO: Is this inclusive?
-                    # println("$offset, $save")
-                    # println("$start <= $dt_utc < $until_utc")
-                    start <= dt_utc < until_utc || continue
+                # Using @sprintf would be best but it doesn't accept a format as a
+                # variable.
+                tz = FixedTimeZone(
+                    abbr,
+                    as_seconds(offset),
+                    as_seconds(save),
+                )
 
-                    save = r.save
-                    letter = r.letter
-                    abbr = replace(format,"%s",letter,1)
+                # TODO: We can maybe reduce memory usage by reusing the same
+                # FixedTimeZone object.
+                # Note: By default pushing onto a set will replace objects.
+                # if !(tz in zones)
+                #     push!(zones, tz)
+                # else
+                #     tz = first(intersect(zones, Set([tz])))
+                # end
 
-                    # if year(y) <= 1940
-                    #     @show dt, dt_utc, until_utc
-                    # end
+                push!(transitions, Transition(dt_utc, tz))
 
-                    # Using @sprintf would be best but it doesn't accept a format as a
-                    # variable.
-                    tz = FixedTimeZone(
-                        abbr,
-                        as_seconds(offset),
-                        as_seconds(save),
-                    )
-
-                    # TODO: We can maybe reduce memory usage by reusing the same
-                    # FixedTimeZone object.
-                    # Note: By default pushing onto a set will replace objects.
-                    # if !(tz in zones)
-                    #     push!(zones, tz)
-                    # else
-                    #     tz = first(intersect(zones, Set([tz])))
-                    # end
-
-                    push!(transitions, Transition(dt_utc, tz))
-
-                    println("Rule $(year(current)), $dt $(r.at_flag), $dt_utc 1, $save, $abbr")
-                end
-                current += Month(1)
-
-                # Testing
-                current >= MAXDATE && break
+                println("Rule $(year(date)), $dt $(rule.at_flag), $dt_utc 1, $save, $abbr")
             end
-
-            start = until_utc
-        else
-            until_utc = zone.until_flag == 1 ? until :
-                        zone.until_flag == 0 ? until - offset - save : until - offset
-            start = until_utc
         end
 
         until_utc = zone.until_flag == 1 ? until :
                     zone.until_flag == 0 ? until - offset - save : until - offset
-        start = until_utc
-
-        if rule_name != ""
-            state[rule_name] = (current, save, letter)
-        end
+        start_utc = until_utc
 
         println("Zone End   $rule_name, $offset, $save, $until_utc 1")
-        # println("end $start, $until, $offset, $save")
-        until >= MAXDATE && break
+        start_utc >= MAXDATETIME && break
     end
-    sort!(transitions)
+
+    # sort!(transitions)
     return VariableTimeZone(zone_name, transitions)
 end
 
