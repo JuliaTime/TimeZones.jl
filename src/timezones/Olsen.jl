@@ -299,10 +299,12 @@ Example:
     Rule    Poland  1919    only    -   Apr 15  2:00s   1:00    S
     Rule    Poland  1944    only    -   Apr  3  2:00s   1:00    S
 
+    Processing rules by iterating through years would generate:
+
     # ON         AT      SAVE    LETTER/S
     1918-09-16   2:00s   0       -
-    1919-04-15   2:00s   1:00    S
     1919-09-16   2:00s   0       -
+    1919-04-15   2:00s   1:00    S
     1944-04-03   2:00s   1:00    S
 """
 function order_rules(rules::Array{Rule})
@@ -336,7 +338,7 @@ function order_rules(rules::Array{Rule})
     # there is a small chance that the results are not ordered correctly.
     last_date = typemin(Date)
     for (i, (date, rule)) in enumerate(date_rules)
-        if i > 1 && date - last_date < MAXABSDIFF
+        if i > 1 && date - last_date <= MAXABSDIFF
             error("Dates are probably not in order")
         end
         last_date = date
@@ -351,7 +353,6 @@ function resolve(zone_name, zonesets, rulesets; debug=false)
 
     # Set some default values and starting DateTime increment and away we go...
     start_utc = MINDATETIME
-    offset = ZERO
     save = ZERO
     letter = ""
 
