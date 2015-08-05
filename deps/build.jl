@@ -1,15 +1,15 @@
 
 dir = dirname(@__FILE__)
-tz = joinpath(dir,"tzdata")
-com = joinpath(dir,"compiled")
+tz = joinpath(dir, "tzdata")
+com = joinpath(dir, "compiled")
 
 isdir(tz)  || mkdir(tz)
 isdir(com) || mkdir(com)
 
-
-for f in (tz,com)
-    for file in readdir(f)
-        rm(joinpath(f,file))
+# Remove all contents in tz and com directories.
+for d in (tz, com)
+    for file in readdir(d)
+        rm(joinpath(d, file), recursive=true)
     end
 end
 
@@ -26,6 +26,6 @@ while loading /Users/omus/.julia/v0.4/Timezones/deps/build.jl, in expression sta
     @async download("ftp://ftp.iana.org/tz/data/"*reg,joinpath(tz,reg))
 end
 
-# include("../src/TimeZones.jl")
-# TimeZones.Olsen.generate_tzdata(tz,com)
+include("../src/TimeZones.jl")
+TimeZones.Olsen.generate_tzdata(tz,com)
 println("=========Timezone Database Successfully Compiled=========")

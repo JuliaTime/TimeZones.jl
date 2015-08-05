@@ -577,6 +577,23 @@ function load(olsen_dir::String)
     return timezones
 end
 
+function generate_tzdata(olsen_dir::String, dest_dir::String)
+    timezones = load(olsen_dir)
+
+    isdir(dest_dir) || error("Destination directory doesn't exist")
+
+    for (name, timezone) in timezones
+        parts = split(name, "/")
+        tz_dir, tz_file = joinpath(dest_dir, parts[1:end-1]...), parts[end]
+
+        isdir(tz_dir) || mkpath(tz_dir)
+
+        open(joinpath(tz_dir, tz_file), "w") do fp
+            serialize(fp, timezone)
+        end
+    end
+end
+
 #TODO
  #spot check times/offsets/abbrs
  #handle timezone link names

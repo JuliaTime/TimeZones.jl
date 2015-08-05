@@ -1,8 +1,17 @@
-import TimeZones: FixedTimeZone, Transition
+import TimeZones: TimeZone, FixedTimeZone, Transition
+import TimeZones.Olsen: tzparse, resolve, ZoneDict, RuleDict
 
-# # Create "test" check manually
-# na, r = TimeZones.Olsen.tzparse(joinpath(Pkg.dir("TimeZones"), "deps", "tzdata", "northamerica"));
-# tz = z["America/Winnipeg"]
+# Note: It is possible the testcases could fail due to changes to the TZ database. If this
+# occurs we may want to keep a static TZ database around for testing purposes. These test
+# cases were generated from a TZ database last modified 2015/07/06.
+
+# For testing we'll reparse the tzdata every time to simplify development.
+tzdata_dir = joinpath(dirname(@__FILE__), "..", "..", "deps", "tzdata")
+
+tzdata = Dict{String,Tuple{ZoneDict,RuleDict}}()
+for name in ("australasia", "europe", "northamerica")
+    tzdata[name] = tzparse(joinpath(tzdata_dir, name))
+end
 
 # test = TimeZones.Zoned(Dates.UTM(63492681600000))
 # # Test DateTime construction by parts
@@ -14,10 +23,7 @@ import TimeZones: FixedTimeZone, Transition
 # @test Dates.DateTime(2013,1,1,0,0,0) == test
 # @test Dates.DateTime(2013,1,1,0,0,0,0) == test
 
-
-# Note: Switch currently occurs are the wrong time.
-europe_zones, europe_rules = TimeZones.Olsen.tzparse(joinpath(Pkg.dir("TimeZones"), "deps", "tzdata", "europe"));
-warsaw = TimeZones.Olsen.resolve("Europe/Warsaw", europe_zones, europe_rules)
+warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 
 # Europe/Warsaw timezone has a combination of factors that requires computing
 # the abbreviation to be done in a specific way.
@@ -55,13 +61,11 @@ zone["EEST"] = TimeZones.DaylightSavingTimeZone("EEST", 7200, 3600)
 @test warsaw.transitions[18] == Transition(DateTime(1944, 9, 30, 22, 0), zone["CEST"]) #
 
 
-
-na_zones, na_rules = TimeZones.Olsen.tzparse(joinpath(Pkg.dir("TimeZones"), "deps", "tzdata", "northamerica"));
-honolulu = TimeZones.Olsen.resolve("Pacific/Honolulu", na_zones, na_rules)
-
 # Zone Pacific/Honolulu contains the following properties which make it good for testing:
 # - Zone's contain save in rules field
 # - Zone abbreviation redefined: HST
+
+honolulu = resolve("Pacific/Honolulu", tzdata["northamerica"]...)
 
 zone = Dict{String,FixedTimeZone}()
 zone["LMT"] = TimeZones.DaylightSavingTimeZone("LMT", -37886, 0)
@@ -86,8 +90,7 @@ zone["HST_NEW"] = TimeZones.DaylightSavingTimeZone("HST", -36000, 0)
 # - Changed zone format while in a non-standard transition
 # - Zone abbreviation redefined: LMT, WSST
 
-aa_zones, aa_rules = TimeZones.Olsen.tzparse(joinpath(Pkg.dir("TimeZones"), "deps", "tzdata", "australasia"));
-apia = TimeZones.Olsen.resolve("Pacific/Apia", aa_zones, aa_rules)
+apia = resolve("Pacific/Apia", tzdata["australasia"]...)
 
 zone = Dict{String,FixedTimeZone}()
 zone["LMT_OLD"] = TimeZones.DaylightSavingTimeZone("LMT", 45184, 0)
