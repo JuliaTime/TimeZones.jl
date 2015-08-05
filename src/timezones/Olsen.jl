@@ -1,12 +1,13 @@
 module Olsen
 
 using Base.Dates
+import Base.Dates: value, toms
 import Compat: parse
 
 import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
 
 # Convenience type for working with HH:MM:SS.
-immutable Time
+immutable Time <: TimePeriod
     seconds::Int
 end
 const ZERO = Time(0)
@@ -37,6 +38,10 @@ function Time(s::String)
     return Time(values...)
 end
 
+# TimePeriod methods
+value(t::Time) = t.seconds
+toms(t::Time) = t.seconds * 1000
+
 toseconds(t::Time) = t.seconds
 hour(t::Time) = div(toseconds(t), 3600)
 minute(t::Time) = rem(div(toseconds(t), 60), 60)
@@ -48,16 +53,13 @@ function hourminutesecond(t::Time)
     return h, m, s
 end
 
-Base.abs(t::Time) = Time(abs(toseconds(t)))
-Base.isless(x::Time,y::Time) = isless(toseconds(x), toseconds(y))
-(+)(x::Time,y::Time) = Time(toseconds(x) + toseconds(y))
-(-)(x::Time,y::Time) = Time(toseconds(x) - toseconds(y))
-(+)(x::DateTime,y::Time) = x + Second(toseconds(y))
-(-)(x::DateTime,y::Time) = x - Second(toseconds(y))
-
 Base.convert(::Type{Second}, t::Time) = Second(toseconds(t))
-Base.promote_rule{T<:Period}(::Type{T}, ::Type{Time}) = Second
-Base.isless(x::Time, y::Period) = isless(promote(x, y)...)
+Base.convert(::Type{Millisecond}, t::Time) = Millisecond(toseconds(t) * 1000)
+Base.promote_rule{P<:Union{Week,Day,Hour,Minute,Second}}(::Type{P}, ::Type{Time}) = Second
+Base.promote_rule(::Type{Millisecond}, ::Type{Time}) = Millisecond
+
+# Should be defined in Base.Dates
+Base.isless(x::Period, y::Period) = isless(promote(x,y)...)
 
 # https://en.wikipedia.org/wiki/ISO_8601#Times
 function Base.string(t::Time)
