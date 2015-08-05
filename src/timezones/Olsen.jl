@@ -90,6 +90,19 @@ type Zone
     until_flag::Int
 end
 
+function Base.isless(x::Zone,y::Zone)
+    x_dt = get(x.until, typemax(DateTime))
+    y_dt = get(y.until, typemax(DateTime))
+
+    # Easy to compare until's if they are using the same flag. Alternatively, it should
+    # be safe to compare different until flags if the DateTimes are far enough apart.
+    if x.until_flag == y.until_flag || abs(x_dt - y_dt) > MAXABSDIFF
+        return isless(x_dt, y_dt)
+    else
+        error("Unable to compare zones when until datetimes are too close and flags are mixed")
+    end
+end
+
 # Rules govern how Daylight Savings transitions happen for a given timezone
 type Rule
     from::Nullable{Int}  # First year rule applies
@@ -343,8 +356,9 @@ function resolve(zone_name, zonesets, rulesets)
     ordered_rules = Dict{String,Array{Tuple{Date,Rule}}}()
     # zones = Set{FixedTimeZone}()
 
-    # TODO: Make sure zonesets are ordered.
-    for zone in zonesets[zone_name]
+    # Zone needs to be in ascending order to ensure that start_utc is being applied
+    # to the correct transition.
+    for zone in sort(zonesets[zone_name])
         offset = zone.gmtoffset
         format = zone.format
         # save = zone.save
@@ -456,7 +470,8 @@ function resolve(zone_name, zonesets, rulesets)
         start_utc >= MAXDATETIME && break
     end
 
-    # sort!(transitions)
+    # Note: Transitions array is expected to be ordered and should be if both
+    # zones and rules were ordered.
     return VariableTimeZone(zone_name, transitions)
 end
 
