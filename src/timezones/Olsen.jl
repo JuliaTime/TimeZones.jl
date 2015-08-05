@@ -76,7 +76,7 @@ end
 Base.show(io::IO, t::Time) = print(io, string(t))
 
 # min/max offsets across all zones and all time.
-const MINOFFSET = Time("-14:21:00")  # Pacific/Guam
+const MINOFFSET = Time("-15:56:00")  # Asia/Manilla
 const MAXOFFSET = Time("15:13:42")   # America/Metlakatla
 
 # min/max save across all zones/rules and all time.
