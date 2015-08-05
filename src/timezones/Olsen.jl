@@ -87,7 +87,7 @@ type Zone
     rules::String
     format::String
     until::Nullable{DateTime}
-    until_flag::Int
+    until_flag::Char
 end
 
 function Base.isless(x::Zone,y::Zone)
@@ -110,9 +110,9 @@ type Rule
     month::Int           # Month in which DST transition happens
     on::Function         # Anonymous boolean function to determine day
     at::Time             # Hour and minute at which the transition happens
-    at_flag::Int         # 0, 1, 2 = Local wall time ('w' or blank), UTC time ('u'), Local Standard time ('s')
+    at_flag::Char        # Local wall time (w), UTC time (u), Local Standard time (s)
     save::Time           # How much time is "saved" in daylight savings transition
-    letter::String       # Timezone abbreviation letter change; i.e CST => CDT
+    letter::String       # Timezone abbreviation letter. Can be empty; i.e. CST => CDT,
 end
 
 # Min and max years that we create DST transition instants for (inclusive)
@@ -142,13 +142,13 @@ end
 
 function parseflag(s::String)
     if s == "" || s == "w"
-        return 0
+        return 'w'
     elseif s == "u"
-        return 1
+        return 'u'
     elseif s == "s"
-        return 2
+        return 's'
     else
-        error("Unhanbled flag $s")
+        error("Unhandled flag $s")
     end
 end
 
@@ -158,7 +158,7 @@ end
 function parsedate(s::String)
     s = replace(s, r"\s+", " ")
     num_periods = length(split(s, " "))
-    s, letter = num_periods > 3 && isalpha(s[end]) ? (s[1:end-1], s[end:end]) : (s, "")
+    s, flag = num_periods > 3 && isalpha(s[end]) ? (s[1:end-1], s[end:end]) : (s, "")
     if contains(s,"lastSun")
         dt = DateTime(replace(s, "lastSun", "1", 1), "yyyy uuu d H:MM:SS")
         dt = tonext(lastSun, dt; same=true)
@@ -185,19 +185,21 @@ function parsedate(s::String)
     # If it's local standard time, we just need to add any saved amount
     # return letter == 's' ? (dt - save) : (dt - offset - save)
 
-    return dt, parseflag(letter)
+    return dt, parseflag(flag)
 end
 
-function asutc(dt::DateTime, flag::Int, offset::Time, save::Time)
-    if flag == 1
+function asutc(dt::DateTime, flag::Char, offset::Time, save::Time)
+    if flag == 'u'
         # In UTC
         return dt
-    elseif flag == 0
+    elseif flag == 'w'
         # In local wall time, add back offset and saved amount
         return dt - offset - save
-    else
+    elseif flag == 's'
         # In local standard time, add back any saved amount
         return dt - offset
+    else
+        error("Unknown flag: $flag")
     end
 end
 
@@ -265,7 +267,7 @@ function zoneparse(gmtoff, rules, format, until="")
     format = format == "zzz" ? "" : format
 
     # Parse the date the line rule applies up to
-    until_tuple = until == "" ? (nothing, 0) : parsedate(until)
+    until_tuple = until == "" ? (nothing, 'w') : parsedate(until)
     until_dt, until_flag = Nullable{DateTime}(until_tuple[1]), until_tuple[2]
 
     if rules == "-" || ismatch(r"\d",rules)
@@ -344,7 +346,7 @@ function order_rules(rules::Array{Rule})
 end
 
 
-function resolve(zone_name, zonesets, rulesets)
+function resolve(zone_name, zonesets, rulesets; debug=false)
     transitions = Transition[]
 
     # Set some default values and starting DateTime increment and away we go...
@@ -369,7 +371,10 @@ function resolve(zone_name, zonesets, rulesets)
             save = zone.save
             abbr = format
 
-            println("Zone Start $rule_name, $(zone.gmtoffset), $save, $start_utc 1, $until $(zone.until_flag), $abbr")
+            if debug
+                rule_name = "\"\""  # Just for display purposes
+                println("Zone Start $rule_name, $(zone.gmtoffset), $save, $(start_utc)u, $(until)$(zone.until_flag), $abbr")
+            end
 
             tz = FixedTimeZone(abbr, toseconds(offset), toseconds(save))
             push!(transitions, Transition(start_utc, tz))
@@ -404,7 +409,7 @@ function resolve(zone_name, zonesets, rulesets)
             # format as a variable.
             abbr = replace(format,"%s",letter,1)
 
-            println("Zone Start $rule_name, $(zone.gmtoffset), $save, $start_utc 1, $until $(zone.until_flag), $abbr")
+            debug && println("Zone Start $rule_name, $(zone.gmtoffset), $save, $(start_utc)u, $(until)$(zone.until_flag), $abbr")
 
             tz = FixedTimeZone(abbr, toseconds(offset), toseconds(save))
             push!(transitions, Transition(start_utc, tz))
@@ -428,8 +433,10 @@ function resolve(zone_name, zonesets, rulesets)
                 letter = rule.letter
                 abbr = replace(format,"%s",letter,1)
 
-                status = start_utc <= dt_utc ? "Rule" : "Skip"
-                println("$status $(year(date)), $dt $(rule.at_flag), $dt_utc 1, $save, $abbr")
+                if debug
+                    status = start_utc <= dt_utc ? "Rule" : "Skip"
+                    println("$status $(year(date)), $(dt)$(rule.at_flag), $(dt_utc)u, $save, $abbr")
+                end
 
                 # TODO: Is start_utc inclusive or exclusive?
                 start_utc <= dt_utc || continue
@@ -451,7 +458,7 @@ function resolve(zone_name, zonesets, rulesets)
 
         start_utc = asutc(until, zone.until_flag, offset, save)
 
-        println("Zone End   $rule_name, $offset, $save, $start_utc 1")
+        debug && println("Zone End   $rule_name, $offset, $save, $(start_utc)u")
         start_utc >= MAXDATETIME && break
     end
 
