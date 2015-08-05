@@ -70,6 +70,16 @@ end
 
 Base.show(io::IO, t::Time) = print(io, string(t))
 
+# min/max offsets across all zones and all time.
+const MINOFFSET = Time("-14:21:00")  # Pacific/Guam
+const MAXOFFSET = Time("15:13:42")   # America/Metlakatla
+
+# min/max save across all zones/rules and all time.
+const MINSAVE = Time("00:00")
+const MAXSAVE = Time("02:00")  # France, Germany, Port, Spain
+
+const MAXABSDIFF = abs((MAXOFFSET + MAXSAVE) - (MINOFFSET + MINSAVE))
+
 # Zone type maps to an Olsen Timezone database entity
 type Zone
     gmtoffset::Time
@@ -214,6 +224,10 @@ function ruleparse(from, to, rule_type, month, on, at, save, letter)
     save_hm = Time(save)
     letter = letter == "-" ? "" : letter
 
+    # Report unexpected save values that could cause issues during resolve.
+    save_hm < MINSAVE && warn("Discovered save $save_hm less than the expected min $MINSAVE")
+    save_hm > MAXSAVE && warn("Discovered save $save_hm larger than the expected max $MAXSAVE")
+
     # Now we've finally parsed everything we need
     return Rule(
         from_int,
@@ -230,6 +244,11 @@ end
 function zoneparse(gmtoff, rules, format, until="")
     # Get our offset and abbreviation string for this period
     offset = Time(gmtoff)
+
+    # Report unexpected offsets that could cause issues during resolve.
+    offset < MINOFFSET && warn("Discovered offset $offset less than the expected min $MINOFFSET")
+    offset > MAXOFFSET && warn("Discovered offset $offset larger than the expected max $MAXOFFSET")
+
     format = format == "zzz" ? "" : format
 
     # Parse the date the line rule applies up to
@@ -302,7 +321,7 @@ function order_rules(rules::Array{Rule})
     # there is a small chance that the results are not ordered correctly.
     last_date = typemin(Date)
     for (i, (date, rule)) in enumerate(date_rules)
-        if i > 1 && last_date >= date - Day(1)
+        if i > 1 && date - last_date < MAXABSDIFF
             error("Dates are probably not in order")
         end
         last_date = date
