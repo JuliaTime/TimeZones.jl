@@ -6,6 +6,11 @@ import Compat: parse
 
 import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
 
+const REGIONS = (
+    "africa", "antarctica", "asia", "australasia",
+    "europe", "northamerica", "southamerica",
+)
+
 # Convenience type for working with HH:MM:SS.
 immutable Time <: TimePeriod
     seconds::Int
@@ -114,6 +119,10 @@ type Rule
     save::Time           # How much time is "saved" in daylight savings transition
     letter::String       # Timezone abbreviation letter. Can be empty; i.e. CST => CDT,
 end
+
+typealias ZoneDict Dict{String,Array{Zone}}
+typealias RuleDict Dict{String,Array{Rule}}
+typealias OrderedRuleDict Dict{String,Array{Tuple{Date,Rule}}}
 
 # Min and max years that we create DST transition instants for (inclusive)
 const MINYEAR = 1800
@@ -347,8 +356,13 @@ function order_rules(rules::Array{Rule})
     return date_rules
 end
 
+"""
+Resolves a named zone into TimeZone. Updates ordered with any new rules that
+were required to be ordered.
+"""
+function resolve!(zone_name::String, zoneset::ZoneDict, ruleset::RuleDict,
+    ordered::OrderedRuleDict; debug=false)
 
-function resolve(zone_name, zonesets, rulesets; debug=false)
     transitions = Transition[]
 
     # Set some default values and starting DateTime increment and away we go...
@@ -361,7 +375,7 @@ function resolve(zone_name, zonesets, rulesets; debug=false)
 
     # Zone needs to be in ascending order to ensure that start_utc is being applied
     # to the correct transition.
-    for zone in sort(zonesets[zone_name])
+    for zone in sort(zoneset[zone_name])
         offset = zone.gmtoffset
         format = zone.format
         # save = zone.save
@@ -380,13 +394,13 @@ function resolve(zone_name, zonesets, rulesets; debug=false)
             tz = FixedTimeZone(abbr, toseconds(offset), toseconds(save))
             push!(transitions, Transition(start_utc, tz))
         else
-            if !haskey(ordered_rules, rule_name)
-                ordered_rules[rule_name] = order_rules(rulesets[rule_name])
+            if !haskey(ordered, rule_name)
+                ordered[rule_name] = order_rules(ruleset[rule_name])
             end
 
             # TODO: We could avoid this search if the rule_name haven't changed since the
             # last iteration.
-            rules = ordered_rules[rule_name]
+            rules = ordered[rule_name]
             index = searchsortedlast(rules, start_utc, by=el -> isa(el, Tuple) ? el[1] : el)
 
             # If start occurs prior to the first rule it can be expected in standard-time.
@@ -468,9 +482,26 @@ function resolve(zone_name, zonesets, rulesets; debug=false)
     return VariableTimeZone(zone_name, transitions)
 end
 
+function resolve(zoneset::ZoneDict, ruleset::RuleDict; debug=false)
+    ordered = OrderedRuleDict()
+    timezones = Dict{String,TimeZone}()
+
+    for zone_name in keys(zoneset)
+        tz = resolve!(zone_name, zoneset, ruleset, ordered, debug=debug)
+        timezones[zone_name] = tz
+    end
+
+    return timezones
+end
+
+function resolve(zone_name::String, zoneset::ZoneDict, ruleset::RuleDict; debug=false)
+    ordered = OrderedRuleDict()
+    return resolve!(zone_name, zoneset, ruleset, ordered, debug=debug)
+end
+
 function tzparse(tzfile::String)
-    rules = Dict{String,Array{Rule}}()
-    zones = Dict{String,Array{Zone}}()
+    zones = ZoneDict()
+    rules = RuleDict()
 
     # For the intial pass we'll collect the zone and rule lines.
     open(tzfile) do fp
@@ -537,16 +568,13 @@ function generate_tzinfo(olsen_path::String,dest_path::String)
     end
 end
 
-function generate_tzdata(olsen_path::String,dest_path::String)
-    files = [:africa,:antarctica,:asia,:australasia,
-             :europe,:northamerica,:southamerica]
-    for f in files
-        for (name,zone) in tzparse(joinpath(olsen_path,string(f)))[1]
-            open(joinpath(dest_path,zone_symbol(zone)),"w") do x
-                serialize(x,zone.dst)
-            end
-        end
+function load(olsen_dir::String)
+    timezones = Dict{String,TimeZone}()
+    for region in REGIONS
+        zones, rules = tzparse(joinpath(olsen_dir, region))
+        merge!(timezones, resolve(zones, rules))
     end
+    return timezones
 end
 
 #TODO
