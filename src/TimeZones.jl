@@ -16,6 +16,30 @@ function TimeZone(name::String)
     end
 end
 
+function timezone_names()
+    names = String[]
+
+    compiled_dir = joinpath(dirname(@__FILE__), "..", "deps", "compiled")
+    check = Tuple{String,String}[(compiled_dir, "")]
+
+    for (dir, partial) in check
+        for filename in readdir(dir)
+            startswith(filename, ".") && continue
+
+            path = joinpath(dir, filename)
+            name = partial == "" ? filename : join([partial, filename], "/")
+
+            if isdir(path)
+                push!(check, (path, name))
+            else
+                push!(names, name)
+            end
+        end
+    end
+
+    return sort(names)
+end
+
 export TimeZone, FixedTimeZone, VariableTimeZone, Transition, ZonedDateTime
     AmbiguousTimeError, NonExistentTimeError
 
