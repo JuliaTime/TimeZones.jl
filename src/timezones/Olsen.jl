@@ -371,23 +371,23 @@ function resolve(zone_name, zonesets, rulesets)
 
             println("Zone Start $rule_name, $(zone.gmtoffset), $save, $start_utc 1, $until $(zone.until_flag), $abbr")
 
-            tz = FixedTimeZone(
-                abbr,
-                toseconds(offset),
-                toseconds(save),
-            )
+            tz = FixedTimeZone(abbr, toseconds(offset), toseconds(save))
             push!(transitions, Transition(start_utc, tz))
         else
             if !haskey(ordered_rules, rule_name)
                 ordered_rules[rule_name] = order_rules(rulesets[rule_name])
             end
 
+            # TODO: We could avoid this search if the rule_name haven't changed since the
+            # last iteration.
             rules = ordered_rules[rule_name]
             index = searchsortedlast(rules, start_utc, by=el -> isa(el, Tuple) ? el[1] : el)
 
+            # If start occurs prior to the first rule it can be expected in standard-time.
             if index == 0
-                #
                 save = ZERO
+
+                # Find the first occurrence of of standard-time
                 for (date, rule) in rules
                     if rule.save == save
                         letter = rule.letter
@@ -400,15 +400,13 @@ function resolve(zone_name, zonesets, rulesets)
                 letter = rule.letter
             end
 
+            # Note: using @sprintf would make sense but unfortunately it doesn't accept a
+            # format as a variable.
             abbr = replace(format,"%s",letter,1)
 
             println("Zone Start $rule_name, $(zone.gmtoffset), $save, $start_utc 1, $until $(zone.until_flag), $abbr")
 
-            tz = FixedTimeZone(
-                abbr,
-                toseconds(offset),
-                toseconds(save),
-            )
+            tz = FixedTimeZone(abbr, toseconds(offset), toseconds(save))
             push!(transitions, Transition(start_utc, tz))
 
             for (date, rule) in rules[max(index,1):end]
@@ -425,29 +423,18 @@ function resolve(zone_name, zonesets, rulesets)
 
                 dt_utc < until_utc || break
 
+                # Need to be careful when we update save/letter.
                 save = rule.save
                 letter = rule.letter
-
-                # TMP
                 abbr = replace(format,"%s",letter,1)
-                if start_utc <= dt_utc
-                    println("Rule $(year(date)), $dt $(rule.at_flag), $dt_utc 1, $save, $abbr")
-                else
-                    println("Skip $(year(date)), $dt $(rule.at_flag), $dt_utc 1, $save, $abbr")
-                end
 
-                # TODO: Is start_utc exclusive or inclusive?
+                status = start_utc <= dt_utc ? "Rule" : "Skip"
+                println("$status $(year(date)), $dt $(rule.at_flag), $dt_utc 1, $save, $abbr")
+
+                # TODO: Is start_utc inclusive or exclusive?
                 start_utc <= dt_utc || continue
 
-                # Using @sprintf would be best but it doesn't accept a format as a
-                # variable.
-                abbr = replace(format,"%s",letter,1)
-
-                tz = FixedTimeZone(
-                    abbr,
-                    toseconds(offset),
-                    toseconds(save),
-                )
+                tz = FixedTimeZone(abbr, toseconds(offset), toseconds(save))
 
                 # TODO: We can maybe reduce memory usage by reusing the same
                 # FixedTimeZone object.
@@ -459,8 +446,6 @@ function resolve(zone_name, zonesets, rulesets)
                 # end
 
                 push!(transitions, Transition(dt_utc, tz))
-
-                # println("Rule $(year(date)), $dt $(rule.at_flag), $dt_utc 1, $save, $abbr")
             end
         end
 
