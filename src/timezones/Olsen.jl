@@ -332,7 +332,7 @@ function order_rules(rules::Array{Rule})
                 date = tonext(rule.on, date; same=true, limit=daysinmonth(date))
             catch e
                 if isa(e, ArgumentError)
-                    error("Unable to find matching day for $zone_name in month $(year(date))/$(month(date))")
+                    error("Unable to find matching day in month $(year(date))/$(month(date))")
                 else
                     rethrow(e)
                 end
