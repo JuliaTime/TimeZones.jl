@@ -107,3 +107,13 @@ t = VariableTimeZone("Testing", [
 
 @test_throws AmbiguousTimeError ZonedDateTime(DateTime(1960,9,1,0), t, true)
 @test_throws AmbiguousTimeError ZonedDateTime(DateTime(1960,9,1,0), t, false)
+
+
+# Significant offset change: -11:00 -> 13:00.
+apia = resolve("Pacific/Apia", tzdata["australasia"]...)
+
+# Skips an entire day.
+@test ZonedDateTime(DateTime(2011,12,29,23),apia).utc_datetime == DateTime(2011,12,30,9)
+@test_throws NonExistentTimeError ZonedDateTime(DateTime(2011,12,30,0),apia)
+@test_throws NonExistentTimeError ZonedDateTime(DateTime(2011,12,30,23),apia)
+@test ZonedDateTime(DateTime(2011,12,31,0),apia).utc_datetime == DateTime(2011,12,30,10)
