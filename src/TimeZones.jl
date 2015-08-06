@@ -40,7 +40,7 @@ function timezone_names()
     return sort(names)
 end
 
-export TimeZone, FixedTimeZone, VariableTimeZone, Transition, ZonedDateTime
+export TimeZone, FixedTimeZone, VariableTimeZone, Transition, ZonedDateTime,
     AmbiguousTimeError, NonExistentTimeError
 
 end # module
