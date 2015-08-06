@@ -1,4 +1,5 @@
 using TimeZones
+import Base.Dates: Second
 
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 
@@ -31,29 +32,78 @@ dt = DateTime(1916, 10, 1, 0)
 @test ZonedDateTime(dt, warsaw, true).utc_datetime == DateTime(1916, 9, 30, 22)
 @test ZonedDateTime(dt, warsaw, false).utc_datetime == DateTime(1916, 9, 30, 23)
 
-# TODO: Add tests where save > 02:00:00
-# TODO: Test offset changes where gap or overlap is greater than an hour
+# Zone offset reduced creating an ambigious hour
+dt = DateTime(1922,5,31,23)
+@test_throws AmbiguousTimeError ZonedDateTime(dt, warsaw)
+
+@test ZonedDateTime(dt, warsaw, 1).zone.name == :EET
+@test ZonedDateTime(dt, warsaw, 2).zone.name == :CET
+@test_throws AmbiguousTimeError ZonedDateTime(dt, warsaw, true)
+@test_throws AmbiguousTimeError ZonedDateTime(dt, warsaw, false)
+
+@test ZonedDateTime(dt, warsaw, 1).utc_datetime == DateTime(1922, 5, 31, 21)
+@test ZonedDateTime(dt, warsaw, 2).utc_datetime == DateTime(1922, 5, 31, 22)
 
 
-# test = TimeZones.Zoned(Dates.UTM(63492681600000))
-# # Test DateTime construction by parts
-# @test ZonedDateTime(DateTime(1918,10,27,0), tz) == ZonedDateTime(DateTime(1918,10,27,0), tz) ==
-# @test Dates.DateTime(2013,1) == test
-# @test Dates.DateTime(2013,1,1) == test
-# @test Dates.DateTime(2013,1,1,0) == test
-# @test Dates.DateTime(2013,1,1,0,0) == test
-# @test Dates.DateTime(2013,1,1,0,0,0) == test
-# @test Dates.DateTime(2013,1,1,0,0,0,0) == test
+# Check behaviour when save is larger than an hour.
+paris = resolve("Europe/Paris", tzdata["europe"]...)
+
+@test ZonedDateTime(DateTime(1945,4,2,1), paris).zone == FixedTimeZone("WEST", 0, 3600)
+@test_throws NonExistentTimeError ZonedDateTime(DateTime(1945,4,2,2), paris)
+@test ZonedDateTime(DateTime(1945,4,2,3), paris).zone == FixedTimeZone("WEMT", 0, 7200)
+
+@test_throws AmbiguousTimeError ZonedDateTime(DateTime(1945,9,16,2), paris)
+@test ZonedDateTime(DateTime(1945,9,16,2), paris, 1).zone == FixedTimeZone("WEMT", 0, 7200)
+@test ZonedDateTime(DateTime(1945,9,16,2), paris, 2).zone == FixedTimeZone("CET", 3600, 0)
+
+# Ensure that dates are continuous when both a UTC offset and the DST offset change.
+@test ZonedDateTime(DateTime(1945,9,16,1), paris).utc_datetime == DateTime(1945,9,15,23)
+@test ZonedDateTime(DateTime(1945,9,16,2), paris, 1).utc_datetime == DateTime(1945,9,16,0)
+@test ZonedDateTime(DateTime(1945,9,16,2), paris, 2).utc_datetime == DateTime(1945,9,16,1)
+@test ZonedDateTime(DateTime(1945,9,16,3), paris).utc_datetime == DateTime(1945,9,16,2)
 
 
-# @test_throws AmbiguousTimeError ZonedDateTime(DateTime(1942,11,2,3), warsaw)
-# @test_throws AmbiguousTimeError ZonedDateTime(DateTime(1942,11,2,3), warsaw, true)
-# @test_throws AmbiguousTimeError ZonedDateTime(DateTime(1942,11,2,3), warsaw, false)
-# @test ZonedDateTime(DateTime(1942,11,2,3), warsaw, 1).zone.name == :EET
-# @test ZonedDateTime(DateTime(1942,11,2,3), warsaw, 2).zone.name == :CET
+# Transitions changes that exceed an hour.
+t = VariableTimeZone("Testing", [
+    Transition(DateTime(1800,1,1), FixedTimeZone("TST",0,0)),
+    Transition(DateTime(1950,4,1), FixedTimeZone("TDT",0,7200)),
+    Transition(DateTime(1950,9,1), FixedTimeZone("TST",0,0)),
+])
+
+# A "spring forward" where 2 hours are skipped.
+@test ZonedDateTime(DateTime(1950,3,31,23), t).zone == FixedTimeZone("TST",0,0)
+@test_throws NonExistentTimeError ZonedDateTime(DateTime(1950,4,1,0), t)
+@test_throws NonExistentTimeError ZonedDateTime(DateTime(1950,4,1,1), t)
+@test ZonedDateTime(DateTime(1950,4,1,2), t).zone == FixedTimeZone("TDT",0,7200)
 
 
-# na_zones, na_rules = TimeZones.Olsen.tzparse(joinpath(Pkg.dir("TimeZones"), "deps", "tzdata", "northamerica"));
-# winnipeg = TimeZones.Olsen.resolve("America/Winnipeg", na_zones, na_rules)
-# @test ZonedDateTime(DateTime(1945,8,14,17), winnipeg).zone.name == :CWT
-# @test ZonedDateTime(DateTime(1945,8,14,18), winnipeg).zone.name == :CPT
+# A "fall back" where 2 hours are duplicated. Never appears to occur in reality.
+@test ZonedDateTime(DateTime(1950,8,31,23), t).utc_datetime == DateTime(1950,8,31,21)  # TDT
+
+# First occurrences of duplicated hours.
+@test ZonedDateTime(DateTime(1950,9,1,0), t, 1).utc_datetime == DateTime(1950,8,31,22) # TST
+@test ZonedDateTime(DateTime(1950,9,1,1), t, 1).utc_datetime == DateTime(1950,8,31,23) # TST
+
+# Second occurrences of duplicated hours.
+@test ZonedDateTime(DateTime(1950,9,1,0), t, 2).utc_datetime == DateTime(1950,9,1,0)   # TDT
+@test ZonedDateTime(DateTime(1950,9,1,1), t, 2).utc_datetime == DateTime(1950,9,1,1)   # TDT
+
+@test ZonedDateTime(DateTime(1950,9,1,2), t).utc_datetime == DateTime(1950,9,1,2)      # TDT
+
+
+# Ambigious local DateTime that has more than 2 solutions. Never occurs in reality.
+t = VariableTimeZone("Testing", [
+    Transition(DateTime(1800,1,1), FixedTimeZone("TST",0,0)),
+    Transition(DateTime(1960,4,1), FixedTimeZone("TDT",0,7200)),
+    Transition(DateTime(1960,8,31,23), FixedTimeZone("TXT",0,3600)),
+    Transition(DateTime(1960,9,1), FixedTimeZone("TST",0,0)),
+])
+
+@test ZonedDateTime(DateTime(1960,8,31,23), t).utc_datetime == DateTime(1960,8,31,21)  # TDT
+@test ZonedDateTime(DateTime(1960,9,1,0), t, 1).utc_datetime == DateTime(1960,8,31,22) # TDT
+@test ZonedDateTime(DateTime(1960,9,1,0), t, 2).utc_datetime == DateTime(1960,8,31,23) # TXT
+@test ZonedDateTime(DateTime(1960,9,1,0), t, 3).utc_datetime == DateTime(1960,9,1,0)   # TST
+@test ZonedDateTime(DateTime(1960,9,1,1), t).utc_datetime == DateTime(1960,9,1,1)      # TST
+
+@test_throws AmbiguousTimeError ZonedDateTime(DateTime(1960,9,1,0), t, true)
+@test_throws AmbiguousTimeError ZonedDateTime(DateTime(1960,9,1,0), t, false)
