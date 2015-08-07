@@ -502,6 +502,7 @@ end
 function tzparse(tzfile::String)
     zones = ZoneDict()
     rules = RuleDict()
+    links = Dict{String,String}()
 
     # For the intial pass we'll collect the zone and rule lines.
     open(tzfile) do fp
@@ -526,11 +527,19 @@ function tzparse(tzfile::String)
                 zone = zoneparse(split(line, ' '; limit=4)...)
                 zones[name] = push!(get(zones, name, Zone[]), zone)
             elseif kind == "Link"
-                # TODO: Handle Links
+                dest = line
+                links[dest] = name
             else
                 warn("Unhandled line found with type: $kind")
             end
         end
+    end
+
+    # Turn links into zones.
+    # Note: it would be more computationally efficient to pass the links around
+    # and only resolve a zone once.
+    for (dest, source) in links
+        zones[dest] = zones[source]
     end
 
     return zones, rules

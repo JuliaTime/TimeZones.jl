@@ -224,4 +224,18 @@ zone["TDT-5"] = TimeZones.DaylightSavingTimeZone("TDT-5", -36000, 3600)
 # should be able to safely handle this but nothing should require duplicates.
 @test test.transitions[6] == test.transitions[7]
 
-# TODO: Link
+
+# Make sure that we can deal with Links. Take note that the current implementation converts
+# links into zones which makes it hard to explicitly test for a link. We expect that the
+# following link exists:
+#
+# Link  Europe/Oslo  Arctic/Longyearbyen
+
+# Make sure that that the link timezone was parsed.
+zone_names = keys(tzdata["europe"][1])
+@test "Arctic/Longyearbyen" in zone_names
+
+oslo = resolve("Europe/Oslo", tzdata["europe"]...)
+longyearbyen = resolve("Arctic/Longyearbyen", tzdata["europe"]...)
+
+@test oslo.transitions == longyearbyen.transitions
