@@ -117,3 +117,31 @@ apia = resolve("Pacific/Apia", tzdata["australasia"]...)
 @test_throws NonExistentTimeError ZonedDateTime(DateTime(2011,12,30,0),apia)
 @test_throws NonExistentTimeError ZonedDateTime(DateTime(2011,12,30,23),apia)
 @test ZonedDateTime(DateTime(2011,12,31,0),apia).utc_datetime == DateTime(2011,12,30,10)
+
+
+# Redundant transitions should be ignored.
+# Note: that this can occur in reality if the TZ database parse has a Zone that ends at
+# the same time a Rule starts. When this occurs the duplicates always in standard time
+# with the same abbreviation.
+zone = Dict{String,FixedTimeZone}()
+zone["DTST"] = TimeZones.DaylightSavingTimeZone("DTST", 0, 0)
+zone["DTDT-1"] = TimeZones.DaylightSavingTimeZone("DTDT-1", 0, 3600)
+zone["DTDT-2"] = TimeZones.DaylightSavingTimeZone("DTDT-2", 0, 3600)
+
+dup = VariableTimeZone("DuplicateTest", [
+    Transition(DateTime(1800,1,1), zone["DTST"])
+    Transition(DateTime(1935,4,1), zone["DTDT-1"])  # Ignored
+    Transition(DateTime(1935,4,1), zone["DTDT-2"])
+    Transition(DateTime(1935,9,1), zone["DTST"])
+])
+
+# Make sure that the duplicated hour only doesn't contain an additional entry.
+@test_throws AmbiguousTimeError ZonedDateTime(DateTime(1935,9,1), dup)
+@test ZonedDateTime(DateTime(1935,9,1), dup, 1).zone.name == symbol("DTDT-2")
+@test ZonedDateTime(DateTime(1935,9,1), dup, 2).zone.name == :DTST
+@test_throws BoundsError ZonedDateTime(DateTime(1935,9,1), dup, 3)
+
+# Ensure that DTDT-1 is completely ignored.
+@test_throws NonExistentTimeError ZonedDateTime(DateTime(1935,4,1), dup)
+@test ZonedDateTime(DateTime(1935,4,1,1), dup).zone.name == symbol("DTDT-2")
+@test ZonedDateTime(DateTime(1935,8,31,23), dup).zone.name == symbol("DTDT-2")

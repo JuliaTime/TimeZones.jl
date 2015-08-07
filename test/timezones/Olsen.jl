@@ -1,5 +1,5 @@
 import TimeZones.Olsen: Time, hour, minute, second, toseconds, hourminutesecond
-import TimeZones.Olsen: parsedate
+import TimeZones.Olsen: ZoneDict, RuleDict, zoneparse, ruleparse, resolve, parsedate
 import Base.Dates: Hour, Minute, Second
 
 # Time seconds constructor
@@ -182,7 +182,46 @@ zone["WSDT"] = TimeZones.DaylightSavingTimeZone("WSDT", 46800, 3600)
 @test apia.transitions[9] == Transition(DateTime(2012,3,31,14), zone["WSST"])
 @test apia.transitions[10] == Transition(DateTime(2012,9,29,14), zone["WSDT"])
 
-# TODO: Test behaviour of mixing RULES as a string and save? For example what happens with
-# these made up Zones:
-# -10:30    1:00    HDT 1933 May 21 12:00
-# -10:30    Pacific H%sT 1933 May 21 12:00
+
+# Behaviour of mixing "RULES" as a String and as a Time. In reality this behaviour has never
+# been observed.
+
+# Manually generate zones and rules as if we had read them from a file.
+zones = ZoneDict()
+rules = RuleDict()
+
+zones["Pacific/Test"] = [
+    zoneparse("-10:00", "-", "TST-1", "1933 Apr 1 2:00s"),
+    zoneparse("-10:00", "1:00", "TDT-2", "1933 Sep 1 2:00s"),
+    zoneparse("-10:00", "Testing", "T%sT-3", "1934 Sep 1 3:00s"),
+    zoneparse("-10:00", "1:00", "TDT-4", "1935 Sep 1 3:00s"),
+    zoneparse("-10:00", "Testing", "T%sT-5", ""),
+]
+rules["Testing"] = [
+    ruleparse("1934", "1935", "-", "Apr", "1", "3:00s", "1", "D"),
+    ruleparse("1934", "1935", "-", "Sep", "1", "3:00s", "0", "S"),
+]
+
+test = resolve("Pacific/Test", zones, rules)
+
+zone = Dict{String,FixedTimeZone}()
+zone["TST-1"] = TimeZones.DaylightSavingTimeZone("TST-1", -36000, 0)
+zone["TDT-2"] = TimeZones.DaylightSavingTimeZone("TDT-2", -36000, 3600)
+zone["TST-3"] = TimeZones.DaylightSavingTimeZone("TST-3", -36000, 0)
+zone["TDT-3"] = TimeZones.DaylightSavingTimeZone("TDT-3", -36000, 3600)
+zone["TDT-4"] = TimeZones.DaylightSavingTimeZone("TDT-4", -36000, 3600)
+zone["TST-5"] = TimeZones.DaylightSavingTimeZone("TST-5", -36000, 0)
+zone["TDT-5"] = TimeZones.DaylightSavingTimeZone("TDT-5", -36000, 3600)
+
+@test test.transitions[1] == Transition(DateTime(1800,1,1), zone["TST-1"])
+@test test.transitions[2] == Transition(DateTime(1933,4,1,12), zone["TDT-2"]) # -09:00
+@test test.transitions[3] == Transition(DateTime(1933,9,1,12), zone["TST-3"])
+@test test.transitions[4] == Transition(DateTime(1934,4,1,13), zone["TDT-3"])
+@test test.transitions[5] == Transition(DateTime(1934,9,1,13), zone["TDT-4"])
+@test test.transitions[6] == Transition(DateTime(1935,9,1,13), zone["TST-5"])
+
+# Note: Due to how I wrote the zones/rules a duplicate transition exists. The TimeZone code
+# should be able to safely handle this but nothing should require duplicates.
+@test test.transitions[6] == test.transitions[7]
+
+# TODO: Link
