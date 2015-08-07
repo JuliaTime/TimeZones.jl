@@ -1,31 +1,41 @@
 import TimeZones.Olsen: REGIONS, generate_tzdata
 
 dir = dirname(@__FILE__)
-tz = joinpath(dir, "tzdata")
-com = joinpath(dir, "compiled")
+tzdata_dir = joinpath(dir, "tzdata")
+compiled_dir = joinpath(dir, "compiled")
 
-isdir(tz)  || mkdir(tz)
-isdir(com) || mkdir(com)
+isdir(tzdata_dir) || mkdir(tzdata_dir)
+isdir(compiled_dir) || mkdir(compiled_dir)
 
-# Remove all contents in tz and com directories.
-for d in (tz, com)
-    for file in readdir(d)
-        rm(joinpath(d, file), recursive=true)
+# TODO: Downloading fails regularly. Implement a retry system or file alternative
+# sources.
+info("Downloading TZ data")
+@sync for region in REGIONS
+    @async begin
+        remote_file = "ftp://ftp.iana.org/tz/data/" * region
+        region_file = joinpath(tzdata_dir, region)
+        try
+            # Note the destination file will be overwritten upon success.
+            download(remote_file, region_file)
+        catch e
+            if isa(e, ErrorException)
+                if isfile(region_file)
+                    warn("Falling back to old region file $region. Unable to download: $remote_file")
+                else
+                    error("Missing region file $region. Unable to download: $remote_file")
+                end
+            else
+                rethrow()
+            end
+        end
     end
 end
 
-#=
-Need to make this code more reliable
-
-LoadError: failed process: Process(`curl -o ~/.julia/v0.4/Timezones/deps/tzdata/asia -L ftp://ftp.iana.org/tz/data/asia`, ProcessExited(56)) [56]
-while loading ~/.julia/v0.4/Timezones/deps/build.jl, in expression starting on line 18
-=#
-info("Downloading TZ data")
-@sync for region in REGIONS
-    @async download("ftp://ftp.iana.org/tz/data/"*region, joinpath(tz,region))
-end
 
 info("Pre-processing TimeZone data")
-generate_tzdata(tz,com)
+for file in readdir(compiled_dir)
+    rm(joinpath(compiled_dir, file), recursive=true)
+end
+generate_tzdata(tzdata_dir, compiled_dir)
 
 info("Successfully processed TimeZone data")
