@@ -147,6 +147,25 @@ function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
     end
 end
 
+function ZonedDateTime(zdt::ZonedDateTime, tz::VariableTimeZone)
+    i = searchsortedlast(
+        tz.transitions, zdt.utc_datetime,
+        by=v -> typeof(v) == Transition ? v.utc_datetime : v,
+    )
+
+    if i == 0
+        local_dt = zdt.utc_datetime + total_offset(zdt.zone)
+        throw(NonExistentTimeError(local_dt, tz))
+    end
+
+    zone = tz.transitions[i].zone
+    return ZonedDateTime(zdt.utc_datetime, tz, zone)
+end
+
+function ZonedDateTime(zdt::ZonedDateTime, tz::FixedTimeZone)
+    return ZonedDateTime(zdt.utc_datetime, tz, tz)
+end
+
 type AmbiguousTimeError <: Exception
     dt::DateTime
     tz::TimeZone
