@@ -145,3 +145,27 @@ dup = VariableTimeZone("DuplicateTest", [
 @test_throws NonExistentTimeError ZonedDateTime(DateTime(1935,4,1), dup)
 @test ZonedDateTime(DateTime(1935,4,1,1), dup).zone.name == symbol("DTDT-2")
 @test ZonedDateTime(DateTime(1935,8,31,23), dup).zone.name == symbol("DTDT-2")
+
+
+# Check equality between ZonedDateTimes
+utc = FixedTimeZone("UTC", 0, 0)
+
+spring_utc = ZonedDateTime(DateTime(2010, 5, 1, 12), utc)
+spring_apia = ZonedDateTime(DateTime(2010, 5, 1, 1), apia)
+
+@test spring_utc.zone == FixedTimeZone("UTC", 0, 0)
+@test spring_apia.zone == FixedTimeZone("SST", -39600, 0)
+@test spring_utc == spring_apia
+@test spring_utc !== spring_apia
+@test ZonedDateTime(spring_utc, apia) === spring_apia
+@test ZonedDateTime(spring_apia, utc) === spring_utc
+
+fall_utc = ZonedDateTime(DateTime(2010, 10, 1, 12), utc)
+fall_apia = ZonedDateTime(DateTime(2010, 10, 1, 2), apia)
+
+@test fall_utc.zone == FixedTimeZone("UTC", 0, 0)
+@test fall_apia.zone == FixedTimeZone("SDT", -39600, 3600)
+@test fall_utc == fall_apia
+@test fall_utc !== fall_apia
+@test ZonedDateTime(fall_utc, apia) === fall_apia
+@test ZonedDateTime(fall_apia, utc) === fall_utc
