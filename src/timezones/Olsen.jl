@@ -479,7 +479,13 @@ function resolve!(zone_name::String, zoneset::ZoneDict, ruleset::RuleDict,
 
     # Note: Transitions array is expected to be ordered and should be if both
     # zones and rules were ordered.
-    return VariableTimeZone(zone_name, transitions)
+    if length(transitions) > 1
+        return VariableTimeZone(zone_name, transitions)
+    else
+        # Although unlikely the timezone name in the transition and the zone_name
+        # could be different. We'll ignore this issue at the moment.
+        return transitions[1].zone
+    end
 end
 
 function resolve(zoneset::ZoneDict, ruleset::RuleDict; debug=false)

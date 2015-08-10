@@ -239,3 +239,8 @@ oslo = resolve("Europe/Oslo", tzdata["europe"]...)
 longyearbyen = resolve("Arctic/Longyearbyen", tzdata["europe"]...)
 
 @test oslo.transitions == longyearbyen.transitions
+
+
+# Zones that don't include multiple lines and no rules should be treated as a FixedTimeZone.
+mst = resolve("MST", tzdata["northamerica"]...)
+@test isa(mst, FixedTimeZone)
