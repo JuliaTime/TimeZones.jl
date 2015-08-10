@@ -6,28 +6,16 @@ import Base.Dates: value
 # Note: The Olsen Database rounds offset precision to the nearest second
 # See "America/New_York" notes for an example.
 
-abstract FixedTimeZone <: TimeZone
-
 # Using type Symbol instead of AbstractString for name since it
 # gets us ==, and hash for free.
-immutable OffsetTimeZone <: FixedTimeZone
-    name::Symbol
-    offset::Second
-end
-
-immutable DaylightSavingTimeZone <: FixedTimeZone
+immutable FixedTimeZone <: TimeZone
     name::Symbol
     utc_offset::Second  # Standard offset from UTC
     dst_offset::Second  # Addition offset applied to UTC offset
-end
 
-function FixedTimeZone(name::Symbol, utc_offset::Second, dst_offset::Second)
-    # if value(dst_offset) == 0
-    #     OffsetTimeZone(name, utc_offset)
-    # else
-    #     DaylightSavingTimeZone(name, utc_offset, dst_offset)
-    # end
-    DaylightSavingTimeZone(name, utc_offset, dst_offset)
+    function FixedTimeZone(name::Symbol, utc_offset::Second, dst_offset::Second=Second(0))
+        new(name, utc_offset, dst_offset)
+    end
 end
 
 function FixedTimeZone(name::String, utc_offset::Int, dst_offset::Int=0)
@@ -70,7 +58,7 @@ Produces a list of possible UTC DateTimes given a local DateTime
 and a timezone. Results are returned in ascending order.
 """
 function possible_dates(local_dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
-    possible = sizehint!(Tuple{DateTime,FixedTimeZone}[], 2)
+    possible = Tuple{DateTime,FixedTimeZone}[]
     t = tz.transitions
 
     # Determine the earliest and latest possible UTC DateTime
@@ -94,7 +82,7 @@ function possible_dates(local_dt::DateTime, tz::VariableTimeZone; from_utc::Bool
 
     n = length(t)
     while i <= n && t[i].utc_datetime < latest
-        utc_dt = from_utc ? local_dt : local_dt - total_offset(t[i].zone)
+        utc_dt = from_utc ? local_dt : local_dt - offset(t[i].zone)
 
         if utc_dt >= t[i].utc_datetime && (i == n || utc_dt < t[i + 1].utc_datetime)
             push!(possible, (utc_dt, t[i].zone))
@@ -133,7 +121,7 @@ function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, is_dst::Bool; f
     elseif num == 0
         throw(NonExistentTimeError(local_dt, tz))
     elseif num == 2
-        mask = [dst_offset(zone) > Second(0) for (utc_dt, zone) in possible]
+        mask = [zone.dst_offset > Second(0) for (utc_dt, zone) in possible]
 
         # Mask is expected to be unambiguous.
         !($)(mask...) && throw(AmbiguousTimeError(local_dt, tz))
@@ -147,7 +135,7 @@ function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, is_dst::Bool; f
 end
 
 function ZonedDateTime(local_dt::DateTime, tz::FixedTimeZone; from_utc::Bool=false)
-    utc_dt = from_utc ? local_dt : local_dt - total_offset(tz)
+    utc_dt = from_utc ? local_dt : local_dt - offset(tz)
     return ZonedDateTime(utc_dt, tz, tz)
 end
 
@@ -158,8 +146,7 @@ function ZonedDateTime(zdt::ZonedDateTime, tz::VariableTimeZone)
     )
 
     if i == 0
-        local_dt = zdt.utc_datetime + total_offset(zdt.zone)
-        throw(NonExistentTimeError(local_dt, tz))
+        throw(NonExistentTimeError(localtime(zdt), tz))
     end
 
     zone = tz.transitions[i].zone

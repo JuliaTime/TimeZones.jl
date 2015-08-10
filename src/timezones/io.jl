@@ -1,5 +1,5 @@
 function Base.string(dt::ZonedDateTime)
-    offset = total_offset(dt.zone)
+    offset = offset(dt.zone)
 
     v = offset.value
     h, v = divrem(v, 3600)
@@ -9,7 +9,7 @@ function Base.string(dt::ZonedDateTime)
     mm = lpad(m, 2, "0")
     ss = s != 0 ? lpad(s, 2, "0") : ""
 
-    local_dt = dt.utc_datetime + offset
+    local_dt = localtime(dt)
     return "$local_dt$hh:$mm$(ss)"
 end
 Base.show(io::IO,dt::ZonedDateTime) = print(io,string(dt))
