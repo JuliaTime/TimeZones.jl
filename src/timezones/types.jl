@@ -69,7 +69,7 @@ end
 Produces a list of possible UTC DateTimes given a local DateTime
 and a timezone. Results are returned in ascending order.
 """
-function possible_dates(local_dt::DateTime, tz::VariableTimeZone)
+function possible_dates(local_dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
     possible = sizehint!(Tuple{DateTime,FixedTimeZone}[], 2)
     t = tz.transitions
 
@@ -77,8 +77,12 @@ function possible_dates(local_dt::DateTime, tz::VariableTimeZone)
     # that this local DateTime could be.
     # TODO: Maybe look at the range of offsets available within
     # this TimeZone?
-    earliest = local_dt - Hour(12)
-    latest = local_dt + Hour(14)
+    if from_utc
+        earliest = latest = local_dt
+    else
+        earliest = local_dt - Hour(12)
+        latest = local_dt + Hour(14)
+    end
 
     # Determine the earliest transition the local DateTime could
     # occur within.
@@ -90,7 +94,7 @@ function possible_dates(local_dt::DateTime, tz::VariableTimeZone)
 
     n = length(t)
     while i <= n && t[i].utc_datetime < latest
-        utc_dt = local_dt - total_offset(t[i].zone)
+        utc_dt = from_utc ? local_dt : local_dt - total_offset(t[i].zone)
 
         if utc_dt >= t[i].utc_datetime && (i == n || utc_dt < t[i + 1].utc_datetime)
             push!(possible, (utc_dt, t[i].zone))
@@ -102,8 +106,8 @@ function possible_dates(local_dt::DateTime, tz::VariableTimeZone)
     return possible
 end
 
-function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, occurrence::Int=0)
-    possible = possible_dates(local_dt, tz)
+function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, occurrence::Int=0; from_utc::Bool=false)
+    possible = possible_dates(local_dt, tz; from_utc=from_utc)
 
     num = length(possible)
     if num == 1
@@ -111,18 +115,16 @@ function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, occurrence::Int
         return ZonedDateTime(utc_dt, tz, zone)
     elseif num == 0
         throw(NonExistentTimeError(local_dt, tz))
-        # error("Non-existent DateTime")  # NonExistentTimeError
     elseif occurrence > 0
         utc_dt, zone = possible[occurrence]
         return ZonedDateTime(utc_dt, tz, zone)
     else
         throw(AmbiguousTimeError(local_dt, tz))
-        # error("Ambiguous DateTime")  # AmbiguousTimeError
     end
 end
 
-function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
-    possible = possible_dates(local_dt, tz)
+function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, is_dst::Bool; from_utc::Bool=false)
+    possible = possible_dates(local_dt, tz; from_utc=from_utc)
 
     num = length(possible)
     if num == 1
@@ -144,8 +146,8 @@ function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
     end
 end
 
-function ZonedDateTime(local_dt::DateTime, tz::FixedTimeZone)
-    utc_dt = local_dt - total_offset(tz)
+function ZonedDateTime(local_dt::DateTime, tz::FixedTimeZone; from_utc::Bool=false)
+    utc_dt = from_utc ? local_dt : local_dt - total_offset(tz)
     return ZonedDateTime(utc_dt, tz, tz)
 end
 
@@ -168,8 +170,6 @@ function ZonedDateTime(zdt::ZonedDateTime, tz::FixedTimeZone)
     return ZonedDateTime(zdt.utc_datetime, tz, tz)
 end
 
-==(a::ZonedDateTime, b::ZonedDateTime) = a.utc_datetime == b.utc_datetime
-
 type AmbiguousTimeError <: Exception
     dt::DateTime
     tz::TimeZone
@@ -181,3 +181,7 @@ type NonExistentTimeError <: Exception
     tz::TimeZone
 end
 Base.showerror(io::IO, e::NonExistentTimeError) = print(io, "DateTime $(e.dt) does not exist within $(e.tz)");
+
+# Equality
+==(a::ZonedDateTime, b::ZonedDateTime) = a.utc_datetime == b.utc_datetime
+Base.isless(a::ZonedDateTime, b::ZonedDateTime) = isless(a.utc_datetime, b.utc_datetime)
