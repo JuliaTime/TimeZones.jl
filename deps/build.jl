@@ -14,18 +14,25 @@ info("Downloading TZ data")
     @async begin
         remote_file = "ftp://ftp.iana.org/tz/data/" * region
         region_file = joinpath(tzdata_dir, region)
-        try
-            # Note the destination file will be overwritten upon success.
-            download(remote_file, region_file)
-        catch e
-            if isa(e, ErrorException)
-                if isfile(region_file)
-                    warn("Falling back to old region file $region. Unable to download: $remote_file")
+        remaining = 3
+
+        while remaining > 0
+            try
+                # Note the destination file will be overwritten upon success.
+                download(remote_file, region_file)
+                remaining = 0
+            catch e
+                if isa(e, ErrorException)
+                    if remaining > 0
+                        remaining -= 1
+                    elseif isfile(region_file)
+                        warn("Falling back to old region file $region. Unable to download: $remote_file")
+                    else
+                        error("Missing region file $region. Unable to download: $remote_file")
+                    end
                 else
-                    error("Missing region file $region. Unable to download: $remote_file")
+                    rethrow()
                 end
-            else
-                rethrow()
             end
         end
     end
