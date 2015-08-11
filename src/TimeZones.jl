@@ -1,5 +1,8 @@
 module TimeZones
 
+export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
+    AmbiguousTimeError, NonExistentTimeError, DateTime
+
 const PKG_DIR = normpath(joinpath(dirname(@__FILE__), "..", "deps"))
 const TZDATA_DIR = joinpath(PKG_DIR, "tzdata")
 const COMPILED_DIR = joinpath(PKG_DIR, "compiled")
@@ -41,8 +44,5 @@ function timezone_names()
 
     return sort(names)
 end
-
-export TimeZone, FixedTimeZone, VariableTimeZone, Transition, ZonedDateTime,
-    AmbiguousTimeError, NonExistentTimeError, DateTime
 
 end # module

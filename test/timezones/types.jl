@@ -1,4 +1,4 @@
-using TimeZones
+import TimeZones: Transition
 import Base.Dates: Second
 
 
