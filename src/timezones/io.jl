@@ -30,7 +30,7 @@ function Base.Dates.slotparse(slot::Slot{TimeZoneSlot},x)
     end
 end
 
-const SLOT_TYPE = Dict(
+SLOT_TYPE = Dict(
     'y' => Year,
     'm' => Month,
     'u' => Month,
@@ -46,7 +46,7 @@ const SLOT_TYPE = Dict(
     'Z' => TimeZoneSlot,
 )
 
-const SLOT_OPTION = Dict(
+SLOT_OPTION = Dict(
     'e' => 1,
     'E' => 2,
     'u' => 1,
@@ -55,11 +55,13 @@ const SLOT_OPTION = Dict(
     'Z' => 2,
 )
 
+# Overwritten to allow for extensibility.
 function Base.Dates.DateFormat(f::AbstractString, locale::AbstractString="english")
     slots = Slot[]
     trans = []
-    begtran, format = match(r"(^[^ymuUdHMSsEeZz]*)(.*)", f).captures
-    s = split(format, r"[^ymuUdHMSsEeZz]+|(?<=([ymuUdHMSsEeZz])(?!\1))")
+    ids = join(keys(SLOT_TYPE), "")
+    begtran, format = match(Regex("(^[^$ids]*)(.*)"), f).captures
+    s = split(format, Regex("[^$ids]+|(?<=([$ids])(?!\\1))"))
     for (i,k) in enumerate(s)
         k == "" && break
         tran = i >= endof(s) ? r"$" : match(Regex("(?<=$(s[i])).*(?=$(s[i+1]))"),f).match
