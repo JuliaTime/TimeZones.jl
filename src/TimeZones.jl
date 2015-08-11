@@ -42,6 +42,6 @@ function timezone_names()
 end
 
 export TimeZone, FixedTimeZone, VariableTimeZone, Transition, ZonedDateTime,
-    AmbiguousTimeError, NonExistentTimeError
+    AmbiguousTimeError, NonExistentTimeError, DateTime
 
 end # module

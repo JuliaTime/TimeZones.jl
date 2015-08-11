@@ -180,6 +180,24 @@ function ZonedDateTime(zdt::ZonedDateTime, tz::FixedTimeZone)
     return ZonedDateTime(zdt.utc_datetime, tz, tz)
 end
 
+function DateTime(parts::Union{Period,TimeZone}...)
+    periods = Period[]
+    timezone = Nullable{TimeZone}()
+    for part in parts
+        if isa(part, Period)
+            push!(periods, part)
+        elseif isnull(timezone)
+            timezone = Nullable{TimeZone}(part)
+        else
+            error("Multiple timezones found")
+        end
+    end
+
+    dt = DateTime(periods...)
+    return isnull(timezone) ? dt : ZonedDateTime(dt, get(timezone))
+end
+
+
 type AmbiguousTimeError <: Exception
     dt::DateTime
     tz::TimeZone
