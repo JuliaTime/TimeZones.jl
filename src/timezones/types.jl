@@ -22,6 +22,29 @@ function FixedTimeZone(name::String, utc_offset::Int, dst_offset::Int=0)
     FixedTimeZone(symbol(name), Second(utc_offset), Second(dst_offset))
 end
 
+function FixedTimeZone(s::String)
+    m = match(r"^([+-]?\d{2})\:?(\d{2})(?:\:(\d{2}+))?$", s)
+    m == nothing && error("Unrecognized timezone: $s")
+
+    # TODO: Somehow this is not working in the package but works in the REPL
+    values = map(n -> n == nothing ? 0 : Base.parse(Int, n), m.captures)
+
+    if values[3] == 0
+        name = @sprintf("UTC%+03d:%02d", values[1:2]...)
+    else
+        name = @sprintf("UTC%+03d:%02d:%02d", values...)
+    end
+
+    if values[1] < 0
+        for i in 2:length(values)
+            values[i] = -values[i]
+        end
+    end
+
+    offset = values[1] * 3600 + values[2] * 60 + values[3]
+    return FixedTimeZone(name, offset)
+end
+
 immutable Transition
     utc_datetime::DateTime  # Instant where new zone applies
     zone::FixedTimeZone

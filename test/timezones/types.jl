@@ -1,6 +1,26 @@
 using TimeZones
 import Base.Dates: Second
 
+
+# Constructor FixedTimeZone from a string.
+@test FixedTimeZone("0123") == FixedTimeZone("UTC+01:23", 4980)
+@test FixedTimeZone("+0123") == FixedTimeZone("UTC+01:23", 4980)
+@test FixedTimeZone("-0123") == FixedTimeZone("UTC-01:23", -4980)
+@test FixedTimeZone("01:23") == FixedTimeZone("UTC+01:23", 4980)
+@test FixedTimeZone("+01:23") == FixedTimeZone("UTC+01:23", 4980)
+@test FixedTimeZone("-01:23") == FixedTimeZone("UTC-01:23", -4980)
+@test FixedTimeZone("01:23:45") == FixedTimeZone("UTC+01:23:45", 5025)
+@test FixedTimeZone("+01:23:45") == FixedTimeZone("UTC+01:23:45", 5025)
+@test FixedTimeZone("-01:23:45") == FixedTimeZone("UTC-01:23:45", -5025)
+@test FixedTimeZone("99:99:99") == FixedTimeZone("UTC+99:99:99", 362439)
+
+@test_throws Exception FixedTimeZone("123")
+@test_throws Exception FixedTimeZone("012345")
+@test_throws Exception FixedTimeZone("01:-23:45")
+@test_throws Exception FixedTimeZone("01:23:-45")
+@test_throws Exception FixedTimeZone("01:23:45:67")
+
+
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 
 # Typical "spring-forward" behaviour
