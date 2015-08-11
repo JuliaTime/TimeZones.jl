@@ -15,6 +15,15 @@ fall = DateTime(2015, 10, 25, 0)   # 25 hour day in warsaw
 @test ZonedDateTime(spring, warsaw) + Hour(24) == ZonedDateTime(spring + Hour(25), warsaw)
 @test ZonedDateTime(fall, warsaw) + Hour(24) == ZonedDateTime(fall + Hour(23), warsaw)
 
+# Do the same calculations but backwards over the transitions.
+@test ZonedDateTime(normal + Day(1), warsaw) - Day(1) == ZonedDateTime(normal, warsaw)
+@test ZonedDateTime(spring + Day(1), warsaw) - Day(1) == ZonedDateTime(spring, warsaw)
+@test ZonedDateTime(fall + Day(1), warsaw) - Day(1) == ZonedDateTime(fall, warsaw)
+
+@test ZonedDateTime(normal + Day(1), warsaw) - Hour(24) == ZonedDateTime(normal, warsaw)
+@test ZonedDateTime(spring + Day(1), warsaw) - Hour(23) == ZonedDateTime(spring, warsaw)
+@test ZonedDateTime(fall + Day(1), warsaw) - Hour(25) == ZonedDateTime(fall, warsaw)
+
 # Non-Associativity
 hour_day = (ZonedDateTime(spring, warsaw) + Hour(24)) + Day(1)
 day_hour = (ZonedDateTime(spring, warsaw) + Day(1)) + Hour(24)
