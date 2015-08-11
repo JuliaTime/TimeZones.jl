@@ -1,19 +1,15 @@
-language: cpp
-compiler: 
-    - clang
+language: julia
+sudo: false
+os:
+    - osx
+    - linux
+julia:
+    - nightly
 notifications:
     email: false
-env:
-    matrix: 
-        - JULIAVERSION="julianightlies" 
-before_install:
-    - sudo add-apt-repository ppa:staticfloat/julia-deps -y
-    - sudo add-apt-repository ppa:staticfloat/${JULIAVERSION} -y
-    - sudo apt-get update -qq -y
-    - sudo apt-get install libpcre3-dev julia -y
 script:
-    - julia -e 'Pkg.init(); Pkg.clone(pwd()); Pkg.test("Timezones")'
-    - julia -e 'using Timezones; @assert isdefined(:Timezones); @assert typeof(Timezones) === Module'
-    - if [ $JULIAVERSION = "julianightlies" ]; then julia --code-coverage test/runtests.jl; fi
+    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+    - julia -e 'Pkg.clone(pwd()); Pkg.build("TimeZones"); Pkg.test("TimeZones"; coverage=true)';
 after_success:
-    - if [ $JULIAVERSION = "julianightlies" ]; then julia -e 'cd(Pkg.dir("Timezones")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'; fi
+    - julia -e 'cd(Pkg.dir("TimeZones")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())';
+    - julia -e 'cd(Pkg.dir("TimeZones")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
