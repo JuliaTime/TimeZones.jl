@@ -1,10 +1,5 @@
 import Base.Dates: Day, Hour
 
-# wpg = TimeZone("America/Winnipeg")
-# dt = ZonedDateTime(DateTime(2015, 3, 8, 0), wpg)
-# dt + Day(1)
-# dt + Hour(24)
-
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 
 # Period arithmetic

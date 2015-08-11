@@ -551,38 +551,6 @@ function tzparse(tzfile::String)
     return zones, rules
 end
 
-function zone_symbol(z::Zone)
-    n = z.name
-    n = ismatch(r"(?<=/).+?$",n) ? match(r"(?<=/).+?$",n).match : n
-    n = ismatch(r"(?<=/).+?$",n) ? match(r"(?<=/).+?$",n).match : n
-    return replace(n,"-","_")
-end
-
-function generate_tzinfo(olsen_path::String,dest_path::String)
-    files = [:africa,:antarctica,:asia,:australasia,
-             :europe,:northamerica,:southamerica]
-    zones = Zone[]
-    for f in files
-        append!(zones,tzparse(joinpath(olsen_path,string(f)))[1])
-    end
-    z_syms = [symbol(zone_symbol(x)) for x in zones]
-    z_s = [a.name=>b for (a,b) in zip(zones,z_syms)]
-    s_z = [a=>b.name for (a,b) in zip(z_syms,zones)]
-    open(joinpath(dest_path, "tzinfo.jl"), "w") do f
-        write(f,"### AUTO-GENERATED FILE ###\n\n")
-        # Zone Definitions
-        write(f,"#Define zone immutable for each timezone in Olson tz database\n")
-        write(f,"for tz in $(repr(tuple(z_syms...)))\n")
-        write(f,"\t@eval immutable \$tz <: PoliticalTimezone end\n")
-        write(f,"end\n\n")
-        # String=>Zone, Zone=>String mapping
-        write(f,"const TIMEZONES = $(repr(s_z))\n")
-        write(f,"const TIMEZONES1 = $(repr(z_s))\n")
-        # Abbreviations
-
-    end
-end
-
 function load(tzdata_dir::String=TZDATA_DIR)
     timezones = Dict{String,TimeZone}()
     for region in REGIONS
@@ -609,10 +577,4 @@ function compile(tzdata_dir::String=TZDATA_DIR, dest_dir::String=COMPILED_DIR)
     end
 end
 
-#TODO
- #spot check times/offsets/abbrs
- #handle timezone link names
- #generate common abbreviation typealiases
- #fix abbreviation for kiev? antarctica
- #use etcetera file for generic offsets?
 end # module

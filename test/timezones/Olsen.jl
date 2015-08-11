@@ -101,6 +101,7 @@ warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 @test warsaw.transitions[2].zone.name == :WMT
 @test warsaw.transitions[3].zone.name == :CET   # Standard time
 @test warsaw.transitions[4].zone.name == :CEST  # Daylight saving time
+@test issorted(warsaw.transitions)
 
 zone = Dict{String,FixedTimeZone}()
 zone["LMT"] = FixedTimeZone("LMT", 5040, 0)

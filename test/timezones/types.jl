@@ -23,6 +23,40 @@ import Base.Dates: Second
 
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 
+# Standard time behaviour
+dt = DateTime(1916, 2, 1, 0)
+
+# Disambiguating parameters ignored when there is no ambiguity.
+@test ZonedDateTime(dt, warsaw).zone.name == :CET
+@test ZonedDateTime(dt, warsaw, 1).zone.name == :CET
+@test ZonedDateTime(dt, warsaw, 2).zone.name == :CET
+@test ZonedDateTime(dt, warsaw, true).zone.name == :CET
+@test ZonedDateTime(dt, warsaw, false).zone.name == :CET
+
+@test ZonedDateTime(dt, warsaw).utc_datetime == DateTime(1916, 1, 31, 23)
+@test ZonedDateTime(dt, warsaw, 1).utc_datetime == DateTime(1916, 1, 31, 23)
+@test ZonedDateTime(dt, warsaw, 2).utc_datetime == DateTime(1916, 1, 31, 23)
+@test ZonedDateTime(dt, warsaw, true).utc_datetime == DateTime(1916, 1, 31, 23)
+@test ZonedDateTime(dt, warsaw, false).utc_datetime == DateTime(1916, 1, 31, 23)
+
+
+# Daylight saving time behaviour
+dt = DateTime(1916, 6, 1, 0)
+
+# Disambiguating parameters ignored when there is no ambiguity.
+@test ZonedDateTime(dt, warsaw).zone.name == :CEST
+@test ZonedDateTime(dt, warsaw, 1).zone.name == :CEST
+@test ZonedDateTime(dt, warsaw, 2).zone.name == :CEST
+@test ZonedDateTime(dt, warsaw, true).zone.name == :CEST
+@test ZonedDateTime(dt, warsaw, false).zone.name == :CEST
+
+@test ZonedDateTime(dt, warsaw).utc_datetime == DateTime(1916, 5, 31, 22)
+@test ZonedDateTime(dt, warsaw, 1).utc_datetime == DateTime(1916, 5, 31, 22)
+@test ZonedDateTime(dt, warsaw, 2).utc_datetime == DateTime(1916, 5, 31, 22)
+@test ZonedDateTime(dt, warsaw, true).utc_datetime == DateTime(1916, 5, 31, 22)
+@test ZonedDateTime(dt, warsaw, false).utc_datetime == DateTime(1916, 5, 31, 22)
+
+
 # Typical "spring-forward" behaviour
 dts = (
     DateTime(1916,4,30,22),
@@ -30,6 +64,10 @@ dts = (
     DateTime(1916,5,1,0),
 )
 @test_throws NonExistentTimeError ZonedDateTime(dts[2], warsaw)
+@test_throws NonExistentTimeError ZonedDateTime(dts[2], warsaw, 1)
+@test_throws NonExistentTimeError ZonedDateTime(dts[2], warsaw, 2)
+@test_throws NonExistentTimeError ZonedDateTime(dts[2], warsaw, true)
+@test_throws NonExistentTimeError ZonedDateTime(dts[2], warsaw, false)
 
 @test ZonedDateTime(dts[1], warsaw).zone.name == :CET
 @test ZonedDateTime(dts[3], warsaw).zone.name == :CEST
@@ -172,6 +210,7 @@ utc = FixedTimeZone("UTC", 0, 0)
 
 spring_utc = ZonedDateTime(DateTime(2010, 5, 1, 12), utc)
 spring_apia = ZonedDateTime(DateTime(2010, 5, 1, 1), apia)
+early_utc = ZonedDateTime(DateTime(1, 1, 1, 0), utc)
 
 @test spring_utc.zone == FixedTimeZone("UTC", 0, 0)
 @test spring_apia.zone == FixedTimeZone("SST", -39600, 0)
@@ -187,5 +226,11 @@ fall_apia = ZonedDateTime(DateTime(2010, 10, 1, 2), apia)
 @test fall_apia.zone == FixedTimeZone("SDT", -39600, 3600)
 @test fall_utc == fall_apia
 @test fall_utc !== fall_apia
+@test !(fall_utc < fall_apia)
+@test !(fall_utc > fall_apia)
 @test ZonedDateTime(fall_utc, apia) === fall_apia
 @test ZonedDateTime(fall_apia, utc) === fall_utc
+
+# A FixedTimeZone is effective for all of time where as a VariableTimeZone has as start.
+@test TimeZones.utc(early_utc) < apia.transitions[1].utc_datetime
+@test_throws NonExistentTimeError ZonedDateTime(early_utc, apia)
