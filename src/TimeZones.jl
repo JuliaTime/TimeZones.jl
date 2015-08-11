@@ -1,5 +1,9 @@
 module TimeZones
 
+const PKG_DIR = normpath(joinpath(dirname(@__FILE__), "..", "deps"))
+const TZDATA_DIR = joinpath(PKG_DIR, "tzdata")
+const COMPILED_DIR = joinpath(PKG_DIR, "compiled")
+
 include("timezones/types.jl")
 include("timezones/accessors.jl")
 include("timezones/arithmetic.jl")
@@ -7,8 +11,7 @@ include("timezones/io.jl")
 include("timezones/Olsen.jl")
 
 function TimeZone(name::String)
-    compiled_dir = joinpath(dirname(@__FILE__), "..", "deps", "compiled")
-    tz_path = joinpath(compiled_dir, split(name, "/")...)
+    tz_path = joinpath(COMPILED_DIR, split(name, "/")...)
 
     isfile(tz_path) || error("Unknown timezone $name")
 
@@ -19,9 +22,7 @@ end
 
 function timezone_names()
     names = String[]
-
-    compiled_dir = joinpath(dirname(@__FILE__), "..", "deps", "compiled")
-    check = Tuple{String,String}[(compiled_dir, "")]
+    check = Tuple{String,String}[(COMPILED_DIR, "")]
 
     for (dir, partial) in check
         for filename in readdir(dir)

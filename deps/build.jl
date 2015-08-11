@@ -1,11 +1,8 @@
-import TimeZones.Olsen: REGIONS, generate_tzdata
+import TimeZones: TZDATA_DIR, COMPILED_DIR
+import TimeZones.Olsen: REGIONS, compile
 
-dir = dirname(@__FILE__)
-tzdata_dir = joinpath(dir, "tzdata")
-compiled_dir = joinpath(dir, "compiled")
-
-isdir(tzdata_dir) || mkdir(tzdata_dir)
-isdir(compiled_dir) || mkdir(compiled_dir)
+isdir(TZDATA_DIR) || mkdir(TZDATA_DIR)
+isdir(COMPILED_DIR) || mkdir(COMPILED_DIR)
 
 # TODO: Downloading fails regularly. Implement a retry system or file alternative
 # sources.
@@ -13,7 +10,7 @@ info("Downloading TZ data")
 @sync for region in REGIONS
     @async begin
         remote_file = "ftp://ftp.iana.org/tz/data/" * region
-        region_file = joinpath(tzdata_dir, region)
+        region_file = joinpath(TZDATA_DIR, region)
         remaining = 3
 
         while remaining > 0
@@ -40,9 +37,9 @@ end
 
 
 info("Pre-processing TimeZone data")
-for file in readdir(compiled_dir)
-    rm(joinpath(compiled_dir, file), recursive=true)
+for file in readdir(COMPILED_DIR)
+    rm(joinpath(COMPILED_DIR, file), recursive=true)
 end
-generate_tzdata(tzdata_dir, compiled_dir)
+compile(TZDATA_DIR, COMPILED_DIR)
 
 info("Successfully processed TimeZone data")

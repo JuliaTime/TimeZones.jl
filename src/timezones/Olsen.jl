@@ -3,6 +3,7 @@ module Olsen
 using Base.Dates
 import Base.Dates: value, toms
 
+import ..TimeZones: TZDATA_DIR, COMPILED_DIR
 import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
 
 const REGIONS = (
@@ -582,17 +583,17 @@ function generate_tzinfo(olsen_path::String,dest_path::String)
     end
 end
 
-function load(olsen_dir::String)
+function load(tzdata_dir::String=TZDATA_DIR)
     timezones = Dict{String,TimeZone}()
     for region in REGIONS
-        zones, rules = tzparse(joinpath(olsen_dir, region))
+        zones, rules = tzparse(joinpath(tzdata_dir, region))
         merge!(timezones, resolve(zones, rules))
     end
     return timezones
 end
 
-function generate_tzdata(olsen_dir::String, dest_dir::String)
-    timezones = load(olsen_dir)
+function compile(tzdata_dir::String=TZDATA_DIR, dest_dir::String=COMPILED_DIR)
+    timezones = load(tzdata_dir)
 
     isdir(dest_dir) || error("Destination directory doesn't exist")
 
