@@ -2,7 +2,6 @@ module Olsen
 
 using Base.Dates
 import Base.Dates: value, toms
-import Compat: parse
 
 import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
 
