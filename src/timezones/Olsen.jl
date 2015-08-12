@@ -1,89 +1,15 @@
 module Olsen
 
 using Base.Dates
-import Base.Dates: value, toms
 
-import ..TimeZones: TZDATA_DIR, COMPILED_DIR
-import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
+import ..TimeZones: TZDATA_DIR, COMPILED_DIR, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET,
+    MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET, Time, toseconds
+import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition, Time
 
 const REGIONS = (
     "africa", "antarctica", "asia", "australasia",
     "europe", "northamerica", "southamerica",
 )
-
-# Convenience type for working with HH:MM:SS.
-immutable Time <: TimePeriod
-    seconds::Int
-end
-const ZERO = Time(0)
-
-function Time(hour::Int, minute::Int, second::Int)
-    Time(hour * 3600 + minute * 60 + second)
-end
-
-function Time(s::String)
-    # "-" represents 0:00 for some DST rules
-    s == "-" && return ZERO
-    parsed = map(n -> parse(Int, n), split(s, ':'))
-
-    # Only can handle up to hour, minute, second.
-    length(parsed) > 3 && error("Invalid Time string")
-    any(parsed[2:end] .< 0) && error("Invalid Time string")
-
-    # Handle variations where minutes and seconds may be excluded.
-    values = [0,0,0]
-    values[1:length(parsed)] = parsed
-
-    if values[1] < 0
-        for i in 2:length(values)
-            values[i] = -values[i]
-        end
-    end
-
-    return Time(values...)
-end
-
-# TimePeriod methods
-value(t::Time) = t.seconds
-toms(t::Time) = t.seconds * 1000
-
-toseconds(t::Time) = t.seconds
-hour(t::Time) = div(toseconds(t), 3600)
-minute(t::Time) = rem(div(toseconds(t), 60), 60)
-second(t::Time) = rem(toseconds(t), 60)
-
-function hourminutesecond(t::Time)
-    h, r = divrem(toseconds(t), 3600)
-    m, s = divrem(r, 60)
-    return h, m, s
-end
-
-Base.convert(::Type{Second}, t::Time) = Second(toseconds(t))
-Base.convert(::Type{Millisecond}, t::Time) = Millisecond(toseconds(t) * 1000)
-Base.promote_rule{P<:Union{Week,Day,Hour,Minute,Second}}(::Type{P}, ::Type{Time}) = Second
-Base.promote_rule(::Type{Millisecond}, ::Type{Time}) = Millisecond
-
-# Should be defined in Base.Dates
-Base.isless(x::Period, y::Period) = isless(promote(x,y)...)
-
-# https://en.wikipedia.org/wiki/ISO_8601#Times
-function Base.string(t::Time)
-    neg = toseconds(t) < 0 ? "-" : ""
-    h, m, s = map(abs, hourminutesecond(t))
-    @sprintf("%s%02d:%02d:%02d", neg, h, m, s)
-end
-
-Base.show(io::IO, t::Time) = print(io, string(t))
-
-# min/max offsets across all zones and all time.
-const MINOFFSET = Time("-15:56:00")  # Asia/Manilla
-const MAXOFFSET = Time("15:13:42")   # America/Metlakatla
-
-# min/max save across all zones/rules and all time.
-const MINSAVE = Time("00:00")
-const MAXSAVE = Time("02:00")  # France, Germany, Port, Spain
-
-const MAXABSDIFF = abs((MAXOFFSET + MAXSAVE) - (MINOFFSET + MINSAVE))
 
 # Zone type maps to an Olsen Timezone database entity
 type Zone
@@ -101,7 +27,7 @@ function Base.isless(x::Zone,y::Zone)
 
     # Easy to compare until's if they are using the same flag. Alternatively, it should
     # be safe to compare different until flags if the DateTimes are far enough apart.
-    if x.until_flag == y.until_flag || abs(x_dt - y_dt) > MAXABSDIFF
+    if x.until_flag == y.until_flag || abs(x_dt - y_dt) > ABS_DIFF_OFFSET
         return isless(x_dt, y_dt)
     else
         error("Unable to compare zones when until datetimes are too close and flags are mixed")
@@ -249,8 +175,8 @@ function ruleparse(from, to, rule_type, month, on, at, save, letter)
     letter = letter == "-" ? "" : letter
 
     # Report unexpected save values that could cause issues during resolve.
-    save_hm < MINSAVE && warn("Discovered save $save_hm less than the expected min $MINSAVE")
-    save_hm > MAXSAVE && warn("Discovered save $save_hm larger than the expected max $MAXSAVE")
+    save_hm < MIN_SAVE && warn("Discovered save $save_hm less than the expected min $MIN_SAVE")
+    save_hm > MAX_SAVE && warn("Discovered save $save_hm larger than the expected max $MAX_SAVE")
 
     # Now we've finally parsed everything we need
     return Rule(
@@ -270,8 +196,8 @@ function zoneparse(gmtoff, rules, format, until="")
     offset = Time(gmtoff)
 
     # Report unexpected offsets that could cause issues during resolve.
-    offset < MINOFFSET && warn("Discovered offset $offset less than the expected min $MINOFFSET")
-    offset > MAXOFFSET && warn("Discovered offset $offset larger than the expected max $MAXOFFSET")
+    offset < MIN_GMT_OFFSET && warn("Discovered offset $offset less than the expected min $MIN_GMT_OFFSET")
+    offset > MAX_GMT_OFFSET && warn("Discovered offset $offset larger than the expected max $MAX_GMT_OFFSET")
 
     format = format == "zzz" ? "" : format
 
@@ -347,7 +273,7 @@ function order_rules(rules::Array{Rule})
     # there is a small chance that the results are not ordered correctly.
     last_date = typemin(Date)
     for (i, (date, rule)) in enumerate(date_rules)
-        if i > 1 && date - last_date <= MAXABSDIFF
+        if i > 1 && date - last_date <= ABS_DIFF_OFFSET
             error("Dates are probably not in order")
         end
         last_date = date

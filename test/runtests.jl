@@ -15,6 +15,7 @@ for name in ("australasia", "europe", "northamerica")
     tzdata[name] = tzparse(joinpath(TZDATA_DIR, name))
 end
 
+include("timezones/time.jl")
 include("timezones/types.jl")
 include("timezones/Olsen.jl")
 include("timezones/arithmetic.jl")

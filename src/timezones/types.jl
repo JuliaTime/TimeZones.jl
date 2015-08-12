@@ -86,13 +86,13 @@ function possible_dates(local_dt::DateTime, tz::VariableTimeZone; from_utc::Bool
 
     # Determine the earliest and latest possible UTC DateTime
     # that this local DateTime could be.
-    # TODO: Maybe look at the range of offsets available within
-    # this TimeZone?
     if from_utc
         earliest = latest = local_dt
     else
-        earliest = local_dt - Hour(12)
-        latest = local_dt + Hour(14)
+        # TODO: Alternatively we should only look at the range of offsets available within
+        # this TimeZone.
+        earliest = local_dt + MIN_OFFSET
+        latest = local_dt + MAX_OFFSET
     end
 
     # Determine the earliest transition the local DateTime could

@@ -1,5 +1,7 @@
 module TimeZones
 
+using Base.Dates
+
 export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
     AmbiguousTimeError, NonExistentTimeError, DateTime
 
@@ -7,6 +9,7 @@ const PKG_DIR = normpath(joinpath(dirname(@__FILE__), "..", "deps"))
 const TZDATA_DIR = joinpath(PKG_DIR, "tzdata")
 const COMPILED_DIR = joinpath(PKG_DIR, "compiled")
 
+include("timezones/time.jl")
 include("timezones/types.jl")
 include("timezones/accessors.jl")
 include("timezones/arithmetic.jl")
