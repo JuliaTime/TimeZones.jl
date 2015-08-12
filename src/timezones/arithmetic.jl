@@ -3,7 +3,7 @@ typealias UTCPeriod Union{Hour,Minute,Second,Millisecond}
 
 # ZonedDateTime arithmetic
 (+)(x::ZonedDateTime) = x
-(-){T<:ZonedDateTime}(x::T,y::T) = x.utc_datetime - y.utc_datetime
+(-)(x::ZonedDateTime,y::ZonedDateTime) = x.utc_datetime - y.utc_datetime
 
 function (+)(dt::ZonedDateTime,p::LocalPeriod)
     return ZonedDateTime(localtime(dt) + p, dt.timezone)

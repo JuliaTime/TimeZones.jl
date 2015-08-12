@@ -44,3 +44,8 @@ t = Time(1,-23,-45)
 # Math
 @test Time(1,23,45) + Time(-1,-23,-45) == Time(0)
 @test Time(1,23,45) - Time(1,23,45) == Time(0)
+
+# Time show function
+buffer = IOBuffer()
+show(buffer, Time(1,23,45))
+@test takebuf_string(buffer) == "01:23:45"

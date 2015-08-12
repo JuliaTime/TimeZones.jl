@@ -21,6 +21,18 @@ import Base.Dates: Second
 @test_throws Exception FixedTimeZone("01:23:45:67")
 
 
+# Test exception messages
+tz = FixedTimeZone("Imaginary/Zone", 0, 0)
+
+buffer = IOBuffer()
+showerror(buffer, AmbiguousTimeError(DateTime(2015,1,1), tz))
+@test takebuf_string(buffer) == "Local DateTime 2015-01-01T00:00:00 is ambiguious"
+
+buffer = IOBuffer()
+showerror(buffer, NonExistentTimeError(DateTime(2015,1,1), tz))
+@test takebuf_string(buffer) == "DateTime 2015-01-01T00:00:00 does not exist within Imaginary/Zone"
+
+
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 
 # Standard time behaviour
@@ -258,3 +270,7 @@ fall_apia = ZonedDateTime(DateTime(2010, 10, 1, 2), apia)
 # A FixedTimeZone is effective for all of time where as a VariableTimeZone has as start.
 @test TimeZones.utc(early_utc) < apia.transitions[1].utc_datetime
 @test_throws NonExistentTimeError ZonedDateTime(early_utc, apia)
+
+
+# DateTime constructor that takes any number of Period or TimeZone types
+@test_throws Exception DateTime(FixedTimeZone("UTC", 0, 0), FixedTimeZone("TMW", 86400, 0))

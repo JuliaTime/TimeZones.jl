@@ -68,8 +68,6 @@ function VariableTimeZone(name::String, transitions::Vector{Transition})
     return VariableTimeZone(symbol(name), transitions)
 end
 
-Base.show(io::IO, tz::VariableTimeZone) = print(io, string(tz.name))
-
 immutable ZonedDateTime <: TimeType
     utc_datetime::DateTime
     timezone::TimeZone
@@ -197,7 +195,6 @@ function DateTime(parts::Union{Period,TimeZone}...)
     return isnull(timezone) ? dt : ZonedDateTime(dt, get(timezone))
 end
 
-
 type AmbiguousTimeError <: Exception
     dt::DateTime
     tz::TimeZone
@@ -208,7 +205,7 @@ type NonExistentTimeError <: Exception
     dt::DateTime
     tz::TimeZone
 end
-Base.showerror(io::IO, e::NonExistentTimeError) = print(io, "DateTime $(e.dt) does not exist within $(e.tz)");
+Base.showerror(io::IO, e::NonExistentTimeError) = print(io, "DateTime $(e.dt) does not exist within $(string(e.tz))");
 
 # Equality
 ==(a::ZonedDateTime, b::ZonedDateTime) = a.utc_datetime == b.utc_datetime

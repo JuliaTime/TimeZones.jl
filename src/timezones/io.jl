@@ -1,5 +1,8 @@
 import Base.Dates: Slot, AbstractTime, FixedWidthSlot, DelimitedSlot, DayOfWeekSlot, duplicates, getslot, periodisless
 
+Base.string(tz::TimeZone) = string(tz.name)
+Base.show(io::IO,tz::VariableTimeZone) = print(io,string(tz))
+
 function Base.string(dt::ZonedDateTime)
     v = offset(dt.zone).value
     h, v = divrem(v, 3600)
