@@ -24,83 +24,107 @@ import Base.Dates: Second
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 
 # Standard time behaviour
-dt = DateTime(1916, 2, 1, 0)
+local_dt = DateTime(1916, 2, 1, 0)
+utc_dt = DateTime(1916, 1, 31, 23)
 
 # Disambiguating parameters ignored when there is no ambiguity.
-@test ZonedDateTime(dt, warsaw).zone.name == :CET
-@test ZonedDateTime(dt, warsaw, 1).zone.name == :CET
-@test ZonedDateTime(dt, warsaw, 2).zone.name == :CET
-@test ZonedDateTime(dt, warsaw, true).zone.name == :CET
-@test ZonedDateTime(dt, warsaw, false).zone.name == :CET
+@test ZonedDateTime(local_dt, warsaw).zone.name == :CET
+@test ZonedDateTime(local_dt, warsaw, 1).zone.name == :CET
+@test ZonedDateTime(local_dt, warsaw, 2).zone.name == :CET
+@test ZonedDateTime(local_dt, warsaw, true).zone.name == :CET
+@test ZonedDateTime(local_dt, warsaw, false).zone.name == :CET
+@test ZonedDateTime(utc_dt, warsaw, from_utc=true).zone.name == :CET
 
-@test ZonedDateTime(dt, warsaw).utc_datetime == DateTime(1916, 1, 31, 23)
-@test ZonedDateTime(dt, warsaw, 1).utc_datetime == DateTime(1916, 1, 31, 23)
-@test ZonedDateTime(dt, warsaw, 2).utc_datetime == DateTime(1916, 1, 31, 23)
-@test ZonedDateTime(dt, warsaw, true).utc_datetime == DateTime(1916, 1, 31, 23)
-@test ZonedDateTime(dt, warsaw, false).utc_datetime == DateTime(1916, 1, 31, 23)
+@test ZonedDateTime(local_dt, warsaw).utc_datetime == utc_dt
+@test ZonedDateTime(local_dt, warsaw, 1).utc_datetime == utc_dt
+@test ZonedDateTime(local_dt, warsaw, 2).utc_datetime == utc_dt
+@test ZonedDateTime(local_dt, warsaw, true).utc_datetime == utc_dt
+@test ZonedDateTime(local_dt, warsaw, false).utc_datetime == utc_dt
+@test ZonedDateTime(utc_dt, warsaw, from_utc=true).utc_datetime == utc_dt
 
 
 # Daylight saving time behaviour
-dt = DateTime(1916, 6, 1, 0)
+local_dt = DateTime(1916, 6, 1, 0)
+utc_dt = DateTime(1916, 5, 31, 22)
 
 # Disambiguating parameters ignored when there is no ambiguity.
-@test ZonedDateTime(dt, warsaw).zone.name == :CEST
-@test ZonedDateTime(dt, warsaw, 1).zone.name == :CEST
-@test ZonedDateTime(dt, warsaw, 2).zone.name == :CEST
-@test ZonedDateTime(dt, warsaw, true).zone.name == :CEST
-@test ZonedDateTime(dt, warsaw, false).zone.name == :CEST
+@test ZonedDateTime(local_dt, warsaw).zone.name == :CEST
+@test ZonedDateTime(local_dt, warsaw, 1).zone.name == :CEST
+@test ZonedDateTime(local_dt, warsaw, 2).zone.name == :CEST
+@test ZonedDateTime(local_dt, warsaw, true).zone.name == :CEST
+@test ZonedDateTime(local_dt, warsaw, false).zone.name == :CEST
+@test ZonedDateTime(utc_dt, warsaw, from_utc=true).zone.name == :CEST
 
-@test ZonedDateTime(dt, warsaw).utc_datetime == DateTime(1916, 5, 31, 22)
-@test ZonedDateTime(dt, warsaw, 1).utc_datetime == DateTime(1916, 5, 31, 22)
-@test ZonedDateTime(dt, warsaw, 2).utc_datetime == DateTime(1916, 5, 31, 22)
-@test ZonedDateTime(dt, warsaw, true).utc_datetime == DateTime(1916, 5, 31, 22)
-@test ZonedDateTime(dt, warsaw, false).utc_datetime == DateTime(1916, 5, 31, 22)
+@test ZonedDateTime(local_dt, warsaw).utc_datetime == utc_dt
+@test ZonedDateTime(local_dt, warsaw, 1).utc_datetime == utc_dt
+@test ZonedDateTime(local_dt, warsaw, 2).utc_datetime == utc_dt
+@test ZonedDateTime(local_dt, warsaw, true).utc_datetime == utc_dt
+@test ZonedDateTime(local_dt, warsaw, false).utc_datetime == utc_dt
+@test ZonedDateTime(utc_dt, warsaw, from_utc=true).utc_datetime == utc_dt
 
 
 # Typical "spring-forward" behaviour
-dts = (
+local_dts = (
     DateTime(1916,4,30,22),
     DateTime(1916,4,30,23),
     DateTime(1916,5,1,0),
 )
-@test_throws NonExistentTimeError ZonedDateTime(dts[2], warsaw)
-@test_throws NonExistentTimeError ZonedDateTime(dts[2], warsaw, 1)
-@test_throws NonExistentTimeError ZonedDateTime(dts[2], warsaw, 2)
-@test_throws NonExistentTimeError ZonedDateTime(dts[2], warsaw, true)
-@test_throws NonExistentTimeError ZonedDateTime(dts[2], warsaw, false)
+utc_dts = (
+    DateTime(1916,4,30,21),
+    DateTime(1916,4,30,22),
+)
+@test_throws NonExistentTimeError ZonedDateTime(local_dts[2], warsaw)
+@test_throws NonExistentTimeError ZonedDateTime(local_dts[2], warsaw, 1)
+@test_throws NonExistentTimeError ZonedDateTime(local_dts[2], warsaw, 2)
+@test_throws NonExistentTimeError ZonedDateTime(local_dts[2], warsaw, true)
+@test_throws NonExistentTimeError ZonedDateTime(local_dts[2], warsaw, false)
 
-@test ZonedDateTime(dts[1], warsaw).zone.name == :CET
-@test ZonedDateTime(dts[3], warsaw).zone.name == :CEST
+@test ZonedDateTime(local_dts[1], warsaw).zone.name == :CET
+@test ZonedDateTime(local_dts[3], warsaw).zone.name == :CEST
+@test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).zone.name == :CET
+@test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).zone.name == :CEST
 
-@test ZonedDateTime(dts[1], warsaw).utc_datetime == DateTime(1916,4,30,21)
-@test ZonedDateTime(dts[3], warsaw).utc_datetime == DateTime(1916,4,30,22)
+@test ZonedDateTime(local_dts[1], warsaw).utc_datetime == utc_dts[1]
+@test ZonedDateTime(local_dts[3], warsaw).utc_datetime == utc_dts[2]
+@test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).utc_datetime == utc_dts[1]
+@test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).utc_datetime == utc_dts[2]
 
 
 # Typical "fall-back" behaviour
-dt = DateTime(1916, 10, 1, 0)
-@test_throws AmbiguousTimeError ZonedDateTime(dt, warsaw)
+local_dt = DateTime(1916, 10, 1, 0)
+utc_dts = (DateTime(1916, 9, 30, 22), DateTime(1916, 9, 30, 23))
+@test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw)
 
-@test ZonedDateTime(dt, warsaw, 1).zone.name == :CEST
-@test ZonedDateTime(dt, warsaw, 2).zone.name == :CET
-@test ZonedDateTime(dt, warsaw, true).zone.name == :CEST
-@test ZonedDateTime(dt, warsaw, false).zone.name == :CET
+@test ZonedDateTime(local_dt, warsaw, 1).zone.name == :CEST
+@test ZonedDateTime(local_dt, warsaw, 2).zone.name == :CET
+@test ZonedDateTime(local_dt, warsaw, true).zone.name == :CEST
+@test ZonedDateTime(local_dt, warsaw, false).zone.name == :CET
+@test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).zone.name == :CEST
+@test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).zone.name == :CET
 
-@test ZonedDateTime(dt, warsaw, 1).utc_datetime == DateTime(1916, 9, 30, 22)
-@test ZonedDateTime(dt, warsaw, 2).utc_datetime == DateTime(1916, 9, 30, 23)
-@test ZonedDateTime(dt, warsaw, true).utc_datetime == DateTime(1916, 9, 30, 22)
-@test ZonedDateTime(dt, warsaw, false).utc_datetime == DateTime(1916, 9, 30, 23)
+@test ZonedDateTime(local_dt, warsaw, 1).utc_datetime == utc_dts[1]
+@test ZonedDateTime(local_dt, warsaw, 2).utc_datetime == utc_dts[2]
+@test ZonedDateTime(local_dt, warsaw, true).utc_datetime == utc_dts[1]
+@test ZonedDateTime(local_dt, warsaw, false).utc_datetime == utc_dts[2]
+@test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).utc_datetime == utc_dts[1]
+@test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).utc_datetime == utc_dts[2]
 
 # Zone offset reduced creating an ambigious hour
-dt = DateTime(1922,5,31,23)
-@test_throws AmbiguousTimeError ZonedDateTime(dt, warsaw)
+local_dt = DateTime(1922,5,31,23)
+utc_dts = (DateTime(1922, 5, 31, 21), DateTime(1922, 5, 31, 22))
+@test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw)
 
-@test ZonedDateTime(dt, warsaw, 1).zone.name == :EET
-@test ZonedDateTime(dt, warsaw, 2).zone.name == :CET
-@test_throws AmbiguousTimeError ZonedDateTime(dt, warsaw, true)
-@test_throws AmbiguousTimeError ZonedDateTime(dt, warsaw, false)
+@test ZonedDateTime(local_dt, warsaw, 1).zone.name == :EET
+@test ZonedDateTime(local_dt, warsaw, 2).zone.name == :CET
+@test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw, true)
+@test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw, false)
+@test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).zone.name == :EET
+@test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).zone.name == :CET
 
-@test ZonedDateTime(dt, warsaw, 1).utc_datetime == DateTime(1922, 5, 31, 21)
-@test ZonedDateTime(dt, warsaw, 2).utc_datetime == DateTime(1922, 5, 31, 22)
+@test ZonedDateTime(local_dt, warsaw, 1).utc_datetime == utc_dts[1]
+@test ZonedDateTime(local_dt, warsaw, 2).utc_datetime == utc_dts[2]
+@test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).utc_datetime == utc_dts[1]
+@test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).utc_datetime == utc_dts[2]
 
 
 # Check behaviour when save is larger than an hour.

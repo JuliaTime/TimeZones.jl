@@ -104,7 +104,7 @@ function possible_dates(local_dt::DateTime, tz::VariableTimeZone; from_utc::Bool
     i = max(i, 1)
 
     n = length(t)
-    while i <= n && t[i].utc_datetime < latest
+    while i <= n && t[i].utc_datetime <= latest
         utc_dt = from_utc ? local_dt : local_dt - offset(t[i].zone)
 
         if utc_dt >= t[i].utc_datetime && (i == n || utc_dt < t[i + 1].utc_datetime)
