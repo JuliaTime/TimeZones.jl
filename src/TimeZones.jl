@@ -3,7 +3,12 @@ module TimeZones
 using Base.Dates
 
 export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
-    AmbiguousTimeError, NonExistentTimeError, DateTime
+    AmbiguousTimeError, NonExistentTimeError, DateTime,
+    # adjusters.jl
+    firstdayofweek, lastdayofweek,
+    firstdayofmonth, lastdayofmonth,
+    firstdayofyear, lastdayofyear,
+    firstdayofquarter, lastdayofquarter
 
 const PKG_DIR = normpath(joinpath(dirname(@__FILE__), "..", "deps"))
 const TZDATA_DIR = joinpath(PKG_DIR, "tzdata")

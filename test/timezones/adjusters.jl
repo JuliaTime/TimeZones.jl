@@ -1,4 +1,4 @@
-import Base.Dates: Year, Month, Day, Hour, Minute, Second, Millisecond
+using Base.Dates
 
 # Basic truncation
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
@@ -17,3 +17,20 @@ dt = DateTime(2014,10,26,2)
 @test ZonedDateTime(dt, warsaw, 1) != ZonedDateTime(dt, warsaw, 2)
 @test trunc(ZonedDateTime(dt + Minute(59), warsaw, 1), Hour) == ZonedDateTime(dt, warsaw, 1)
 @test trunc(ZonedDateTime(dt + Minute(59), warsaw, 2), Hour) == ZonedDateTime(dt, warsaw, 2)
+
+
+# Adjuster functions
+zdt = ZonedDateTime(DateTime(2013,9,9), warsaw) # Monday
+
+@test TimeZones.firstdayofweek(zdt) == ZonedDateTime(DateTime(2013,9,9), warsaw)
+@test TimeZones.lastdayofweek(zdt) == ZonedDateTime(DateTime(2013,9,15), warsaw)
+@test TimeZones.firstdayofmonth(zdt) == ZonedDateTime(DateTime(2013,9,1), warsaw)
+@test TimeZones.lastdayofmonth(zdt) == ZonedDateTime(DateTime(2013,9,30), warsaw)
+@test TimeZones.firstdayofyear(zdt) == ZonedDateTime(DateTime(2013,1,1), warsaw)
+@test TimeZones.lastdayofyear(zdt) == ZonedDateTime(DateTime(2013,12,31), warsaw)
+@test TimeZones.firstdayofquarter(zdt) == ZonedDateTime(DateTime(2013,7,1), warsaw)
+@test TimeZones.lastdayofquarter(zdt) == ZonedDateTime(DateTime(2013,9,30), warsaw)
+
+
+# TODO: Should be in Base.Dates.
+@test Dates.lastdayofyear(DateTime(2013,9,9)) == DateTime(2013,12,31)
