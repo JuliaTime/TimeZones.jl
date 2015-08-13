@@ -1,1 +1,7 @@
+# Ignore system files
+*.swp
+.DS_Store
 
+# Ignore dependencies that are build/retrieved
+deps/tzdata
+deps/compiled
