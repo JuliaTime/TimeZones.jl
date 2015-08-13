@@ -4,7 +4,7 @@ using Base.Dates
 import Base.Dates: days, hour, minute, second, millisecond
 
 export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
-    AmbiguousTimeError, NonExistentTimeError, DateTime,
+    TimeError, AmbiguousTimeError, NonExistentTimeError, DateTime,
     # accessors.jl
     hour, minute, second, millisecond,
     # adjusters.jl
