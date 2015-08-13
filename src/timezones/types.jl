@@ -3,6 +3,21 @@
 using Base.Dates
 import Base.Dates: value
 
+
+abstract TimeError <: Exception
+
+type AmbiguousTimeError <: TimeError
+    dt::DateTime
+    tz::TimeZone
+end
+Base.showerror(io::IO, e::AmbiguousTimeError) = print(io, "Local DateTime $(e.dt) is ambiguious");
+
+type NonExistentTimeError <: TimeError
+    dt::DateTime
+    tz::TimeZone
+end
+Base.showerror(io::IO, e::NonExistentTimeError) = print(io, "DateTime $(e.dt) does not exist within $(string(e.tz))");
+
 # Note: The Olsen Database rounds offset precision to the nearest second
 # See "America/New_York" notes for an example.
 
@@ -194,18 +209,6 @@ function DateTime(parts::Union{Period,TimeZone}...)
     dt = DateTime(periods...)
     return isnull(timezone) ? dt : ZonedDateTime(dt, get(timezone))
 end
-
-type AmbiguousTimeError <: Exception
-    dt::DateTime
-    tz::TimeZone
-end
-Base.showerror(io::IO, e::AmbiguousTimeError) = print(io, "Local DateTime $(e.dt) is ambiguious");
-
-type NonExistentTimeError <: Exception
-    dt::DateTime
-    tz::TimeZone
-end
-Base.showerror(io::IO, e::NonExistentTimeError) = print(io, "DateTime $(e.dt) does not exist within $(string(e.tz))");
 
 # Equality
 ==(a::ZonedDateTime, b::ZonedDateTime) = a.utc_datetime == b.utc_datetime
