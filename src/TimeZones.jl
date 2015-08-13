@@ -1,14 +1,19 @@
 module TimeZones
 
 using Base.Dates
+import Base.Dates: days, hour, minute, second, millisecond
 
 export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
     AmbiguousTimeError, NonExistentTimeError, DateTime,
+    # accessors.jl
+    hour, minute, second, millisecond,
     # adjusters.jl
     firstdayofweek, lastdayofweek,
     firstdayofmonth, lastdayofmonth,
     firstdayofyear, lastdayofyear,
-    firstdayofquarter, lastdayofquarter
+    firstdayofquarter, lastdayofquarter,
+    # Re-export from Base.Dates
+    yearmonthday, yearmonth, monthday, year, month, week, day, dayofmonth
 
 const PKG_DIR = normpath(joinpath(dirname(@__FILE__), "..", "deps"))
 const TZDATA_DIR = joinpath(PKG_DIR, "tzdata")

@@ -18,6 +18,7 @@ end
 include("timezones/time.jl")
 include("timezones/types.jl")
 include("timezones/Olsen.jl")
+include("timezones/accessors.jl")
 include("timezones/arithmetic.jl")
 include("timezones/io.jl")
 include("timezones/adjusters.jl")
