@@ -22,7 +22,7 @@ Base.show(io::IO,dt::ZonedDateTime) = print(io,string(dt))
 
 # Note: Ideally Base.Dates.Slot definition should just be: "abstract Slot{P<:Any}" which
 # would allow for custom Slots to be of any type.
-immutable TimeZoneSlot <: AbstractTime end
+abstract TimeZoneSlot <: AbstractTime
 
 function Base.Dates.slotparse(slot::Slot{TimeZoneSlot},x)
     if slot.option == 1
@@ -91,7 +91,7 @@ function Base.Dates.parse(x::AbstractString,df::DateFormat)
     cursor = 1
     for slot in df.slots
         cursor, pe = getslot(x,slot,df,cursor)
-        pe != nothing && isa(pe,Period) ? push!(periods,pe) : push!(extra,pe)
+        pe != nothing && (isa(pe,Period) ? push!(periods,pe) : push!(extra,pe))
         cursor > endof(x) && break
     end
     return vcat(sort!(periods,rev=true,lt=periodisless), extra)
