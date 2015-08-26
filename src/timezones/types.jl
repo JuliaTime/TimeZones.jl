@@ -2,6 +2,7 @@
 # import Base.Dates: UTInstant, DateTime, TimeZone, Millisecond
 using Base.Dates
 import Base.Dates: value
+import Base: ==
 
 
 abstract TimeError <: Exception
