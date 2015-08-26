@@ -1,4 +1,4 @@
-import Base.Dates: DateFormat, Slot, slotrule, slotparse, slotformat
+import Base.Dates: DateFormat, Slot, slotparse, slotformat, SLOT_RULE
 
 Base.string(tz::TimeZone) = string(tz.name)
 Base.show(io::IO,tz::VariableTimeZone) = print(io,string(tz))
@@ -22,8 +22,8 @@ Base.show(io::IO,dt::ZonedDateTime) = print(io,string(dt))
 # DateTime Parsing
 const ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.szzz")
 
-slotrule(::Type{Val{'z'}}) = TimeZone
-slotrule(::Type{Val{'Z'}}) = TimeZone
+SLOT_RULE['z'] = TimeZone
+SLOT_RULE['Z'] = TimeZone
 
 function slotparse(slot::Slot{TimeZone},x,locale)
     if slot.letter == 'z'
