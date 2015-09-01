@@ -7,6 +7,10 @@ spring = DateTime(2015, 3, 29, 0)  # 23 hour day in warsaw
 fall = DateTime(2015, 10, 25, 0)   # 25 hour day in warsaw
 
 
+# Offset arithmetic
+@test normal + TimeZones.Offset(7200, -3600) == normal + Hour(1)
+@test normal - TimeZones.Offset(7200, -3600) == normal - Hour(1)
+
 # Unary plus
 @test +ZonedDateTime(normal, warsaw) == ZonedDateTime(normal, warsaw)
 
