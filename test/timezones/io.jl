@@ -35,8 +35,15 @@ show(buffer, ZonedDateTime(dt, warsaw))
 # ZonedDateTime formatting
 f = "yyyy/m/d H:M:S ZZZ"
 @test Dates.format(ZonedDateTime(dt, fixed), f) == "1942/12/25 1:23:45 UTC+01:00"
-@test Dates.format(ZonedDateTime(dt, warsaw), f) == "1942/12/25 1:23:45 Europe/Warsaw"
+@test Dates.format(ZonedDateTime(dt, warsaw), f) == "1942/12/25 1:23:45 CET"
 
 f = "yyyy/m/d H:M:S zzz"
 @test Dates.format(ZonedDateTime(dt, fixed), f) == "1942/12/25 1:23:45 +01:00"
 @test Dates.format(ZonedDateTime(dt, warsaw), f) == "1942/12/25 1:23:45 +01:00"
+
+
+# The "Z" slot displays the timezone abbreviation for VariableTimeZones. It is fine to use
+# the abbreviation for display purposes but not fine for parsing. This means that we
+# currently cannot parse all strings produced by format.
+f = Dates.DateFormat("yyyy-mm-ddTHH:MM:SS ZZZ")
+@test_throws ArgumentError Dates.parse(Dates.format(ZonedDateTime(dt, warsaw), f), f)

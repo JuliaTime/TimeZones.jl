@@ -39,7 +39,7 @@ function slotformat(slot::Slot{TimeZone},zdt::ZonedDateTime,locale)
     if slot.letter == 'z'
         return string(zdt.zone.offset)
     elseif slot.letter == 'Z'
-        return string(zdt.timezone.name)
+        return string(zdt.zone.name)  # In most cases will be an abbreviation.
     end
 end
 
