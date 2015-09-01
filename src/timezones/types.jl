@@ -17,25 +17,32 @@ type NonExistentTimeError <: TimeError
     dt::DateTime
     tz::TimeZone
 end
-Base.showerror(io::IO, e::NonExistentTimeError) = print(io, "DateTime $(e.dt) does not exist within $(string(e.tz.name))");
+Base.showerror(io::IO, e::NonExistentTimeError) = print(io, "DateTime $(e.dt) does not exist within $(string(e.tz))");
 
 # Note: The Olsen Database rounds offset precision to the nearest second
 # See "America/New_York" notes for an example.
+immutable Offset
+    utc::Second  # Standard offset from UTC
+    dst::Second  # Addition daylight saving time offset applied to UTC offset
+
+    function Offset(utc_offset::Second, dst_offset::Second=Second(0))
+        new(utc_offset, dst_offset)
+    end
+end
+
+function Offset(utc_offset::Int64, dst_offset::Int64=0)
+    Offset(Second(utc_offset), Second(dst_offset))
+end
 
 # Using type Symbol instead of AbstractString for name since it
 # gets us ==, and hash for free.
 immutable FixedTimeZone <: TimeZone
     name::Symbol
-    utc_offset::Second  # Standard offset from UTC
-    dst_offset::Second  # Addition offset applied to UTC offset
-
-    function FixedTimeZone(name::Symbol, utc_offset::Second, dst_offset::Second=Second(0))
-        new(name, utc_offset, dst_offset)
-    end
+    offset::Offset
 end
 
-function FixedTimeZone(name::String, utc_offset::Int, dst_offset::Int=0)
-    FixedTimeZone(symbol(name), Second(utc_offset), Second(dst_offset))
+function FixedTimeZone(name::String, utc_offset::Int64, dst_offset::Int64=0)
+    FixedTimeZone(symbol(name), Offset(utc_offset, dst_offset))
 end
 
 function FixedTimeZone(s::String)
@@ -119,7 +126,7 @@ function possible_dates(local_dt::DateTime, tz::VariableTimeZone; from_utc::Bool
 
     n = length(t)
     while i <= n && t[i].utc_datetime <= latest
-        utc_dt = from_utc ? local_dt : local_dt - offset(t[i].zone)
+        utc_dt = from_utc ? local_dt : local_dt - t[i].zone.offset
 
         if utc_dt >= t[i].utc_datetime && (i == n || utc_dt < t[i + 1].utc_datetime)
             push!(possible, (utc_dt, t[i].zone))
@@ -158,7 +165,7 @@ function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, is_dst::Bool; f
     elseif num == 0
         throw(NonExistentTimeError(local_dt, tz))
     elseif num == 2
-        mask = [zone.dst_offset > Second(0) for (utc_dt, zone) in possible]
+        mask = [zone.offset.dst > Second(0) for (utc_dt, zone) in possible]
 
         # Mask is expected to be unambiguous.
         !($)(mask...) && throw(AmbiguousTimeError(local_dt, tz))
@@ -172,7 +179,7 @@ function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, is_dst::Bool; f
 end
 
 function ZonedDateTime(local_dt::DateTime, tz::FixedTimeZone; from_utc::Bool=false)
-    utc_dt = from_utc ? local_dt : local_dt - offset(tz)
+    utc_dt = from_utc ? local_dt : local_dt - tz.offset
     return ZonedDateTime(utc_dt, tz, tz)
 end
 

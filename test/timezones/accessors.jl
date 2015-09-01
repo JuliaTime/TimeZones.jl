@@ -3,10 +3,6 @@ import Base.Dates: Second
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 fixed = FixedTimeZone("Fixed", -7200, 3600)
 
-# Determine total offset for FixedTimeZone.
-@test TimeZones.offset(fixed) == Second(-3600)
-@test_throws MethodError TimeZones.offset(warsaw)
-
 # ZonedDateTime accessors
 zdt = ZonedDateTime(DateTime(2014,6,12,23,59,58,57), fixed)
 @test TimeZones.localtime(zdt) == DateTime(2014,6,12,23,59,58,57)

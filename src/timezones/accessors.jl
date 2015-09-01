@@ -1,6 +1,6 @@
-offset(tz::FixedTimeZone) = tz.utc_offset + tz.dst_offset
+Second(offset::Offset) = offset.utc + offset.dst
 
-localtime(dt::ZonedDateTime) = dt.utc_datetime + offset(dt.zone)
+localtime(dt::ZonedDateTime) = dt.utc_datetime + Second(dt.zone.offset)
 utc(dt::ZonedDateTime) = dt.utc_datetime
 
 days(dt::ZonedDateTime) = days(localtime(dt))

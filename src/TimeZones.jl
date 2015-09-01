@@ -1,7 +1,7 @@
 module TimeZones
 
 using Base.Dates
-import Base.Dates: days, hour, minute, second, millisecond
+import Base.Dates: AbstractTime, days, hour, minute, second, millisecond
 
 export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
     TimeError, AmbiguousTimeError, NonExistentTimeError, DateTime,

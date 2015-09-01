@@ -1,8 +1,7 @@
-import Base.Dates: DateFormat, Slot, slotparse, slotformat, SLOT_RULE
+import Base.Dates: value, DateFormat, Slot, slotparse, slotformat, SLOT_RULE
 
-Base.string(tz::TimeZone) = string(tz.name)
-function Base.string(tz::FixedTimeZone)
-    v = offset(tz).value
+function Base.string(offset::Offset)
+    v = value(Second(offset))
     h, v = divrem(v, 3600)
     m, s  = divrem(abs(v), 60)
 
@@ -13,11 +12,8 @@ function Base.string(tz::FixedTimeZone)
     return "$hh:$mm$(ss)"
 end
 
-function Base.string(dt::ZonedDateTime)
-    local_dt = localtime(dt)
-    offset_str = string(dt.zone)
-    return "$local_dt$offset_str"
-end
+Base.string(tz::TimeZone) = string(tz.name)
+Base.string(dt::ZonedDateTime) = "$(localtime(dt))$(string(dt.zone.offset))"
 
 Base.show(io::IO,tz::VariableTimeZone) = print(io,string(tz))
 Base.show(io::IO,dt::ZonedDateTime) = print(io,string(dt))
@@ -41,7 +37,7 @@ end
 
 function slotformat(slot::Slot{TimeZone},zdt::ZonedDateTime,locale)
     if slot.letter == 'z'
-        return string(zdt.zone)
+        return string(zdt.zone.offset)
     elseif slot.letter == 'Z'
         return string(zdt.timezone.name)
     end
