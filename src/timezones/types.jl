@@ -17,7 +17,7 @@ type NonExistentTimeError <: TimeError
     dt::DateTime
     tz::TimeZone
 end
-Base.showerror(io::IO, e::NonExistentTimeError) = print(io, "DateTime $(e.dt) does not exist within $(string(e.tz))");
+Base.showerror(io::IO, e::NonExistentTimeError) = print(io, "DateTime $(e.dt) does not exist within $(string(e.tz.name))");
 
 # Note: The Olsen Database rounds offset precision to the nearest second
 # See "America/New_York" notes for an example.
