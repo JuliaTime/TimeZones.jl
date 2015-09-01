@@ -194,7 +194,7 @@ function ZonedDateTime(zdt::ZonedDateTime, tz::FixedTimeZone)
     return ZonedDateTime(zdt.utc_datetime, tz, tz)
 end
 
-function DateTime(parts::Union{Period,TimeZone}...)
+function ZonedDateTime(parts::Union{Period,TimeZone}...)
     periods = Period[]
     timezone = Nullable{TimeZone}()
     for part in parts
@@ -203,12 +203,12 @@ function DateTime(parts::Union{Period,TimeZone}...)
         elseif isnull(timezone)
             timezone = Nullable{TimeZone}(part)
         else
-            error("Multiple timezones found")
+            throw(ArgumentError("Multiple timezones found"))
         end
     end
 
-    dt = DateTime(periods...)
-    return isnull(timezone) ? dt : ZonedDateTime(dt, get(timezone))
+    isnull(timezone) && throw(ArgumentError("Missing timezone"))
+    return ZonedDateTime(DateTime(periods...), get(timezone))
 end
 
 # Equality

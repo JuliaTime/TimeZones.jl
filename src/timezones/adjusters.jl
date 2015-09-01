@@ -12,10 +12,6 @@ end
 Base.trunc(dt::ZonedDateTime,::Type{Millisecond}) = dt
 
 # Adjusters
-
-# TODO: Should be included in Base.Dates.
-lastdayofyear(dt::DateTime) = DateTime(lastdayofyear(Date(dt)))
-
 for prefix in ("firstdayof", "lastdayof"), suffix in ("week", "month", "year", "quarter")
     func = symbol(prefix * suffix)
     @eval begin
