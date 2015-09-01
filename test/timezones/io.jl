@@ -20,6 +20,7 @@ show(buffer, ZonedDateTime(dt, warsaw))
 @test takebuf_string(buffer) == "1942-12-25T01:23:45+01:00"
 
 # ZonedDateTime parsing. Note this will use the compiled timezone information.
+@test ZonedDateTime("1942-12-25T01:23:45.0+01:00") == ZonedDateTime(dt, fixed)
 @test ZonedDateTime("1942-12-25T01:23:45+0100", "yyyy-mm-ddTHH:MM:SSzzz") == ZonedDateTime(dt, fixed)
 @test ZonedDateTime("1942-12-25T01:23:45 Europe/Warsaw", "yyyy-mm-ddTHH:MM:SS ZZZ") == ZonedDateTime(dt, warsaw)
 

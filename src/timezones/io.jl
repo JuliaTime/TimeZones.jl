@@ -21,10 +21,10 @@ Base.show(io::IO,dt::ZonedDateTime) = print(io,string(dt))
 # NOTE: The changes below require Base.Dates to be updated to include slotrule.
 
 # DateTime Parsing
-const ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.szzz")
-
 SLOT_RULE['z'] = TimeZone
 SLOT_RULE['Z'] = TimeZone
+
+const ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.szzz")
 
 function slotparse(slot::Slot{TimeZone},x,locale)
     if slot.letter == 'z'
