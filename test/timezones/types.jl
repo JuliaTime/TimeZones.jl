@@ -272,5 +272,5 @@ fall_apia = ZonedDateTime(DateTime(2010, 10, 1, 2), apia)
 @test_throws NonExistentTimeError ZonedDateTime(early_utc, apia)
 
 
-# DateTime constructor that takes any number of Period or TimeZone types
-@test_throws Exception DateTime(FixedTimeZone("UTC", 0, 0), FixedTimeZone("TMW", 86400, 0))
+# ZonedDateTime constructor that takes any number of Period or TimeZone types
+@test_throws ArgumentError ZonedDateTime(FixedTimeZone("UTC", 0, 0), FixedTimeZone("TMW", 86400, 0))
