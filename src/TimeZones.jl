@@ -15,7 +15,9 @@ export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
     # Re-export from Base.Dates
     yearmonthday, yearmonth, monthday, year, month, week, day, dayofmonth,
     # conversion.jl
-    now
+    now,
+    # local.jl
+    get_localzone
 
 const PKG_DIR = normpath(joinpath(dirname(@__FILE__), "..", "deps"))
 const TZDATA_DIR = joinpath(PKG_DIR, "tzdata")
@@ -30,6 +32,7 @@ include("timezones/tzfile.jl")
 include("timezones/adjusters.jl")
 include("timezones/Olson.jl")
 include("timezones/conversions.jl")
+include("timezones/local.jl")
 
 function TimeZone(name::AbstractString)
     tz_path = joinpath(COMPILED_DIR, split(name, "/")...)
