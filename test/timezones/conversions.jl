@@ -7,3 +7,7 @@ zdt = ZonedDateTime(dt, warsaw)
 
 # Converting from ZonedDateTime to DateTime isn't possible as it is always inexact.
 @test_throws MethodError convert(DateTime, zdt)
+
+# Vectorized accessors
+arr = repmat([zdt], 10)
+@test Dates.DateTime(arr) == repmat([dt], 10)

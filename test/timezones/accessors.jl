@@ -23,3 +23,19 @@ zdt = ZonedDateTime(DateTime(2014,6,12,23,59,58,57), fixed)
 @test Dates.yearmonth(zdt) == (2014, 6)
 @test Dates.monthday(zdt) == (6, 12)
 @test Dates.yearmonthday(zdt) == (2014, 6, 12)
+
+# Vectorized accessors
+# Note: repmat is used over broadcast to test for size and equality.
+arr = repmat([zdt], 10)
+@test TimeZones.hour(arr) == repmat([23], 10)
+@test TimeZones.minute(arr) == repmat([59], 10)
+@test TimeZones.second(arr) == repmat([58], 10)
+@test TimeZones.millisecond(arr) == repmat([57], 10)
+
+@test Dates.year(arr) == repmat([2014], 10)
+@test Dates.month(arr) == repmat([6], 10)
+@test Dates.day(arr) == repmat([12], 10)
+@test Dates.dayofmonth(arr) == repmat([12], 10)
+@test Dates.yearmonth(arr) == repmat([(2014, 6)], 10)
+@test Dates.monthday(arr) == repmat([(6, 12)], 10)
+@test Dates.yearmonthday(arr) == repmat([(2014, 6, 12)], 10)
