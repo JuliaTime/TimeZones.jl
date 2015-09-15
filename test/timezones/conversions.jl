@@ -11,3 +11,10 @@ zdt = ZonedDateTime(dt, warsaw)
 # Vectorized accessors
 arr = repmat([zdt], 10)
 @test Dates.DateTime(arr) == repmat([dt], 10)
+
+# now function
+dt = Dates.unix2datetime(time())  # Base.now in UTC
+zdt = now(warsaw)
+@test zdt.timezone == warsaw
+@test isapprox(map(Dates.datetime2unix, [dt, TimeZones.utc(zdt)])...)
+@test millisecond(zdt) == 0  # Base.now only includes up to seconds

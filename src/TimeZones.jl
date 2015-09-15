@@ -13,7 +13,9 @@ export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
     firstdayofyear, lastdayofyear,
     firstdayofquarter, lastdayofquarter,
     # Re-export from Base.Dates
-    yearmonthday, yearmonth, monthday, year, month, week, day, dayofmonth
+    yearmonthday, yearmonth, monthday, year, month, week, day, dayofmonth,
+    # conversion.jl
+    now
 
 const PKG_DIR = normpath(joinpath(dirname(@__FILE__), "..", "deps"))
 const TZDATA_DIR = joinpath(PKG_DIR, "tzdata")
