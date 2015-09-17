@@ -1,4 +1,4 @@
-module Olsen
+module Olson
 
 using Base.Dates
 
@@ -11,7 +11,7 @@ const REGIONS = (
     "europe", "northamerica", "southamerica",
 )
 
-# Zone type maps to an Olsen Timezone database entity
+# Zone type maps to an Olson Timezone database entity
 type Zone
     gmtoffset::Time
     save::Time
@@ -87,7 +87,7 @@ function parseflag(s::String)
     end
 end
 
-# Olsen timezone dates can be a single year (1900), yyyy-mm-dd (1900-Jan-01),
+# Olson timezone dates can be a single year (1900), yyyy-mm-dd (1900-Jan-01),
 # or minute-precision (1900-Jan-01 2:00).
 # They can also be given in Local Wall Time, UTC time (u), or Local Standard time (s)
 function parsedate(s::String)

@@ -1,4 +1,4 @@
-import TimeZones.Olsen: ZoneDict, RuleDict, zoneparse, ruleparse, resolve, parsedate
+import TimeZones.Olson: ZoneDict, RuleDict, zoneparse, ruleparse, resolve, parsedate
 import Base.Dates: Hour, Minute, Second
 
 # Variations of until dates

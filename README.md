@@ -5,7 +5,7 @@ TimeZones.jl
 [![Coverage Status](https://coveralls.io/repos/quinnj/TimeZones.jl/badge.svg?branch=master)](https://coveralls.io/r/quinnj/TimeZones.jl?branch=master)
 [![codecov.io](http://codecov.io/github/quinnj/TimeZones.jl/coverage.svg?branch=master)](http://codecov.io/github/quinnj/TimeZones.jl?branch=master)
 
-Olsen Timezone Database Access for the Julia Programming Language
+Olson Timezone Database Access for the Julia Programming Language
 
 `ZonedDateTime` is *timezone-aware* (in Python parlance) of `DateTime`. All `ZonedDateTime` represented will always be in the correct zone without requiring manual normalization (required by Python's pytz module).
 

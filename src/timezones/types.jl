@@ -19,7 +19,7 @@ type NonExistentTimeError <: TimeError
 end
 Base.showerror(io::IO, e::NonExistentTimeError) = print(io, "DateTime $(e.dt) does not exist within $(string(e.tz))");
 
-# Note: The Olsen Database rounds offset precision to the nearest second
+# Note: The Olson Database rounds offset precision to the nearest second
 # See "America/New_York" notes for an example.
 immutable Offset
     utc::Second  # Standard offset from UTC

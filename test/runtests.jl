@@ -2,7 +2,7 @@ using TimeZones
 using Base.Test
 
 import TimeZones: TZDATA_DIR
-import TimeZones.Olsen: ZoneDict, RuleDict, tzparse, resolve
+import TimeZones.Olson: ZoneDict, RuleDict, tzparse, resolve
 
 # For testing we'll reparse the tzdata every time to instead of using the serialized data.
 # This should make the development/testing cycle simplier since you won't be forced to
@@ -17,7 +17,7 @@ end
 
 include("timezones/time.jl")
 include("timezones/types.jl")
-include("timezones/Olsen.jl")
+include("timezones/Olson.jl")
 include("timezones/accessors.jl")
 include("timezones/arithmetic.jl")
 include("timezones/io.jl")

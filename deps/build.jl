@@ -1,5 +1,5 @@
 import TimeZones: TZDATA_DIR, COMPILED_DIR
-import TimeZones.Olsen: REGIONS, compile
+import TimeZones.Olson: REGIONS, compile
 
 isdir(TZDATA_DIR) || mkdir(TZDATA_DIR)
 isdir(COMPILED_DIR) || mkdir(COMPILED_DIR)
