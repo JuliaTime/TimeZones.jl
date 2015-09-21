@@ -30,7 +30,7 @@ immutable Offset
     end
 end
 
-function Offset(utc_offset::Int64, dst_offset::Int64=0)
+function Offset(utc_offset::Integer, dst_offset::Integer=0)
     Offset(Second(utc_offset), Second(dst_offset))
 end
 
@@ -41,7 +41,7 @@ immutable FixedTimeZone <: TimeZone
     offset::Offset
 end
 
-function FixedTimeZone(name::AbstractString, utc_offset::Int64, dst_offset::Int64=0)
+function FixedTimeZone(name::AbstractString, utc_offset::Integer, dst_offset::Integer=0)
     FixedTimeZone(symbol(name), Offset(utc_offset, dst_offset))
 end
 
