@@ -8,7 +8,7 @@ function Time(hour::Int, minute::Int, second::Int)
     Time(hour * 3600 + minute * 60 + second)
 end
 
-function Time(s::String)
+function Time(s::AbstractString)
     # "-" represents 0:00 for some DST rules
     s == "-" && return ZERO
     parsed = map(n -> parse(Int, n), split(s, ':'))

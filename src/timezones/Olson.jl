@@ -15,8 +15,8 @@ const REGIONS = (
 type Zone
     gmtoffset::Time
     save::Time
-    rules::String
-    format::String
+    rules::AbstractString
+    format::AbstractString
     until::Nullable{DateTime}
     until_flag::Char
 end
@@ -43,12 +43,12 @@ type Rule
     at::Time             # Hour and minute at which the transition happens
     at_flag::Char        # Local wall time (w), UTC time (u), Local Standard time (s)
     save::Time           # How much time is "saved" in daylight savings transition
-    letter::String       # Timezone abbreviation letter. Can be empty; i.e. CST => CDT,
+    letter::AbstractString  # Timezone abbr letter(s). ie. CKT ("") => CKHST ("HS")
 end
 
-typealias ZoneDict Dict{String,Array{Zone}}
-typealias RuleDict Dict{String,Array{Rule}}
-typealias OrderedRuleDict Dict{String,Array{Tuple{Date,Rule}}}
+typealias ZoneDict Dict{AbstractString,Array{Zone}}
+typealias RuleDict Dict{AbstractString,Array{Rule}}
+typealias OrderedRuleDict Dict{AbstractString,Array{Tuple{Date,Rule}}}
 
 # Min and max years that we create DST transition instants for (inclusive)
 const MINYEAR = 1800
@@ -75,7 +75,7 @@ for (abbr, dayofweek) in DAYS
 end
 
 
-function parseflag(s::String)
+function parseflag(s::AbstractString)
     if s == "" || s == "w"
         return 'w'
     elseif s == "u"
@@ -90,7 +90,7 @@ end
 # Olson timezone dates can be a single year (1900), yyyy-mm-dd (1900-Jan-01),
 # or minute-precision (1900-Jan-01 2:00).
 # They can also be given in Local Wall Time, UTC time (u), or Local Standard time (s)
-function parsedate(s::String)
+function parsedate(s::AbstractString)
     s = replace(s, r"\s+", " ")
     num_periods = length(split(s, " "))
     s, flag = num_periods > 3 && isalpha(s[end]) ? (s[1:end-1], s[end:end]) : (s, "")
@@ -286,7 +286,7 @@ end
 Resolves a named zone into TimeZone. Updates ordered with any new rules that
 were required to be ordered.
 """
-function resolve!(zone_name::String, zoneset::ZoneDict, ruleset::RuleDict,
+function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDict,
     ordered::OrderedRuleDict; debug=false)
 
     transitions = Transition[]
@@ -296,7 +296,7 @@ function resolve!(zone_name::String, zoneset::ZoneDict, ruleset::RuleDict,
     save = ZERO
     letter = ""
 
-    ordered_rules = Dict{String,Array{Tuple{Date,Rule}}}()
+    ordered_rules = Dict{AbstractString,Array{Tuple{Date,Rule}}}()
     # zones = Set{FixedTimeZone}()
 
     # Zone needs to be in ascending order to ensure that start_utc is being applied
@@ -416,7 +416,7 @@ end
 
 function resolve(zoneset::ZoneDict, ruleset::RuleDict; debug=false)
     ordered = OrderedRuleDict()
-    timezones = Dict{String,TimeZone}()
+    timezones = Dict{AbstractString,TimeZone}()
 
     for zone_name in keys(zoneset)
         tz = resolve!(zone_name, zoneset, ruleset, ordered, debug=debug)
@@ -426,15 +426,15 @@ function resolve(zoneset::ZoneDict, ruleset::RuleDict; debug=false)
     return timezones
 end
 
-function resolve(zone_name::String, zoneset::ZoneDict, ruleset::RuleDict; debug=false)
+function resolve(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDict; debug=false)
     ordered = OrderedRuleDict()
     return resolve!(zone_name, zoneset, ruleset, ordered, debug=debug)
 end
 
-function tzparse(tzfile::String)
+function tzparse(tzfile::AbstractString)
     zones = ZoneDict()
     rules = RuleDict()
-    links = Dict{String,String}()
+    links = Dict{AbstractString,AbstractString}()
 
     # For the intial pass we'll collect the zone and rule lines.
     open(tzfile) do fp
@@ -477,8 +477,8 @@ function tzparse(tzfile::String)
     return zones, rules
 end
 
-function load(tzdata_dir::String=TZDATA_DIR)
-    timezones = Dict{String,TimeZone}()
+function load(tzdata_dir::AbstractString=TZDATA_DIR)
+    timezones = Dict{AbstractString,TimeZone}()
     for region in REGIONS
         zones, rules = tzparse(joinpath(tzdata_dir, region))
         merge!(timezones, resolve(zones, rules))
@@ -486,7 +486,7 @@ function load(tzdata_dir::String=TZDATA_DIR)
     return timezones
 end
 
-function compile(tzdata_dir::String=TZDATA_DIR, dest_dir::String=COMPILED_DIR)
+function compile(tzdata_dir::AbstractString=TZDATA_DIR, dest_dir::AbstractString=COMPILED_DIR)
     timezones = load(tzdata_dir)
 
     isdir(dest_dir) || error("Destination directory doesn't exist")

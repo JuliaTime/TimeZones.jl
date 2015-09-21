@@ -10,7 +10,7 @@ import TimeZones.Olson: ZoneDict, RuleDict, tzparse, resolve
 #
 # Note: resolving only the timezones we want is much faster than running compile which
 # recompiles all the timezones.
-tzdata = Dict{String,Tuple{ZoneDict,RuleDict}}()
+tzdata = Dict{AbstractString,Tuple{ZoneDict,RuleDict}}()
 for name in ("australasia", "europe", "northamerica")
     tzdata[name] = tzparse(joinpath(TZDATA_DIR, name))
 end

@@ -41,11 +41,11 @@ immutable FixedTimeZone <: TimeZone
     offset::Offset
 end
 
-function FixedTimeZone(name::String, utc_offset::Int64, dst_offset::Int64=0)
+function FixedTimeZone(name::AbstractString, utc_offset::Int64, dst_offset::Int64=0)
     FixedTimeZone(symbol(name), Offset(utc_offset, dst_offset))
 end
 
-function FixedTimeZone(s::String)
+function FixedTimeZone(s::AbstractString)
     m = match(r"^([+-]?\d{2})\:?(\d{2})(?:\:(\d{2}+))?$", s)
     m == nothing && error("Unrecognized timezone: $s")
 
@@ -87,7 +87,7 @@ immutable VariableTimeZone <: TimeZone
     transitions::Vector{Transition}
 end
 
-function VariableTimeZone(name::String, transitions::Vector{Transition})
+function VariableTimeZone(name::AbstractString, transitions::Vector{Transition})
     return VariableTimeZone(symbol(name), transitions)
 end
 

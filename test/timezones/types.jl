@@ -217,7 +217,7 @@ apia = resolve("Pacific/Apia", tzdata["australasia"]...)
 # Note: that this can occur in reality if the TZ database parse has a Zone that ends at
 # the same time a Rule starts. When this occurs the duplicates always in standard time
 # with the same abbreviation.
-zone = Dict{String,FixedTimeZone}()
+zone = Dict{AbstractString,FixedTimeZone}()
 zone["DTST"] = FixedTimeZone("DTST", 0, 0)
 zone["DTDT-1"] = FixedTimeZone("DTDT-1", 0, 3600)
 zone["DTDT-2"] = FixedTimeZone("DTDT-2", 0, 3600)

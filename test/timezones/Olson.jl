@@ -57,7 +57,7 @@ warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 @test warsaw.transitions[4].zone.name == :CEST  # Daylight saving time
 @test issorted(warsaw.transitions)
 
-zone = Dict{String,FixedTimeZone}()
+zone = Dict{AbstractString,FixedTimeZone}()
 zone["LMT"] = FixedTimeZone("LMT", 5040, 0)
 zone["WMT"] = FixedTimeZone("WMT", 5040, 0)
 zone["CET"] = FixedTimeZone("CET", 3600, 0)
@@ -92,7 +92,7 @@ zone["EEST"] = FixedTimeZone("EEST", 7200, 3600)
 
 honolulu = resolve("Pacific/Honolulu", tzdata["northamerica"]...)
 
-zone = Dict{String,FixedTimeZone}()
+zone = Dict{AbstractString,FixedTimeZone}()
 zone["LMT"] = FixedTimeZone("LMT", -37886, 0)
 zone["HST"] = FixedTimeZone("HST", -37800, 0)
 zone["HDT"] = FixedTimeZone("HDT", -37800, 3600)
@@ -117,7 +117,7 @@ zone["HST_NEW"] = FixedTimeZone("HST", -36000, 0)
 
 apia = resolve("Pacific/Apia", tzdata["australasia"]...)
 
-zone = Dict{String,FixedTimeZone}()
+zone = Dict{AbstractString,FixedTimeZone}()
 zone["LMT_OLD"] = FixedTimeZone("LMT", 45184, 0)
 zone["LMT"] = FixedTimeZone("LMT", -41216, 0)
 zone["WSST_OLD"] = FixedTimeZone("WSST", -41400, 0)
@@ -159,7 +159,7 @@ rules["Testing"] = [
 
 test = resolve("Pacific/Test", zones, rules)
 
-zone = Dict{String,FixedTimeZone}()
+zone = Dict{AbstractString,FixedTimeZone}()
 zone["TST-1"] = FixedTimeZone("TST-1", -36000, 0)
 zone["TDT-2"] = FixedTimeZone("TDT-2", -36000, 3600)
 zone["TST-3"] = FixedTimeZone("TST-3", -36000, 0)
