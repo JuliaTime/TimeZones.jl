@@ -56,40 +56,50 @@ function tzfile(file::IO, zone::AbstractString)
     else
         # Calculate transition info
         transition_info = Transition[]
+        prev_utc = 0
+        prev_dst = 0
+        dst = 0
+        utc = 0
         for i in 1:length(transitions)
             inf = ttinfo[lindexes[i]]
             utcoffset = inf.tt_gmtoff
             if inf.tt_isdst == 0
+                utc = inf.tt_gmtoff
                 dst = 0
             else
-                prev_inf = nothing
-                for j in i:-1:1
-                    prev_inf = ttinfo[lindexes[j]]
-                    if prev_inf.tt_isdst == 0
-                        continue
-                    end
-                end
-                dst = inf.tt_gmtoff - prev_inf.tt_gmtoff # dst offset
-                if dst <= 0 # Bad dst? Look further.
-                    for j in i+1:length(transitions)
-                        stdinf = ttinfo[lindexes[j]]
-                        if stdinf.tt_isdst == 0
-                            dst = inf.tt_gmtoff - stdinf.tt_gmtoff
-                            if dst > 0
-                                continue
-                            end
-                        end
-                    end
+                if prev_dst == 0
+                    utc = prev_utc
+                    dst = inf.tt_gmtoff - prev_utc
+                else
+                    utc = inf.tt_gmtoff - prev_dst
+                    dst = prev_dst
                 end
             end
-            tzname = tznames[inf.tt_abbrind]
-            push!(transition_info,
+            if haskey(tznames, inf.tt_abbrind)
+                tzname = tznames[inf.tt_abbrind]
+            else
+                # Sometimes it likes to be fancy and have multiple names in one for
+                # example "WSST" at tt_abbrind 5 turns into "SST" at tt_abbrind 6
+                name_offset = 1
+                while !haskey(tznames, (inf.tt_abbrind-name_offset))
+                    name_offset+=1
+                    if name_offset >= inf.tt_abbrind
+                        error("Failed to find a tzname referenced in a transition.")
+                    end
+                end
+                tzname = tznames[inf.tt_abbrind-name_offset][name_offset+1:end]
+                tznames[inf.tt_abbrind] = tzname
+            end
+            push!(
+                transition_info,
                 Transition(
                     unix2datetime(transitions[i]),
                     FixedTimeZone(Symbol(tzname),
-                    Offset(Int64(inf.tt_gmtoff-dst), Int64(dst)))
+                    Offset(utc, dst))
                 )
             )
+            prev_utc = utc
+            prev_dst = dst
         end
         return VariableTimeZone(Symbol(zone), transition_info)
     end
