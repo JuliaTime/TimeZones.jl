@@ -1,15 +1,7 @@
 # Determine the local systems timezone
 # Based upon Python's tzlocal https://pypi.python.org/pypi/tzlocal
 
-function get_localzone()
-    @windows? _get_localzone_windows():(
-        @osx? _get_localzone_mac():(
-            _get_localzone_unix()
-        )
-    )
-end
-
-function _get_localzone_mac()
+@osx_only function localzone()
     zone = readall(`systemsetup -gettimezone`)
     if contains(zone, "Time Zone: ")
         zone = strip(replace(zone, "Time Zone: ", ""))
@@ -21,7 +13,7 @@ function _get_localzone_mac()
     return zone
 end
 
-function _get_localzone_unix()
+@linux_only function localzone()
     validnames = timezone_names()
 
     # Try getting the time zone "TZ" environment variable
@@ -99,7 +91,7 @@ function _get_localzone_unix()
     error("Failed to find local timezone")
 end
 
-function _get_localzone_windows()
+@windows_only function localzone()
     isfile(TRANSLATION_FILE) ||
         error("Windows zones not found. Try running Pkg.build(\"TimeZones\")")
 
