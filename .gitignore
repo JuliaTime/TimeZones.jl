@@ -5,3 +5,4 @@
 # Ignore dependencies that are build/retrieved
 deps/tzdata
 deps/compiled
+deps/windows

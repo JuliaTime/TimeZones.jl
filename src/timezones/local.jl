@@ -2,10 +2,9 @@
 # Based upon Python's tzlocal https://pypi.python.org/pypi/tzlocal
 
 function get_localzone()
-    @osx? _get_localzone_mac():(
-        @unix? _get_localzone_unix():(
-            # TODO Add support for Windows
-            error("Failed to find local timezone (Windows is not currently supported)")
+    @windows? _get_localzone_windows():(
+        @osx? _get_localzone_mac():(
+            _get_localzone_unix()
         )
     )
 end
@@ -98,4 +97,24 @@ function _get_localzone_unix()
     # TODO No explicit setting existed. Use localtime
 
     error("Failed to find local timezone")
+end
+
+function _get_localzone_windows()
+    isfile(TRANSLATION_FILE) ||
+        error("Windows zones not found. Try running Pkg.build(\"TimeZones\")")
+
+    win_tz_dict = nothing
+    open(TRANSLATION_FILE, "r") do fp
+        win_tz_dict = deserialize(fp)
+    end
+
+    winzone = strip(readall(`powershell -Command "[TimeZoneInfo]::Local.Id"`))
+    if haskey(win_tz_dict, winzone)
+        timezone = win_tz_dict[winzone]
+    else
+        error("Failed to determine your Windows timezone. ",
+            "Uses powershell, should work on windows 7 and above")
+    end
+
+    return timezone
 end
