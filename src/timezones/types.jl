@@ -221,3 +221,7 @@ end
 # Equality
 ==(a::ZonedDateTime, b::ZonedDateTime) = a.utc_datetime == b.utc_datetime
 Base.isless(a::ZonedDateTime, b::ZonedDateTime) = isless(a.utc_datetime, b.utc_datetime)
+
+function ==(a::VariableTimeZone, b::VariableTimeZone)
+    a.name == b.name && a.transitions == b.transitions
+end

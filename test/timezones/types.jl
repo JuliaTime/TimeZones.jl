@@ -274,3 +274,12 @@ fall_apia = ZonedDateTime(DateTime(2010, 10, 1, 2), apia)
 
 # ZonedDateTime constructor that takes any number of Period or TimeZone types
 @test_throws ArgumentError ZonedDateTime(FixedTimeZone("UTC", 0, 0), FixedTimeZone("TMW", 86400, 0))
+
+
+# Equality for VariableTimeZones
+another_warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
+
+@test warsaw == warsaw
+@test warsaw === warsaw
+@test warsaw == another_warsaw
+@test warsaw !== another_warsaw
