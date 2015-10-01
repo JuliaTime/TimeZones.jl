@@ -308,6 +308,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     start_utc = MINDATETIME
     save = ZERO
     letter = ""
+    start_rule = Nullable{Rule}()
 
     # zones = Set{FixedTimeZone}()
 
@@ -342,8 +343,13 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
             # last iteration.
             index = searchsortedlast(dates, start_utc)
 
-            # If start occurs prior to the first rule it can be expected in standard-time.
-            if index == 0
+            if !isnull(start_rule)
+                rule = get(start_rule)
+                save = rule.save
+                letter = rule.letter
+
+                start_rule = Nullable{Rule}()
+            elseif index == 0
                 save = ZERO
 
                 # Find the first occurrence of of standard-time
@@ -353,8 +359,6 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
                         break
                     end
                 end
-
-                index = 1
             else
                 rule = rules[index]
                 save = rule.save
@@ -370,6 +374,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
             tz = FixedTimeZone(abbr, toseconds(offset), toseconds(save))
             push!(transitions, Transition(start_utc, tz))
 
+            index = max(index, 1)
             for (date, rule) in zip(dates[index:end], rules[index:end])
                 # TODO: Problematic if rule date close to until and offset is a large positive.
                 date > until && break
@@ -381,6 +386,10 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
                 # offset and save values that occurred prior to this rule.
                 dt_utc = asutc(dt, rule.at_flag, offset, save)
                 until_utc = asutc(until, zone.until_flag, offset, save)
+
+                if dt_utc == until_utc
+                    start_rule = Nullable{Rule}(rule)
+                end
 
                 dt_utc < until_utc || break
 

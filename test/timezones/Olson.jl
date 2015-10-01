@@ -1,3 +1,4 @@
+import TimeZones: Transition
 import TimeZones.Olson: ZoneDict, RuleDict, zoneparse, ruleparse, resolve, parsedate
 import Base.Dates: Hour, Minute, Second
 
@@ -136,6 +137,29 @@ zone["WSDT"] = FixedTimeZone("WSDT", 46800, 3600)
 @test apia.transitions[8] == Transition(DateTime(2011,12,30,10), zone["WSDT"])
 @test apia.transitions[9] == Transition(DateTime(2012,3,31,14), zone["WSST"])
 @test apia.transitions[10] == Transition(DateTime(2012,9,29,14), zone["WSDT"])
+
+
+# Zone Europe/Madrid contains the following properties which make it good for testing:
+# - Observed midsummer time
+# - End of midsummer time also switches both the UTC offset and the saving time
+madrid = resolve("Europe/Madrid", tzdata["europe"]...)
+
+zone = Dict{AbstractString,FixedTimeZone}()
+zone["WET"] = FixedTimeZone("WET", 0, 0)
+zone["WEST"] = FixedTimeZone("WEST", 0, 3600)
+zone["WEMT"] = FixedTimeZone("WEMT", 0, 7200)
+zone["CET"] = FixedTimeZone("CET", 3600, 0)
+zone["CEST"] = FixedTimeZone("CEST", 3600, 3600)
+
+@test madrid.transitions[23] == Transition(DateTime(1939,4,15,23), zone["WEST"])
+@test madrid.transitions[24] == Transition(DateTime(1939,10,7,23), zone["WET"])
+@test madrid.transitions[25] == Transition(DateTime(1940,3,16,23), zone["WEST"])
+@test madrid.transitions[26] == Transition(DateTime(1942,5,2,22), zone["WEMT"])
+
+@test madrid.transitions[33] == Transition(DateTime(1945,9,29,23), zone["WEST"])
+@test madrid.transitions[34] == Transition(DateTime(1946,4,13,22), zone["WEMT"])
+@test madrid.transitions[35] == Transition(DateTime(1946,9,29,22), zone["CET"])
+@test madrid.transitions[36] == Transition(DateTime(1949,4,30,22), zone["CEST"])
 
 
 # Behaviour of mixing "RULES" as a String and as a Time. In reality this behaviour has never
