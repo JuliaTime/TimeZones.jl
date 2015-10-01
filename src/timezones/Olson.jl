@@ -48,7 +48,7 @@ end
 
 typealias ZoneDict Dict{AbstractString,Array{Zone}}
 typealias RuleDict Dict{AbstractString,Array{Rule}}
-typealias OrderedRuleDict Dict{AbstractString,Array{Tuple{Date,Rule}}}
+typealias OrderedRuleDict Dict{AbstractString,Tuple{Array{Date},Array{Rule}}}
 
 # Min and max years that we create DST transition instants for (inclusive)
 const MINYEAR = 1800
@@ -234,16 +234,26 @@ Example:
     Rule    Poland  1919    only    -   Apr 15  2:00s   1:00    S
     Rule    Poland  1944    only    -   Apr  3  2:00s   1:00    S
 
-    Processing rules by iterating through years would generate:
+    A simplistic way of iterating through the rules by years could yield the rules
+    in the wrong order:
 
     # ON         AT      SAVE    LETTER/S
     1918-09-16   2:00s   0       -
     1919-09-16   2:00s   0       -
     1919-04-15   2:00s   1:00    S
     1944-04-03   2:00s   1:00    S
+
+    The order_rules function will expand the rules such that they can be ordered by the
+    "on" date which ensures we process the rules in the correct order:
+
+    1918-09-16   2:00s   0       -
+    1919-04-15   2:00s   1:00    S
+    1919-09-16   2:00s   0       -
+    1944-04-03   2:00s   1:00    S
 """
 function order_rules(rules::Array{Rule})
-    date_rules = Tuple{Date,Rule}[]
+    dates = Date[]
+    ordered = Rule[]
 
     # Note: Typically rules are orderd by "from" and "in". Unfortunately
     for rule in rules
@@ -263,23 +273,26 @@ function order_rules(rules::Array{Rule})
                     rethrow(e)
                 end
             end
-            push!(date_rules, (date, rule))
+            push!(dates, date)
+            push!(ordered, rule)
         end
     end
 
-    sort!(date_rules, by=el -> el[1])
+    perm = sortperm(dates)
+    dates = dates[perm]
+    ordered = ordered[perm]
 
     # Since we are not yet taking offsets or flags into account yet
     # there is a small chance that the results are not ordered correctly.
     last_date = typemin(Date)
-    for (i, (date, rule)) in enumerate(date_rules)
+    for (i, date) in enumerate(dates)
         if i > 1 && date - last_date <= ABS_DIFF_OFFSET
             error("Dates are probably not in order")
         end
         last_date = date
     end
 
-    return date_rules
+    return dates, ordered
 end
 
 """
@@ -296,7 +309,6 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     save = ZERO
     letter = ""
 
-    ordered_rules = Dict{AbstractString,Array{Tuple{Date,Rule}}}()
     # zones = Set{FixedTimeZone}()
 
     # Zone needs to be in ascending order to ensure that start_utc is being applied
@@ -324,24 +336,27 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
                 ordered[rule_name] = order_rules(ruleset[rule_name])
             end
 
+            dates, rules = ordered[rule_name]
+
             # TODO: We could avoid this search if the rule_name haven't changed since the
             # last iteration.
-            rules = ordered[rule_name]
-            index = searchsortedlast(rules, start_utc, by=el -> isa(el, Tuple) ? el[1] : el)
+            index = searchsortedlast(dates, start_utc)
 
             # If start occurs prior to the first rule it can be expected in standard-time.
             if index == 0
                 save = ZERO
 
                 # Find the first occurrence of of standard-time
-                for (date, rule) in rules
+                for rule in rules
                     if rule.save == save
                         letter = rule.letter
                         break
                     end
                 end
+
+                index = 1
             else
-                date, rule = rules[index]
+                rule = rules[index]
                 save = rule.save
                 letter = rule.letter
             end
@@ -355,7 +370,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
             tz = FixedTimeZone(abbr, toseconds(offset), toseconds(save))
             push!(transitions, Transition(start_utc, tz))
 
-            for (date, rule) in rules[max(index,1):end]
+            for (date, rule) in zip(dates[index:end], rules[index:end])
                 # TODO: Problematic if rule date close to until and offset is a large positive.
                 date > until && break
 
