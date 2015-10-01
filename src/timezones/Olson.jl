@@ -399,12 +399,12 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
                 abbr = replace(format,"%s",letter,1)
 
                 if debug
-                    status = start_utc <= dt_utc ? "Rule" : "Skip"
+                    status = dt_utc >= start_utc ? "Rule" : "Skip"
                     println("$status $(year(date)), $(dt)$(rule.at_flag), $(dt_utc)u, $save, $abbr")
                 end
 
                 # TODO: Is start_utc inclusive or exclusive?
-                start_utc <= dt_utc || continue
+                dt_utc >= start_utc || continue
 
                 tz = FixedTimeZone(abbr, toseconds(offset), toseconds(save))
 
