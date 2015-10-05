@@ -331,7 +331,9 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
             end
 
             tz = FixedTimeZone(abbr, toseconds(offset), toseconds(save))
-            push!(transitions, Transition(start_utc, tz))
+            if isempty(transitions) || last(transitions).zone != tz
+                push!(transitions, Transition(start_utc, tz))
+            end
         else
             if !haskey(ordered, rule_name)
                 ordered[rule_name] = order_rules(ruleset[rule_name])
@@ -372,7 +374,9 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
             debug && println("Zone Start $rule_name, $(zone.gmtoffset), $save, $(start_utc)u, $(until)$(zone.until_flag), $abbr")
 
             tz = FixedTimeZone(abbr, toseconds(offset), toseconds(save))
-            push!(transitions, Transition(start_utc, tz))
+            if isempty(transitions) || last(transitions).zone != tz
+                push!(transitions, Transition(start_utc, tz))
+            end
 
             index = max(index, 1)
             for (date, rule) in zip(dates[index:end], rules[index:end])
@@ -417,7 +421,9 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
                 #     tz = first(intersect(zones, Set([tz])))
                 # end
 
-                push!(transitions, Transition(dt_utc, tz))
+                if isempty(transitions) || last(transitions).zone != tz
+                    push!(transitions, Transition(dt_utc, tz))
+                end
             end
         end
 

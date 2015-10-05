@@ -80,11 +80,11 @@ zone["EEST"] = FixedTimeZone("EEST", 7200, 3600)
 @test warsaw.transitions[12] == Transition(DateTime(1922,5,31,22,0), zone["CET"]) #
 @test warsaw.transitions[13] == Transition(DateTime(1940,6,23,1,0), zone["CEST"])
 
-@test warsaw.transitions[14] == Transition(DateTime(1942, 11, 2, 1, 0), zone["CET"])
-@test warsaw.transitions[15] == Transition(DateTime(1943, 3, 29, 1, 0), zone["CEST"])
-@test warsaw.transitions[16] == Transition(DateTime(1943, 10, 4, 1, 0), zone["CET"])
-@test warsaw.transitions[17] == Transition(DateTime(1944, 4, 3, 1, 0), zone["CEST"]) #
-@test warsaw.transitions[18] == Transition(DateTime(1944, 9, 30, 22, 0), zone["CEST"]) #
+@test warsaw.transitions[14] == Transition(DateTime(1942,11,2,1,0), zone["CET"])
+@test warsaw.transitions[15] == Transition(DateTime(1943,3,29,1,0), zone["CEST"])
+@test warsaw.transitions[16] == Transition(DateTime(1943,10,4,1,0), zone["CET"])
+@test warsaw.transitions[17] == Transition(DateTime(1944,4,3,1,0), zone["CEST"])
+@test warsaw.transitions[18] == Transition(DateTime(1944,10,4,0,0), zone["CET"])
 
 
 # Zone Pacific/Honolulu contains the following properties which make it good for testing:
@@ -142,6 +142,7 @@ zone["WSDT"] = FixedTimeZone("WSDT", 46800, 3600)
 # Zone Europe/Madrid contains the following properties which make it good for testing:
 # - Observed midsummer time
 # - End of midsummer time also switches both the UTC offset and the saving time
+# - In 1979-01-01 switches from "Spain" to "EU" rules which could create a redundant entry
 madrid = resolve("Europe/Madrid", tzdata["europe"]...)
 
 zone = Dict{AbstractString,FixedTimeZone}()
@@ -160,6 +161,10 @@ zone["CEST"] = FixedTimeZone("CEST", 3600, 3600)
 @test madrid.transitions[34] == Transition(DateTime(1946,4,13,22), zone["WEMT"])
 @test madrid.transitions[35] == Transition(DateTime(1946,9,29,22), zone["CET"])
 @test madrid.transitions[36] == Transition(DateTime(1949,4,30,22), zone["CEST"])
+
+# Redundant transition would be around 1979-01-01T00:00:00 as CET
+@test madrid.transitions[47] == Transition(DateTime(1978,9,30,23), zone["CET"])
+@test madrid.transitions[48] == Transition(DateTime(1979,4,1,1), zone["CEST"])
 
 
 # Behaviour of mixing "RULES" as a String and as a Time. In reality this behaviour has never
@@ -199,10 +204,10 @@ zone["TDT-5"] = FixedTimeZone("TDT-5", -36000, 3600)
 @test test.transitions[5] == Transition(DateTime(1934,9,1,13), zone["TDT-4"])
 @test test.transitions[6] == Transition(DateTime(1935,9,1,13), zone["TST-5"])
 
-# Note: Due to how I wrote the zones/rules a duplicate transition exists. The TimeZone code
-# should be able to safely handle this but nothing should require duplicates.
-@test test.transitions[6] == test.transitions[7]
-
+# Note: Due to how the the zones/rules were written a redundant transition could be created
+# such that `test.transitions[6] == test.transitions[7]`. The TimeZone code can safely
+# handle redundant transitions but ideally they should be eliminated.
+@test length(test.transitions) == 6
 
 # Make sure that we can deal with Links. Take note that the current implementation converts
 # links into zones which makes it hard to explicitly test for a link. We expect that the
