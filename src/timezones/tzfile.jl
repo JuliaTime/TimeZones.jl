@@ -71,14 +71,12 @@ function read_tzfile(io::IO, name::AbstractString)
             # Sometimes it likes to be fancy and have multiple names in one for
             # example "WSST" at abbrindex 5 turns into "SST" at abbrindex 6
             abbr = abbreviation(abbrs, inf.abbrindex)
-            push!(
-                transition_info,
-                Transition(
-                    unix2datetime(transitions[i]),
-                    FixedTimeZone(Symbol(abbr),
-                    Offset(utc, dst))
-                )
-            )
+            tz = FixedTimeZone(abbr, utc, dst)
+
+            if isempty(transition_info) || last(transition_info).zone != tz
+                push!(transition_info, Transition(unix2datetime(transitions[i]), tz))
+            end
+
             prev_utc = utc
             prev_dst = dst
         end
