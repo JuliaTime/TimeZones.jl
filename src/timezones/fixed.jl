@@ -13,11 +13,11 @@ function fixed_timezones()
     # GMT+1 to GMT+12
     for i in 1:12
         zone = "GMT+$i"
-        fixedzones["Etc/$zone"] = FixedTimeZone(zone, i*3600)
+        fixedzones["Etc/$zone"] = FixedTimeZone(zone, -i*3600)
     end
     # GMT-1 to GMT-14
-    for i in -1:-1:-14
-        zone = "GMT$i"
+    for i in 1:14
+        zone = "GMT-$i"
         fixedzones["Etc/$zone"] = FixedTimeZone(zone, i*3600)
     end
     return fixedzones
