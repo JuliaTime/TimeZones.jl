@@ -13,32 +13,32 @@ function read_tzfile(io::IO, name::AbstractString)
 
     version = readbytes(io, 1)  # Format version (ASCII NUL ('\0') or a '2' (0x32))
     readbytes(io, 15)  # Fifteen bytes reserved for future use
-    tzh_ttisgmtcnt = bswap(read(io, Int32))  # Number of UTC/local indicators
-    tzh_ttisstdcnt = bswap(read(io, Int32))  # Number of standard/wall indicators
-    tzh_leapcnt = bswap(read(io, Int32))  # Number of leap seconds
-    tzh_timecnt = bswap(read(io, Int32))  # Number of transition dates
-    tzh_typecnt = bswap(read(io, Int32))  # Number of TransitionTimeInfos (must be > 0)
-    tzh_charcnt = bswap(read(io, Int32))  # Number of timezone abbreviation characters
+    tzh_ttisgmtcnt = ntoh(read(io, Int32))  # Number of UTC/local indicators
+    tzh_ttisstdcnt = ntoh(read(io, Int32))  # Number of standard/wall indicators
+    tzh_leapcnt = ntoh(read(io, Int32))  # Number of leap seconds
+    tzh_timecnt = ntoh(read(io, Int32))  # Number of transition dates
+    tzh_typecnt = ntoh(read(io, Int32))  # Number of TransitionTimeInfos (must be > 0)
+    tzh_charcnt = ntoh(read(io, Int32))  # Number of timezone abbreviation characters
 
     transitions = Array{Int32}(tzh_timecnt)
     for i in eachindex(transitions)
-        transitions[i] = bswap(read(io, Int32))
+        transitions[i] = ntoh(read(io, Int32))
     end
     lindexes = Array{UInt8}(tzh_timecnt)
     for i in eachindex(lindexes)
-        lindexes[i] = bswap(read(io, UInt8)) + 1 # Julia uses 1 indexing
+        lindexes[i] = ntoh(read(io, UInt8)) + 1 # Julia uses 1 indexing
     end
     ttinfo = Array{TransitionTimeInfo}(tzh_typecnt)
     for i in eachindex(ttinfo)
         ttinfo[i] = TransitionTimeInfo(
-            bswap(read(io, Int32)),
-            bswap(read(io, Int8)),
-            bswap(read(io, UInt8)) + 1 # Julia uses 1 indexing
+            ntoh(read(io, Int32)),
+            ntoh(read(io, Int8)),
+            ntoh(read(io, UInt8)) + 1 # Julia uses 1 indexing
         )
     end
     abbrs = Array{UInt8}(tzh_charcnt)
     for i in eachindex(abbrs)
-        abbrs[i] = bswap(read(io, UInt8))
+        abbrs[i] = ntoh(read(io, UInt8))
     end
 
     # Now build the timezone object
