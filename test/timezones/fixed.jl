@@ -1,4 +1,12 @@
 zonenames = TimeZones.timezone_names()
+fixedzones = TimeZones.fixed_timezones()
+
+@test sizeof(fixedzones) >= 56
+
+for i in keys(fixedzones)
+    @test i in zonenames
+    @test TimeZone(i) == fixedzones[i]
+end
 
 for i in ("UTC", "Universal", "Zulu", "Etc/UTC", "Etc/Universal", "Etc/Zulu")
     @test i in zonenames
