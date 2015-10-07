@@ -1,4 +1,4 @@
-# Parsing tzfiles (http://man7.org/linux/man-pages/man5/tzfile.5.html)
+# Parsing tzfiles (ftp://ftp.iana.org/tz/code/tzfile.5.txt)
 immutable TransitionTimeInfo
     gmtoff::Int32     # tt_gmtoff
     isdst::Int8       # tt_isdst
@@ -11,7 +11,9 @@ function read_tzfile(io::IO, name::AbstractString)
     magic = readbytes(io, 4)
     @assert magic == b"TZif" "Magic file identifier \"TZif\" not found."
 
-    version = readbytes(io, 1)  # Format version (ASCII NUL ('\0') or a '2' (0x32))
+    # A byte indicating the version of the file's format: '\0', '2', '3'
+    version = Char(read(io, UInt8))
+
     readbytes(io, 15)  # Fifteen bytes reserved for future use
     tzh_ttisgmtcnt = ntoh(read(io, Int32))  # Number of UTC/local indicators
     tzh_ttisstdcnt = ntoh(read(io, Int32))  # Number of standard/wall indicators
@@ -20,9 +22,9 @@ function read_tzfile(io::IO, name::AbstractString)
     tzh_typecnt = ntoh(read(io, Int32))  # Number of TransitionTimeInfos (must be > 0)
     tzh_charcnt = ntoh(read(io, Int32))  # Number of timezone abbreviation characters
 
-    transitions = Array{Int32}(tzh_timecnt)
-    for i in eachindex(transitions)
-        transitions[i] = ntoh(read(io, Int32))
+    transition_times = Array{Int32}(tzh_timecnt)
+    for i in eachindex(transition_times)
+        transition_times[i] = ntoh(read(io, Int32))
     end
     lindexes = Array{UInt8}(tzh_timecnt)
     for i in eachindex(lindexes)
@@ -42,44 +44,40 @@ function read_tzfile(io::IO, name::AbstractString)
     end
 
     # Now build the timezone object
-    if length(transitions) == 0
+    if tzh_timecnt == 0
         abbr = abbreviation(abbrs, ttinfo[1].abbrindex)
         return FixedTimeZone(Symbol(abbr), Offset(ttinfo[1].gmtoff))
     else
         # Calculate transition info
-        transition_info = Transition[]
-        prev_utc = 0
-        prev_dst = 0
-        dst = 0
-        utc = 0
-        for i in eachindex(transitions)
-            inf = ttinfo[lindexes[i]]
-            utcoffset = inf.gmtoff
-            if inf.isdst == 0
-                utc = inf.gmtoff
+        transitions = Transition[]
+        utc = dst = 0
+        for i in eachindex(transition_times)
+            info = ttinfo[lindexes[i]]
+
+            # Since the tzfile does not contain the DST offset we need to
+            # attempt to calculate it.
+            if info.isdst == 0
+                utc = info.gmtoff
                 dst = 0
+            elseif dst == 0
+                # isdst == false and the last DST offset was 0:
+                # assume that only the DST offset has changed
+                dst = info.gmtoff - utc
             else
-                if prev_dst == 0
-                    utc = prev_utc
-                    dst = inf.gmtoff - prev_utc
-                else
-                    utc = inf.gmtoff - prev_dst
-                    dst = prev_dst
-                end
+                # isdst == false and the last DST offset was not 0:
+                # assume that only the GMT offset has changed
+                utc = info.gmtoff - dst
             end
 
             # Sometimes it likes to be fancy and have multiple names in one for
             # example "WSST" at abbrindex 5 turns into "SST" at abbrindex 6
-            abbr = abbreviation(abbrs, inf.abbrindex)
+            abbr = abbreviation(abbrs, info.abbrindex)
             tz = FixedTimeZone(abbr, utc, dst)
 
-            if isempty(transition_info) || last(transition_info).zone != tz
-                push!(transition_info, Transition(unix2datetime(transitions[i]), tz))
+            if isempty(transitions) || last(transitions).zone != tz
+                push!(transitions, Transition(unix2datetime(transition_times[i]), tz))
             end
-
-            prev_utc = utc
-            prev_dst = dst
         end
-        return VariableTimeZone(Symbol(name), transition_info)
+        return VariableTimeZone(Symbol(name), transitions)
     end
 end
