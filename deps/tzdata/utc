@@ -1,0 +1,5 @@
+# Zones specifically for TimeZones.jl
+
+# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+Zone	UTC			0 	-	UTC
+Zone	GMT			0	-	GMT

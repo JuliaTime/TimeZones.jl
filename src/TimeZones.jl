@@ -29,7 +29,6 @@ include("timezones/io.jl")
 include("timezones/adjusters.jl")
 include("timezones/Olson.jl")
 include("timezones/conversions.jl")
-include("timezones/fixed.jl")
 
 function TimeZone(name::AbstractString)
     tz_path = joinpath(COMPILED_DIR, split(name, "/")...)

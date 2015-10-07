@@ -1,5 +1,13 @@
-import TimeZones: TZDATA_DIR, COMPILED_DIR, fixed_timezones
-import TimeZones.Olson: REGIONS, compile
+import TimeZones: TZDATA_DIR, COMPILED_DIR
+import TimeZones.Olson: compile
+
+# See "ftp://ftp.iana.org/tz/data/Makefile" PRIMARY_YDATA for listing of
+# regions to include. YDATA includes historical zones which we'll ignore.
+const REGIONS = (
+    "africa", "antarctica", "asia", "australasia",
+    "europe", "northamerica", "southamerica",
+    # "pacificnew", "etcetera", "backward",  # Historical zones
+)
 
 isdir(TZDATA_DIR) || mkdir(TZDATA_DIR)
 isdir(COMPILED_DIR) || mkdir(COMPILED_DIR)
@@ -41,17 +49,5 @@ for file in readdir(COMPILED_DIR)
     rm(joinpath(COMPILED_DIR, file), recursive=true)
 end
 compile(TZDATA_DIR, COMPILED_DIR)
-
-info("Adding additional FixedTimeZones")
-for (name, tz) in fixed_timezones()
-    parts = split(name, "/")
-    tz_dir, tz_file = joinpath(COMPILED_DIR, parts[1:end-1]...), parts[end]
-
-    isdir(tz_dir) || mkpath(tz_dir)
-
-    open(joinpath(tz_dir, tz_file), "w") do fp
-        serialize(fp, tz)
-    end
-end
 
 info("Successfully processed TimeZone data")

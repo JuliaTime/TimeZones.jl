@@ -6,11 +6,6 @@ import ..TimeZones: TZDATA_DIR, COMPILED_DIR, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFS
     MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET, Time, toseconds
 import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition, Time
 
-const REGIONS = (
-    "africa", "antarctica", "asia", "australasia",
-    "europe", "northamerica", "southamerica",
-)
-
 # Zone type maps to an Olson Timezone database entity
 type Zone
     gmtoffset::Time
@@ -509,8 +504,8 @@ end
 
 function load(tzdata_dir::AbstractString=TZDATA_DIR)
     timezones = Dict{AbstractString,TimeZone}()
-    for region in REGIONS
-        zones, rules = tzparse(joinpath(tzdata_dir, region))
+    for filename in readdir(tzdata_dir)
+        zones, rules = tzparse(joinpath(tzdata_dir, filename))
         merge!(timezones, resolve(zones, rules))
     end
     return timezones
