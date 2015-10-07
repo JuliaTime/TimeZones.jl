@@ -1,43 +1,18 @@
-zonenames = TimeZones.timezone_names()
 fixedzones = TimeZones.fixed_timezones()
 
-@test sizeof(fixedzones) >= 56
-
-for i in keys(fixedzones)
-    @test i in zonenames
-    @test TimeZone(i) == fixedzones[i]
+for name in ("UTC", "Universal", "Zulu", "Etc/UTC", "Etc/Universal", "Etc/Zulu")
+    tz = fixedzones[name]
+    @test tz == FixedTimeZone("UTC", 0)
 end
 
-for i in ("UTC", "Universal", "Zulu", "Etc/UTC", "Etc/Universal", "Etc/Zulu")
-    @test i in zonenames
-    fixedzone = TimeZone(i)
-    @test typeof(fixedzone) <: FixedTimeZone
-    @test fixedzone.name == :UTC
-    @test fixedzone.offset.utc == Dates.Second(0)
+for name in ("GMT", "Etc/GMT", "Etc/GMT+0", "Etc/GMT-0")
+    tz = fixedzones[name]
+    @test tz == FixedTimeZone("GMT", 0)
 end
 
-for i in ("GMT", "Etc/GMT", "Etc/GMT+0", "Etc/GMT-0")
-    @test i in zonenames
-    fixedzone = TimeZone(i)
-    @test typeof(fixedzone) <: FixedTimeZone
-    @test fixedzone.name == :GMT
-    @test fixedzone.offset.utc == Dates.Second(0)
-end
-
-for i in 1:12
-    zonename = "GMT+$i"
-    @test "Etc/$zonename" in zonenames
-    fixedzone = TimeZone("Etc/$zonename")
-    @test typeof(fixedzone) <: FixedTimeZone
-    @test fixedzone.name == Symbol("$zonename")
-    @test fixedzone.offset.utc == Dates.Second(i*(-3600))
-end
-
-for i in 1:14
-    zonename = "GMT-$i"
-    @test "Etc/$zonename" in zonenames
-    fixedzone = TimeZone("Etc/$zonename")
-    @test typeof(fixedzone) <: FixedTimeZone
-    @test fixedzone.name == Symbol("$zonename")
-    @test fixedzone.offset.utc == Dates.Second(i*3600)
+for i in [-14:-1; 1:12]
+    abbr = @sprintf("GMT%+d", i)
+    name = "Etc/$abbr"
+    tz = fixedzones[name]
+    @test tz == FixedTimeZone(abbr, -i * 3600)
 end
