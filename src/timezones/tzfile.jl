@@ -8,13 +8,26 @@ end
 abbreviation(chars::Array{UInt8}, offset::Integer=1) = ascii(pointer(chars[offset:end]))
 
 function read_tzfile(io::IO, name::AbstractString)
+    version = _read_tzfile_header(io)
+    transitions = _read_tzfile_data(io)
+    if version in ('2', '3')
+        # Another even better transition table after this first one
+        _read_tzfile_header(io)
+        transitions = _read_tzfile_data(io, timesize=Int64, has_posix_str=true)
+    end
+    return VariableTimeZone(Symbol(name), transitions)
+end
+
+function _read_tzfile_header(io)
     magic = readbytes(io, 4)
     @assert magic == b"TZif" "Magic file identifier \"TZif\" not found."
-
     # A byte indicating the version of the file's format: '\0', '2', '3'
     version = Char(read(io, UInt8))
-
     readbytes(io, 15)  # Fifteen bytes reserved for future use
+    return version
+end
+
+function _read_tzfile_data{T<:Integer}(io::IO; timesize::Type{T}=Int32, has_posix_str=false)
     tzh_ttisgmtcnt = ntoh(read(io, Int32))  # Number of UTC/local indicators
     tzh_ttisstdcnt = ntoh(read(io, Int32))  # Number of standard/wall indicators
     tzh_leapcnt = ntoh(read(io, Int32))  # Number of leap seconds
@@ -22,9 +35,9 @@ function read_tzfile(io::IO, name::AbstractString)
     tzh_typecnt = ntoh(read(io, Int32))  # Number of TransitionTimeInfos (must be > 0)
     tzh_charcnt = ntoh(read(io, Int32))  # Number of timezone abbreviation characters
 
-    transition_times = Array{Int32}(tzh_timecnt)
+    transition_times = Array{timesize}(tzh_timecnt)
     for i in eachindex(transition_times)
-        transition_times[i] = ntoh(read(io, Int32))
+        transition_times[i] = ntoh(read(io, timesize))
     end
     lindexes = Array{UInt8}(tzh_timecnt)
     for i in eachindex(lindexes)
@@ -43,7 +56,29 @@ function read_tzfile(io::IO, name::AbstractString)
         abbrs[i] = ntoh(read(io, UInt8))
     end
 
-    # Now build the timezone object
+    # leap seconds (We don't use these)
+    leapseconds_time = Array{timesize}(tzh_leapcnt)
+    leapseconds_seconds = Array{Int32}(tzh_leapcnt)
+    for i in eachindex(leapseconds_time)
+        leapseconds_time[i] = ntoh(read(io, timesize))
+        leapseconds_seconds[i] = ntoh(read(io, Int32))
+    end
+    # standard/wall and UTC/local indicators (We don't use these)
+    isstd = Array{Int8}(tzh_ttisstdcnt)
+    for i in eachindex(isstd)
+        isstd[i] = ntoh(read(io, Int8))
+    end
+    isgmt = Array{Int8}(tzh_ttisgmtcnt)
+    for i in eachindex(isgmt)
+        isgmt[i] = ntoh(read(io, Int8))
+    end
+    # We don't use this yet
+    if has_posix_str
+        readline(io)
+        posix_str = readline(io)
+    end
+
+    # Now build the timezone transitions
     if tzh_timecnt == 0
         abbr = abbreviation(abbrs, ttinfo[1].abbrindex)
         return FixedTimeZone(Symbol(abbr), Offset(ttinfo[1].gmtoff))
@@ -78,6 +113,6 @@ function read_tzfile(io::IO, name::AbstractString)
                 push!(transitions, Transition(unix2datetime(transition_times[i]), tz))
             end
         end
-        return VariableTimeZone(Symbol(name), transitions)
+        return transitions
     end
 end

@@ -6,7 +6,8 @@ function overlap(a::Array{Transition}, b::Array{Transition})
     start_dt = max(first(a).utc_datetime, first(b).utc_datetime)
     end_dt = min(last(a).utc_datetime, last(b).utc_datetime)
 
-    within = t -> start_dt <= t.utc_datetime <= end_dt
+    # Not equal to because sometimes the very first date will differ
+    within = t -> start_dt < t.utc_datetime < end_dt
     return a[find(within, a)], b[find(within, b)]
 end
 
@@ -24,6 +25,12 @@ end
 
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 open(joinpath(TZFILE_DIR, "Warsaw")) do f
+    tz = TimeZones.read_tzfile(f, "Europe/Warsaw")
+    @test string(tz) == "Europe/Warsaw"
+    @test ==(overlap(tz.transitions, warsaw.transitions)...)
+end
+# Test tzinfo file version 2
+open(joinpath(TZFILE_DIR, "Warsaw_v2")) do f
     tz = TimeZones.read_tzfile(f, "Europe/Warsaw")
     @test string(tz) == "Europe/Warsaw"
     @test ==(overlap(tz.transitions, warsaw.transitions)...)
