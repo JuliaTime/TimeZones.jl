@@ -1,4 +1,7 @@
-# Parsing tzfiles (ftp://ftp.iana.org/tz/code/tzfile.5.txt)
+# Parsing tzfiles references:
+# - http://man7.org/linux/man-pages/man5/tzfile.5.html
+# - ftp://ftp.iana.org/tz/code/tzfile.5.txt
+
 immutable TransitionTimeInfo
     gmtoff::Int32     # tt_gmtoff
     isdst::Int8       # tt_isdst
@@ -8,26 +11,22 @@ end
 abbreviation(chars::Array{UInt8}, offset::Integer=1) = ascii(pointer(chars[offset:end]))
 
 function read_tzfile(io::IO, name::AbstractString)
-    version = _read_tzfile_header(io)
-    transitions = _read_tzfile_data(io)
-    if version in ('2', '3')
+    version, tz = read_tzfile_internal(io, name)
+    if version != '\0'
         # Another even better transition table after this first one
-        _read_tzfile_header(io)
-        transitions = _read_tzfile_data(io, timesize=Int64, has_posix_str=true)
+        version, tz = read_tzfile_internal(io, name, version)
     end
-    return VariableTimeZone(Symbol(name), transitions)
+    return tz
 end
 
-function _read_tzfile_header(io)
+function read_tzfile_internal(io::IO, name::AbstractString, force_version::Char='\0')
     magic = readbytes(io, 4)
     @assert magic == b"TZif" "Magic file identifier \"TZif\" not found."
+
     # A byte indicating the version of the file's format: '\0', '2', '3'
     version = Char(read(io, UInt8))
     readbytes(io, 15)  # Fifteen bytes reserved for future use
-    return version
-end
 
-function _read_tzfile_data{T<:Integer}(io::IO; timesize::Type{T}=Int32, has_posix_str=false)
     tzh_ttisgmtcnt = ntoh(read(io, Int32))  # Number of UTC/local indicators
     tzh_ttisstdcnt = ntoh(read(io, Int32))  # Number of standard/wall indicators
     tzh_leapcnt = ntoh(read(io, Int32))  # Number of leap seconds
@@ -35,9 +34,11 @@ function _read_tzfile_data{T<:Integer}(io::IO; timesize::Type{T}=Int32, has_posi
     tzh_typecnt = ntoh(read(io, Int32))  # Number of TransitionTimeInfos (must be > 0)
     tzh_charcnt = ntoh(read(io, Int32))  # Number of timezone abbreviation characters
 
-    transition_times = Array{timesize}(tzh_timecnt)
+    time_type = force_version == '\0' ? Int32 : Int64
+
+    transition_times = Array{time_type}(tzh_timecnt)
     for i in eachindex(transition_times)
-        transition_times[i] = ntoh(read(io, timesize))
+        transition_times[i] = ntoh(read(io, time_type))
     end
     lindexes = Array{UInt8}(tzh_timecnt)
     for i in eachindex(lindexes)
@@ -56,14 +57,15 @@ function _read_tzfile_data{T<:Integer}(io::IO; timesize::Type{T}=Int32, has_posi
         abbrs[i] = ntoh(read(io, UInt8))
     end
 
-    # leap seconds (We don't use these)
-    leapseconds_time = Array{timesize}(tzh_leapcnt)
+    # leap seconds (unused)
+    leapseconds_time = Array{time_type}(tzh_leapcnt)
     leapseconds_seconds = Array{Int32}(tzh_leapcnt)
     for i in eachindex(leapseconds_time)
-        leapseconds_time[i] = ntoh(read(io, timesize))
+        leapseconds_time[i] = ntoh(read(io, time_type))
         leapseconds_seconds[i] = ntoh(read(io, Int32))
     end
-    # standard/wall and UTC/local indicators (We don't use these)
+
+    # standard/wall and UTC/local indicators (unused)
     isstd = Array{Int8}(tzh_ttisstdcnt)
     for i in eachindex(isstd)
         isstd[i] = ntoh(read(io, Int8))
@@ -72,16 +74,17 @@ function _read_tzfile_data{T<:Integer}(io::IO; timesize::Type{T}=Int32, has_posi
     for i in eachindex(isgmt)
         isgmt[i] = ntoh(read(io, Int8))
     end
-    # We don't use this yet
-    if has_posix_str
+
+    # POSIX TZ variable string used for transistions after the last ttinfo (unused)
+    if force_version != '\0'
         readline(io)
-        posix_str = readline(io)
+        posix_tz_str = chomp(readline(io))
     end
 
     # Now build the timezone transitions
     if tzh_timecnt == 0
         abbr = abbreviation(abbrs, ttinfo[1].abbrindex)
-        return FixedTimeZone(Symbol(abbr), Offset(ttinfo[1].gmtoff))
+        timezone = FixedTimeZone(Symbol(abbr), Offset(ttinfo[1].gmtoff))
     else
         # Calculate transition info
         transitions = Transition[]
@@ -104,8 +107,8 @@ function _read_tzfile_data{T<:Integer}(io::IO; timesize::Type{T}=Int32, has_posi
                 utc = info.gmtoff - dst
             end
 
-            # Sometimes it likes to be fancy and have multiple names in one for
-            # example "WSST" at abbrindex 5 turns into "SST" at abbrindex 6
+            # Sometimes tzfiles save on storage by having multiple names in one for example
+            # "WSST\0" at index 1 turns into "WSST" where as index 2 results in "SST".
             abbr = abbreviation(abbrs, info.abbrindex)
             tz = FixedTimeZone(abbr, utc, dst)
 
@@ -113,6 +116,8 @@ function _read_tzfile_data{T<:Integer}(io::IO; timesize::Type{T}=Int32, has_posi
                 push!(transitions, Transition(unix2datetime(transition_times[i]), tz))
             end
         end
-        return transitions
+        timezone = VariableTimeZone(Symbol(name), transitions)
     end
+
+    return version, timezone
 end
