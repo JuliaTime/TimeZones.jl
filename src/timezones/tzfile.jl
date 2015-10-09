@@ -36,6 +36,9 @@ function read_tzfile_internal(io::IO, name::AbstractString, force_version::Char=
 
     time_type = force_version == '\0' ? Int32 : Int64
 
+    # Transition time that represents negative infinity
+    initial_epoch = time_type == Int64 ? -Int64(2)^59 : typemin(Int32)
+
     transition_times = Array{time_type}(tzh_timecnt)
     for i in eachindex(transition_times)
         transition_times[i] = ntoh(read(io, time_type))
@@ -113,7 +116,13 @@ function read_tzfile_internal(io::IO, name::AbstractString, force_version::Char=
             tz = FixedTimeZone(abbr, utc, dst)
 
             if isempty(transitions) || last(transitions).zone != tz
-                push!(transitions, Transition(unix2datetime(transition_times[i]), tz))
+                if transition_times[i] == initial_epoch
+                    utc_datetime = typemin(DateTime)
+                else
+                    utc_datetime = unix2datetime(transition_times[i])
+                end
+
+                push!(transitions, Transition(utc_datetime, tz))
             end
         end
         timezone = VariableTimeZone(Symbol(name), transitions)

@@ -33,6 +33,8 @@ warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 open(joinpath(TZFILE_DIR, "Europe", "Warsaw")) do f
     tz = TimeZones.read_tzfile(f, "Europe/Warsaw")
     @test string(tz) == "Europe/Warsaw"
+    @test first(tz.transitions).utc_datetime == DateTime(1915,8,4,22,36)
+    @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
     @test ==(overlap(tz.transitions, warsaw.transitions)...)
 end
 
@@ -40,6 +42,8 @@ end
 open(joinpath(TZFILE_DIR, "Europe", "Warsaw (Version 2)")) do f
     tz = TimeZones.read_tzfile(f, "Europe/Warsaw")
     @test string(tz) == "Europe/Warsaw"
+    @test first(tz.transitions).utc_datetime == typemin(DateTime)
+    @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
     @test ==(overlap(tz.transitions, warsaw.transitions)...)
 end
 
@@ -51,6 +55,8 @@ apia = resolve("Pacific/Apia", tzdata["australasia"]...)
 open(joinpath(TZFILE_DIR, "Pacific", "Apia")) do f
     tz = TimeZones.read_tzfile(f, "Pacific/Apia")
     @test string(tz) == "Pacific/Apia"
+    @test first(tz.transitions).utc_datetime == DateTime(1911,1,1,11,26,56)
+    @test last(tz.transitions).utc_datetime == DateTime(2037,9,26,14)
     @test ==(overlap(tz.transitions, apia.transitions)...)
 end
 
@@ -62,6 +68,8 @@ paris = resolve("Europe/Paris", tzdata["europe"]...)
 open(joinpath(TZFILE_DIR, "Europe", "Paris")) do f
     tz = TimeZones.read_tzfile(f, "Europe/Paris")
     @test string(tz) == "Europe/Paris"
+    @test first(tz.transitions).utc_datetime == DateTime(1911,3,10,23,51,39)
+    @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
 
     tz_transitions, paris_transitions = overlap(tz.transitions, paris.transitions)
 
@@ -76,6 +84,8 @@ madrid = resolve("Europe/Madrid", tzdata["europe"]...)
 open(joinpath(TZFILE_DIR, "Europe", "Madrid")) do f
     tz = TimeZones.read_tzfile(f, "Europe/Madrid")
     @test string(tz) == "Europe/Madrid"
+    @test first(tz.transitions).utc_datetime == DateTime(1917,5,5,23)
+    @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
 
     tz_transitions, madrid_transitions = overlap(tz.transitions, madrid.transitions)
 
