@@ -24,14 +24,14 @@ end
 # Compare tzfile transitions with those we resolved directly from the Olson zones/rules
 
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
-open(joinpath(TZFILE_DIR, "Warsaw")) do f
+open(joinpath(TZFILE_DIR, "Europe", "Warsaw")) do f
     tz = TimeZones.read_tzfile(f, "Europe/Warsaw")
     @test string(tz) == "Europe/Warsaw"
     @test ==(overlap(tz.transitions, warsaw.transitions)...)
 end
 
 # Test tzfile version 2
-open(joinpath(TZFILE_DIR, "Warsaw_v2")) do f
+open(joinpath(TZFILE_DIR, "Europe", "Warsaw (Version 2)")) do f
     tz = TimeZones.read_tzfile(f, "Europe/Warsaw")
     @test string(tz) == "Europe/Warsaw"
     @test ==(overlap(tz.transitions, warsaw.transitions)...)
@@ -42,7 +42,7 @@ end
 # DST calculation. The entire day of 2011/12/30 was skipped when they changed from a
 # -11:00 GMT offset to 13:00 GMT offset
 apia = resolve("Pacific/Apia", tzdata["australasia"]...)
-open(joinpath(TZFILE_DIR, "Apia")) do f
+open(joinpath(TZFILE_DIR, "Pacific", "Apia")) do f
     tz = TimeZones.read_tzfile(f, "Pacific/Apia")
     @test string(tz) == "Pacific/Apia"
     @test ==(overlap(tz.transitions, apia.transitions)...)
@@ -53,7 +53,7 @@ end
 # midsomer back in 1940's there were 2 different dst one after another, we get a
 # different utc and dst than Olson.
 paris = resolve("Europe/Paris", tzdata["europe"]...)
-open(joinpath(TZFILE_DIR, "Paris")) do f
+open(joinpath(TZFILE_DIR, "Europe", "Paris")) do f
     tz = TimeZones.read_tzfile(f, "Europe/Paris")
     @test string(tz) == "Europe/Paris"
 
@@ -67,7 +67,7 @@ open(joinpath(TZFILE_DIR, "Paris")) do f
 end
 
 madrid = resolve("Europe/Madrid", tzdata["europe"]...)
-open(joinpath(TZFILE_DIR, "Madrid")) do f
+open(joinpath(TZFILE_DIR, "Europe", "Madrid")) do f
     tz = TimeZones.read_tzfile(f, "Europe/Madrid")
     @test string(tz) == "Europe/Madrid"
 
