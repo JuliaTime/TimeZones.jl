@@ -23,11 +23,13 @@ end
 
 # Compare tzfile transitions with those we resolved directly from the Olson zones/rules
 
+# Ensure that read_tzfile returns a FixedTimeZone with the right data
 utc = FixedTimeZone("UTC", 0)
 open(joinpath(TZFILE_DIR, "Etc", "UTC")) do f
     tz = TimeZones.read_tzfile(f, "UTC")
     @test tz == utc
 end
+
 
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 open(joinpath(TZFILE_DIR, "Europe", "Warsaw")) do f
@@ -38,13 +40,52 @@ open(joinpath(TZFILE_DIR, "Europe", "Warsaw")) do f
     @test ==(overlap(tz.transitions, warsaw.transitions)...)
 end
 
-# Test tzfile version 2
+# Read version 1 compatible data
+open(joinpath(TZFILE_DIR, "Europe", "Warsaw (Version 2)")) do f
+    version, tz = TimeZones.read_tzfile_internal(f, "Europe/Warsaw")
+    @test version == '2'
+    @test string(tz) == "Europe/Warsaw"
+    @test first(tz.transitions).utc_datetime == typemin(DateTime)
+    @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
+    @test ==(overlap(tz.transitions, warsaw.transitions[2:end])...)
+end
+
+# Read version 2 data
 open(joinpath(TZFILE_DIR, "Europe", "Warsaw (Version 2)")) do f
     tz = TimeZones.read_tzfile(f, "Europe/Warsaw")
     @test string(tz) == "Europe/Warsaw"
     @test first(tz.transitions).utc_datetime == typemin(DateTime)
     @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
     @test ==(overlap(tz.transitions, warsaw.transitions)...)
+end
+
+
+godthab = resolve("America/Godthab", tzdata["europe"]...)
+open(joinpath(TZFILE_DIR, "America", "Godthab")) do f
+    tz = TimeZones.read_tzfile(f, "America/Godthab")
+    @test string(tz) == "America/Godthab"
+    @test first(tz.transitions).utc_datetime == DateTime(1916,7,28,3,26,56)
+    @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
+    @test ==(overlap(tz.transitions, godthab.transitions)...)
+end
+
+# Read version 1 compatible data
+open(joinpath(TZFILE_DIR, "America", "Godthab (Version 3)")) do f
+    version, tz = TimeZones.read_tzfile_internal(f, "America/Godthab")
+    @test version == '3'
+    @test string(tz) == "America/Godthab"
+    @test first(tz.transitions).utc_datetime == typemin(DateTime)
+    @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
+    @test ==(overlap(tz.transitions, godthab.transitions)...)
+end
+
+# Read version 3 data
+open(joinpath(TZFILE_DIR, "America", "Godthab (Version 3)")) do f
+    tz = TimeZones.read_tzfile(f, "America/Godthab")
+    @test string(tz) == "America/Godthab"
+    @test first(tz.transitions).utc_datetime == typemin(DateTime)
+    @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
+    @test ==(overlap(tz.transitions, godthab.transitions)...)
 end
 
 
