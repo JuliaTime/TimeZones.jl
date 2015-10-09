@@ -119,7 +119,7 @@ function read_tzfile_internal(io::IO, name::AbstractString, force_version::Char=
                 if transition_times[i] == initial_epoch
                     utc_datetime = typemin(DateTime)
                 else
-                    utc_datetime = unix2datetime(transition_times[i])
+                    utc_datetime = unix2datetime(Int64(transition_times[i]))
                 end
 
                 push!(transitions, Transition(utc_datetime, tz))
