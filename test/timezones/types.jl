@@ -1,5 +1,5 @@
 import TimeZones: Transition
-import Base.Dates: Second
+import Base.Dates: Second, UTM
 
 
 # Constructor FixedTimeZone from a string.
@@ -246,7 +246,9 @@ utc = FixedTimeZone("UTC", 0, 0)
 
 spring_utc = ZonedDateTime(DateTime(2010, 5, 1, 12), utc)
 spring_apia = ZonedDateTime(DateTime(2010, 5, 1, 1), apia)
-early_utc = ZonedDateTime(DateTime(1, 1, 1, 0), utc)
+
+# The absolutely min DateTime you can create. Even smaller than typemin(DateTime)
+early_utc = ZonedDateTime(DateTime(UTM(typemin(Int64))), utc)
 
 @test spring_utc.zone == FixedTimeZone("UTC", 0, 0)
 @test spring_apia.zone == FixedTimeZone("SST", -39600, 0)

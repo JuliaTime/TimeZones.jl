@@ -66,7 +66,7 @@ zone["CEST"] = FixedTimeZone("CEST", 3600, 3600)
 zone["EET"] = FixedTimeZone("EET", 7200, 0)
 zone["EEST"] = FixedTimeZone("EEST", 7200, 3600)
 
-@test warsaw.transitions[1] == Transition(DateTime(1800,1,1), zone["LMT"])  # Really should be -Inf
+@test warsaw.transitions[1] == Transition(typemin(DateTime), zone["LMT"])  # Ideally -Inf
 @test warsaw.transitions[2] == Transition(DateTime(1879,12,31,22,36), zone["WMT"])
 @test warsaw.transitions[3] == Transition(DateTime(1915,8,4,22,36), zone["CET"])
 @test warsaw.transitions[4] == Transition(DateTime(1916,4,30,22,0), zone["CEST"])
@@ -99,7 +99,7 @@ zone["HST"] = FixedTimeZone("HST", -37800, 0)
 zone["HDT"] = FixedTimeZone("HDT", -37800, 3600)
 zone["HST_NEW"] = FixedTimeZone("HST", -36000, 0)
 
-@test honolulu.transitions[1] == Transition(DateTime(1800,1,1), zone["LMT"])
+@test honolulu.transitions[1] == Transition(typemin(DateTime), zone["LMT"])
 @test honolulu.transitions[2] == Transition(DateTime(1896,1,13,22,31,26), zone["HST"])
 @test honolulu.transitions[3] == Transition(DateTime(1933,4,30,12,30), zone["HDT"])
 @test honolulu.transitions[4] == Transition(DateTime(1933,5,21,21,30), zone["HST"])
@@ -127,7 +127,7 @@ zone["SDT"] = FixedTimeZone("SDT", -39600, 3600)
 zone["WSST"] = FixedTimeZone("WSST", 46800, 0)
 zone["WSDT"] = FixedTimeZone("WSDT", 46800, 3600)
 
-@test apia.transitions[1] == Transition(DateTime(1800,1,1), zone["LMT_OLD"])
+@test apia.transitions[1] == Transition(typemin(DateTime), zone["LMT_OLD"])
 @test apia.transitions[2] == Transition(DateTime(1879,7,4,11,26,56), zone["LMT"])
 @test apia.transitions[3] == Transition(DateTime(1911,1,1,11,26,56), zone["WSST_OLD"])
 @test apia.transitions[4] == Transition(DateTime(1950,1,1,11,30), zone["SST"])
@@ -197,7 +197,7 @@ zone["TDT-4"] = FixedTimeZone("TDT-4", -36000, 3600)
 zone["TST-5"] = FixedTimeZone("TST-5", -36000, 0)
 zone["TDT-5"] = FixedTimeZone("TDT-5", -36000, 3600)
 
-@test test.transitions[1] == Transition(DateTime(1800,1,1), zone["TST-1"])
+@test test.transitions[1] == Transition(typemin(DateTime), zone["TST-1"])
 @test test.transitions[2] == Transition(DateTime(1933,4,1,12), zone["TDT-2"]) # -09:00
 @test test.transitions[3] == Transition(DateTime(1933,9,1,12), zone["TST-3"])
 @test test.transitions[4] == Transition(DateTime(1934,4,1,13), zone["TDT-3"])
