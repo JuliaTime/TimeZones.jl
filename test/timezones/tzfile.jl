@@ -23,6 +23,12 @@ end
 
 # Compare tzfile transitions with those we resolved directly from the Olson zones/rules
 
+utc = FixedTimeZone("UTC", 0)
+open(joinpath(TZFILE_DIR, "Etc", "UTC")) do f
+    tz = TimeZones.read_tzfile(f, "UTC")
+    @test tz == utc
+end
+
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 open(joinpath(TZFILE_DIR, "Europe", "Warsaw")) do f
     tz = TimeZones.read_tzfile(f, "Europe/Warsaw")
