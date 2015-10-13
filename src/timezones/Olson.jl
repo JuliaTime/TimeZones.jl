@@ -45,12 +45,9 @@ typealias ZoneDict Dict{AbstractString,Array{Zone}}
 typealias RuleDict Dict{AbstractString,Array{Rule}}
 typealias OrderedRuleDict Dict{AbstractString,Tuple{Array{Date},Array{Rule}}}
 
-# Min and max years that we create DST transition instants for (inclusive)
-const MINYEAR = 1800
-const MAXYEAR = 2038
-
-const MINDATETIME = DateTime(MINYEAR,1,1)
-const MAXDATETIME = DateTime(MAXYEAR,12,31)
+# Min and max DateTimes that we create DST transition instants for (inclusive)
+const MINDATETIME = typemin(DateTime)
+const MAXDATETIME = DateTime(2038,12,31)
 
 # Helper functions/data
 const MONTHS = Dict("Jan"=>1,"Feb"=>2,"Mar"=>3,"Apr"=>4,"May"=>5,"Jun"=>6,
@@ -253,7 +250,7 @@ function order_rules(rules::Array{Rule})
     # Note: Typically rules are orderd by "from" and "in". Unfortunately
     for rule in rules
         # Replicate the rule for each year that it is effective.
-        for rule_year in get(rule.from, MINYEAR):get(rule.to, MAXYEAR)
+        for rule_year in get(rule.from, year(MINDATETIME)):get(rule.to, year(MAXDATETIME))
             # Determine the rule transition day by starting at the
             # beginning of the month and applying our "on" function
             # until we reach the correct day.

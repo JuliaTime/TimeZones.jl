@@ -6,8 +6,7 @@ function overlap(a::Array{Transition}, b::Array{Transition})
     start_dt = max(first(a).utc_datetime, first(b).utc_datetime)
     end_dt = min(last(a).utc_datetime, last(b).utc_datetime)
 
-    # Start may not be equal as the initial transition date is arbitrary
-    within = t -> start_dt < t.utc_datetime <= end_dt
+    within = t -> start_dt <= t.utc_datetime <= end_dt
     return a[find(within, a)], b[find(within, b)]
 end
 
@@ -47,7 +46,9 @@ open(joinpath(TZFILE_DIR, "Europe", "Warsaw (Version 2)")) do f
     @test string(tz) == "Europe/Warsaw"
     @test first(tz.transitions).utc_datetime == typemin(DateTime)
     @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
-    @test ==(overlap(tz.transitions, warsaw.transitions[2:end])...)
+
+    # File skips 1879-12-31T22:36:00
+    @test ==(overlap(tz.transitions, warsaw.transitions[3:end])...)
 end
 
 # Read version 2 data
