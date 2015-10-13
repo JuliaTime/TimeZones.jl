@@ -19,10 +19,10 @@ export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
     # local.jl
     localzone
 
-const PKG_DIR = normpath(joinpath(dirname(@__FILE__), "..", "deps"))
-const TZDATA_DIR = joinpath(PKG_DIR, "tzdata")
-const COMPILED_DIR = joinpath(PKG_DIR, "compiled")
-@windows_only const TRANSLATION_FILE = joinpath(PKG_DIR, "windows_translation")
+const PKG_DIR = normpath(joinpath(dirname(@__FILE__), ".."))
+const TZDATA_DIR = joinpath(PKG_DIR, "deps", "tzdata")
+const COMPILED_DIR = joinpath(PKG_DIR, "deps", "compiled")
+@windows_only const TRANSLATION_FILE = joinpath(PKG_DIR, "deps", "windows_translation")
 
 include("timezones/time.jl")
 include("timezones/types.jl")
