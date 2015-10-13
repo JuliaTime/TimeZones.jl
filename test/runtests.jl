@@ -4,7 +4,8 @@ using Base.Test
 import TimeZones: TZDATA_DIR
 import TimeZones.Olson: ZoneDict, RuleDict, tzparse, resolve
 
-const TZFILE_DIR = normpath(joinpath(dirname(@__FILE__), "tzfile"))
+const TEST_DIR = normpath(dirname(@__FILE__))
+const TZFILE_DIR = joinpath(TEST_DIR, "tzfile")
 
 # For testing we'll reparse the tzdata every time to instead of using the serialized data.
 # This should make the development/testing cycle simplier since you won't be forced to
@@ -26,4 +27,5 @@ include("timezones/io.jl")
 include("timezones/tzfile.jl")
 include("timezones/adjusters.jl")
 include("timezones/conversions.jl")
+include("timezones/local.jl")
 include("timezone_names.jl")
