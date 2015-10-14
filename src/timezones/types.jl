@@ -46,13 +46,29 @@ function FixedTimeZone(name::AbstractString, utc_offset::Integer, dst_offset::In
 end
 
 function FixedTimeZone(s::AbstractString)
-    m = match(r"^([+-]?\d{2})\:?(\d{2})(?:\:(\d{2}+))?$", s)
+    const regex = r"""
+    ^(?|
+        UTC([+-]\d{1,2})?
+        |
+        (?:UTC(?=[+-]))?
+        ([+-]?\d{2})
+        (?|
+            (\d{2})
+            |
+            \:(\d{2})
+            (?:\:(\d{2}))?
+        )
+    )$
+    """x
+
+    m = match(regex, s)
     m == nothing && error("Unrecognized timezone: $s")
 
-    # TODO: Somehow this is not working in the package but works in the REPL
     values = map(n -> n == nothing ? 0 : Base.parse(Int, n), m.captures)
 
-    if values[3] == 0
+    if values == [0, 0, 0]
+        name = "UTC"
+    elseif values[3] == 0
         name = @sprintf("UTC%+03d:%02d", values[1:2]...)
     else
         name = @sprintf("UTC%+03d:%02d:%02d", values...)
