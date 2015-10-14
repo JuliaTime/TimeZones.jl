@@ -118,10 +118,28 @@ end
     end
 
     # Windows powershell should be available on Windows 7 and above
-    winzone = strip(readall(`powershell -Command "[TimeZoneInfo]::Local.Id"`))
-    if haskey(translation, winzone)
-        return TimeZone(translation[winzone])
+    win_name = strip(readall(`powershell -Command "[TimeZoneInfo]::Local.Id"`))
+    if haskey(translation, win_name)
+        posix_name = translation[win_name]
+
+        # Translation dict includes Etc timezones which we currently are not supporting
+        # since they are deemed historical. To ensure compatibility with the translation
+        # dict we will manually convert these fixed time zones.
+        if startswith(posix_name, "Etc/GMT")
+            name = replace(posix_name, r"Etc/GMT0?", "UTC")
+
+            # Note: Etc/GMT[+-] are reversed compared to UTC[+-]
+            if contains(name, "+")
+                name = replace(name, "+", "-")
+            else
+                name = replace(name, "-", "+")
+            end
+
+            return FixedTimeZone(name)
+        else
+            return TimeZone(posix_name)
+        end
     else
-        error("unable to translate to POSIX timezone name: $winzone")
+        error("unable to translate to POSIX timezone name from: \"$win_name\"")
     end
 end
