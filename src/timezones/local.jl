@@ -110,10 +110,10 @@ end
 end
 
 @windows_only function localzone()
-    isfile(TRANSLATION_FILE) || error("Missing Windows to POSIX timezone translation ",
+    isfile(WIN_TRANSLATION_FILE) || error("Missing Windows to POSIX timezone translation ",
         "file. Try running Pkg.build(\"TimeZones\")")
 
-    translation = open(TRANSLATION_FILE, "r") do fp
+    translation = open(WIN_TRANSLATION_FILE, "r") do fp
         deserialize(fp)
     end
 
