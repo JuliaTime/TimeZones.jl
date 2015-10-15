@@ -2,7 +2,7 @@
 # Based upon Python's tzlocal https://pypi.python.org/pypi/tzlocal
 
 @osx_only function localzone()
-    name = readall(`systemsetup -gettimezone`)
+    name = readall(`systemsetup -gettimezone`)  # Appears to only work as root
     if contains(name, "Time Zone: ")
         name = strip(replace(name, "Time Zone: ", ""))
     else
@@ -74,7 +74,7 @@ end
             for line in readlines(file)
                 matched = match(zone_re, line)
                 if matched != nothing
-                    name = matched.captures["name"]
+                    name = matched["name"]
                     name = replace(name, ' ', '_')
                     break
                 end
