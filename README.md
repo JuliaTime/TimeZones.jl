@@ -2,7 +2,7 @@ TimeZones.jl
 ============
 
 [![Linux/OS X Build Status](https://travis-ci.org/quinnj/TimeZones.jl.svg?branch=master)](https://travis-ci.org/quinnj/TimeZones.jl)
-[![Windows Build Status](https://ci.appveyor.com/api/projects/status/1foo12pca80b5d2j/branch/master?svg=true)](https://ci.appveyor.com/project/omus/timezones-jl/branch/master)
+[![Windows Build Status](https://ci.appveyor.com/api/projects/status/99tm5t4txx92oh2c/branch/master?svg=true)](https://ci.appveyor.com/project/quinnj/timezones-jl/branch/master)
 [![Coverage Status](https://coveralls.io/repos/quinnj/TimeZones.jl/badge.svg?branch=master)](https://coveralls.io/r/quinnj/TimeZones.jl?branch=master)
 [![codecov.io](http://codecov.io/github/quinnj/TimeZones.jl/coverage.svg?branch=master)](http://codecov.io/github/quinnj/TimeZones.jl?branch=master)
 
