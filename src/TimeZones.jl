@@ -24,7 +24,7 @@ const TZDATA_DIR = joinpath(PKG_DIR, "deps", "tzdata")
 const COMPILED_DIR = joinpath(PKG_DIR, "deps", "compiled")
 
 @windows_only begin
-    const WIN_TRANSLATION_FILE = joinpath(PKG_DIR, "deps", "windows_translation.xml")
+    const WIN_TRANSLATION_FILE = joinpath(PKG_DIR, "deps", "windows_to_posix")
 end
 
 include("timezones/time.jl")
