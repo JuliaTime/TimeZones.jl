@@ -3,13 +3,6 @@ sudo: false
 os:
     - osx
     - linux
-env:
-    - ARCH="i686"
-    - ARCH="x86_64"
-matrix:
-  exclude:
-    - os: osx
-      env: ARCH="i686"
 julia:
     - "0.4"
     - nightly
