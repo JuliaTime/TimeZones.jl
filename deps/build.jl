@@ -15,8 +15,8 @@ const REGIONS = (
 isdir(TZDATA_DIR) || mkdir(TZDATA_DIR)
 isdir(COMPILED_DIR) || mkdir(COMPILED_DIR)
 
-# TODO: Downloading fails regularly. Implement a retry system or file alternative
-# sources.
+# TODO: Downloading from the IANA source fails regularly. We should attempt to find
+# alternative sources.
 info("Downloading TZ data")
 @sync for region in REGIONS
     @async begin
@@ -57,15 +57,13 @@ compile(TZDATA_DIR, COMPILED_DIR)
     translation_dir = dirname(WIN_TRANSLATION_FILE)
     isdir(translation_dir) || mkdir(translation_dir)
 
-    # Windows is weird and uses its own timezone
     info("Downloading Windows to POSIX timezone name XML")
 
-    # Generate the mapping between MS Windows timezone names and
-    # tzdata/Olsen timezone names, by retrieving a file.
+    # Retrieve a mapping of Windows timezone names to Olson timezone names.
+    # Details on the contents of this file can be found at:
+    # http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping
     xml_source = "http://unicode.org/cldr/data/common/supplemental/windowsZones.xml"
     xml_file = joinpath(translation_dir, "windowsZones.xml")
-
-    # Download the xml file from source
     download(xml_source, xml_file)
 
     info("Pre-processing Windows translation")
@@ -73,28 +71,25 @@ compile(TZDATA_DIR, COMPILED_DIR)
     # Get the timezone conversions from the file
     xdoc = parse_file(xml_file)
     xroot = root(xdoc)
-    windowsZones = find_element(xroot, "windowsZones")
-    mapTimezones = find_element(windowsZones, "mapTimezones")
-    # Every mapZone is a conversion
-    mapZones = get_elements_by_tagname(mapTimezones, "mapZone")
+    windows_zones = find_element(xroot, "windowsZones")
+    map_timezones = find_element(windows_zones, "mapTimezones")
+    map_zones = get_elements_by_tagname(map_timezones, "mapZone")
+
+    # TODO: Eliminate the Etc/* POSIX names here? See @windows_only localzone
 
     # Dictionary to store the windows to timezone conversions
-    win_tz = Dict{AbstractString,AbstractString}()
-
-    # Add conversions to the dictionary
-    for mapzone in mapZones
-        # territory "001" is the global default
-        # http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping
-        if attribute(mapzone, "territory") == "001"
-            windowszone = attribute(mapzone, "other")
-            utczone = attribute(mapzone, "type")
-            win_tz[windowszone] = utczone
+    translation = Dict{AbstractString,AbstractString}()
+    for map_zone in map_zones
+        # Territory "001" is the global default
+        if attribute(map_zone, "territory") == "001"
+            win_name = attribute(map_zone, "other")
+            posix_name = attribute(map_zone, "type")
+            translation[win_name] = posix_name
         end
     end
 
-    # Save the dictionary
     open(WIN_TRANSLATION_FILE, "w") do fp
-        serialize(fp, win_tz)
+        serialize(fp, translation)
     end
 end
 

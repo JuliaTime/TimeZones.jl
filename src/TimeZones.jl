@@ -3,8 +3,8 @@ module TimeZones
 using Base.Dates
 import Base.Dates: AbstractTime, days, hour, minute, second, millisecond
 
-export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
-    TimeError, AmbiguousTimeError, NonExistentTimeError, DateTime,
+export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime, DateTime, timezone_names,
+    TimeError, AmbiguousTimeError, NonExistentTimeError,
     # accessors.jl
     hour, minute, second, millisecond,
     # adjusters.jl
@@ -38,6 +38,12 @@ include("timezones/Olson.jl")
 include("timezones/conversions.jl")
 include("timezones/local.jl")
 
+doc"""
+`TimeZone(name::AbstractString) -> TimeZone`
+
+Construct `TimeZone` information based upon its `name`.
+See `FixedTimeZone(::AbstractString)` for making a custom `TimeZone`.
+"""
 function TimeZone(name::AbstractString)
     tz_path = joinpath(COMPILED_DIR, split(name, "/")...)
 
@@ -48,6 +54,11 @@ function TimeZone(name::AbstractString)
     end
 end
 
+doc"""
+`timezone_names() -> Array{AbstractString}`
+
+Returns all of the valid names for constructing a `TimeZone`.
+"""
 function timezone_names()
     names = AbstractString[]
     check = Tuple{AbstractString,AbstractString}[(COMPILED_DIR, "")]

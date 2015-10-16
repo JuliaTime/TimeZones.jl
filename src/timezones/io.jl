@@ -14,6 +14,7 @@ end
 
 Base.string(tz::TimeZone) = string(tz.name)
 Base.string(dt::ZonedDateTime) = "$(localtime(dt))$(string(dt.zone.offset))"
+# Base.string(t::Transition) = "$(t.utc_datetime), $(t.zone.name), $(t.zone.offset)"
 
 Base.show(io::IO,tz::VariableTimeZone) = print(io,string(tz))
 Base.show(io::IO,dt::ZonedDateTime) = print(io,string(dt))

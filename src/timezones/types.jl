@@ -20,7 +20,7 @@ end
 Base.showerror(io::IO, e::NonExistentTimeError) = print(io, "DateTime $(e.dt) does not exist within $(string(e.tz))");
 
 # Note: The Olson Database rounds offset precision to the nearest second
-# See "America/New_York" notes for an example.
+# See "America/New_York" notes in Olson file "northamerica" for an example.
 immutable Offset
     utc::Second  # Standard offset from UTC
     dst::Second  # Addition daylight saving time offset applied to UTC offset
@@ -36,15 +36,31 @@ end
 
 # Using type Symbol instead of AbstractString for name since it
 # gets us ==, and hash for free.
+
+doc"""A `TimeZone` with a constant offset for all of time."""
 immutable FixedTimeZone <: TimeZone
     name::Symbol
     offset::Offset
 end
 
+doc"""
+`FixedTimeZone(name::AbstractString, utc_offset::Integer, dst_offset::Integer=0) -> FixedTimeZone`
+
+Constructs a `FixedTimeZone` with the given `name`, UTC offset (in seconds), and DST offset
+(in seconds).
+"""
 function FixedTimeZone(name::AbstractString, utc_offset::Integer, dst_offset::Integer=0)
     FixedTimeZone(symbol(name), Offset(utc_offset, dst_offset))
 end
 
+doc"""
+`FixedTimeZone(::AbstractString) -> FixedTimeZone`
+
+Constructs a `FixedTimeZone` with a UTC offset from a string. Resulting `FixedTimeZone` will
+be named like \"UTC±HH:MM\".
+
+Examples: \"UTC+6\", \"-1330\", \"15:45:21\"
+"""
 function FixedTimeZone(s::AbstractString)
     const regex = r"""
     ^(?|
@@ -91,13 +107,7 @@ end
 
 Base.isless(x::Transition,y::Transition) = isless(x.utc_datetime,y.utc_datetime)
 
-# function Base.string(t::Transition)
-#     return "$(t.utc_datetime), $(t.zone.name), $(t.zone.offset)"
-# end
-
-"""
-A TimeZone that has a variable offset from UTC.
-"""
+doc"""A `TimeZone` with an offset that changes over time."""
 immutable VariableTimeZone <: TimeZone
     name::Symbol
     transitions::Vector{Transition}
@@ -107,15 +117,16 @@ function VariableTimeZone(name::AbstractString, transitions::Vector{Transition})
     return VariableTimeZone(symbol(name), transitions)
 end
 
+doc"""A `DateTime` that includes `TimeZone` information."""
 immutable ZonedDateTime <: TimeType
     utc_datetime::DateTime
     timezone::TimeZone
     zone::FixedTimeZone  # The current zone for the utc_datetime.
 end
 
-"""
+doc"""
 Produces a list of possible UTC DateTimes given a local DateTime
-and a timezone. Results are returned in ascending order.
+and a `VariableTimeZone`. Results are returned in ascending order.
 """
 function possible_dates(local_dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
     possible = Tuple{DateTime,FixedTimeZone}[]
@@ -154,7 +165,15 @@ function possible_dates(local_dt::DateTime, tz::VariableTimeZone; from_utc::Bool
     return possible
 end
 
-function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, occurrence::Int=0; from_utc::Bool=false)
+doc"""
+`ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, occurrence::Integer=0; from_utc::Bool=false) -> ZonedDateTime`
+
+Constructs a `ZonedDateTime` given a local `DateTime` and a `TimeZone`. If the local
+`DateTime` is ambiguious in the given time zone you can set `occurrence` to a positive
+integer to resolve the ambiuity. When the `from_utc` keyword is true the given `DateTime` is
+processed as if it is in UTC.
+"""
+function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, occurrence::Integer=0; from_utc::Bool=false)
     possible = possible_dates(local_dt, tz; from_utc=from_utc)
 
     num = length(possible)
@@ -171,6 +190,14 @@ function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, occurrence::Int
     end
 end
 
+doc"""
+`ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, is_dst::Bool; from_utc::Bool=false) -> ZonedDateTime`
+
+Constructs a `ZonedDateTime` given a local `DateTime` and a `TimeZone`. If the local
+`DateTime` is ambiguious in the given time zone you can set `is_dst` to resolve the
+ambiuity. When the `from_utc` keyword is true the given `DateTime` is processed as if it is
+in UTC.
+"""
 function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, is_dst::Bool; from_utc::Bool=false)
     possible = possible_dates(local_dt, tz; from_utc=from_utc)
 
@@ -194,11 +221,22 @@ function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, is_dst::Bool; f
     end
 end
 
+doc"""
+`ZonedDateTime(local_dt::DateTime, tz::FixedTimeZone; from_utc::Bool=false) -> ZonedDateTime`
+
+Constructs a `ZonedDateTime` given a local `DateTime` and a `FixedTimeZone`. When the
+`from_utc` keyword is true the given `DateTime` is processed as if it is in UTC.
+"""
 function ZonedDateTime(local_dt::DateTime, tz::FixedTimeZone; from_utc::Bool=false)
     utc_dt = from_utc ? local_dt : local_dt - tz.offset
     return ZonedDateTime(utc_dt, tz, tz)
 end
 
+doc"""
+`ZonedDateTime(zdt::DateTime, tz::TimeZone) -> ZonedDateTime`
+
+Converts a `ZonedDateTime` from the current `TimeZone` into the specified `tz`.
+"""
 function ZonedDateTime(zdt::ZonedDateTime, tz::VariableTimeZone)
     i = searchsortedlast(
         tz.transitions, zdt.utc_datetime,

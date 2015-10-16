@@ -13,6 +13,7 @@
     return TimeZone(name)
 end
 
+
 @linux_only function localzone()
     name = ""
     validnames = timezone_names()
@@ -143,3 +144,9 @@ end
         error("unable to translate to POSIX timezone name from: \"$win_name\"")
     end
 end
+
+@doc """
+`localzone() -> TimeZone`
+
+Returns a `TimeZone` object that is equivalent to the system's current time zone.
+""" localzone
