@@ -92,9 +92,8 @@ function read_tzfile_internal(io::IO, name::AbstractString, force_version::Char=
     end
 
     # Now build the timezone transitions
-    if tzh_timecnt == 0
-        abbr = abbreviation(abbrs, ttinfo[1].abbrindex)
-        timezone = FixedTimeZone(Symbol(abbr), Offset(ttinfo[1].gmtoff))
+    if tzh_timecnt == 0 || (tzh_timecnt == 1 && transition_times[1] == initial_epoch)
+        timezone = FixedTimeZone(Symbol(name), Offset(ttinfo[1].gmtoff))
     else
         # Calculate transition info
         transitions = Transition[]

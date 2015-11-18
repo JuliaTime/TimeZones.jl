@@ -36,7 +36,7 @@
 
     # Use system installed files
     @test_throws ErrorException TimeZone("Etc/GMT-9")
-    gmt_minus_9 = FixedTimeZone("GMT-9", 9 * 3600)
+    gmt_minus_9 = FixedTimeZone("Etc/GMT-9", 9 * 3600)
     withenv("TZ" => ":Etc/GMT-9") do
         @test localzone() == gmt_minus_9
     end

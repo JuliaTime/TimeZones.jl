@@ -29,6 +29,12 @@ open(joinpath(TZFILE_DIR, "Etc", "UTC")) do f
     @test tz == utc
 end
 
+# Fixed timezone using version 2 data.
+utc_plus_6 = FixedTimeZone("UTC+6", 6 * 3600)
+open(joinpath(TZFILE_DIR, "Etc", "GMT-6")) do f
+    tz = TimeZones.read_tzfile(f, "UTC+6")
+    @test tz == utc_plus_6
+end
 
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 open(joinpath(TZFILE_DIR, "Europe", "Warsaw")) do f
