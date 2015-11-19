@@ -56,6 +56,7 @@ end
 
 doc"""
 `TimeZone() -> TimeZone`
+
 Construct `TimeZone` information corresponding to the local timezone
 """
 TimeZone() = localzone()
