@@ -1,5 +1,5 @@
 import TimeZones: Transition
-import TimeZones.Olson: ZoneDict, RuleDict, zoneparse, ruleparse, resolve, parsedate
+import TimeZones.Olson: ZoneDict, RuleDict, zoneparse, ruleparse, resolve, parsedate, order_rules
 import Base.Dates: Hour, Minute, Second
 
 # Variations of until dates
@@ -228,3 +228,60 @@ longyearbyen = resolve("Arctic/Longyearbyen", tzdata["europe"]...)
 # Zones that don't include multiple lines and no rules should be treated as a FixedTimeZone.
 mst = resolve("MST", tzdata["northamerica"]...)
 @test isa(mst, FixedTimeZone)
+
+# order rules
+    # Rule    Poland  1918    1919    -   Sep 16  2:00s   0       -
+    # Rule    Poland  1919    only    -   Apr 15  2:00s   1:00    S
+    # Rule    Poland  1944    only    -   Apr  3  2:00s   1:00    S
+rule_a = ruleparse("1918", "1919", "-", "Sep", "16", "2:00s", "0", "-")
+rule_b = ruleparse("1919", "only", "-", "Apr", "15", "2:00s", "1:00", "S")
+rule_c = ruleparse("1944", "only", "-", "Apr", "3", "2:00s", "1:00", "S")
+
+for rules in ([rule_a, rule_b, rule_c], [rule_c, rule_b, rule_a], [rule_a, rule_c, rule_b])
+    dates, ordered = order_rules(rules)
+
+    @test dates == [DateTime(1918, 9, 16), DateTime(1919, 4, 15), DateTime(1919, 9, 16), DateTime(1944, 4, 3)]
+    @test ordered == [rule_a, rule_b, rule_a, rule_c]
+end
+
+# ignore rules starting after the cutoff
+dates, ordered = order_rules([rule_a, rule_b, rule_c], maxdatetime=DateTime(1940, 1, 1))
+@test dates == [DateTime(1918, 9, 16), DateTime(1919, 4, 15), DateTime(1919, 9, 16)]
+@test ordered == [rule_a, rule_b, rule_a]
+
+# truncate rules ending after the cutoff
+rule_pre = ruleparse("1999", "only", "-", "Jun", "7", "2:00s", "0", "P" )
+rule_overlap = ruleparse("1999", "2001", "-", "Jan", "1", "0:00s", "0", "-")
+rule_endless = ruleparse("1993", "max", "-", "Feb", "2", "6:00s", "0", "G")
+rule_post = ruleparse("2002", "only", "-", "Jan", "1", "0:00s", "0", "IP")
+
+truncated = ruleparse("1999", "2000", "-", "Jan", "1", "0:00s", "0", "-")
+
+dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], maxdatetime=DateTime(2000, 1, 1))
+@test dates == [
+    DateTime(1993, 2, 2),
+    DateTime(1994, 2, 2),
+    DateTime(1995, 2, 2),
+    DateTime(1996, 2, 2),
+    DateTime(1997, 2, 2),
+    DateTime(1998, 2, 2),
+    DateTime(1999, 1, 1),
+    DateTime(1999, 2, 2),
+    DateTime(1999, 6, 7),
+    DateTime(2000, 1, 1),
+    DateTime(2000, 2, 2),
+]
+#  Test not quite right, equality on rules isn't defined
+# @test ordered == [
+#     rule_endless,
+#     rule_endless,
+#     rule_endless,
+#     rule_endless,
+#     rule_endless,
+#     rule_endless,
+#     truncated,
+#     rule_endless,
+#     rule_pre,
+#     truncated,
+#     rule_endless,
+# ]

@@ -243,30 +243,77 @@ Example:
     1919-09-16   2:00s   0       -
     1944-04-03   2:00s   1:00    S
 """
-function order_rules(rules::Array{Rule})
+function order_rules(rules::Array{Rule}; maxdatetime::DateTime=MAXDATETIME)
     dates = Date[]
     ordered = Rule[]
 
+    max_year = year(maxdatetime)
+
     # Note: Typically rules are orderd by "from" and "in". Unfortunately
     for rule in rules
-        # Replicate the rule for each year that it is effective.
-        for rule_year in get(rule.from, year(MINDATETIME)):get(rule.to, year(MAXDATETIME))
-            # Determine the rule transition day by starting at the
-            # beginning of the month and applying our "on" function
-            # until we reach the correct day.
-            date = Date(rule_year, rule.month)
-            try
-                # The "on" function should evaluate to a day within the current month.
-                date = tonext(rule.on, date; same=true, limit=daysinmonth(date))
-            catch e
-                if isa(e, ArgumentError)
-                    error("Unable to find matching day in month $(year(date))/$(month(date))")
-                else
-                    rethrow(e)
-                end
+        # TODO: Rearchitect so that later transitions can be calculated on the
+        # fly.
+        #
+        # Presently, all transitions are calculated at compile time. Some Rules
+        # do not have ending dates (and Rules could have ending dates that were
+        # arbitrarily far in the future). Instead of running forever, this code
+        # makes the pragmatic decision to only calculate transitions up until
+        # an arbitrary cutoff date.
+        #
+        # Thus, any dates after our cutoff (in a given timezone) cannot be
+        # guaranteed to be valid unless that date is in UTC (n.b., we can't
+        # really make any guarantees about the accuracy of any date that has
+        # occurred after the creation of whatever version of the Olson DB we
+        # are compiling, but in this case we mean we can't even guarantee
+        # accuracy to the model of time that the source DB is offering). A date
+        # also cannot be guaranteed to be accurate if timezone transition/math
+        # ever placed that date after our cutoff (In practice, the last safe
+        # date is 20XX/12/31 23:59:59 in the furthest ahead timezone).
+        #
+        # Since we can't be accurate after this cutoff, it is important that we
+        # also don't imply we are being accurate after that cutoff. So we will
+        # ignore any rules starting after maxdatetime, and truncate rules' to
+        # field to maxdatetime if necessary.
+        start_year = get(rule.from, year(MINDATETIME))
+
+        if start_year <= max_year
+            end_year = get(rule.to, max_year)
+
+            if end_year > max_year
+                # At present, nothing in ruleparse can produce an on rule
+                rule = Rule(
+                    rule.from,
+                    max_year,
+                    rule.month,
+                    rule.on,
+                    rule.at,
+                    rule.at_flag,
+                    rule.save,
+                    rule.letter
+                )
+
+                end_year = max_year
             end
-            push!(dates, date)
-            push!(ordered, rule)
+
+            # Replicate the rule for each year that it is effective.
+            for rule_year in start_year:end_year
+                # Determine the rule transition day by starting at the
+                # beginning of the month and applying our "on" function
+                # until we reach the correct day.
+                date = Date(rule_year, rule.month)
+                try
+                    # The "on" function should evaluate to a day within the current month.
+                    date = tonext(rule.on, date; same=true, limit=daysinmonth(date))
+                catch e
+                    if isa(e, ArgumentError)
+                        error("Unable to find matching day in month $(year(date))/$(month(date))")
+                    else
+                        rethrow(e)
+                    end
+                end
+                push!(dates, date)
+                push!(ordered, rule)
+            end
         end
     end
 
@@ -292,7 +339,7 @@ Resolves a named zone into TimeZone. Updates ordered with any new rules that
 were required to be ordered.
 """
 function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDict,
-    ordered::OrderedRuleDict; debug=false)
+    ordered::OrderedRuleDict; maxdatetime::DateTime=MAXDATETIME, debug=false)
 
     transitions = Transition[]
 
@@ -311,7 +358,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
         format = zone.format
         # save = zone.save
         rule_name = zone.rules
-        until = get(zone.until, MAXDATETIME)
+        until = get(zone.until, maxdatetime)
 
         if rule_name == ""
             save = zone.save
@@ -328,7 +375,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
             end
         else
             if !haskey(ordered, rule_name)
-                ordered[rule_name] = order_rules(ruleset[rule_name])
+                ordered[rule_name] = order_rules(ruleset[rule_name], maxdatetime=maxdatetime)
             end
 
             dates, rules = ordered[rule_name]
@@ -422,7 +469,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
         start_utc = asutc(until, zone.until_flag, offset, save)
 
         debug && println("Zone End   $rule_name, $offset, $save, $(start_utc)u")
-        start_utc >= MAXDATETIME && break
+        start_utc >= maxdatetime && break
     end
 
     # Note: Transitions array is expected to be ordered and should be if both
@@ -436,21 +483,21 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     end
 end
 
-function resolve(zoneset::ZoneDict, ruleset::RuleDict; debug=false)
+function resolve(zoneset::ZoneDict, ruleset::RuleDict; maxdatetime::DateTime=MAXDATETIME, debug=false)
     ordered = OrderedRuleDict()
     timezones = Dict{AbstractString,TimeZone}()
 
     for zone_name in keys(zoneset)
-        tz = resolve!(zone_name, zoneset, ruleset, ordered, debug=debug)
+        tz = resolve!(zone_name, zoneset, ruleset, ordered, maxdatetime=maxdatetime, debug=debug)
         timezones[zone_name] = tz
     end
 
     return timezones
 end
 
-function resolve(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDict; debug=false)
+function resolve(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDict; maxdatetime::DateTime=MAXDATETIME, debug=false)
     ordered = OrderedRuleDict()
-    return resolve!(zone_name, zoneset, ruleset, ordered, debug=debug)
+    return resolve!(zone_name, zoneset, ruleset, ordered, maxdatetime=maxdatetime, debug=debug)
 end
 
 function tzparse(tzfile::AbstractString)
@@ -499,17 +546,17 @@ function tzparse(tzfile::AbstractString)
     return zones, rules
 end
 
-function load(tzdata_dir::AbstractString=TZDATA_DIR)
+function load(tzdata_dir::AbstractString=TZDATA_DIR; maxdatetime::DateTime=MAXDATETIME)
     timezones = Dict{AbstractString,TimeZone}()
     for filename in readdir(tzdata_dir)
         zones, rules = tzparse(joinpath(tzdata_dir, filename))
-        merge!(timezones, resolve(zones, rules))
+        merge!(timezones, resolve(zones, rules, maxdatetime=maxdatetime))
     end
     return timezones
 end
 
-function compile(tzdata_dir::AbstractString=TZDATA_DIR, dest_dir::AbstractString=COMPILED_DIR)
-    timezones = load(tzdata_dir)
+function compile(tzdata_dir::AbstractString=TZDATA_DIR, dest_dir::AbstractString=COMPILED_DIR; maxdatetime::DateTime=MAXDATETIME)
+    timezones = load(tzdata_dir, maxdatetime=maxdatetime)
 
     isdir(dest_dir) || error("Destination directory doesn't exist")
 
@@ -524,5 +571,6 @@ function compile(tzdata_dir::AbstractString=TZDATA_DIR, dest_dir::AbstractString
         end
     end
 end
+
 
 end # module
