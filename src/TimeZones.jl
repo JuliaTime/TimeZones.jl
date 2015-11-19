@@ -55,6 +55,12 @@ function TimeZone(name::AbstractString)
 end
 
 doc"""
+`TimeZone() -> TimeZone`
+Construct `TimeZone` information corresponding to the local timezone
+"""
+TimeZone() = localzone()
+
+doc"""
 `timezone_names() -> Array{AbstractString}`
 
 Returns all of the valid names for constructing a `TimeZone`.
