@@ -47,7 +47,7 @@ typealias OrderedRuleDict Dict{AbstractString,Tuple{Array{Date},Array{Rule}}}
 
 # Min and max years that we create DST transition DateTimes for (inclusive)
 const MIN_YEAR = year(typemin(DateTime))  # Essentially the begining of time
-const MAX_YEAR = 2038                     # year(typemax(Int32))
+const MAX_YEAR = 2037                     # year(unix2datetime(typemax(Int32))) - 1
 
 # Helper functions/data
 const MONTHS = Dict("Jan"=>1,"Feb"=>2,"Mar"=>3,"Apr"=>4,"May"=>5,"Jun"=>6,
