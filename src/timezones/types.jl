@@ -169,8 +169,10 @@ doc"""
 `ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, occurrence::Integer=0; from_utc::Bool=false) -> ZonedDateTime`
 
 Constructs a `ZonedDateTime` given a local `DateTime` and a `TimeZone`. If the local
-`DateTime` is ambiguious in the given time zone you can set `occurrence` to a positive
-integer to resolve the ambiuity. When the `from_utc` keyword is true the given `DateTime` is
+`DateTime` is ambiguious in the given time zone, e.g. 02:01 on a date when clocks have moved from
+03:00->02:00 at the end of daylight time, you can set `occurrence` to a positive
+integer to resolve the ambiuity. In the example given, 2 would set it to the second occurrence of 02:01
+i.e. after the clocks had been turned back. When the `from_utc` keyword is true, the given `DateTime` is
 processed as if it is in UTC.
 """
 function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, occurrence::Integer=0; from_utc::Bool=false)
@@ -222,6 +224,57 @@ function ZonedDateTime(local_dt::DateTime, tz::VariableTimeZone, is_dst::Bool; f
 end
 
 doc"""
+`ZonedDateTime(tz::VariableTimeZone, is_dst::Bool; from_utc::Bool=false) -> ZonedDateTime`
+
+Get a `ZonedDateTime` object in the timezone specified, for the current time.
+
+equivalent to `ZonedDateTime(now(Dates.UTC), tz, is_dst; from_utc=true)`
+"""
+ZonedDateTime(local_dt::DateTime, is_dst::Bool) = ZonedDateTime(now(Dates.UTC), tz, is_dst; from_utc=true)
+
+doc"""
+`ZonedDateTime(local_dt::DateTime, is_dst::Bool; from_utc::Bool=false) -> ZonedDateTime`
+
+Get a `ZonedDateTime` object for the time specified, using your local time zone.
+
+equivalent to `ZonedDateTime(local_dt, localzone(), is_dst; from_utc=from_utc)`
+"""
+ZonedDateTime(local_dt::DateTime, is_dst::Bool; from_utc::Bool=false) = ZonedDateTime(local_dt, localzone(), is_dst; from_utc=from_utc)
+
+doc"""
+`ZonedDateTime(tz::VariableTimeZone, occurrence::Integer=0) -> ZonedDateTime`
+
+Get a ZonedDateTime object in the timezone specified, for the current time (as provided by your system).
+
+equivalent to `ZonedDateTime(now(Dates.UTC), tz, occurrence; from_utc=true)`
+"""
+ZonedDateTime(tz::VariableTimeZone, occurrence::Integer=0) = ZonedDateTime(now(Dates.UTC), tz, occurrence; from_utc=true)
+
+doc"""
+`ZonedDateTime(local_dt::DateTime, is_dst::Bool; from_utc::Bool=false) -> ZonedDateTime`
+
+Get a `ZonedDateTime` object for the time specified, using your local time zone
+
+equivalent to `ZonedDateTime(local_dt, localzone(), occurrence; from_utc=from_utc)`
+"""
+ZonedDateTime(local_dt::DateTime, occurrence::Integer=0; from_utc::Bool=false) = ZonedDateTime(local_dt, localzone(), occurrence; from_utc=from_utc)
+
+doc"""
+`ZonedDateTime() -> ZonedDateTime`
+
+`ZonedDateTime(occurrence::Integer) -> ZonedDateTime`
+
+ZonedDateTime() will give you a ZonedDateTime for the current time in your local time zone.
+
+equivalent to `ZonedDateTime(now(Dates.UTC), localzone(); from_utc=true)` if occurrence is not set or
+
+equivalent to `ZonedDateTime(now(Dates.UTC), localzone(), occurrence; from_utc=true)` if it is
+"""
+ZonedDateTime(occurrence::Integer=0) = ZonedDateTime(now(Dates.UTC), localzone(); from_utc=true)
+
+nowtz() = ZonedDateTime()
+
+doc"""
 `ZonedDateTime(local_dt::DateTime, tz::FixedTimeZone; from_utc::Bool=false) -> ZonedDateTime`
 
 Constructs a `ZonedDateTime` given a local `DateTime` and a `FixedTimeZone`. When the
@@ -233,7 +286,7 @@ function ZonedDateTime(local_dt::DateTime, tz::FixedTimeZone; from_utc::Bool=fal
 end
 
 doc"""
-`ZonedDateTime(zdt::DateTime, tz::TimeZone) -> ZonedDateTime`
+`ZonedDateTime(zdt::ZonedDateTime, tz::TimeZone) -> ZonedDateTime`
 
 Converts a `ZonedDateTime` from the current `TimeZone` into the specified `tz`.
 """

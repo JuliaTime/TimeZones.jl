@@ -15,7 +15,7 @@ export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime, DateTime, timez
     # Re-export from Base.Dates
     yearmonthday, yearmonth, monthday, year, month, week, day, dayofmonth,
     # conversion.jl
-    now,
+    now, nowtz,
     # local.jl
     localzone
 
@@ -53,13 +53,6 @@ function TimeZone(name::AbstractString)
         return deserialize(fp)
     end
 end
-
-doc"""
-`TimeZone() -> TimeZone`
-
-Construct `TimeZone` information corresponding to the local timezone
-"""
-TimeZone() = localzone()
 
 doc"""
 `timezone_names() -> Array{AbstractString}`
