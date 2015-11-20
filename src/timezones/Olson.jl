@@ -45,9 +45,9 @@ typealias ZoneDict Dict{AbstractString,Array{Zone}}
 typealias RuleDict Dict{AbstractString,Array{Rule}}
 typealias OrderedRuleDict Dict{AbstractString,Tuple{Array{Date},Array{Rule}}}
 
-# Min and max DateTimes that we create DST transition instants for (inclusive)
-const MINDATETIME = typemin(DateTime)
-const MAXDATETIME = DateTime(2038,12,31)
+# Min and max years that we create DST transition DateTimes for (inclusive)
+const MIN_YEAR = year(typemin(DateTime))  # Essentially the begining of time
+const MAX_YEAR = 2038                     # year(typemax(Int32))
 
 # Helper functions/data
 const MONTHS = Dict("Jan"=>1,"Feb"=>2,"Mar"=>3,"Apr"=>4,"May"=>5,"Jun"=>6,
@@ -243,7 +243,7 @@ Example:
     1919-09-16   2:00s   0       -
     1944-04-03   2:00s   1:00    S
 """
-function order_rules(rules::Array{Rule}; max_year::Integer=year(MAXDATETIME))
+function order_rules(rules::Array{Rule}; max_year::Integer=MAX_YEAR)
     dates = Date[]
     ordered = Rule[]
 
@@ -272,7 +272,7 @@ function order_rules(rules::Array{Rule}; max_year::Integer=year(MAXDATETIME))
         # also don't imply we are being accurate after that cutoff. So we will
         # ignore any rules starting after it, and truncate rules' to field to
         # the cutoff as necessary.
-        start_year = get(rule.from, year(MINDATETIME))
+        start_year = get(rule.from, MIN_YEAR)
 
         if start_year <= max_year
             end_year = get(rule.to, max_year)
@@ -337,12 +337,13 @@ Resolves a named zone into TimeZone. Updates ordered with any new rules that
 were required to be ordered.
 """
 function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDict,
-    ordered::OrderedRuleDict; maxdatetime::DateTime=MAXDATETIME, debug=false)
+    ordered::OrderedRuleDict; max_year::Integer=MAX_YEAR, debug=false)
 
     transitions = Transition[]
 
     # Set some default values and starting DateTime increment and away we go...
-    start_utc = MINDATETIME
+    start_utc = DateTime(MIN_YEAR)
+    max_until = DateTime(max_year, 12, 31, 23, 59, 59)
     save = ZERO
     letter = ""
     start_rule = Nullable{Rule}()
@@ -356,7 +357,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
         format = zone.format
         # save = zone.save
         rule_name = zone.rules
-        until = get(zone.until, maxdatetime)
+        until = get(zone.until, max_until)
 
         if rule_name == ""
             save = zone.save
@@ -373,7 +374,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
             end
         else
             if !haskey(ordered, rule_name)
-                ordered[rule_name] = order_rules(ruleset[rule_name], max_year=year(maxdatetime))
+                ordered[rule_name] = order_rules(ruleset[rule_name]; max_year=max_year)
             end
 
             dates, rules = ordered[rule_name]
@@ -467,7 +468,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
         start_utc = asutc(until, zone.until_flag, offset, save)
 
         debug && println("Zone End   $rule_name, $offset, $save, $(start_utc)u")
-        start_utc >= maxdatetime && break
+        year(start_utc) > max_year && break
     end
 
     # Note: Transitions array is expected to be ordered and should be if both
@@ -481,21 +482,21 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     end
 end
 
-function resolve(zoneset::ZoneDict, ruleset::RuleDict; maxdatetime::DateTime=MAXDATETIME, debug=false)
+function resolve(zoneset::ZoneDict, ruleset::RuleDict; max_year::Integer=MAX_YEAR, debug=false)
     ordered = OrderedRuleDict()
     timezones = Dict{AbstractString,TimeZone}()
 
     for zone_name in keys(zoneset)
-        tz = resolve!(zone_name, zoneset, ruleset, ordered, maxdatetime=maxdatetime, debug=debug)
+        tz = resolve!(zone_name, zoneset, ruleset, ordered; max_year=max_year, debug=debug)
         timezones[zone_name] = tz
     end
 
     return timezones
 end
 
-function resolve(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDict; maxdatetime::DateTime=MAXDATETIME, debug=false)
+function resolve(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDict; max_year::Integer=MAX_YEAR, debug=false)
     ordered = OrderedRuleDict()
-    return resolve!(zone_name, zoneset, ruleset, ordered, maxdatetime=maxdatetime, debug=debug)
+    return resolve!(zone_name, zoneset, ruleset, ordered; max_year=max_year, debug=debug)
 end
 
 function tzparse(tzfile::AbstractString)
@@ -544,17 +545,17 @@ function tzparse(tzfile::AbstractString)
     return zones, rules
 end
 
-function load(tzdata_dir::AbstractString=TZDATA_DIR; maxdatetime::DateTime=MAXDATETIME)
+function load(tzdata_dir::AbstractString=TZDATA_DIR; max_year::Integer=MAX_YEAR)
     timezones = Dict{AbstractString,TimeZone}()
     for filename in readdir(tzdata_dir)
         zones, rules = tzparse(joinpath(tzdata_dir, filename))
-        merge!(timezones, resolve(zones, rules, maxdatetime=maxdatetime))
+        merge!(timezones, resolve(zones, rules; max_year=max_year))
     end
     return timezones
 end
 
-function compile(tzdata_dir::AbstractString=TZDATA_DIR, dest_dir::AbstractString=COMPILED_DIR; maxdatetime::DateTime=MAXDATETIME)
-    timezones = load(tzdata_dir, maxdatetime=maxdatetime)
+function compile(tzdata_dir::AbstractString=TZDATA_DIR, dest_dir::AbstractString=COMPILED_DIR; max_year::Integer=MAX_YEAR)
+    timezones = load(tzdata_dir; max_year=max_year)
 
     isdir(dest_dir) || error("Destination directory doesn't exist")
 
