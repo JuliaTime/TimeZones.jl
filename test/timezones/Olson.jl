@@ -240,13 +240,13 @@ rule_c = ruleparse("1944", "only", "-", "Apr", "3", "2:00s", "1:00", "S")
 for rules in ([rule_a, rule_b, rule_c], [rule_c, rule_b, rule_a], [rule_a, rule_c, rule_b])
     dates, ordered = order_rules(rules)
 
-    @test dates == [DateTime(1918, 9, 16), DateTime(1919, 4, 15), DateTime(1919, 9, 16), DateTime(1944, 4, 3)]
+    @test dates == [Date(1918, 9, 16), Date(1919, 4, 15), Date(1919, 9, 16), Date(1944, 4, 3)]
     @test ordered == [rule_a, rule_b, rule_a, rule_c]
 end
 
 # ignore rules starting after the cutoff
 dates, ordered = order_rules([rule_a, rule_b, rule_c], max_year=1940)
-@test dates == [DateTime(1918, 9, 16), DateTime(1919, 4, 15), DateTime(1919, 9, 16)]
+@test dates == [Date(1918, 9, 16), Date(1919, 4, 15), Date(1919, 9, 16)]
 @test ordered == [rule_a, rule_b, rule_a]
 
 # make sure order_rules works for both 32- and 64-bit julia
@@ -266,17 +266,17 @@ truncated = ruleparse("1999", "2000", "-", "Jan", "1", "0:00s", "0", "-")
 
 dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], max_year=2000)
 @test dates == [
-    DateTime(1993, 2, 2),
-    DateTime(1994, 2, 2),
-    DateTime(1995, 2, 2),
-    DateTime(1996, 2, 2),
-    DateTime(1997, 2, 2),
-    DateTime(1998, 2, 2),
-    DateTime(1999, 1, 1),
-    DateTime(1999, 2, 2),
-    DateTime(1999, 6, 7),
-    DateTime(2000, 1, 1),
-    DateTime(2000, 2, 2),
+    Date(1993, 2, 2),
+    Date(1994, 2, 2),
+    Date(1995, 2, 2),
+    Date(1996, 2, 2),
+    Date(1997, 2, 2),
+    Date(1998, 2, 2),
+    Date(1999, 1, 1),
+    Date(1999, 2, 2),
+    Date(1999, 6, 7),
+    Date(2000, 1, 1),
+    Date(2000, 2, 2),
 ]
 
 expected = [
