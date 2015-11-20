@@ -228,9 +228,9 @@ doc"""
 
 Get a `ZonedDateTime` object in the timezone specified, for the current time.
 
-equivalent to `ZonedDateTime(now(Dates.UTC), tz, is_dst; from_utc=true)`
+equivalent to `ZonedDateTime(unix2datetime(time()), tz, is_dst; from_utc=true)`
 """
-ZonedDateTime(local_dt::DateTime, is_dst::Bool) = ZonedDateTime(now(Dates.UTC), tz, is_dst; from_utc=true)
+ZonedDateTime(tz::VariableTimeZone, is_dst::Bool) = ZonedDateTime(unix2datetime(time()), tz, is_dst; from_utc=true)
 
 doc"""
 `ZonedDateTime(local_dt::DateTime, is_dst::Bool; from_utc::Bool=false) -> ZonedDateTime`
@@ -246,9 +246,9 @@ doc"""
 
 Get a ZonedDateTime object in the timezone specified, for the current time (as provided by your system).
 
-equivalent to `ZonedDateTime(now(Dates.UTC), tz, occurrence; from_utc=true)`
+equivalent to `ZonedDateTime(unix2datetime(time()), tz, occurrence; from_utc=true)`
 """
-ZonedDateTime(tz::VariableTimeZone, occurrence::Integer=0) = ZonedDateTime(now(Dates.UTC), tz, occurrence; from_utc=true)
+ZonedDateTime(tz::VariableTimeZone, occurrence::Integer=0) = ZonedDateTime(unix2datetime(time()), tz, occurrence; from_utc=true)
 
 doc"""
 `ZonedDateTime(local_dt::DateTime, is_dst::Bool; from_utc::Bool=false) -> ZonedDateTime`
@@ -266,11 +266,11 @@ doc"""
 
 ZonedDateTime() will give you a ZonedDateTime for the current time in your local time zone.
 
-equivalent to `ZonedDateTime(now(Dates.UTC), localzone(); from_utc=true)` if occurrence is not set or
+equivalent to `ZonedDateTime(unix2datetime(time()), localzone(); from_utc=true)` if occurrence is not set or
 
-equivalent to `ZonedDateTime(now(Dates.UTC), localzone(), occurrence; from_utc=true)` if it is
+equivalent to `ZonedDateTime(unix2datetime(time()), localzone(), occurrence; from_utc=true)` if it is
 """
-ZonedDateTime(occurrence::Integer=0) = ZonedDateTime(now(Dates.UTC), localzone(); from_utc=true)
+function ZonedDateTime(occurrence::Integer=0) = ZonedDateTime(unix2datetime(time()), localzone(); from_utc=true)
 
 nowtz() = ZonedDateTime()
 
