@@ -278,30 +278,17 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     Date(2000, 1, 1),
     Date(2000, 2, 2),
 ]
-
-expected = [
+# Equality check based on reference
+@test ordered == [
     rule_endless,
     rule_endless,
     rule_endless,
     rule_endless,
     rule_endless,
     rule_endless,
-    truncated,
+    rule_overlap,
     rule_endless,
     rule_pre,
-    truncated,
+    rule_overlap,
     rule_endless,
 ]
-
-for (o, e) in zip(ordered, expected)
-    @test get(o.from) == get(e.from)
-    @test isnull(o.to) == isnull(e.to)
-    if !isnull(o.to)
-        @test get(o.to) == get(e.to)
-    end
-    @test o.month == e.month
-    @test o.at == e.at
-    @test o.at_flag == e.at_flag
-    @test o.save == e.save
-    @test o.letter == e.letter
-end
