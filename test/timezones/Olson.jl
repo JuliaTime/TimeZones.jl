@@ -249,6 +249,13 @@ dates, ordered = order_rules([rule_a, rule_b, rule_c], max_year=1940)
 @test dates == [DateTime(1918, 9, 16), DateTime(1919, 4, 15), DateTime(1919, 9, 16)]
 @test ordered == [rule_a, rule_b, rule_a]
 
+# make sure order_rules works for both 32- and 64-bit julia
+for year in (Int32(1940), Int64(1940))
+    dates, ordered = order_rules([rule_a, rule_b, rule_c], max_year=year)
+    @test dates == [DateTime(1918, 9, 16), DateTime(1919, 4, 15), DateTime(1919, 9, 16)]
+    @test ordered == [rule_a, rule_b, rule_a]
+end
+
 # truncate rules ending after the cutoff
 rule_pre = ruleparse("1999", "only", "-", "Jun", "7", "2:00s", "0", "P" )
 rule_overlap = ruleparse("1999", "2001", "-", "Jan", "1", "0:00s", "0", "-")

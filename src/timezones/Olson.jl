@@ -243,7 +243,7 @@ Example:
     1919-09-16   2:00s   0       -
     1944-04-03   2:00s   1:00    S
 """
-function order_rules(rules::Array{Rule}; max_year::Int=year(MAXDATETIME))
+function order_rules(rules::Array{Rule}; max_year::Integer=year(MAXDATETIME))
     dates = Date[]
     ordered = Rule[]
 
