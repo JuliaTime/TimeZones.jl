@@ -243,11 +243,9 @@ Example:
     1919-09-16   2:00s   0       -
     1944-04-03   2:00s   1:00    S
 """
-function order_rules(rules::Array{Rule}; maxdatetime::DateTime=MAXDATETIME)
+function order_rules(rules::Array{Rule}; max_year::Int=year(MAXDATETIME))
     dates = Date[]
     ordered = Rule[]
-
-    max_year = year(maxdatetime)
 
     # Note: Typically rules are orderd by "from" and "in". Unfortunately
     for rule in rules
@@ -272,8 +270,8 @@ function order_rules(rules::Array{Rule}; maxdatetime::DateTime=MAXDATETIME)
         #
         # Since we can't be accurate after this cutoff, it is important that we
         # also don't imply we are being accurate after that cutoff. So we will
-        # ignore any rules starting after maxdatetime, and truncate rules' to
-        # field to maxdatetime if necessary.
+        # ignore any rules starting after it, and truncate rules' to field to
+        # the cutoff as necessary.
         start_year = get(rule.from, year(MINDATETIME))
 
         if start_year <= max_year
@@ -375,7 +373,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
             end
         else
             if !haskey(ordered, rule_name)
-                ordered[rule_name] = order_rules(ruleset[rule_name], maxdatetime=maxdatetime)
+                ordered[rule_name] = order_rules(ruleset[rule_name], max_year=year(maxdatetime))
             end
 
             dates, rules = ordered[rule_name]

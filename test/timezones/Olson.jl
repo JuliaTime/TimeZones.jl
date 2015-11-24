@@ -245,7 +245,7 @@ for rules in ([rule_a, rule_b, rule_c], [rule_c, rule_b, rule_a], [rule_a, rule_
 end
 
 # ignore rules starting after the cutoff
-dates, ordered = order_rules([rule_a, rule_b, rule_c], maxdatetime=DateTime(1940, 1, 1))
+dates, ordered = order_rules([rule_a, rule_b, rule_c], max_year=1940)
 @test dates == [DateTime(1918, 9, 16), DateTime(1919, 4, 15), DateTime(1919, 9, 16)]
 @test ordered == [rule_a, rule_b, rule_a]
 
@@ -257,7 +257,7 @@ rule_post = ruleparse("2002", "only", "-", "Jan", "1", "0:00s", "0", "IP")
 
 truncated = ruleparse("1999", "2000", "-", "Jan", "1", "0:00s", "0", "-")
 
-dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], maxdatetime=DateTime(2000, 1, 1))
+dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], max_year=2000)
 @test dates == [
     DateTime(1993, 2, 2),
     DateTime(1994, 2, 2),
@@ -271,17 +271,30 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     DateTime(2000, 1, 1),
     DateTime(2000, 2, 2),
 ]
-#  Test not quite right, equality on rules isn't defined
-# @test ordered == [
-#     rule_endless,
-#     rule_endless,
-#     rule_endless,
-#     rule_endless,
-#     rule_endless,
-#     rule_endless,
-#     truncated,
-#     rule_endless,
-#     rule_pre,
-#     truncated,
-#     rule_endless,
-# ]
+
+expected = [
+    rule_endless,
+    rule_endless,
+    rule_endless,
+    rule_endless,
+    rule_endless,
+    rule_endless,
+    truncated,
+    rule_endless,
+    rule_pre,
+    truncated,
+    rule_endless,
+]
+
+for (o, e) in zip(ordered, expected)
+    @test get(o.from) == get(e.from)
+    @test isnull(o.to) == isnull(e.to)
+    if !isnull(o.to)
+        @test get(o.to) == get(e.to)
+    end
+    @test o.month == e.month
+    @test o.at == e.at
+    @test o.at_flag == e.at_flag
+    @test o.save == e.save
+    @test o.letter == e.letter
+end
