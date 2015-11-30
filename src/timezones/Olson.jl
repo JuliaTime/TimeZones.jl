@@ -529,5 +529,4 @@ function compile(tzdata_dir::AbstractString=TZDATA_DIR, dest_dir::AbstractString
     end
 end
 
-
 end # module
