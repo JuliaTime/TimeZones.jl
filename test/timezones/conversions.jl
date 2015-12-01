@@ -17,4 +17,3 @@ dt = Dates.unix2datetime(time())  # Base.now in UTC
 zdt = now(warsaw)
 @test zdt.timezone == warsaw
 @test isapprox(map(Dates.datetime2unix, [dt, TimeZones.utc(zdt)])...)
-@test millisecond(zdt) == 0  # Base.now only includes up to seconds
