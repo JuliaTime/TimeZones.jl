@@ -55,12 +55,14 @@ function TimeZone(name::AbstractString)
 end
 
 doc"""
-`timezone_names() -> Array{AbstractString}`
+`timezone_names() -> Array{UTF8String}`
 
 Returns all of the valid names for constructing a `TimeZone`.
 """
 function timezone_names()
-    names = AbstractString[]
+    # Note: Olson time zone names are typically encoded only in ASCII. Using UTF8 here just
+    # ensures compatibility in case things change.
+    names = UTF8String[]
     check = Tuple{AbstractString,AbstractString}[(COMPILED_DIR, "")]
 
     for (dir, partial) in check
@@ -78,7 +80,7 @@ function timezone_names()
         end
     end
 
-    return sort(names)
+    return sort!(names)
 end
 
 end # module
