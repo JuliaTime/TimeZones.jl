@@ -1,0 +1,14 @@
+site_name: TimeZones.jl
+repo_url: https://github.com/quinnj/TimeZones.jl
+site_description: Olson Timezone Database access for the Julia Programming Language
+theme: readthedocs
+markdown_extensions:
+- toc:
+    permalink: True
+pages:
+- Introduction: index.md
+- Types: types.md
+- Converting: conversions.md
+- Arithmetic: arithmetic.md
+- Current Time: current.md
+- Frequently Asked Questions: faq.md
