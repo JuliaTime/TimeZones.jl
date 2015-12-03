@@ -14,6 +14,6 @@ doc"""
 Returns a `ZonedDateTime` corresponding to the user's system time in the specified `TimeZone`.
 """
 function now(tz::TimeZone)
-    utc = trunc(unix2datetime(time()), Second)
+    utc = unix2datetime(time())
     ZonedDateTime(utc, tz, from_utc=true)
 end
