@@ -1,4 +1,4 @@
-import Base.Dates: now, unix2datetime, Second
+import Base.Dates: now, unix2datetime
 
 doc"""
 `DateTime(::ZonedDateTime) -> DateTime`
