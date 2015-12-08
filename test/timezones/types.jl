@@ -269,10 +269,10 @@ early_utc = ZonedDateTime(DateTime(UTM(typemin(Int64))), utc)
 @test spring_utc !== spring_apia
 @test !isequal(spring_utc, spring_apia)
 @test hash(spring_utc) != hash(spring_apia)
-@test ZonedDateTime(spring_utc, apia) === spring_apia  # Since ZonedDateTime is immutable
-@test ZonedDateTime(spring_apia, utc) === spring_utc
-@test isequal(ZonedDateTime(spring_utc, apia), spring_apia)
-@test hash(ZonedDateTime(spring_utc, apia)) == hash(spring_apia)
+@test astimezone(spring_utc, apia) === spring_apia  # Since ZonedDateTime is immutable
+@test astimezone(spring_apia, utc) === spring_utc
+@test isequal(astimezone(spring_utc, apia), spring_apia)
+@test hash(astimezone(spring_utc, apia)) == hash(spring_apia)
 
 fall_utc = ZonedDateTime(DateTime(2010, 10, 1, 12), utc)
 fall_apia = ZonedDateTime(DateTime(2010, 10, 1, 2), apia)
@@ -285,14 +285,14 @@ fall_apia = ZonedDateTime(DateTime(2010, 10, 1, 2), apia)
 @test !(fall_utc > fall_apia)
 @test !isequal(fall_utc, fall_apia)
 @test hash(fall_utc) != hash(fall_apia)
-@test ZonedDateTime(fall_utc, apia) === fall_apia  # Since ZonedDateTime is immutable
-@test ZonedDateTime(fall_apia, utc) === fall_utc
-@test isequal(ZonedDateTime(fall_utc, apia), fall_apia)
-@test hash(ZonedDateTime(fall_utc, apia)) == hash(fall_apia)
+@test astimezone(fall_utc, apia) === fall_apia  # Since ZonedDateTime is immutable
+@test astimezone(fall_apia, utc) === fall_utc
+@test isequal(astimezone(fall_utc, apia), fall_apia)
+@test hash(astimezone(fall_utc, apia)) == hash(fall_apia)
 
 # A FixedTimeZone is effective for all of time where as a VariableTimeZone has as start.
 @test TimeZones.utc(early_utc) < apia.transitions[1].utc_datetime
-@test_throws NonExistentTimeError ZonedDateTime(early_utc, apia)
+@test_throws NonExistentTimeError astimezone(early_utc, apia)
 
 
 # ZonedDateTime constructor that takes any number of Period or TimeZone types

@@ -289,31 +289,6 @@ function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
     end
 end
 
-
-"""
-    ZonedDateTime(zdt::ZonedDateTime, tz::TimeZone) -> ZonedDateTime
-
-Converts a `ZonedDateTime` from its current `TimeZone` into the specified `TimeZone`.
-"""
-function ZonedDateTime(zdt::ZonedDateTime, tz::VariableTimeZone)
-    i = searchsortedlast(
-        tz.transitions, zdt.utc_datetime,
-        by=v -> typeof(v) == Transition ? v.utc_datetime : v,
-    )
-
-    if i == 0
-        throw(NonExistentTimeError(localtime(zdt), tz))
-    end
-
-    zone = tz.transitions[i].zone
-    return ZonedDateTime(zdt.utc_datetime, tz, zone)
-end
-
-function ZonedDateTime(zdt::ZonedDateTime, tz::FixedTimeZone)
-    return ZonedDateTime(zdt.utc_datetime, tz, tz)
-end
-
-
 # Convenience constructors
 @doc """
     ZonedDateTime(y, [m, d, h, mi, s, ms], tz, [amb]) -> DateTime
