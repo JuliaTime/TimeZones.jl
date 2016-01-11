@@ -131,7 +131,7 @@ function read_tzfile_internal(io::IO, name::AbstractString, force_version::Char=
                 push!(transitions, Transition(utc_datetime, tz))
             end
         end
-        timezone = VariableTimeZone(Symbol(name), transitions)
+        timezone = VariableTimeZone(Symbol(name), transitions, Nullable())
     end
 
     return version, timezone

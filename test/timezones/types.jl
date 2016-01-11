@@ -1,5 +1,5 @@
 import TimeZones: Transition
-import Base.Dates: Second, UTM
+import Base.Dates: Hour, Second, UTM
 
 
 # Constructor FixedTimeZone from a string.
@@ -32,7 +32,6 @@ import Base.Dates: Second, UTM
 @test_throws Exception FixedTimeZone("01:23:-45")
 @test_throws Exception FixedTimeZone("01:23:45:67")
 @test_throws Exception FixedTimeZone("UTC1")
-
 
 # Test exception messages
 tz = FixedTimeZone("Imaginary/Zone", 0, 0)
@@ -306,3 +305,18 @@ another_warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 @test warsaw === warsaw
 @test warsaw == another_warsaw
 @test warsaw !== another_warsaw
+
+# variable timezones with cutoffs
+timezone = VariableTimeZone(
+    "test",
+    [
+        Transition(DateTime(1970, 1, 1), FixedTimeZone("test", 0)),
+        Transition(DateTime(1970, 1, 2), FixedTimeZone("test1", 1)),
+    ],
+    Nullable(1988)
+)
+
+ZonedDateTime(DateTime(1970, 1, 1), timezone, utc)  # pre max_year
+ZonedDateTime(DateTime(1988, 1, 1), timezone, utc)  # on max_year
+@test_throws OutOfRangeTimeError ZonedDateTime(DateTime(1989, 1, 1), timezone, utc)
+@test_throws OutOfRangeTimeError ZonedDateTime(DateTime(1988, 12, 31), timezone, utc) + Hour(24)

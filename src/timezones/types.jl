@@ -111,17 +111,39 @@ doc"""A `TimeZone` with an offset that changes over time."""
 immutable VariableTimeZone <: TimeZone
     name::Symbol
     transitions::Vector{Transition}
+    max_year::Nullable{Int}
+end
+
+function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, max_year::Nullable{Int})
+    return VariableTimeZone(symbol(name), transitions, max_year)
 end
 
 function VariableTimeZone(name::AbstractString, transitions::Vector{Transition})
-    return VariableTimeZone(symbol(name), transitions)
+    return VariableTimeZone(symbol(name), transitions, Nullable())
 end
+
+type OutOfRangeTimeError <: TimeError
+    tz::VariableTimeZone
+end
+Base.showerror(io::IO, e::OutOfRangeTimeError) = print(io, "TimeZone $(string(e.tz)) does not handle dates after $(string(e.tz.max_year.value))");
 
 doc"""A `DateTime` that includes `TimeZone` information."""
 immutable ZonedDateTime <: TimeType
     utc_datetime::DateTime
     timezone::TimeZone
     zone::FixedTimeZone  # The current zone for the utc_datetime.
+
+    function ZonedDateTime(utc_datetime::DateTime, timezone::TimeZone, zone::FixedTimeZone)
+        return new(utc_datetime, timezone, zone)
+    end
+
+    function ZonedDateTime(utc_datetime::DateTime, timezone::VariableTimeZone, zone::FixedTimeZone)
+        if !isnull(timezone.max_year) && year(utc_datetime + Second(zone.offset)) > timezone.max_year.value
+            throw(OutOfRangeTimeError(timezone))
+        end
+
+        return new(utc_datetime, timezone, zone)
+    end
 end
 
 doc"""

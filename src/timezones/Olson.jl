@@ -246,11 +246,18 @@ Example:
 function order_rules(rules::Array{Rule}; max_year::Integer=MAX_YEAR)
     dates = Date[]
     ordered = Rule[]
+    truncated = false
 
     # Note: Typically rules are orderd by "from" and "in". Unfortunately
     for rule in rules
         start_year = max(get(rule.from, MIN_YEAR), MIN_YEAR)
-        end_year = min(get(rule.to, max_year), max_year)
+
+        if isnull(rule.to) || rule.to.value > max_year
+            end_year = max_year
+            truncated = true
+        else
+            end_year = rule.to.value
+        end
 
         # Replicate the rule for each year that it is effective.
         for rule_year in start_year:end_year
@@ -287,7 +294,7 @@ function order_rules(rules::Array{Rule}; max_year::Integer=MAX_YEAR)
         last_date = date
     end
 
-    return dates, ordered
+    return dates, ordered, truncated
 end
 
 """
@@ -298,6 +305,8 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     ordered::OrderedRuleDict; max_year::Integer=MAX_YEAR, debug=false)
 
     transitions = Transition[]
+
+    truncated = false
 
     # Set some default values and starting DateTime increment and away we go...
     start_utc = DateTime(MIN_YEAR)
@@ -332,7 +341,10 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
             end
         else
             if !haskey(ordered, rule_name)
-                ordered[rule_name] = order_rules(ruleset[rule_name]; max_year=max_year)
+                dates, ordered_rules, was_truncated = order_rules(ruleset[rule_name]; max_year=max_year)
+
+                ordered[rule_name] = dates, ordered_rules
+                truncated |= was_truncated
             end
 
             dates, rules = ordered[rule_name]
@@ -432,7 +444,12 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     # Note: Transitions array is expected to be ordered and should be if both
     # zones and rules were ordered.
     if length(transitions) > 1
-        return VariableTimeZone(zone_name, transitions)
+        if truncated
+            maybe_max = Nullable(max_year)
+        else
+            maybe_max = Nullable()
+        end
+        return VariableTimeZone(zone_name, transitions, maybe_max)
     else
         # Although unlikely the timezone name in the transition and the zone_name
         # could be different. We'll ignore this issue at the moment.
