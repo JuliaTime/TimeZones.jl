@@ -1,13 +1,15 @@
 # Determine the local systems timezone
 # Based upon Python's tzlocal https://pypi.python.org/pypi/tzlocal
 
+import Mocking: @mendable
+
 @osx_only function localzone()
-    name = readall([`systemsetup -gettimezone`]...)  # Appears to only work as root
+    name = @mendable readall(`systemsetup -gettimezone`)  # Appears to only work as root
     if contains(name, "Time Zone: ")
         name = strip(replace(name, "Time Zone: ", ""))
     else
         # link will be something like /usr/share/zoneinfo/Europe/Warsaw
-        name = readlink(["/etc/localtime"]...)
+        name = @mendable readlink("/etc/localtime")
         name = match(r"(?<=zoneinfo/).*$", name).match
     end
     return TimeZone(name)
@@ -26,7 +28,7 @@ end
         name = name[2:end]
 
         if startswith(name, '/')
-            return open([name]...) do f
+            return @mendable open(name) do f
                 read_tzfile(f, "local")
             end
         else
@@ -39,8 +41,8 @@ end
 
             for dir in tzdirs
                 filepath = joinpath(dir, name)
-                isfile([filepath]...) || continue
-                return open([filepath]...) do f
+                @mendable isfile(filepath) || continue
+                return @mendable open(filepath) do f
                     read_tzfile(f, name)
                 end
             end
@@ -52,8 +54,8 @@ end
     # Look for distribution specific configuration files that contain the timezone name.
 
     filename = "/etc/timezone"
-    if isfile([filename]...)
-        open([filename]...) do file
+    if @mendable isfile(filename)
+        @mendable open(filename) do file
             name = readall(file)
 
             # Get rid of host definitions and comments:
@@ -70,8 +72,8 @@ end
 
     zone_re = r"(TIME)?ZONE\s*=\s*\"(?<name>.*?)\""
     for filepath in ("/etc/sysconfig/clock", "/etc/conf.d/clock")
-        isfile([filepath]...) || continue
-        open([filepath]...) do file
+        @mendable isfile(filepath) || continue
+        @mendable open(filepath) do file
             for line in readlines(file)
                 matched = match(zone_re, line)
                 if matched != nothing
@@ -88,8 +90,8 @@ end
     # systemd distributions use symlinks that include the zone name,
     # see manpage of localtime(5) and timedatectl(1)
     link = "/etc/localtime"
-    if islink([link]...)
-        filepath = readlink([link]...)
+    if @mendable islink(link)
+        filepath = @mendable readlink(link)
         start = search(filepath, '/')
 
         while start != 0
@@ -101,8 +103,8 @@ end
 
     # No explicit setting existed. Use localtime
     for filepath in ("/etc/localtime", "/usr/local/etc/localtime")
-        isfile([filepath]...) || continue
-        return open([filepath]...) do f
+        @mendable isfile(filepath) || continue
+        return @mendable open(filepath) do f
             read_tzfile(f, "local")
         end
     end
@@ -119,7 +121,7 @@ end
     end
 
     # Windows powershell should be available on Windows 7 and above
-    win_name = strip(readall([`powershell -Command "[TimeZoneInfo]::Local.Id"`]...))
+    win_name = strip(@mendable readall(`powershell -Command "[TimeZoneInfo]::Local.Id"`))
     if haskey(translation, win_name)
         posix_name = translation[win_name]
 
