@@ -127,7 +127,7 @@ elseif OS_NAME == :Linux
 
         # Determine timezone from symlink /etc/localtime
         ignore = ("/etc/timezone", "/etc/sysconfig/clock", "/etc/conf.d/clock")
-        mock_isfile(f::AbstractString) = !(f in ignore) || Original.isfile(f)
+        mock_isfile(f::AbstractString) = !(f in ignore) && Original.isfile(f)
         mock_islink(f::AbstractString) = f == "/etc/localtime" || Original.islink(f)
         mock_readlink(f::AbstractString) = f == "/etc/localtime" ? "/usr/share/zoneinfo/$name" : Original.readlink(f)
         patches = [
