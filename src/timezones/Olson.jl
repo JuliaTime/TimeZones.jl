@@ -43,7 +43,7 @@ end
 
 typealias ZoneDict Dict{AbstractString,Array{Zone}}
 typealias RuleDict Dict{AbstractString,Array{Rule}}
-typealias OrderedRuleDict Dict{AbstractString,Tuple{Array{Date},Array{Rule}}}
+typealias OrderedRuleDict Dict{AbstractString,Tuple{Array{Date},Array{Rule}, Bool}}
 
 # Min and max years that we create DST transition DateTimes for (inclusive)
 const MIN_YEAR = year(typemin(DateTime))  # Essentially the begining of time
@@ -306,14 +306,14 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
 
     transitions = Transition[]
 
-    truncated = false
-
     # Set some default values and starting DateTime increment and away we go...
     start_utc = DateTime(MIN_YEAR)
     max_until = DateTime(max_year, 12, 31, 23, 59, 59)
     save = ZERO
     letter = ""
     start_rule = Nullable{Rule}()
+
+    truncated = false;
 
     # zones = Set{FixedTimeZone}()
 
@@ -341,13 +341,12 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
             end
         else
             if !haskey(ordered, rule_name)
-                dates, ordered_rules, was_truncated = order_rules(ruleset[rule_name]; max_year=max_year)
-
-                ordered[rule_name] = dates, ordered_rules
-                truncated |= was_truncated
+                ordered[rule_name] = order_rules(ruleset[rule_name]; max_year=max_year)
             end
 
-            dates, rules = ordered[rule_name]
+            dates, rules, was_truncated = ordered[rule_name]
+
+            truncated |= was_truncated
 
             # TODO: We could avoid this search if the rule_name haven't changed since the
             # last iteration.
