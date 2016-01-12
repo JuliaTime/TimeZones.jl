@@ -119,13 +119,13 @@ function VariableTimeZone(name::AbstractString, transitions::Vector{Transition},
 end
 
 function VariableTimeZone(name::AbstractString, transitions::Vector{Transition})
-    return VariableTimeZone(symbol(name), transitions, Nullable())
+    return VariableTimeZone(symbol(name), transitions, Nullable{Int}())
 end
 
 type OutOfRangeTimeError <: TimeError
     tz::VariableTimeZone
 end
-Base.showerror(io::IO, e::OutOfRangeTimeError) = print(io, "TimeZone $(string(e.tz)) does not handle dates after $(string(e.tz.max_year.value))");
+Base.showerror(io::IO, e::OutOfRangeTimeError) = print(io, "TimeZone $(string(e.tz)) does not handle dates after $(string(get(e.tz.max_year, -1)))");
 
 doc"""A `DateTime` that includes `TimeZone` information."""
 immutable ZonedDateTime <: TimeType

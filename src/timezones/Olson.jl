@@ -444,11 +444,8 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     # Note: Transitions array is expected to be ordered and should be if both
     # zones and rules were ordered.
     if length(transitions) > 1
-        if truncated
-            maybe_max = Nullable(max_year)
-        else
-            maybe_max = Nullable()
-        end
+        maybe_max = Nullable{Int}(truncated ? max_year : nothing)
+
         return VariableTimeZone(zone_name, transitions, maybe_max)
     else
         # Although unlikely the timezone name in the transition and the zone_name
