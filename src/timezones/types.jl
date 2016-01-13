@@ -111,11 +111,11 @@ doc"""A `TimeZone` with an offset that changes over time."""
 immutable VariableTimeZone <: TimeZone
     name::Symbol
     transitions::Vector{Transition}
-    max_date::Nullable{Date}
+    cutoff::Nullable{Date}
 end
 
-function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, max_date::Nullable{Date})
-    return VariableTimeZone(symbol(name), transitions, max_date)
+function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::Nullable{Date})
+    return VariableTimeZone(symbol(name), transitions, cutoff)
 end
 
 function VariableTimeZone(name::AbstractString, transitions::Vector{Transition})
@@ -139,8 +139,8 @@ immutable ZonedDateTime <: TimeType
     end
 
     function ZonedDateTime(utc_datetime::DateTime, timezone::VariableTimeZone, zone::FixedTimeZone)
-        if !isnull(timezone.max_date) && utc_datetime > timezone.max_date.value
-            throw(OutOfRangeTimeError(timezone.name, timezone.max_date.value))
+        if !isnull(timezone.cutoff) && utc_datetime >= timezone.cutoff.value
+            throw(OutOfRangeTimeError(timezone.name, timezone.cutoff.value))
         end
 
         return new(utc_datetime, timezone, zone)

@@ -316,7 +316,7 @@ timezone = VariableTimeZone(
     Nullable(Date(1988, 5, 6))
 )
 
-ZonedDateTime(DateTime(1970, 1, 1), timezone, utc)  # pre max_date
-ZonedDateTime(DateTime(1988, 5, 6), timezone, utc)  # on max_date
+ZonedDateTime(DateTime(1970, 1, 1), timezone, utc)  # pre cutoff
+@test_throws OutOfRangeTimeError ZonedDateTime(DateTime(1988, 5, 6), timezone, utc)  # on cutoff
 @test_throws OutOfRangeTimeError ZonedDateTime(DateTime(1989, 5, 7), timezone, utc)
-@test_throws OutOfRangeTimeError ZonedDateTime(DateTime(1988, 5, 6), timezone, utc) + Hour(24)
+@test_throws OutOfRangeTimeError ZonedDateTime(DateTime(1988, 5, 5), timezone, utc) + Hour(24)

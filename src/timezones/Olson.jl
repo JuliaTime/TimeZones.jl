@@ -247,7 +247,7 @@ function order_rules(rules::Array{Rule}; max_year::Integer=MAX_YEAR)
     dates = Date[]
     ordered = Rule[]
 
-    first_skipped = Nullable{Date}()
+    cutoff = Nullable{Date}()
 
     # Note: Typically rules are orderd by "from" and "in". Unfortunately
     for rule in rules
@@ -261,7 +261,7 @@ function order_rules(rules::Array{Rule}; max_year::Integer=MAX_YEAR)
 
         if start_year > end_year
             date = Date(start_year, rule.month)
-            first_skipped = Nullable{Date}(tonext(rule.on, date; same=true, limit=daysinmonth(date)))
+            cutoff = Nullable{Date}(tonext(rule.on, date; same=true, limit=daysinmonth(date)))
         else
             # Replicate the rule for each year that it is effective.
             for rule_year in start_year:end_year
@@ -281,17 +281,17 @@ function order_rules(rules::Array{Rule}; max_year::Integer=MAX_YEAR)
                 end
 
                 if year(date) > max_year
-                    if isnull(first_skipped)
-                        first_skipped = Nullable{Date}(date)
+                    if isnull(cutoff)
+                        cutoff = Nullable{Date}(date)
                     else
-                        difference = first_skipped.value - date
+                        difference = cutoff.value - date
 
                         if abs(difference) < ABS_DIFF_OFFSET
                             error("Transitions too close to compare")
                         end
 
                         if difference > zero(difference)
-                            first_skipped = Nullable{Date}(date)
+                            cutoff = Nullable{Date}(date)
                         end
                     end
                 else
@@ -316,7 +316,7 @@ function order_rules(rules::Array{Rule}; max_year::Integer=MAX_YEAR)
         last_date = date
     end
 
-    return dates, ordered, first_skipped
+    return dates, ordered, cutoff
 end
 
 """
@@ -335,7 +335,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     letter = ""
     start_rule = Nullable{Rule}()
 
-    first_skipped = Nullable{Date}()
+    cutoff = Nullable{Date}()
 
     # zones = Set{FixedTimeZone}()
 
@@ -366,10 +366,10 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
                 ordered[rule_name] = order_rules(ruleset[rule_name]; max_year=max_year)
             end
 
-            dates, rules, maybe_skipped = ordered[rule_name]
+            dates, rules, maybe_cutoff = ordered[rule_name]
 
-            if isnull(first_skipped) || (!isnull(maybe_skipped) && maybe_skipped.value < first_skipped.value)
-                first_skipped = maybe_skipped
+            if isnull(cutoff) || (!isnull(maybe_cutoff) && maybe_cutoff.value < cutoff.value)
+                cutoff = maybe_cutoff
             end
 
             # TODO: We could avoid this search if the rule_name haven't changed since the
@@ -467,7 +467,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     # Note: Transitions array is expected to be ordered and should be if both
     # zones and rules were ordered.
     if length(transitions) > 1
-        return VariableTimeZone(zone_name, transitions, first_skipped)
+        return VariableTimeZone(zone_name, transitions, cutoff)
     else
         # Although unlikely the timezone name in the transition and the zone_name
         # could be different. We'll ignore this issue at the moment.
