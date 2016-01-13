@@ -313,10 +313,10 @@ timezone = VariableTimeZone(
         Transition(DateTime(1970, 1, 1), FixedTimeZone("test", 0)),
         Transition(DateTime(1970, 1, 2), FixedTimeZone("test1", 1)),
     ],
-    Nullable(1988)
+    Nullable(Date(1988, 5, 6))
 )
 
-ZonedDateTime(DateTime(1970, 1, 1), timezone, utc)  # pre max_year
-ZonedDateTime(DateTime(1988, 1, 1), timezone, utc)  # on max_year
-@test_throws OutOfRangeTimeError ZonedDateTime(DateTime(1989, 1, 1), timezone, utc)
-@test_throws OutOfRangeTimeError ZonedDateTime(DateTime(1988, 12, 31), timezone, utc) + Hour(24)
+ZonedDateTime(DateTime(1970, 1, 1), timezone, utc)  # pre max_date
+ZonedDateTime(DateTime(1988, 5, 6), timezone, utc)  # on max_date
+@test_throws OutOfRangeTimeError ZonedDateTime(DateTime(1989, 5, 7), timezone, utc)
+@test_throws OutOfRangeTimeError ZonedDateTime(DateTime(1988, 5, 6), timezone, utc) + Hour(24)

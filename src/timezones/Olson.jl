@@ -43,7 +43,7 @@ end
 
 typealias ZoneDict Dict{AbstractString,Array{Zone}}
 typealias RuleDict Dict{AbstractString,Array{Rule}}
-typealias OrderedRuleDict Dict{AbstractString,Tuple{Array{Date},Array{Rule}, Bool}}
+typealias OrderedRuleDict Dict{AbstractString,Tuple{Array{Date},Array{Rule}, Nullable{Date}}}
 
 # Min and max years that we create DST transition DateTimes for (inclusive)
 const MIN_YEAR = year(typemin(DateTime))  # Essentially the begining of time
@@ -246,37 +246,59 @@ Example:
 function order_rules(rules::Array{Rule}; max_year::Integer=MAX_YEAR)
     dates = Date[]
     ordered = Rule[]
-    truncated = false
+
+    first_skipped = Nullable{Date}()
 
     # Note: Typically rules are orderd by "from" and "in". Unfortunately
     for rule in rules
         start_year = max(get(rule.from, MIN_YEAR), MIN_YEAR)
 
         if isnull(rule.to) || rule.to.value > max_year
-            end_year = max_year
-            truncated = true
+            end_year = max_year + 1  # we need to calculate
         else
             end_year = rule.to.value
         end
 
-        # Replicate the rule for each year that it is effective.
-        for rule_year in start_year:end_year
-            # Determine the rule transition day by starting at the
-            # beginning of the month and applying our "on" function
-            # until we reach the correct day.
-            date = Date(rule_year, rule.month)
-            try
-                # The "on" function should evaluate to a day within the current month.
-                date = tonext(rule.on, date; same=true, limit=daysinmonth(date))
-            catch e
-                if isa(e, ArgumentError)
-                    error("Unable to find matching day in month $(year(date))/$(month(date))")
+        if start_year > end_year
+            date = Date(start_year, rule.month)
+            first_skipped = Nullable{Date}(tonext(rule.on, date; same=true, limit=daysinmonth(date)))
+        else
+            # Replicate the rule for each year that it is effective.
+            for rule_year in start_year:end_year
+                # Determine the rule transition day by starting at the
+                # beginning of the month and applying our "on" function
+                # until we reach the correct day.
+                date = Date(rule_year, rule.month)
+                try
+                    # The "on" function should evaluate to a day within the current month.
+                    date = tonext(rule.on, date; same=true, limit=daysinmonth(date))
+                catch e
+                    if isa(e, ArgumentError)
+                        error("Unable to find matching day in month $(year(date))/$(month(date))")
+                    else
+                        rethrow(e)
+                    end
+                end
+
+                if year(date) > max_year
+                    if isnull(first_skipped)
+                        first_skipped = Nullable{Date}(date)
+                    else
+                        difference = first_skipped.value - date
+
+                        if abs(difference) < ABS_DIFF_OFFSET
+                            error("Transitions too close to compare")
+                        end
+
+                        if difference > zero(difference)
+                            first_skipped = Nullable{Date}(date)
+                        end
+                    end
                 else
-                    rethrow(e)
+                    push!(dates, date)
+                    push!(ordered, rule)
                 end
             end
-            push!(dates, date)
-            push!(ordered, rule)
         end
     end
 
@@ -294,7 +316,7 @@ function order_rules(rules::Array{Rule}; max_year::Integer=MAX_YEAR)
         last_date = date
     end
 
-    return dates, ordered, truncated
+    return dates, ordered, first_skipped
 end
 
 """
@@ -313,7 +335,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     letter = ""
     start_rule = Nullable{Rule}()
 
-    truncated = false;
+    first_skipped = Nullable{Date}()
 
     # zones = Set{FixedTimeZone}()
 
@@ -344,9 +366,11 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
                 ordered[rule_name] = order_rules(ruleset[rule_name]; max_year=max_year)
             end
 
-            dates, rules, was_truncated = ordered[rule_name]
+            dates, rules, maybe_skipped = ordered[rule_name]
 
-            truncated |= was_truncated
+            if isnull(first_skipped) || (!isnull(maybe_skipped) && maybe_skipped.value < first_skipped.value)
+                first_skipped = maybe_skipped
+            end
 
             # TODO: We could avoid this search if the rule_name haven't changed since the
             # last iteration.
@@ -443,9 +467,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     # Note: Transitions array is expected to be ordered and should be if both
     # zones and rules were ordered.
     if length(transitions) > 1
-        maybe_max = Nullable{Int}(truncated ? max_year : nothing)
-
-        return VariableTimeZone(zone_name, transitions, maybe_max)
+        return VariableTimeZone(zone_name, transitions, first_skipped)
     else
         # Although unlikely the timezone name in the transition and the zone_name
         # could be different. We'll ignore this issue at the moment.
