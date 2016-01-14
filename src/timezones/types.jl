@@ -126,11 +126,10 @@ function VariableTimeZone(name::AbstractString, transitions::Vector{Transition})
     return VariableTimeZone(symbol(name), transitions, Nullable{DateTime}())
 end
 
-type OutOfRangeTimeError <: TimeError
-    name::Symbol
-    cutoff::DateTime
+type UnhandledTimeError <: TimeError
+    tz::VariableTimeZone
 end
-Base.showerror(io::IO, e::OutOfRangeTimeError) = print(io, "TimeZone $(string(e.name)) does not handle dates after $(e.cutoff)");
+Base.showerror(io::IO, e::UnhandledTimeError) = print(io, "TimeZone $(string(e.tz)) does not handle dates on or after $(get(e.tz.cutoff)) UTC")
 
 doc"""A `DateTime` that includes `TimeZone` information."""
 immutable ZonedDateTime <: TimeType
@@ -143,8 +142,8 @@ immutable ZonedDateTime <: TimeType
     end
 
     function ZonedDateTime(utc_datetime::DateTime, timezone::VariableTimeZone, zone::FixedTimeZone)
-        if !isnull(timezone.cutoff) && utc_datetime >= timezone.cutoff.value
-            throw(OutOfRangeTimeError(timezone.name, timezone.cutoff.value))
+        if utc_datetime >= get(timezone.cutoff, typemax(DateTime))
+            throw(UnhandledTimeError(timezone))
         end
 
         return new(utc_datetime, timezone, zone)
