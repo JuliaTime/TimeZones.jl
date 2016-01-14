@@ -111,19 +111,19 @@ doc"""A `TimeZone` with an offset that changes over time."""
 immutable VariableTimeZone <: TimeZone
     name::Symbol
     transitions::Vector{Transition}
-    cutoff::Nullable{Date}
+    cutoff::Nullable{DateTime}
 end
 
-function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::Nullable{Date})
+function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::Nullable{DateTime})
     return VariableTimeZone(symbol(name), transitions, cutoff)
 end
 
-function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::Date)
+function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::DateTime)
     return VariableTimeZone(symbol(name), transitions, Nullable(cutoff))
 end
 
 function VariableTimeZone(name::AbstractString, transitions::Vector{Transition})
-    return VariableTimeZone(symbol(name), transitions, Nullable{Date}())
+    return VariableTimeZone(symbol(name), transitions, Nullable{DateTime}())
 end
 
 type OutOfRangeTimeError <: TimeError

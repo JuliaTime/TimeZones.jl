@@ -18,8 +18,8 @@ for name in ("australasia", "europe", "northamerica")
 end
 
 include("timezones/time.jl")
-include("timezones/types.jl")
 include("timezones/Olson.jl")
+include("timezones/types.jl")
 include("timezones/accessors.jl")
 include("timezones/arithmetic.jl")
 include("timezones/io.jl")

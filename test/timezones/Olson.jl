@@ -240,19 +240,16 @@ rule_c = ruleparse("1944", "only", "-", "Apr", "3", "2:00s", "1:00", "S")
 
 # Note: We could be alternatively be using `permutations` here.
 for rules in ([rule_a, rule_b, rule_c], [rule_c, rule_b, rule_a], [rule_a, rule_c, rule_b])
-    dates, ordered, first_skipped = order_rules(rules)
+    dates, ordered = order_rules(rules)
 
     @test dates == [Date(1918, 9, 16), Date(1919, 4, 15), Date(1919, 9, 16), Date(1944, 4, 3)]
     @test ordered == [rule_a, rule_b, rule_a, rule_c]
-    @test isnull(first_skipped)
 end
 
 # ignore rules starting after the cutoff
-dates, ordered, first_skipped = order_rules([rule_a, rule_b, rule_c], max_year=1940)
+dates, ordered = order_rules([rule_a, rule_b, rule_c], max_year=1940)
 @test dates == [Date(1918, 9, 16), Date(1919, 4, 15), Date(1919, 9, 16)]
 @test ordered == [rule_a, rule_b, rule_a]
-@test !isnull(first_skipped)
-@test first_skipped.value == Date(1944, 4, 3)
 
 # truncate rules ending after the cutoff
 rule_pre = ruleparse("1999", "only", "-", "Jun", "7", "2:00s", "0", "P" )
@@ -260,7 +257,7 @@ rule_overlap = ruleparse("1999", "2001", "-", "Jan", "1", "0:00s", "0", "-")
 rule_endless = ruleparse("1993", "max", "-", "Feb", "2", "6:00s", "0", "G")
 rule_post = ruleparse("2002", "only", "-", "Jan", "1", "0:00s", "0", "IP")
 
-dates, ordered, first_skipped = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], max_year=2000)
+dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], max_year=2000)
 @test dates == [
     Date(1993, 2, 2),
     Date(1994, 2, 2),
@@ -288,5 +285,3 @@ dates, ordered, first_skipped = order_rules([rule_post, rule_endless, rule_overl
     rule_overlap,
     rule_endless,
 ]
-@test !isnull(first_skipped)
-@test first_skipped.value == Date(2001, 1, 1)

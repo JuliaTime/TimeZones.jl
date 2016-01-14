@@ -33,6 +33,7 @@ import Base.Dates: Hour, Second, UTM
 @test_throws Exception FixedTimeZone("01:23:45:67")
 @test_throws Exception FixedTimeZone("UTC1")
 
+
 # Test exception messages
 tz = FixedTimeZone("Imaginary/Zone", 0, 0)
 
@@ -313,7 +314,7 @@ timezone = VariableTimeZone(
         Transition(DateTime(1970, 1, 1), FixedTimeZone("test", 0)),
         Transition(DateTime(1970, 1, 2), FixedTimeZone("test1", 1)),
     ],
-    Nullable(Date(1988, 5, 6))
+    DateTime(1988, 5, 6),
 )
 
 ZonedDateTime(DateTime(1970, 1, 1), timezone, utc)  # pre cutoff

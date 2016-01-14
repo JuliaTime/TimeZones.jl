@@ -43,7 +43,7 @@ end
 
 typealias ZoneDict Dict{AbstractString,Array{Zone}}
 typealias RuleDict Dict{AbstractString,Array{Rule}}
-typealias OrderedRuleDict Dict{AbstractString,Tuple{Array{Date},Array{Rule}, Nullable{Date}}}
+typealias OrderedRuleDict Dict{AbstractString,Tuple{Array{Date},Array{Rule}}}
 
 # Min and max years that we create DST transition DateTimes for (inclusive)
 const MIN_YEAR = year(typemin(DateTime))  # Essentially the begining of time
@@ -247,58 +247,29 @@ function order_rules(rules::Array{Rule}; max_year::Integer=MAX_YEAR)
     dates = Date[]
     ordered = Rule[]
 
-    cutoff = Nullable{Date}()
-
     # Note: Typically rules are orderd by "from" and "in". Unfortunately
     for rule in rules
         start_year = max(get(rule.from, MIN_YEAR), MIN_YEAR)
+        end_year = min(get(rule.to, max_year), max_year)
 
-        if isnull(rule.to) || rule.to.value > max_year
-            end_year = max_year + 1  # we need to calculate
-        else
-            end_year = rule.to.value
-        end
-
-        if start_year > end_year
-            date = Date(start_year, rule.month)
-            cutoff = Nullable{Date}(tonext(rule.on, date; same=true, limit=daysinmonth(date)))
-        else
-            # Replicate the rule for each year that it is effective.
-            for rule_year in start_year:end_year
-                # Determine the rule transition day by starting at the
-                # beginning of the month and applying our "on" function
-                # until we reach the correct day.
-                date = Date(rule_year, rule.month)
-                try
-                    # The "on" function should evaluate to a day within the current month.
-                    date = tonext(rule.on, date; same=true, limit=daysinmonth(date))
-                catch e
-                    if isa(e, ArgumentError)
-                        error("Unable to find matching day in month $(year(date))/$(month(date))")
-                    else
-                        rethrow(e)
-                    end
-                end
-
-                if year(date) > max_year
-                    if isnull(cutoff)
-                        cutoff = Nullable{Date}(date)
-                    else
-                        difference = cutoff.value - date
-
-                        if abs(difference) < ABS_DIFF_OFFSET
-                            error("Transitions too close to compare")
-                        end
-
-                        if difference > zero(difference)
-                            cutoff = Nullable{Date}(date)
-                        end
-                    end
+        # For each year the rule applies compute the transition date
+        for rule_year in start_year:end_year
+            # Determine the rule transition day by starting at the
+            # beginning of the month and applying our "on" function
+            # until we reach the correct day.
+            date = Date(rule_year, rule.month)
+            try
+                # The "on" function should evaluate to a day within the current month.
+                date = tonext(rule.on, date; same=true, limit=daysinmonth(date))
+            catch e
+                if isa(e, ArgumentError)
+                    error("Unable to find matching day in month $(year(date))/$(month(date))")
                 else
-                    push!(dates, date)
-                    push!(ordered, rule)
+                    rethrow(e)
                 end
             end
+            push!(dates, date)
+            push!(ordered, rule)
         end
     end
 
@@ -316,7 +287,7 @@ function order_rules(rules::Array{Rule}; max_year::Integer=MAX_YEAR)
         last_date = date
     end
 
-    return dates, ordered, cutoff
+    return dates, ordered
 end
 
 """
@@ -327,6 +298,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     ordered::OrderedRuleDict; max_year::Integer=MAX_YEAR, debug=false)
 
     transitions = Transition[]
+    cutoff = Nullable{DateTime}()
 
     # Set some default values and starting DateTime increment and away we go...
     start_utc = DateTime(MIN_YEAR)
@@ -334,8 +306,6 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     save = ZERO
     letter = ""
     start_rule = Nullable{Rule}()
-
-    cutoff = Nullable{Date}()
 
     # zones = Set{FixedTimeZone}()
 
@@ -362,15 +332,13 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
                 push!(transitions, Transition(start_utc, tz))
             end
         else
+            # Only order the rule if it hasn't already been processed. We'll go one year
+            # further than the max_year to ensure we get an accurate cutoff DateTime.
             if !haskey(ordered, rule_name)
-                ordered[rule_name] = order_rules(ruleset[rule_name]; max_year=max_year)
+                ordered[rule_name] = order_rules(ruleset[rule_name]; max_year=max_year + 1)
             end
 
-            dates, rules, maybe_cutoff = ordered[rule_name]
-
-            if isnull(cutoff) || (!isnull(maybe_cutoff) && maybe_cutoff.value < cutoff.value)
-                cutoff = maybe_cutoff
-            end
+            dates, rules = ordered[rule_name]
 
             # TODO: We could avoid this search if the rule_name haven't changed since the
             # last iteration.
@@ -411,9 +379,6 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
 
             index = max(index, 1)
             for (date, rule) in zip(dates[index:end], rules[index:end])
-                # TODO: Problematic if rule date close to until and offset is a large positive.
-                date > until && break
-
                 # Add "at" since it could be larger than 23:59:59.
                 dt = DateTime(date) + rule.at
 
@@ -424,9 +389,11 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
 
                 if dt_utc == until_utc
                     start_rule = Nullable{Rule}(rule)
+                elseif dt_utc > until_utc
+                    cutoff = Nullable{DateTime}(dt_utc)
                 end
 
-                dt_utc < until_utc || break
+                dt_utc >= until_utc && break
 
                 # Need to be careful when we update save/letter.
                 save = rule.save
@@ -463,6 +430,8 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
         debug && println("Zone End   $rule_name, $offset, $save, $(start_utc)u")
         year(start_utc) > max_year && break
     end
+
+    debug && println("Cutoff     $(isnull(cutoff) ? "nothing" : get(cutoff))")
 
     # Note: Transitions array is expected to be ordered and should be if both
     # zones and rules were ordered.
