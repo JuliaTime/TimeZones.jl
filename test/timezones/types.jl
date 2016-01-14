@@ -308,16 +308,11 @@ another_warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 @test warsaw !== another_warsaw
 
 # variable timezones with cutoffs
-timezone = VariableTimeZone(
-    "test",
-    [
-        Transition(DateTime(1970, 1, 1), FixedTimeZone("test", 0)),
-        Transition(DateTime(1970, 1, 2), FixedTimeZone("test1", 1)),
-    ],
-    DateTime(1988, 5, 6),
+cutoff_tz = VariableTimeZone(
+    "test", [Transition(DateTime(1970, 1, 1), utc)], DateTime(1988, 5, 6),
 )
 
-ZonedDateTime(DateTime(1970, 1, 1), timezone, utc)  # pre cutoff
-@test_throws OutOfRangeTimeError ZonedDateTime(DateTime(1988, 5, 6), timezone, utc)  # on cutoff
-@test_throws OutOfRangeTimeError ZonedDateTime(DateTime(1989, 5, 7), timezone, utc)
-@test_throws OutOfRangeTimeError ZonedDateTime(DateTime(1988, 5, 5), timezone, utc) + Hour(24)
+ZonedDateTime(DateTime(1970, 1, 1), cutoff_tz)  # pre cutoff
+@test_throws OutOfRangeTimeError ZonedDateTime(DateTime(1988, 5, 6), cutoff_tz)  # on cutoff
+@test_throws OutOfRangeTimeError ZonedDateTime(DateTime(1989, 5, 7), cutoff_tz)
+@test_throws OutOfRangeTimeError ZonedDateTime(DateTime(1988, 5, 5), cutoff_tz) + Hour(24)
