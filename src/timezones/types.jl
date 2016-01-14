@@ -118,6 +118,10 @@ function VariableTimeZone(name::AbstractString, transitions::Vector{Transition},
     return VariableTimeZone(symbol(name), transitions, cutoff)
 end
 
+function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::Date)
+    return VariableTimeZone(symbol(name), transitions, Nullable(cutoff))
+end
+
 function VariableTimeZone(name::AbstractString, transitions::Vector{Transition})
     return VariableTimeZone(symbol(name), transitions, Nullable{Date}())
 end

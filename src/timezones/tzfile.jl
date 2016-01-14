@@ -131,7 +131,9 @@ function read_tzfile_internal(io::IO, name::AbstractString, force_version::Char=
                 push!(transitions, Transition(utc_datetime, tz))
             end
         end
-        timezone = VariableTimeZone(Symbol(name), transitions, Nullable())
+
+        # TODO: Without having access to the rules we canot determine an accurate cutoff
+        timezone = VariableTimeZone(name, transitions)
     end
 
     return version, timezone
