@@ -312,6 +312,14 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     # Zone needs to be in ascending order to ensure that start_utc is being applied
     # to the correct transition.
     for zone in sort(zoneset[zone_name])
+
+        # Break at the beginning of the loop instead of the end so that we know an
+        # future zone exists beyond max_year and we can set cutoff.
+        if year(start_utc) > max_year
+            cutoff = Nullable(start_utc)
+            break
+        end
+
         offset = zone.gmtoffset
         format = zone.format
         # save = zone.save
@@ -427,16 +435,14 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
         end
 
         start_utc = asutc(until, zone.until_flag, offset, save)
-
         debug && println("Zone End   $rule_name, $offset, $save, $(start_utc)u")
-        year(start_utc) > max_year && break
     end
 
     debug && println("Cutoff     $(isnull(cutoff) ? "nothing" : get(cutoff))")
 
     # Note: Transitions array is expected to be ordered and should be if both
     # zones and rules were ordered.
-    if length(transitions) > 1
+    if length(transitions) > 1 || !isnull(cutoff)
         return VariableTimeZone(zone_name, transitions, cutoff)
     else
         # Although unlikely the timezone name in the transition and the zone_name

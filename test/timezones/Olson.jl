@@ -167,6 +167,39 @@ zone["CEST"] = FixedTimeZone("CEST", 3600, 3600)
 @test madrid.transitions[48] == Transition(DateTime(1979,4,1,1), zone["CEST"])
 
 
+# Fake Zone Pacific/Cutoff contains the following properties which make it good for testing:
+# - Having a single transition on the first year allows us to test the special case where we
+#   need to include a cutoff while only having a single transition
+# - Having no rules ensures that cutoff is calculated correctly with only zones
+
+# Manually generate zones and rules as if we had read them from a file.
+zones = ZoneDict()
+rules = RuleDict()
+
+zones["Pacific/Cutoff"] = [
+    zoneparse("-10:00", "-", "CUT-1", "1933 Apr 1 2:00s"),
+    zoneparse("-11:00", "-", "CUT-2", ""),
+]
+
+cutoff_tz = resolve("Pacific/Cutoff", zones, rules)
+
+zone = Dict{AbstractString,FixedTimeZone}()
+zone["CUT-1"] = FixedTimeZone("CUT-1", -36000)
+zone["CUT-2"] = FixedTimeZone("CUT-2", -39600)
+
+@test cutoff_tz.transitions[1] == Transition(typemin(DateTime), zone["CUT-1"])
+@test cutoff_tz.transitions[2] == Transition(DateTime(1933,4,1,12), zone["CUT-2"])
+@test isnull(cutoff_tz.cutoff)
+
+cutoff_tz = resolve("Pacific/Cutoff", zones, rules, max_year=1900)
+
+# Normally resolve TimeZones with a single transition are returned as a FixedTimeZone except
+# when a cutoff is included.
+@test isa(cutoff_tz, VariableTimeZone)
+@test length(cutoff_tz.transitions) == 1
+@test get(cutoff_tz.cutoff) == DateTime(1933,4,1,12)
+
+
 # Behaviour of mixing "RULES" as a String and as a Time. In reality this behaviour has never
 # been observed.
 
@@ -208,6 +241,7 @@ zone["TDT-5"] = FixedTimeZone("TDT-5", -36000, 3600)
 # such that `test.transitions[6] == test.transitions[7]`. The TimeZone code can safely
 # handle redundant transitions but ideally they should be eliminated.
 @test length(test.transitions) == 6
+
 
 # Make sure that we can deal with Links. Take note that the current implementation converts
 # links into zones which makes it hard to explicitly test for a link. We expect that the
