@@ -2,6 +2,8 @@ import TimeZones: Transition
 import TimeZones.Olson: ZoneDict, RuleDict, zoneparse, ruleparse, resolve, parsedate, order_rules
 import Base.Dates: Hour, Minute, Second
 
+### parsedate ###
+
 # Variations of until dates
 @test parsedate("1945") == (DateTime(1945), 'w')
 @test parsedate("1945 Aug") == (DateTime(1945,8), 'w')
@@ -47,6 +49,66 @@ import Base.Dates: Hour, Minute, Second
 # Actual until date found in Zone "Pacific/Apia"
 @test parsedate("2011 Dec 29 24:00") == (DateTime(2011,12,30), 'w')
 
+
+### order_rules ###
+
+# Rule    Poland  1918    1919    -   Sep 16  2:00s   0       -
+# Rule    Poland  1919    only    -   Apr 15  2:00s   1:00    S
+# Rule    Poland  1944    only    -   Apr  3  2:00s   1:00    S
+rule_a = ruleparse("1918", "1919", "-", "Sep", "16", "2:00s", "0", "-")
+rule_b = ruleparse("1919", "only", "-", "Apr", "15", "2:00s", "1:00", "S")
+rule_c = ruleparse("1944", "only", "-", "Apr", "3", "2:00s", "1:00", "S")
+
+# Note: Alternatively we could be using `permutations` here.
+for rules in ([rule_a, rule_b, rule_c], [rule_c, rule_b, rule_a], [rule_a, rule_c, rule_b])
+    dates, ordered = order_rules(rules)
+
+    @test dates == [Date(1918, 9, 16), Date(1919, 4, 15), Date(1919, 9, 16), Date(1944, 4, 3)]
+    @test ordered == [rule_a, rule_b, rule_a, rule_c]
+end
+
+# ignore rules starting after the cutoff
+dates, ordered = order_rules([rule_a, rule_b, rule_c], max_year=1940)
+@test dates == [Date(1918, 9, 16), Date(1919, 4, 15), Date(1919, 9, 16)]
+@test ordered == [rule_a, rule_b, rule_a]
+
+# truncate rules ending after the cutoff
+rule_pre = ruleparse("1999", "only", "-", "Jun", "7", "2:00s", "0", "P" )
+rule_overlap = ruleparse("1999", "2001", "-", "Jan", "1", "0:00s", "0", "-")
+rule_endless = ruleparse("1993", "max", "-", "Feb", "2", "6:00s", "0", "G")
+rule_post = ruleparse("2002", "only", "-", "Jan", "1", "0:00s", "0", "IP")
+
+dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], max_year=2000)
+@test dates == [
+    Date(1993, 2, 2),
+    Date(1994, 2, 2),
+    Date(1995, 2, 2),
+    Date(1996, 2, 2),
+    Date(1997, 2, 2),
+    Date(1998, 2, 2),
+    Date(1999, 1, 1),
+    Date(1999, 2, 2),
+    Date(1999, 6, 7),
+    Date(2000, 1, 1),
+    Date(2000, 2, 2),
+]
+# Equality check based on reference
+@test ordered == [
+    rule_endless,
+    rule_endless,
+    rule_endless,
+    rule_endless,
+    rule_endless,
+    rule_endless,
+    rule_overlap,
+    rule_endless,
+    rule_pre,
+    rule_overlap,
+    rule_endless,
+]
+
+
+### resolve ###
 
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 
@@ -262,60 +324,3 @@ longyearbyen = resolve("Arctic/Longyearbyen", tzdata["europe"]...)
 # Zones that don't include multiple lines and no rules should be treated as a FixedTimeZone.
 mst = resolve("MST", tzdata["northamerica"]...)
 @test isa(mst, FixedTimeZone)
-
-
-# order rules
-#    Rule    Poland  1918    1919    -   Sep 16  2:00s   0       -
-#    Rule    Poland  1919    only    -   Apr 15  2:00s   1:00    S
-#    Rule    Poland  1944    only    -   Apr  3  2:00s   1:00    S
-rule_a = ruleparse("1918", "1919", "-", "Sep", "16", "2:00s", "0", "-")
-rule_b = ruleparse("1919", "only", "-", "Apr", "15", "2:00s", "1:00", "S")
-rule_c = ruleparse("1944", "only", "-", "Apr", "3", "2:00s", "1:00", "S")
-
-# Note: We could be alternatively be using `permutations` here.
-for rules in ([rule_a, rule_b, rule_c], [rule_c, rule_b, rule_a], [rule_a, rule_c, rule_b])
-    dates, ordered = order_rules(rules)
-
-    @test dates == [Date(1918, 9, 16), Date(1919, 4, 15), Date(1919, 9, 16), Date(1944, 4, 3)]
-    @test ordered == [rule_a, rule_b, rule_a, rule_c]
-end
-
-# ignore rules starting after the cutoff
-dates, ordered = order_rules([rule_a, rule_b, rule_c], max_year=1940)
-@test dates == [Date(1918, 9, 16), Date(1919, 4, 15), Date(1919, 9, 16)]
-@test ordered == [rule_a, rule_b, rule_a]
-
-# truncate rules ending after the cutoff
-rule_pre = ruleparse("1999", "only", "-", "Jun", "7", "2:00s", "0", "P" )
-rule_overlap = ruleparse("1999", "2001", "-", "Jan", "1", "0:00s", "0", "-")
-rule_endless = ruleparse("1993", "max", "-", "Feb", "2", "6:00s", "0", "G")
-rule_post = ruleparse("2002", "only", "-", "Jan", "1", "0:00s", "0", "IP")
-
-dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], max_year=2000)
-@test dates == [
-    Date(1993, 2, 2),
-    Date(1994, 2, 2),
-    Date(1995, 2, 2),
-    Date(1996, 2, 2),
-    Date(1997, 2, 2),
-    Date(1998, 2, 2),
-    Date(1999, 1, 1),
-    Date(1999, 2, 2),
-    Date(1999, 6, 7),
-    Date(2000, 1, 1),
-    Date(2000, 2, 2),
-]
-# Equality check based on reference
-@test ordered == [
-    rule_endless,
-    rule_endless,
-    rule_endless,
-    rule_endless,
-    rule_endless,
-    rule_endless,
-    rule_overlap,
-    rule_endless,
-    rule_pre,
-    rule_overlap,
-    rule_endless,
-]
