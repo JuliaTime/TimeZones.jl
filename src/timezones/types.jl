@@ -111,17 +111,43 @@ doc"""A `TimeZone` with an offset that changes over time."""
 immutable VariableTimeZone <: TimeZone
     name::Symbol
     transitions::Vector{Transition}
+    cutoff::Nullable{DateTime}
+end
+
+function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::Nullable{DateTime})
+    return VariableTimeZone(symbol(name), transitions, cutoff)
+end
+
+function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::DateTime)
+    return VariableTimeZone(symbol(name), transitions, Nullable(cutoff))
 end
 
 function VariableTimeZone(name::AbstractString, transitions::Vector{Transition})
-    return VariableTimeZone(symbol(name), transitions)
+    return VariableTimeZone(symbol(name), transitions, Nullable{DateTime}())
 end
+
+type UnhandledTimeError <: TimeError
+    tz::VariableTimeZone
+end
+Base.showerror(io::IO, e::UnhandledTimeError) = print(io, "TimeZone $(string(e.tz)) does not handle dates on or after $(get(e.tz.cutoff)) UTC")
 
 doc"""A `DateTime` that includes `TimeZone` information."""
 immutable ZonedDateTime <: TimeType
     utc_datetime::DateTime
     timezone::TimeZone
     zone::FixedTimeZone  # The current zone for the utc_datetime.
+
+    function ZonedDateTime(utc_datetime::DateTime, timezone::TimeZone, zone::FixedTimeZone)
+        return new(utc_datetime, timezone, zone)
+    end
+
+    function ZonedDateTime(utc_datetime::DateTime, timezone::VariableTimeZone, zone::FixedTimeZone)
+        if utc_datetime >= get(timezone.cutoff, typemax(DateTime))
+            throw(UnhandledTimeError(timezone))
+        end
+
+        return new(utc_datetime, timezone, zone)
+    end
 end
 
 doc"""

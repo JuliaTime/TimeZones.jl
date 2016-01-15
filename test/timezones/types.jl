@@ -1,5 +1,5 @@
 import TimeZones: Transition
-import Base.Dates: Second, UTM
+import Base.Dates: Hour, Second, UTM
 
 
 # Constructor FixedTimeZone from a string.
@@ -306,3 +306,22 @@ another_warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 @test warsaw === warsaw
 @test warsaw == another_warsaw
 @test warsaw !== another_warsaw
+
+
+# VariableTimeZone with a cutoff set
+cutoff_tz = VariableTimeZone(
+    "cutoff", [Transition(DateTime(1970, 1, 1), utc)], DateTime(1988, 5, 6),
+)
+
+ZonedDateTime(DateTime(1970, 1, 1), cutoff_tz)  # pre cutoff
+@test_throws UnhandledTimeError ZonedDateTime(DateTime(1988, 5, 6), cutoff_tz)  # on cutoff
+@test_throws UnhandledTimeError ZonedDateTime(DateTime(1989, 5, 7), cutoff_tz)
+@test_throws UnhandledTimeError ZonedDateTime(DateTime(1988, 5, 5), cutoff_tz) + Hour(24)
+
+zdt = ZonedDateTime(DateTime(2038, 3, 28), warsaw, from_utc=true)
+@test_throws UnhandledTimeError zdt + Hour(1)
+
+# TimeZones that no longer have any transitions after the max_year shouldn't have a cutoff
+# eg. Asia/Hong_Kong, Pacific/Honolulu, Australia/Perth
+perth = resolve("Australia/Perth", tzdata["australasia"]...)
+zdt = ZonedDateTime(DateTime(2200, 1, 1), perth, from_utc=true)

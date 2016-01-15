@@ -252,7 +252,7 @@ function order_rules(rules::Array{Rule}; max_year::Integer=MAX_YEAR)
         start_year = max(get(rule.from, MIN_YEAR), MIN_YEAR)
         end_year = min(get(rule.to, max_year), max_year)
 
-        # Replicate the rule for each year that it is effective.
+        # For each year the rule applies compute the transition date
         for rule_year in start_year:end_year
             # Determine the rule transition day by starting at the
             # beginning of the month and applying our "on" function
@@ -298,6 +298,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     ordered::OrderedRuleDict; max_year::Integer=MAX_YEAR, debug=false)
 
     transitions = Transition[]
+    cutoff = Nullable{DateTime}()
 
     # Set some default values and starting DateTime increment and away we go...
     start_utc = DateTime(MIN_YEAR)
@@ -311,11 +312,20 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     # Zone needs to be in ascending order to ensure that start_utc is being applied
     # to the correct transition.
     for zone in sort(zoneset[zone_name])
+
+        # Break at the beginning of the loop instead of the end so that we know an
+        # future zone exists beyond max_year and we can set cutoff.
+        if year(start_utc) > max_year
+            cutoff = Nullable(start_utc)
+            break
+        end
+
         offset = zone.gmtoffset
         format = zone.format
         # save = zone.save
         rule_name = zone.rules
         until = get(zone.until, max_until)
+        cutoff = Nullable{DateTime}()  # Reset cutoff
 
         if rule_name == ""
             save = zone.save
@@ -331,8 +341,10 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
                 push!(transitions, Transition(start_utc, tz))
             end
         else
+            # Only order the rule if it hasn't already been processed. We'll go one year
+            # further than the max_year to ensure we get an accurate cutoff DateTime.
             if !haskey(ordered, rule_name)
-                ordered[rule_name] = order_rules(ruleset[rule_name]; max_year=max_year)
+                ordered[rule_name] = order_rules(ruleset[rule_name]; max_year=max_year + 1)
             end
 
             dates, rules = ordered[rule_name]
@@ -376,9 +388,6 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
 
             index = max(index, 1)
             for (date, rule) in zip(dates[index:end], rules[index:end])
-                # TODO: Problematic if rule date close to until and offset is a large positive.
-                date > until && break
-
                 # Add "at" since it could be larger than 23:59:59.
                 dt = DateTime(date) + rule.at
 
@@ -389,9 +398,11 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
 
                 if dt_utc == until_utc
                     start_rule = Nullable{Rule}(rule)
+                elseif dt_utc > until_utc
+                    cutoff = Nullable{DateTime}(dt_utc)
                 end
 
-                dt_utc < until_utc || break
+                dt_utc >= until_utc && break
 
                 # Need to be careful when we update save/letter.
                 save = rule.save
@@ -424,15 +435,15 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
         end
 
         start_utc = asutc(until, zone.until_flag, offset, save)
-
         debug && println("Zone End   $rule_name, $offset, $save, $(start_utc)u")
-        year(start_utc) > max_year && break
     end
+
+    debug && println("Cutoff     $(isnull(cutoff) ? "nothing" : get(cutoff))")
 
     # Note: Transitions array is expected to be ordered and should be if both
     # zones and rules were ordered.
-    if length(transitions) > 1
-        return VariableTimeZone(zone_name, transitions)
+    if length(transitions) > 1 || !isnull(cutoff)
+        return VariableTimeZone(zone_name, transitions, cutoff)
     else
         # Although unlikely the timezone name in the transition and the zone_name
         # could be different. We'll ignore this issue at the moment.
