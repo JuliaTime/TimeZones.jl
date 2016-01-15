@@ -317,6 +317,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
         # save = zone.save
         rule_name = zone.rules
         until = get(zone.until, max_until)
+        cutoff = Nullable{DateTime}()  # Reset cutoff
 
         if rule_name == ""
             save = zone.save
