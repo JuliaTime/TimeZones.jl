@@ -1,4 +1,4 @@
-import TimeZones: Transition, Offset
+import TimeZones: Transition, Offset, TZFILE_MAX
 
 # Extracts Transitions such that the two arrays start and stop at the
 # same DateTimes.
@@ -42,6 +42,7 @@ open(joinpath(TZFILE_DIR, "Europe", "Warsaw")) do f
     @test string(tz) == "Europe/Warsaw"
     @test first(tz.transitions).utc_datetime == DateTime(1915,8,4,22,36)
     @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
+    @test get(tz.cutoff) == TZFILE_MAX
     @test ==(overlap(tz.transitions, warsaw.transitions)...)
 end
 
@@ -52,6 +53,7 @@ open(joinpath(TZFILE_DIR, "Europe", "Warsaw (Version 2)")) do f
     @test string(tz) == "Europe/Warsaw"
     @test first(tz.transitions).utc_datetime == typemin(DateTime)
     @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
+    @test get(tz.cutoff) == TZFILE_MAX
 
     # File skips 1879-12-31T22:36:00
     @test ==(overlap(tz.transitions, warsaw.transitions[3:end])...)
@@ -63,6 +65,7 @@ open(joinpath(TZFILE_DIR, "Europe", "Warsaw (Version 2)")) do f
     @test string(tz) == "Europe/Warsaw"
     @test first(tz.transitions).utc_datetime == typemin(DateTime)
     @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
+    @test get(tz.cutoff) == TZFILE_MAX
     @test ==(overlap(tz.transitions, warsaw.transitions)...)
 end
 
@@ -73,6 +76,7 @@ open(joinpath(TZFILE_DIR, "America", "Godthab")) do f
     @test string(tz) == "America/Godthab"
     @test first(tz.transitions).utc_datetime == DateTime(1916,7,28,3,26,56)
     @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
+    @test get(tz.cutoff) == TZFILE_MAX
     @test ==(overlap(tz.transitions, godthab.transitions)...)
 end
 
@@ -83,6 +87,7 @@ open(joinpath(TZFILE_DIR, "America", "Godthab (Version 3)")) do f
     @test string(tz) == "America/Godthab"
     @test first(tz.transitions).utc_datetime == typemin(DateTime)
     @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
+    @test get(tz.cutoff) == TZFILE_MAX
     @test ==(overlap(tz.transitions, godthab.transitions)...)
 end
 
@@ -92,6 +97,7 @@ open(joinpath(TZFILE_DIR, "America", "Godthab (Version 3)")) do f
     @test string(tz) == "America/Godthab"
     @test first(tz.transitions).utc_datetime == typemin(DateTime)
     @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
+    @test get(tz.cutoff) == TZFILE_MAX
     @test ==(overlap(tz.transitions, godthab.transitions)...)
 end
 
@@ -105,6 +111,7 @@ open(joinpath(TZFILE_DIR, "Pacific", "Apia")) do f
     @test string(tz) == "Pacific/Apia"
     @test first(tz.transitions).utc_datetime == DateTime(1911,1,1,11,26,56)
     @test last(tz.transitions).utc_datetime == DateTime(2037,9,26,14)
+    @test get(tz.cutoff) == TZFILE_MAX
     @test ==(overlap(tz.transitions, apia.transitions)...)
 end
 
@@ -118,6 +125,7 @@ open(joinpath(TZFILE_DIR, "Europe", "Paris")) do f
     @test string(tz) == "Europe/Paris"
     @test first(tz.transitions).utc_datetime == DateTime(1911,3,10,23,51,39)
     @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
+    @test get(tz.cutoff) == TZFILE_MAX
 
     tz_transitions, paris_transitions = overlap(tz.transitions, paris.transitions)
 
@@ -134,6 +142,7 @@ open(joinpath(TZFILE_DIR, "Europe", "Madrid")) do f
     @test string(tz) == "Europe/Madrid"
     @test first(tz.transitions).utc_datetime == DateTime(1917,5,5,23)
     @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
+    @test get(tz.cutoff) == TZFILE_MAX
 
     tz_transitions, madrid_transitions = overlap(tz.transitions, madrid.transitions)
 
@@ -142,4 +151,23 @@ open(joinpath(TZFILE_DIR, "Europe", "Madrid")) do f
     @test sum(!mask) == 5
     @test tz_transitions[mask] == madrid_transitions[mask]
     @test all(map(issimilar, tz_transitions[!mask], madrid_transitions[!mask]))
+end
+
+
+# "Australia/Perth" test processing a tzfile that should not contain a cutoff
+perth = resolve("Australia/Perth", tzdata["australasia"]...)
+open(joinpath(TZFILE_DIR, "Australia", "Perth")) do f
+    tz = TimeZones.read_tzfile(f, "Australia/Perth")
+    @test string(tz) == "Australia/Perth"
+    @test first(tz.transitions).utc_datetime == DateTime(1916,12,31,16,1)
+    @test last(tz.transitions).utc_datetime == DateTime(2009,3,28,18)
+    @test isnull(tz.cutoff)
+
+    tz_transitions, perth_transitions = overlap(tz.transitions, perth.transitions)
+
+    # Index 1 doesn't match up
+    mask = tz_transitions .== perth_transitions
+    @test sum(!mask) == 1
+    @test tz_transitions[mask] == perth_transitions[mask]
+    @test all(map(issimilar, tz_transitions[!mask], perth_transitions[!mask]))
 end
