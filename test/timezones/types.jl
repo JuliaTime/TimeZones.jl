@@ -198,7 +198,7 @@ t = VariableTimeZone("Testing", [
 @test ZonedDateTime(DateTime(1950,9,1,2), t).utc_datetime == DateTime(1950,9,1,2)      # TDT
 
 
-# Ambigious local DateTime that has more than 2 solutions. Never occurs in reality.
+# Ambiguous local DateTime that has more than 2 solutions. Never occurs in reality.
 t = VariableTimeZone("Testing", [
     Transition(DateTime(1800,1,1), FixedTimeZone("TST",0,0)),
     Transition(DateTime(1960,4,1), FixedTimeZone("TDT",0,7200)),
