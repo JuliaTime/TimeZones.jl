@@ -30,9 +30,9 @@ t = Time(1,-23,-45)
 @test Time("-1") == Time(-1,0,0)
 @test Time("-1:23") == Time(-1,-23,0)
 @test Time("-1:23:45") == Time(-1,-23,-45)
-@test_throws Exception Time("1:-23:45")
-@test_throws Exception Time("1:23:-45")
-@test_throws Exception Time("1:23:45:67")
+@test_throws ArgumentError Time("1:-23:45")
+@test_throws ArgumentError Time("1:23:-45")
+@test_throws ArgumentError Time("1:23:45:67")
 
 @test string(Time(1,23,45)) == "01:23:45"
 @test string(Time(-1,-23,-45)) == "-01:23:45"

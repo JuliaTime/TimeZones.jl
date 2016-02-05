@@ -20,31 +20,31 @@ import Base.Dates: Hour, Minute, Second
 @test parsedate("1945  Aug  2  12:34:56") == (DateTime(1945,8,2,12,34,56), 'w')
 
 # Explicit zone "local wall time"
-@test_throws Exception parsedate("1945w")
-@test_throws Exception parsedate("1945 Augw")
-@test_throws Exception parsedate("1945 Aug 2w")
+@test_throws ArgumentError parsedate("1945w")
+@test_throws KeyError parsedate("1945 Augw")
+@test_throws ArgumentError parsedate("1945 Aug 2w")
 @test parsedate("1945 Aug 2 12w") == (DateTime(1945,8,2,12), 'w')
 @test parsedate("1945 Aug 2 12:34w") == (DateTime(1945,8,2,12,34), 'w')
 @test parsedate("1945 Aug 2 12:34:56w") == (DateTime(1945,8,2,12,34,56), 'w')
 
 # Explicit zone "UTC time"
-@test_throws Exception parsedate("1945u")
-@test_throws Exception parsedate("1945 Augu")
-@test_throws Exception parsedate("1945 Aug 2u")
+@test_throws ArgumentError parsedate("1945u")
+@test_throws KeyError parsedate("1945 Augu")
+@test_throws ArgumentError parsedate("1945 Aug 2u")
 @test parsedate("1945 Aug 2 12u") == (DateTime(1945,8,2,12), 'u')
 @test parsedate("1945 Aug 2 12:34u") == (DateTime(1945,8,2,12,34), 'u')
 @test parsedate("1945 Aug 2 12:34:56u") == (DateTime(1945,8,2,12,34,56), 'u')
 
 # Explicit zone "standard time"
-@test_throws Exception parsedate("1945s")
-@test_throws Exception parsedate("1945 Augs")
-@test_throws Exception parsedate("1945 Aug 2s")
+@test_throws ArgumentError parsedate("1945s")
+@test_throws KeyError parsedate("1945 Augs")
+@test_throws ArgumentError parsedate("1945 Aug 2s")
 @test parsedate("1945 Aug 2 12s") == (DateTime(1945,8,2,12), 's')
 @test parsedate("1945 Aug 2 12:34s") == (DateTime(1945,8,2,12,34), 's')
 @test parsedate("1945 Aug 2 12:34:56s") == (DateTime(1945,8,2,12,34,56), 's')
 
 # Invalid zone
-@test_throws Exception parsedate("1945 Aug 2 12:34i")
+@test_throws ArgumentError parsedate("1945 Aug 2 12:34i")
 
 # Actual until date found in Zone "Pacific/Apia"
 @test parsedate("2011 Dec 29 24:00") == (DateTime(2011,12,30), 'w')

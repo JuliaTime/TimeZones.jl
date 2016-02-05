@@ -78,7 +78,7 @@ function FixedTimeZone(s::AbstractString)
     """x
 
     m = match(regex, s)
-    m == nothing && error("Unrecognized timezone: $s")
+    m == nothing && throw(ArgumentError("Unrecognized timezone: $s"))
 
     values = map(n -> n == nothing ? 0 : Base.parse(Int, n), m.captures)
 

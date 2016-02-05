@@ -14,8 +14,8 @@ function Time(s::AbstractString)
     parsed = map(n -> parse(Int, n), split(s, ':'))
 
     # Only can handle up to hour, minute, second.
-    length(parsed) > 3 && error("Invalid Time string")
-    any(parsed[2:end] .< 0) && error("Invalid Time string")
+    length(parsed) > 3 && throw(ArgumentError("Invalid Time string"))
+    any(parsed[2:end] .< 0) && throw(ArgumentError("Invalid Time string"))
 
     # Handle variations where minutes and seconds may be excluded.
     values = [0,0,0]

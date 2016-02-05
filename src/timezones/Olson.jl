@@ -75,7 +75,7 @@ function parseflag(s::AbstractString)
     elseif s == "s"
         return 's'
     else
-        error("Unhandled flag $s")
+        throw(ArgumentError("Unhandled flag $s"))
     end
 end
 
