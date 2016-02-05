@@ -2,6 +2,8 @@
 # - http://man7.org/linux/man-pages/man5/tzfile.5.html
 # - ftp://ftp.iana.org/tz/code/tzfile.5.txt
 
+import Compat: read
+
 const TZFILE_MAX = unix2datetime(typemax(Int32))
 
 immutable TransitionTimeInfo
@@ -29,12 +31,12 @@ function read_tzfile(io::IO, name::AbstractString)
 end
 
 function read_tzfile_internal(io::IO, name::AbstractString, force_version::Char='\0')
-    magic = readbytes(io, 4)
+    magic = read(io, 4)  # Read the 4 byte magic identifier
     @assert magic == b"TZif" "Magic file identifier \"TZif\" not found."
 
     # A byte indicating the version of the file's format: '\0', '2', '3'
     version = Char(read(io, UInt8))
-    readbytes(io, 15)  # Fifteen bytes reserved for future use
+    read(io, 15)  # Fifteen bytes reserved for future use
 
     tzh_ttisgmtcnt = ntoh(read(io, Int32))  # Number of UTC/local indicators
     tzh_ttisstdcnt = ntoh(read(io, Int32))  # Number of standard/wall indicators

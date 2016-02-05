@@ -2,9 +2,10 @@
 # Based upon Python's tzlocal https://pypi.python.org/pypi/tzlocal
 
 import Mocking: @mendable
+import Compat: readstring
 
 @osx_only function localzone()
-    name = @mendable readall(`systemsetup -gettimezone`)  # Appears to only work as root
+    name = @mendable readstring(`systemsetup -gettimezone`)  # Appears to only work as root
     if contains(name, "Time Zone: ")
         name = strip(replace(name, "Time Zone: ", ""))
     else
@@ -56,7 +57,7 @@ end
     filename = "/etc/timezone"
     if @mendable isfile(filename)
         @mendable open(filename) do file
-            name = readall(file)
+            name = readstring(file)
 
             # Get rid of host definitions and comments:
             name = strip(replace(name, r"#.*", ""))
@@ -121,7 +122,7 @@ end
     end
 
     # Windows powershell should be available on Windows 7 and above
-    win_name = strip(@mendable readall(`powershell -Command "[TimeZoneInfo]::Local.Id"`))
+    win_name = strip(@mendable readstring(`powershell -Command "[TimeZoneInfo]::Local.Id"`))
     if haskey(translation, win_name)
         posix_name = translation[win_name]
 

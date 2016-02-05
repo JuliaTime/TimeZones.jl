@@ -1,4 +1,5 @@
 julia 0.4
+Compat
 Mocking
 
 # Only required for building

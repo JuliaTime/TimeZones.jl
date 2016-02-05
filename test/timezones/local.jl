@@ -1,5 +1,6 @@
 import TimeZones: TimeZone, localzone
 using Mocking
+import Compat: readstring
 
 # Make sure that the current systems local timezone is supported.
 local_tz = localzone()
@@ -65,19 +66,19 @@ timezone = TimeZone(name)
 
 if OS_NAME == :Darwin
     # Determine timezone via systemsetup.
-    mock_readall = (cmd::Base.AbstractCmd) -> "Time Zone:  $name\n"
+    mock_readstring = (cmd::Base.AbstractCmd) -> "Time Zone:  $name\n"
     patches = [
-        Patch(Base.readall, mock_readall)
+        Patch(readstring, mock_readstring)
     ]
     mend(patches) do
         @test localzone() == timezone
     end
 
     # Determine timezone from /etc/localtime.
-    mock_readall = (cmd::Base.AbstractCmd) -> ""
+    mock_readstring = (cmd::Base.AbstractCmd) -> ""
     mock_readlink = (filename::AbstractString) -> "/usr/share/zoneinfo/$name"
     patches = [
-        Patch(Base.readall, mock_readall)
+        Patch(readstring, mock_readstring)
         Patch(Base.readlink, mock_readlink)
     ]
     mend(patches) do
@@ -85,9 +86,9 @@ if OS_NAME == :Darwin
     end
 
 elseif OS_NAME == :Windows
-    mock_readall = (cmd::Base.AbstractCmd) -> "$win_name\r\n"
+    mock_readstring = (cmd::Base.AbstractCmd) -> "$win_name\r\n"
     patches = [
-        Patch(Base.readall, mock_readall)
+        Patch(readstring, mock_readstring)
     ]
     mend(patches) do
         @test localzone() == timezone
