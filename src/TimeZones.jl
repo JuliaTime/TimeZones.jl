@@ -49,8 +49,12 @@ function TimeZone(name::AbstractString)
 
     isfile(tz_path) || error("Unknown timezone $name")
 
-    open(tz_path, "r") do fp
+    # Workaround for bug with Mocking.jl. Ideally should be using `do` syntax
+    fp = open(tz_path, "r")
+    try
         return deserialize(fp)
+    finally
+        close(fp)
     end
 end
 

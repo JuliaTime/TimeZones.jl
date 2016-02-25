@@ -115,8 +115,7 @@ elseif OS_NAME == :Linux
         end
 
         # Determine timezone from /etc/conf.d/clock
-        ignore = ("/etc/timezone", "/etc/sysconfig/clock")
-        mock_isfile = (f::AbstractString) -> !(f in ignore) && (f == "/etc/conf.d/clock" || Original.isfile(f))
+        mock_isfile = (f::AbstractString) -> !(f in ("/etc/timezone", "/etc/sysconfig/clock")) && (f == "/etc/conf.d/clock" || Original.isfile(f))
         mock_open = (fn::Function, f::AbstractString) -> f == "/etc/conf.d/clock" ? fn(IOBuffer("\n\nTIMEZONE=\"$name\"")) : Original.open(fn, f)
         patches = [
             Patch(Base.isfile, mock_isfile)
@@ -127,8 +126,7 @@ elseif OS_NAME == :Linux
         end
 
         # Determine timezone from symlink /etc/localtime
-        ignore = ("/etc/timezone", "/etc/sysconfig/clock", "/etc/conf.d/clock")
-        mock_isfile = (f::AbstractString) -> !(f in ignore) && Original.isfile(f)
+        mock_isfile = (f::AbstractString) -> !(f in ("/etc/timezone", "/etc/sysconfig/clock", "/etc/conf.d/clock")) && Original.isfile(f)
         mock_islink = (f::AbstractString) -> f == "/etc/localtime" || Original.islink(f)
         mock_readlink = (f::AbstractString) -> f == "/etc/localtime" ? "/usr/share/zoneinfo/$name" : Original.readlink(f)
         patches = [
@@ -145,8 +143,7 @@ elseif OS_NAME == :Linux
             TimeZones.read_tzfile(f, "local")
         end
 
-        ignore = ("/etc/timezone", "/etc/sysconfig/clock", "/etc/conf.d/clock")
-        mock_isfile = (f::AbstractString) -> !(f in ignore) && (f == "/etc/localtime" || Original.isfile(f))
+        mock_isfile = (f::AbstractString) -> !(f in ("/etc/timezone", "/etc/sysconfig/clock", "/etc/conf.d/clock")) && (f == "/etc/localtime" || Original.isfile(f))
         mock_islink = (f::AbstractString) -> f != "/etc/localtime" && Original.islink(f)
         mock_open = (fn::Function, f::AbstractString) -> f == "/etc/localtime" ? fn(open(tzfile_path)) : Original.open(fn, f)
         patches = [
@@ -160,8 +157,7 @@ elseif OS_NAME == :Linux
         end
 
         # Unable to determine timezone
-        ignore = ("/etc/timezone", "/etc/sysconfig/clock", "/etc/conf.d/clock", "/etc/localtime", "/usr/local/etc/localtime")
-        mock_isfile = (f::AbstractString) -> !(f in ignore) && Original.isfile(f)
+        mock_isfile = (f::AbstractString) -> !(f in ("/etc/timezone", "/etc/sysconfig/clock", "/etc/conf.d/clock", "/etc/localtime", "/usr/local/etc/localtime")) && Original.isfile(f)
         mock_islink = (f::AbstractString) -> f != "/etc/localtime" && Original.islink(f)
         patches = [
             Patch(Base.isfile, mock_isfile)
