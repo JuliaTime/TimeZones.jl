@@ -325,3 +325,10 @@ zdt = ZonedDateTime(DateTime(2038, 3, 28), warsaw, from_utc=true)
 # eg. Asia/Hong_Kong, Pacific/Honolulu, Australia/Perth
 perth = resolve("Australia/Perth", tzdata["australasia"]...)
 zdt = ZonedDateTime(DateTime(2200, 1, 1), perth, from_utc=true)
+
+
+# Convenience constructors for making a DateTime on-the-fly
+digits = [2010, 1, 2, 3, 4, 5, 6]
+for i in eachindex(digits)
+    @test ZonedDateTime(digits[1:i]..., warsaw) == ZonedDateTime(DateTime(digits[1:i]...), warsaw)
+end

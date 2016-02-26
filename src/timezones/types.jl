@@ -299,6 +299,19 @@ function ZonedDateTime(zdt::ZonedDateTime, tz::FixedTimeZone)
     return ZonedDateTime(zdt.utc_datetime, tz, tz)
 end
 
+# Convenience constructors
+function ZonedDateTime(y::Integer, m::Integer, d::Integer, h::Integer, mi::Integer, s::Integer, ms::Integer, tz::TimeZone)
+    ZonedDateTime(DateTime(y,m,d,h,mi,s,ms), tz)
+end
+
+ZonedDateTime(y::Integer, m::Integer, d::Integer, h::Integer, mi::Integer, s::Integer, tz::TimeZone) = ZonedDateTime(y,m,d,h,mi,s,0,tz)
+ZonedDateTime(y::Integer, m::Integer, d::Integer, h::Integer, mi::Integer, tz::TimeZone) = ZonedDateTime(y,m,d,h,mi,0,0,tz)
+ZonedDateTime(y::Integer, m::Integer, d::Integer, h::Integer, tz::TimeZone) = ZonedDateTime(y,m,d,h,0,0,0,tz)
+ZonedDateTime(y::Integer, m::Integer, d::Integer, tz::TimeZone) = ZonedDateTime(y,m,d,0,0,0,0,tz)
+ZonedDateTime(y::Integer, m::Integer, tz::TimeZone) = ZonedDateTime(y,m,1,0,0,0,0,tz)
+ZonedDateTime(y::Integer, tz::TimeZone) = ZonedDateTime(y,1,1,0,0,0,0,tz)
+
+
 function ZonedDateTime(parts::Union{Period,TimeZone}...)
     periods = Period[]
     timezone = Nullable{TimeZone}()
