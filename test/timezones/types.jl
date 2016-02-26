@@ -331,4 +331,23 @@ zdt = ZonedDateTime(DateTime(2200, 1, 1), perth, from_utc=true)
 digits = [2010, 1, 2, 3, 4, 5, 6]
 for i in eachindex(digits)
     @test ZonedDateTime(digits[1:i]..., warsaw) == ZonedDateTime(DateTime(digits[1:i]...), warsaw)
+    @test ZonedDateTime(digits[1:i]..., utc) == ZonedDateTime(DateTime(digits[1:i]...), utc)
+end
+
+# Convenience constructor dealing with ambiguous time
+digits = [1916, 10, 1, 0, 2, 3, 4]  # Fall DST transition in Europe/Warsaw
+for i in eachindex(digits)
+    expected = [
+        ZonedDateTime(DateTime(digits[1:i]...), warsaw, 1)
+        ZonedDateTime(DateTime(digits[1:i]...), warsaw, 2)
+    ]
+
+    if i > 1
+        @test_throws AmbiguousTimeError ZonedDateTime(digits[1:i]..., warsaw)
+    end
+
+    @test ZonedDateTime(digits[1:i]..., warsaw, 1) == expected[1]
+    @test ZonedDateTime(digits[1:i]..., warsaw, 2) == expected[2]
+    @test ZonedDateTime(digits[1:i]..., warsaw, true) == expected[1]
+    @test ZonedDateTime(digits[1:i]..., warsaw, false) == expected[2]
 end
