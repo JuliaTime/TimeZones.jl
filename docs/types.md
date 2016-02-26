@@ -59,21 +59,23 @@ julia> ZonedDateTime(DateTime(2014,3,30,3), warsaw)
 Alternatively, working with a `DateTime` that occurs during the "fall back" transition results in a `AmbiguousTimeError`. Providing additional parameters can deal with the ambiguity:
 
 ```julia
-julia> ZonedDateTime(DateTime(2014,10,26,2), warsaw)
-ERROR: Local DateTime 2014-10-26T02:00:00 is ambiguious
- in ZonedDateTime at ~/.julia/v0.4/TimeZones/src/timezones/types.jl:189
- in ZonedDateTime at ~/.julia/v0.4/TimeZones/src/timezones/types.jl:177
+julia> dt = DateTime(2014,10,26,2)
+2014-10-26T02:00:00
 
-julia> ZonedDateTime(DateTime(2014,10,26,2), warsaw, 1)  # use the first occurrence of the duplicate hour
+julia> ZonedDateTime(dt, warsaw)
+ERROR: Local DateTime 2014-10-26T02:00:00 is ambiguious
+ in ZonedDateTime at ~/.julia/v0.4/TimeZones/src/timezones/types.jl:264
+
+julia> ZonedDateTime(dt, warsaw, 1)  # use the first occurrence of the duplicate hour
 2014-10-26T02:00:00+02:00
 
-julia> ZonedDateTime(DateTime(2014,10,26,2), warsaw, 2)  # use second occurrence of the duplicate hour
+julia> ZonedDateTime(dt, warsaw, 2)  # use second occurrence of the duplicate hour
 2014-10-26T02:00:00+01:00
 
-julia> ZonedDateTime(DateTime(2014,10,26,2), warsaw, true)  # use the hour which is in daylight saving time
+julia> ZonedDateTime(dt, warsaw, true)  # use the hour which is in daylight saving time
 2014-10-26T02:00:00+02:00
 
-julia> ZonedDateTime(DateTime(2014,10,26,2), warsaw, false)  # use the hour which is not in daylight saving time
+julia> ZonedDateTime(dt, warsaw, false)  # use the hour which is not in daylight saving time
 2014-10-26T02:00:00+01:00
 ```
 
@@ -84,14 +86,16 @@ julia> ZonedDateTime(DateTime(1879,1,1), warsaw)
 1879-01-01T00:00:00+01:24
 ```
 
-Alternatively, when using future dates past the year 2037 will result in an error:
+Alternatively, when using future dates past the year 2038 will result in an error:
 
 ```julia
-julia> ZonedDateTime(DateTime(2038,1,1), warsaw)
-ERROR: DateTime exceeds maximum supported by this timezone. Please update the timezone to include transitions past 2037.
+julia> ZonedDateTime(DateTime(2039), warsaw)
+ERROR: TimeZone Europe/Warsaw does not handle dates on or after 2038-03-28T01:00:00 UTC
+ in call at ~/.julia/v0.4/TimeZones/src/timezones/types.jl:146
+ in ZonedDateTime at ~/.julia/v0.4/TimeZones/src/timezones/types.jl:260
 ```
 
-It is possible to have [timezones that work after 2037](faq/#why-do-some-timezones-only-work-up-to-the-year-2037) but it since these dates are in the future there is no guarantee that the transitions will actually occur on dates provided by TimeZones.jl.
+It is possible to have [timezones that work beyond 2038](faq/#far-future-zoneddatetime-with-variabletimezone) but it since these dates are in the future it is possible the timezone rules may change and will not be accurate.
 
 
 ## FixedTimeZone

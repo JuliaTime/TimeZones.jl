@@ -13,13 +13,33 @@ download("ftp://ftp.iana.org/tz/data/etcetera", joinpath(TimeZones.TZDATA_DIR, "
 TimeZones.Olson.compile()
 ```
 
-## Why do some timezones only work up to the year 2037?
+## Far-future ZonedDateTime with VariableTimeZone
 
-Due to the internal representation of a `VariableTimeZone` it is infeasible to determine a time zones transitions to infinity. The date [2037](https://en.wikipedia.org/wiki/Year_2038_problem) is the last full year that can be represented by a `Int32` it was decided that was a good year to stop determining transition dates. Additionally, since we are talking about future dates it can not be guaranteed that the transition dates computed from the current rules will be accurate on any future date. Since transitions are not calculated past this year a time zone that is known to have transitions after this year will raise an exception if you try to create a date or use arithmetic to get the `ZonedDateTime` to the year 2038.
-
-If you still want to use time zones past the year 2037 you can do so by re-compiling time zones using the `max_year` keyword:
+Due to the internal representation of a `VariableTimeZone` it is infeasible to determine a time zones transitions to infinity. Since [2038-01-19T03:14:07](https://en.wikipedia.org/wiki/Year_2038_problem) is the last `DateTime` that can be represented by an `Int32` (`Dates.unix2datetime(typemax(Int32))`) it was decided that 2037 would be the last year in which all transition dates are computed. If additional transitions are known to exist after the last transition then a cutoff date is specified.
 
 ```julia
-using TimeZones
-TimeZones.Olson.compile(max_year=2200)
+julia> warsaw = TimeZone("Europe/Warsaw")
+Europe/Warsaw
+
+julia> last(warsaw.transitions)
+TimeZones.Transition(2037-10-25T01:00:00,TimeZones.FixedTimeZone(:CET,TimeZones.Offset(3600 seconds,0 seconds)))
+
+julia> warsaw.cutoff  # DateTime up until the last transition is effective
+Nullable(2038-03-28T01:00:00)
+
+julia> ZonedDateTime(DateTime(2039), warsaw)
+ERROR: TimeZone Europe/Warsaw does not handle dates on or after 2038-03-28T01:00:00 UTC
+ in call at ~/.julia/v0.4/TimeZones/src/timezones/types.jl:146
+ in ZonedDateTime at ~/.julia/v0.4/TimeZones/src/timezones/types.jl:260
+```
+
+It is important to note that since we are taking about future timezone transitions and the rules dictating these transitions are subject to change we cannot be sure that the offsets given will be accurate. If you still want to work with future `ZonedDateTime` past the default cutoff you can re-compile the `TimeZone` objects and specify the `max_year` keyword:
+
+```julia
+julia> using TimeZones
+
+julia> TimeZones.Olson.compile(max_year=2200)
+
+julia> ZonedDateTime(DateTime(2100), TimeZone("Europe/Warsaw"))
+2100-01-01T00:00:00+01:00
 ```
