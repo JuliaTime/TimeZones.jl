@@ -46,8 +46,9 @@ function optional(ex::Expr)
     new_sig = Array{Any}(length(sig.args))
     for (i, arg) in enumerate(sig.args)
         if i in dynamic
-            new_sig[i] = arg.args[1]
-            default[findin(dynamic,i)] = arg.args[2]
+            name, value = arg.args
+            new_sig[i] = name
+            default[findin(dynamic,i)] = value
         else
             new_sig[i] = arg
         end

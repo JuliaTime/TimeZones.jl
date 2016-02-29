@@ -62,3 +62,14 @@ typealias I Integer
         :(ZonedDateTime(y::I,tz::TimeZone) = ZonedDateTime(y,1,1,0,0,0,0,tz)),
     ],
 )
+
+# Currently demonstrates an issue when the type given doesn't match value
+# @test isequal(
+#     TimeZones.flexible(
+#         :(f(a::Float64=1, b) = nothing)
+#     ),
+#     [
+#         :(f(a::Float64, b) = nothing),
+#         :(f(b) = f(1.0, b)),
+#     ]
+# )
