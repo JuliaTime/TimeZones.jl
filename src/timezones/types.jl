@@ -301,27 +301,13 @@ end
 
 
 # Convenience constructors
-function ZonedDateTime(y::Integer, m::Integer, d::Integer, h::Integer, mi::Integer, s::Integer, ms::Integer, tz::VariableTimeZone, amb::Union{Integer,Bool})
+@optional function ZonedDateTime(y::Integer, m::Integer=1, d::Integer=1, h::Integer=0, mi::Integer=0, s::Integer=0, ms::Integer=0, tz::VariableTimeZone, amb::Union{Integer,Bool})
     ZonedDateTime(DateTime(y,m,d,h,mi,s,ms), tz, amb)
 end
 
-ZonedDateTime(y::Integer, m::Integer, d::Integer, h::Integer, mi::Integer, s::Integer, tz::VariableTimeZone, amb::Union{Integer,Bool}) = ZonedDateTime(y,m,d,h,mi,s,0,tz,amb)
-ZonedDateTime(y::Integer, m::Integer, d::Integer, h::Integer, mi::Integer, tz::VariableTimeZone, amb::Union{Integer,Bool}) = ZonedDateTime(y,m,d,h,mi,0,0,tz,amb)
-ZonedDateTime(y::Integer, m::Integer, d::Integer, h::Integer, tz::VariableTimeZone, amb::Union{Integer,Bool}) = ZonedDateTime(y,m,d,h,0,0,0,tz,amb)
-ZonedDateTime(y::Integer, m::Integer, d::Integer, tz::VariableTimeZone, amb::Union{Integer,Bool}) = ZonedDateTime(y,m,d,0,0,0,0,tz,amb)
-ZonedDateTime(y::Integer, m::Integer, tz::VariableTimeZone, amb::Union{Integer,Bool}) = ZonedDateTime(y,m,1,0,0,0,0,tz,amb)
-ZonedDateTime(y::Integer, tz::VariableTimeZone, amb::Union{Integer,Bool}) = ZonedDateTime(y,1,1,0,0,0,0,tz,amb)
-
-function ZonedDateTime(y::Integer, m::Integer, d::Integer, h::Integer, mi::Integer, s::Integer, ms::Integer, tz::TimeZone)
+@optional function ZonedDateTime(y::Integer, m::Integer=1, d::Integer=1, h::Integer=0, mi::Integer=0, s::Integer=0, ms::Integer=0, tz::TimeZone)
     ZonedDateTime(DateTime(y,m,d,h,mi,s,ms), tz)
 end
-
-ZonedDateTime(y::Integer, m::Integer, d::Integer, h::Integer, mi::Integer, s::Integer, tz::TimeZone) = ZonedDateTime(y,m,d,h,mi,s,0,tz)
-ZonedDateTime(y::Integer, m::Integer, d::Integer, h::Integer, mi::Integer, tz::TimeZone) = ZonedDateTime(y,m,d,h,mi,0,0,tz)
-ZonedDateTime(y::Integer, m::Integer, d::Integer, h::Integer, tz::TimeZone) = ZonedDateTime(y,m,d,h,0,0,0,tz)
-ZonedDateTime(y::Integer, m::Integer, d::Integer, tz::TimeZone) = ZonedDateTime(y,m,d,0,0,0,0,tz)
-ZonedDateTime(y::Integer, m::Integer, tz::TimeZone) = ZonedDateTime(y,m,1,0,0,0,0,tz)
-ZonedDateTime(y::Integer, tz::TimeZone) = ZonedDateTime(y,1,1,0,0,0,0,tz)
 
 
 function ZonedDateTime(parts::Union{Period,TimeZone}...)
