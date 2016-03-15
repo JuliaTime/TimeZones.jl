@@ -1,15 +1,16 @@
 Second(offset::Offset) = offset.utc + offset.dst
 
-localtime(dt::ZonedDateTime) = dt.utc_datetime + Second(dt.zone.offset)
-utc(dt::ZonedDateTime) = dt.utc_datetime
+localtime(zdt::ZonedDateTime) = zdt.utc_datetime + Second(zdt.zone.offset)
+utc(zdt::ZonedDateTime) = zdt.utc_datetime
 
-days(dt::ZonedDateTime) = days(localtime(dt))
-hour(dt::ZonedDateTime) = hour(localtime(dt))
-minute(dt::ZonedDateTime) = minute(localtime(dt))
-second(dt::ZonedDateTime) = second(localtime(dt))
-millisecond(dt::ZonedDateTime) = millisecond(localtime(dt))
+days(zdt::ZonedDateTime) = days(localtime(zdt))
 
-@vectorize_1arg ZonedDateTime hour
-@vectorize_1arg ZonedDateTime minute
-@vectorize_1arg ZonedDateTime second
-@vectorize_1arg ZonedDateTime millisecond
+for period in (:Hour, :Minute, :Second, :Millisecond)
+    accessor = symbol(lowercase(string(period)))
+    @eval begin
+        $accessor(zdt::ZonedDateTime) = $accessor(localtime(zdt))
+        @vectorize_1arg ZonedDateTime $accessor
+
+        $period(zdt::ZonedDateTime) = $period($accessor(zdt))
+    end
+end
