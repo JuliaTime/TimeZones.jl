@@ -4,6 +4,13 @@ import TimeZones.Olson: compile
 @windows_only import TimeZones: WIN_TRANSLATION_FILE
 @windows_only using LightXML
 
+# Various sources from which the latest compressed TZ data can be retrieved.
+# Note: HTTP sources are preferable as they tend to work behind firewalls.
+const URLS = (
+    "https://www.iana.org/time-zones/repository/tzdata-latest.tar.gz",
+    "ftp://ftp.iana.org/tz/tzdata-latest.tar.gz",  # Unreliable source
+)
+
 # See "ftp://ftp.iana.org/tz/data/Makefile" PRIMARY_YDATA for listing of
 # regions to include. YDATA includes historical zones which we'll ignore.
 const REGIONS = (
@@ -15,36 +22,28 @@ const REGIONS = (
 isdir(TZDATA_DIR) || mkdir(TZDATA_DIR)
 isdir(COMPILED_DIR) || mkdir(COMPILED_DIR)
 
-# TODO: Downloading from the IANA source fails regularly. We should attempt to find
-# alternative sources.
 info("Downloading TZ data")
-@sync for region in REGIONS
-    @async begin
-        remote_file = "ftp://ftp.iana.org/tz/data/" * region
-        region_file = joinpath(TZDATA_DIR, region)
-        remaining = 3
-
-        while remaining > 0
-            try
-                # Note the destination file will be overwritten upon success.
-                download(remote_file, region_file)
-                remaining = 0
-            catch e
-                if isa(e, ErrorException)
-                    if remaining > 0
-                        remaining -= 1
-                    elseif isfile(region_file)
-                        warn("Falling back to old region file $region. Unable to download: $remote_file")
-                    else
-                        error("Missing region file $region. Unable to download: $remote_file")
-                    end
-                else
-                    rethrow()
-                end
-            end
-        end
+archive = ""
+for url in URLS
+    try
+        archive = download(url)
+        break
+    catch
+        warn("Failed to download TZ data from: $url")
     end
 end
+isfile(archive) || error("Unable to download TZ data")
+
+info("Extracting TZ data")
+@unix_only function extract(archive, directory, files)
+    run(`tar xvf $archive --directory=$directory $files`)
+end
+@windows_only function extract(archive, directory, files)
+    run(pipeline(`7z x $archive -y -so`, `7z x -si -y -ttar -o$directory $files`))
+end
+
+extract(archive, TZDATA_DIR, REGIONS)
+rm(archive)
 
 
 info("Pre-processing TimeZone data")
