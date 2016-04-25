@@ -9,7 +9,7 @@ For example:
 becomes:
 
     f(a, b, c) = ...
-    f(a=1, c) = f(a, 2, c)
+    f(a, c) = f(a, 2, c)
     f(c) = f(1, 2, c)
 """
 macro optional(ex)
