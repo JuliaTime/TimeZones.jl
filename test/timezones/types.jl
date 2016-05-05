@@ -244,14 +244,14 @@ dup = VariableTimeZone("DuplicateTest", [
 
 # Make sure that the duplicated hour only doesn't contain an additional entry.
 @test_throws AmbiguousTimeError ZonedDateTime(DateTime(1935,9,1), dup)
-@test ZonedDateTime(DateTime(1935,9,1), dup, 1).zone.name == symbol("DTDT-2")
+@test ZonedDateTime(DateTime(1935,9,1), dup, 1).zone.name == Symbol("DTDT-2")
 @test ZonedDateTime(DateTime(1935,9,1), dup, 2).zone.name == :DTST
 @test_throws BoundsError ZonedDateTime(DateTime(1935,9,1), dup, 3)
 
 # Ensure that DTDT-1 is completely ignored.
 @test_throws NonExistentTimeError ZonedDateTime(DateTime(1935,4,1), dup)
-@test ZonedDateTime(DateTime(1935,4,1,1), dup).zone.name == symbol("DTDT-2")
-@test ZonedDateTime(DateTime(1935,8,31,23), dup).zone.name == symbol("DTDT-2")
+@test ZonedDateTime(DateTime(1935,4,1,1), dup).zone.name == Symbol("DTDT-2")
+@test ZonedDateTime(DateTime(1935,8,31,23), dup).zone.name == Symbol("DTDT-2")
 
 
 # Check equality between ZonedDateTimes

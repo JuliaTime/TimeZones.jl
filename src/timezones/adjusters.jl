@@ -13,7 +13,7 @@ Base.trunc(dt::ZonedDateTime,::Type{Millisecond}) = dt
 
 # Adjusters
 for prefix in ("firstdayof", "lastdayof"), suffix in ("week", "month", "year", "quarter")
-    func = symbol(prefix * suffix)
+    func = Symbol(prefix * suffix)
     @eval begin
         $func(dt::ZonedDateTime) = ZonedDateTime($func(localtime(dt)), dt.timezone)
     end

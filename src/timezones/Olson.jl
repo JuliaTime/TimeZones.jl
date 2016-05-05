@@ -57,7 +57,7 @@ const DAYS = Dict("Mon"=>1,"Tue"=>2,"Wed"=>3,"Thu"=>4,"Fri"=>5,"Sat"=>6,"Sun"=>7
 
 # Create adjuster functions such as "lastSun".
 for (abbr, dayofweek) in DAYS
-    sym = symbol("last" * abbr)
+    sym = Symbol("last" * abbr)
     @eval (
         function $sym(dt)
             return dayofweek(dt) == $dayofweek &&
@@ -140,7 +140,7 @@ function ruleparse(from, to, rule_type, month, on, at, save, letter)
     if ismatch(r"last\w\w\w", on)
         # We pre-built these functions above
         # They follow the format: "lastSun", "lastMon".
-        on_func = eval(symbol(on))
+        on_func = eval(Symbol(on))
     elseif ismatch(r"\w\w\w[<>]=\d\d?", on)
         # The first day of the week that occurs before or after a given day of month.
         # i.e. Sun>=8 refers to the Sunday after the 8th of the month

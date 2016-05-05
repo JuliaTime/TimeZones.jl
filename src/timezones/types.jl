@@ -50,7 +50,7 @@ Constructs a `FixedTimeZone` with the given `name`, UTC offset (in seconds), and
 (in seconds).
 """
 function FixedTimeZone(name::AbstractString, utc_offset::Integer, dst_offset::Integer=0)
-    FixedTimeZone(symbol(name), Offset(utc_offset, dst_offset))
+    FixedTimeZone(Symbol(name), Offset(utc_offset, dst_offset))
 end
 
 doc"""
@@ -115,15 +115,15 @@ immutable VariableTimeZone <: TimeZone
 end
 
 function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::Nullable{DateTime})
-    return VariableTimeZone(symbol(name), transitions, cutoff)
+    return VariableTimeZone(Symbol(name), transitions, cutoff)
 end
 
 function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::DateTime)
-    return VariableTimeZone(symbol(name), transitions, Nullable(cutoff))
+    return VariableTimeZone(Symbol(name), transitions, Nullable(cutoff))
 end
 
 function VariableTimeZone(name::AbstractString, transitions::Vector{Transition})
-    return VariableTimeZone(symbol(name), transitions, Nullable{DateTime}())
+    return VariableTimeZone(Symbol(name), transitions, Nullable{DateTime}())
 end
 
 type UnhandledTimeError <: TimeError
