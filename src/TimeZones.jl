@@ -29,6 +29,7 @@ const COMPILED_DIR = joinpath(PKG_DIR, "deps", "compiled")
     const WIN_TRANSLATION_FILE = joinpath(PKG_DIR, "deps", "windows_to_posix")
 end
 
+include("timezones/utils.jl")
 include("timezones/time.jl")
 include("timezones/types.jl")
 include("timezones/accessors.jl")

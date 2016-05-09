@@ -21,6 +21,9 @@ To construct a `ZonedDateTime` instance you just need a `DateTime` and a `TimeZo
 ```julia
 julia> ZonedDateTime(DateTime(2014,1,1), TimeZone("Europe/Warsaw"))
 2014-01-01T00:00:00+01:00
+
+julia> ZonedDateTime(2014, 1, 1, TimeZone("Europe/Warsaw"))
+2014-01-01T00:00:00+01:00
 ```
 
 ## VariableTimeZone
@@ -82,14 +85,14 @@ julia> ZonedDateTime(dt, warsaw, false)  # use the hour which is not in daylight
 When working with dates prior to the year 1900 you may notice that the time zone offset includes minutes or even seconds. These kind of offsets are normal:
 
 ```julia
-julia> ZonedDateTime(DateTime(1879,1,1), warsaw)
+julia> ZonedDateTime(1879, 1, 1, warsaw)
 1879-01-01T00:00:00+01:24
 ```
 
 Alternatively, when using future dates past the year 2038 will result in an error:
 
 ```julia
-julia> ZonedDateTime(DateTime(2039), warsaw)
+julia> ZonedDateTime(2039, warsaw)
 ERROR: TimeZone Europe/Warsaw does not handle dates on or after 2038-03-28T01:00:00 UTC
  in call at ~/.julia/v0.4/TimeZones/src/timezones/types.jl:146
  in ZonedDateTime at ~/.julia/v0.4/TimeZones/src/timezones/types.jl:260
@@ -120,6 +123,6 @@ FixedTimeZone("FOO", -6 * 3600)  # 6 hours in seconds
 Constructing a `ZonedDateTime` works similarly to `VariableTimeZone`:
 
 ```julia
-julia> ZonedDateTime(DateTime(1960,1,1), TimeZone("UTC"))
+julia> ZonedDateTime(1960, 1, 1, TimeZone("UTC"))
 1960-01-01T00:00:00+00:00
 ```

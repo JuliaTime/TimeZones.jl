@@ -299,6 +299,17 @@ function ZonedDateTime(zdt::ZonedDateTime, tz::FixedTimeZone)
     return ZonedDateTime(zdt.utc_datetime, tz, tz)
 end
 
+
+# Convenience constructors
+@optional function ZonedDateTime(y::Integer, m::Integer=1, d::Integer=1, h::Integer=0, mi::Integer=0, s::Integer=0, ms::Integer=0, tz::VariableTimeZone, amb::Union{Integer,Bool})
+    ZonedDateTime(DateTime(y,m,d,h,mi,s,ms), tz, amb)
+end
+
+@optional function ZonedDateTime(y::Integer, m::Integer=1, d::Integer=1, h::Integer=0, mi::Integer=0, s::Integer=0, ms::Integer=0, tz::TimeZone)
+    ZonedDateTime(DateTime(y,m,d,h,mi,s,ms), tz)
+end
+
+
 function ZonedDateTime(parts::Union{Period,TimeZone}...)
     periods = Period[]
     timezone = Nullable{TimeZone}()

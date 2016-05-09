@@ -8,7 +8,7 @@ julia> using Dates
 julia> warsaw = TimeZone("Europe/Warsaw")
 Europe/Warsaw
 
-julia> spring = ZonedDateTime(DateTime(2014,3,30), warsaw)
+julia> spring = ZonedDateTime(2014, 3, 30, warsaw)
 2014-03-30T00:00:00+01:00
 
 julia> spring + Day(1)
@@ -47,10 +47,10 @@ Julia allows for the use of powerful [adjuster functions](http://julia.readthedo
 ```julia
 julia> warsaw = TimeZone("Europe/Warsaw")
 
-julia> start = ZonedDateTime(DateTime(2014), warsaw)
+julia> start = ZonedDateTime(2014, warsaw)
 2014-01-01T00:00:00+01:00
 
-julia> stop = ZonedDateTime(DateTime(2015), warsaw)
+julia> stop = ZonedDateTime(2015, warsaw)
 2015-01-01T00:00:00+01:00
 
 julia> Dates.recur(start:Dates.Hour(1):stop) do d
@@ -71,10 +71,10 @@ Note the transition from standard time to daylight saving time (and back again).
 It is possible to define a range `start:step:stop` such that `start` and `stop` have different time zones. In this case the resulting `ZonedDateTime`s will all share a time zone with `start` but the range will stop at the instant that corresponds to `stop` in `start`'s time zone. For example:
 
 ```julia
-julia> start = ZonedDateTime(DateTime(2016, 1, 1, 12), TimeZone("UTC"))
+julia> start = ZonedDateTime(2016, 1, 1, 12, TimeZone("UTC"))
 2016-01-01T12:00:00+00:00
 
-julia> stop = ZonedDateTime(DateTime(2016, 1, 1, 18), TimeZone("Europe/Warsaw"))
+julia> stop = ZonedDateTime(2016, 1, 1, 18, TimeZone("Europe/Warsaw"))
 2016-01-01T18:00:00+01:00
 
 julia> collect(start:Dates.Hour(1):stop)
