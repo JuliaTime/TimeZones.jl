@@ -1,6 +1,4 @@
-Second(offset::Offset) = offset.utc + offset.dst
-
-localtime(zdt::ZonedDateTime) = zdt.utc_datetime + Second(zdt.zone.offset)
+localtime(zdt::ZonedDateTime) = zdt.utc_datetime + zdt.zone.offset
 utc(zdt::ZonedDateTime) = zdt.utc_datetime
 
 days(zdt::ZonedDateTime) = days(localtime(zdt))

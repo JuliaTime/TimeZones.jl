@@ -1,4 +1,4 @@
-import TimeZones: Transition, Offset, TZFILE_MAX
+import TimeZones: Transition, TZFILE_MAX
 
 # Extracts Transitions such that the two arrays start and stop at the
 # same DateTimes.
@@ -11,11 +11,7 @@ function overlap(a::Array{Transition}, b::Array{Transition})
 end
 
 function issimilar(x::Transition, y::Transition)
-    x == y || x.utc_datetime == y.utc_datetime && x.zone.name == y.zone.name && issimilar(x.zone.offset, y.zone.offset)
-end
-
-function issimilar(x::Offset, y::Offset)
-    x == y || Second(x) == Second(y) && (x.dst == y.dst || x.dst > Second(0) && y.dst > Second(0))
+    x == y || x.utc_datetime == y.utc_datetime && x.zone.name == y.zone.name && isequal(x.zone.offset, y.zone.offset)
 end
 
 @test_throws AssertionError TimeZones.read_tzfile(IOBuffer(), "")

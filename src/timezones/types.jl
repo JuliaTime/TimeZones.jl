@@ -19,20 +19,7 @@ type NonExistentTimeError <: TimeError
 end
 Base.showerror(io::IO, e::NonExistentTimeError) = print(io, "DateTime $(e.dt) does not exist within $(string(e.tz))");
 
-# Note: The Olson Database rounds offset precision to the nearest second
-# See "America/New_York" notes in Olson file "northamerica" for an example.
-immutable Offset
-    utc::Second  # Standard offset from UTC
-    dst::Second  # Addition daylight saving time offset applied to UTC offset
 
-    function Offset(utc_offset::Second, dst_offset::Second=Second(0))
-        new(utc_offset, dst_offset)
-    end
-end
-
-function Offset(utc_offset::Integer, dst_offset::Integer=0)
-    Offset(Second(utc_offset), Second(dst_offset))
-end
 
 # Using type Symbol instead of AbstractString for name since it
 # gets us ==, and hash for free.
@@ -44,7 +31,7 @@ A `TimeZone` with a constant offset for all of time.
 """
 immutable FixedTimeZone <: TimeZone
     name::Symbol
-    offset::Offset
+    offset::UTCOffset
 end
 
 """
@@ -54,7 +41,7 @@ Constructs a `FixedTimeZone` with the given `name`, UTC offset (in seconds), and
 (in seconds).
 """
 function FixedTimeZone(name::AbstractString, utc_offset::Integer, dst_offset::Integer=0)
-    FixedTimeZone(Symbol(name), Offset(utc_offset, dst_offset))
+    FixedTimeZone(Symbol(name), UTCOffset(utc_offset, dst_offset))
 end
 
 """
@@ -285,7 +272,7 @@ function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
     elseif num == 0
         throw(NonExistentTimeError(dt, tz))
     elseif num == 2
-        mask = [zone.offset.dst > Second(0) for (utc_dt, zone) in possible]
+        mask = [isdst(zone.offset) for (utc_dt, zone) in possible]
 
         # Mask is expected to be unambiguous.
         !($)(mask...) && throw(AmbiguousTimeError(dt, tz))

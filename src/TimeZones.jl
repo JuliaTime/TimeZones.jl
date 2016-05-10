@@ -31,6 +31,7 @@ end
 
 include("timezones/utils.jl")
 include("timezones/time.jl")
+include("timezones/utcoffset.jl")
 include("timezones/types.jl")
 include("timezones/accessors.jl")
 include("timezones/arithmetic.jl")

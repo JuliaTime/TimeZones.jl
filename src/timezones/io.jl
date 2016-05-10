@@ -1,17 +1,5 @@
 import Base.Dates: value, DateFormat, Slot, slotparse, slotformat, SLOT_RULE
 
-function Base.string(offset::Offset)
-    v = value(Second(offset))
-    h, v = divrem(v, 3600)
-    m, s  = divrem(abs(v), 60)
-
-    hh = @sprintf("%+03i", h)
-    mm = lpad(m, 2, "0")
-    ss = s != 0 ? lpad(s, 2, "0") : ""
-
-    return "$hh:$mm$(ss)"
-end
-
 Base.string(tz::TimeZone) = string(tz.name)
 Base.string(dt::ZonedDateTime) = "$(localtime(dt))$(string(dt.zone.offset))"
 # Base.string(t::Transition) = "$(t.utc_datetime), $(t.zone.name), $(t.zone.offset)"

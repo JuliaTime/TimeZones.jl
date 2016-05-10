@@ -1,8 +1,5 @@
 import Base: +, -
 
-(+)(x::DateTime, y::Offset) = x + Second(y)
-(-)(x::DateTime, y::Offset) = x - Second(y)
-
 # ZonedDateTime arithmetic
 (+)(x::ZonedDateTime) = x
 (-)(x::ZonedDateTime, y::ZonedDateTime) = x.utc_datetime - y.utc_datetime
