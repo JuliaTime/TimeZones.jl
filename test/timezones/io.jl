@@ -1,21 +1,49 @@
-fixed = FixedTimeZone("UTC+01:00", 3600)
+fixed = FixedTimeZone("UTC+01:00")
+est = FixedTimeZone("EST", -18000)
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
+apia = resolve("Pacific/Apia", tzdata["australasia"]...)
 dt = DateTime(1942,12,25,1,23,45)
 
+buffer = IOBuffer()
 
 # TimeZones as a string
-@test string(warsaw) == "Europe/Warsaw"
 @test string(fixed) == "UTC+01:00"
 @test string(fixed.offset) == "+01:00"
+@test string(est) == "EST"
+@test string(est.offset) == "-05:00"
+@test string(warsaw) == "Europe/Warsaw"
+@test string(apia) == "Pacific/Apia"
 
-buffer = IOBuffer()
-show(buffer, warsaw)
+showcompact(buffer, fixed)
+@test takebuf_string(buffer) == "UTC+01:00"
+showcompact(buffer, est)
+@test takebuf_string(buffer) == "EST"
+showcompact(buffer, warsaw)
 @test takebuf_string(buffer) == "Europe/Warsaw"
+showcompact(buffer, apia)
+@test takebuf_string(buffer) == "Pacific/Apia"
+
+show(buffer, fixed)
+@test takebuf_string(buffer) == "UTC+01:00"
+show(buffer, est)
+@test takebuf_string(buffer) == "EST (UTC-5)"
+show(buffer, warsaw)
+@test takebuf_string(buffer) == "Europe/Warsaw (UTC+1/UTC+2)"
+show(buffer, apia)
+@test takebuf_string(buffer) == "Pacific/Apia (UTC+13/UTC+14)"
+
+
+# UTC and GMT are special cases
+show(buffer, FixedTimeZone("UTC"))
+@test takebuf_string(buffer) == "UTC"
+show(buffer, FixedTimeZone("GMT", 0))
+@test takebuf_string(buffer) == "GMT"
+show(buffer, FixedTimeZone("FOO", 0))
+@test takebuf_string(buffer) == "FOO (UTC+0)"
 
 # ZonedDateTime as a string
 @test string(ZonedDateTime(dt, warsaw)) == "1942-12-25T01:23:45+01:00"
 
-buffer = IOBuffer()
 show(buffer, ZonedDateTime(dt, warsaw))
 @test takebuf_string(buffer) == "1942-12-25T01:23:45+01:00"
 

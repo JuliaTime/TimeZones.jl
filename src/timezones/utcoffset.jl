@@ -1,4 +1,4 @@
-import Base: +, -, isequal, convert, string, show
+import Base: +, -, isequal, isless, convert, string, show
 import Base.Dates: AbstractTime, Second, value
 
 # Note: The Olson Database rounds offset precision to the nearest second
@@ -35,6 +35,7 @@ isdst(offset::UTCOffset) = offset.dst != Second(0)
 function isequal(x::UTCOffset, y::UTCOffset)
     x == y || value(x) == value(y) && isdst(x) == isdst(y)
 end
+isless(x::UTCOffset, y::UTCOffset) = isless(value(x), value(y))
 
 function offset_string(seconds::Second, iso8601::Bool=false)
     v = value(seconds)
