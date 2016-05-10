@@ -4,6 +4,13 @@
 import Mocking: @mendable
 import Compat: readstring
 
+"""
+    localzone() -> TimeZone
+
+Returns a `TimeZone` object that is equivalent to the system's current time zone.
+"""
+function localzone end
+
 @osx_only function localzone()
     name = @mendable readstring(`systemsetup -gettimezone`)  # Appears to only work as root
     if contains(name, "Time Zone: ")
@@ -147,9 +154,3 @@ end
         error("unable to translate to POSIX timezone name from: \"$win_name\"")
     end
 end
-
-@doc """
-`localzone() -> TimeZone`
-
-Returns a `TimeZone` object that is equivalent to the system's current time zone.
-""" localzone

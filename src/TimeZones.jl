@@ -42,11 +42,13 @@ include("timezones/conversions.jl")
 include("timezones/local.jl")
 include("timezones/ranges.jl")
 
-doc"""
-`TimeZone(name::AbstractString) -> TimeZone`
+"""
+    TimeZone(name::AbstractString) -> TimeZone
 
-Construct `TimeZone` information based upon its `name`.
-See `FixedTimeZone(::AbstractString)` for making a custom `TimeZone`.
+Constructs a `TimeZone` instance based upon its `name`. A list of available timezones can be
+determined using `timezone_names()`.
+
+See `FixedTimeZone(::AbstractString)` for making a custom `TimeZone` instances.
 """
 function TimeZone(name::AbstractString)
     tz_path = joinpath(COMPILED_DIR, split(name, "/")...)
@@ -62,8 +64,8 @@ function TimeZone(name::AbstractString)
     end
 end
 
-doc"""
-`timezone_names() -> Array{AbstractString}`
+"""
+    timezone_names() -> Array{AbstractString}
 
 Returns all of the valid names for constructing a `TimeZone`.
 """

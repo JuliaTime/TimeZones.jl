@@ -14,12 +14,12 @@ end
 
 abbreviation(chars::Array{UInt8}, offset::Integer=1) = ascii(pointer(chars[offset:end]))
 
-doc"""
-`read_tzfile(io::IO, name::AbstractString) -> TimeZone`
+"""
+    read_tzfile(io::IO, name::AbstractString) -> TimeZone
 
 Read the content of an I/O stream and process it as a
-POSIX [tzfile](http://man7.org/linux/man-pages/man5/tzfile.5.html). The returned `TimeZone` has
-will have the given `name` unless a `FixedTimeZone` is returned.
+[POSIX tzfile](http://man7.org/linux/man-pages/man5/tzfile.5.html). The returned
+`TimeZone` will be given the suppiled name `name` unless a `FixedTimeZone` is returned.
 """
 function read_tzfile(io::IO, name::AbstractString)
     version, tz = read_tzfile_internal(io, name)
