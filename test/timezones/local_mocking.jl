@@ -2,7 +2,7 @@ import TimeZones: TimeZone, localzone
 using Mocking
 import Compat: readstring
 
-# For mocking make sure we are actually changing the timezone
+# For mocking make sure we are actually changing the time zone
 name = string(localzone()) == "Europe/Warsaw" ? "Pacific/Apia" : "Europe/Warsaw"
 
 tzfile_path = joinpath(TZFILE_DIR, split(name, '/')...)
@@ -11,7 +11,7 @@ win_name = name == "Europe/Warsaw" ? "Central European Standard Time" : "Samoa S
 timezone = TimeZone(name)
 
 if OS_NAME == :Darwin
-    # Determine timezone via systemsetup.
+    # Determine time zone via systemsetup.
     mock_readstring = (cmd::Base.AbstractCmd) -> "Time Zone:  $name\n"
     patches = [
         Patch(readstring, mock_readstring)
@@ -20,7 +20,7 @@ if OS_NAME == :Darwin
         @test localzone() == timezone
     end
 
-    # Determine timezone from /etc/localtime.
+    # Determine time zone from /etc/localtime.
     mock_readstring = (cmd::Base.AbstractCmd) -> ""
     mock_readlink = (filename::AbstractString) -> "/usr/share/zoneinfo/$name"
     patches = [
@@ -49,7 +49,7 @@ elseif OS_NAME == :Linux
     end
 
     withenv("TZ" => nothing) do
-        # Determine timezone from /etc/timezone
+        # Determine time zone from /etc/timezone
         mock_isfile = (f::AbstractString) -> f == "/etc/timezone" || Original.isfile(f)
         mock_open = (fn::Function, f::AbstractString) -> f == "/etc/timezone" ? fn(IOBuffer("$name #Works with comments\n")) : Original.open(fn, f)
         patches = [
@@ -60,7 +60,7 @@ elseif OS_NAME == :Linux
             @test localzone() == timezone
         end
 
-        # Determine timezone from /etc/conf.d/clock
+        # Determine time zone from /etc/conf.d/clock
         mock_isfile = (f::AbstractString) -> !(f in ("/etc/timezone", "/etc/sysconfig/clock")) && (f == "/etc/conf.d/clock" || Original.isfile(f))
         mock_open = (fn::Function, f::AbstractString) -> f == "/etc/conf.d/clock" ? fn(IOBuffer("\n\nTIMEZONE=\"$name\"")) : Original.open(fn, f)
         patches = [
@@ -71,7 +71,7 @@ elseif OS_NAME == :Linux
             @test localzone() == timezone
         end
 
-        # Determine timezone from symlink /etc/localtime
+        # Determine time zone from symlink /etc/localtime
         mock_isfile = (f::AbstractString) -> !(f in ("/etc/timezone", "/etc/sysconfig/clock", "/etc/conf.d/clock")) && Original.isfile(f)
         mock_islink = (f::AbstractString) -> f == "/etc/localtime" || Original.islink(f)
         mock_readlink = (f::AbstractString) -> f == "/etc/localtime" ? "/usr/share/zoneinfo/$name" : Original.readlink(f)
@@ -84,7 +84,7 @@ elseif OS_NAME == :Linux
             @test localzone() == timezone
         end
 
-        # Determine timezone from contents of /etc/localtime
+        # Determine time zone from contents of /etc/localtime
         tz_from_file = open(tzfile_path) do f
             TimeZones.read_tzfile(f, "local")
         end
@@ -102,7 +102,7 @@ elseif OS_NAME == :Linux
             @test localzone() == tz_from_file
         end
 
-        # Unable to determine timezone
+        # Unable to determine time zone
         mock_isfile = (f::AbstractString) -> !(f in ("/etc/timezone", "/etc/sysconfig/clock", "/etc/conf.d/clock", "/etc/localtime", "/usr/local/etc/localtime")) && Original.isfile(f)
         mock_islink = (f::AbstractString) -> f != "/etc/localtime" && Original.islink(f)
         patches = [

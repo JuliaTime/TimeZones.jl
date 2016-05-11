@@ -92,7 +92,7 @@ function FixedTimeZone(s::AbstractString)
     """x
 
     m = match(regex, s)
-    m == nothing && throw(ArgumentError("Unrecognized timezone: $s"))
+    m == nothing && throw(ArgumentError("Unrecognized time zone: $s"))
 
     values = map(n -> n == nothing ? 0 : Base.parse(Int, n), m.captures)
 
@@ -350,11 +350,11 @@ function ZonedDateTime(parts::Union{Period,TimeZone}...)
         elseif isnull(timezone)
             timezone = Nullable{TimeZone}(part)
         else
-            throw(ArgumentError("Multiple timezones found"))
+            throw(ArgumentError("Multiple time zones found"))
         end
     end
 
-    isnull(timezone) && throw(ArgumentError("Missing timezone"))
+    isnull(timezone) && throw(ArgumentError("Missing time zone"))
     return ZonedDateTime(DateTime(periods...), get(timezone))
 end
 

@@ -29,7 +29,7 @@ function Base.isless(x::Zone,y::Zone)
     end
 end
 
-# Rules govern how Daylight Savings transitions happen for a given timezone
+# Rules govern how Daylight Savings transitions happen for a given time zone
 type Rule
     from::Nullable{Int}  # First year rule applies
     to::Nullable{Int}    # Rule applies up until, but not including this year
@@ -79,7 +79,7 @@ function parseflag(s::AbstractString)
     end
 end
 
-# Olson timezone dates can be a single year (1900), yyyy-mm-dd (1900-Jan-01),
+# Olson time zone dates can be a single year (1900), yyyy-mm-dd (1900-Jan-01),
 # or minute-precision (1900-Jan-01 2:00).
 # They can also be given in Local Wall Time, UTC time (u), or Local Standard time (s)
 function parsedate(s::AbstractString)
@@ -217,7 +217,7 @@ end
 """
 Rules are typically ordered by the "from" than "in" fields. Since rules also
 contain a "to" field the written ordering can be problematic for resolving
-timezone transitions.
+time zone transitions.
 
 Example:
 
@@ -445,7 +445,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     if length(transitions) > 1 || !isnull(cutoff)
         return VariableTimeZone(zone_name, transitions, cutoff)
     else
-        # Although unlikely the timezone name in the transition and the zone_name
+        # Although unlikely the time zone name in the transition and the zone_name
         # could be different. We'll ignore this issue at the moment.
         return transitions[1].zone
     end

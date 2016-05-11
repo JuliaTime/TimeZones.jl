@@ -43,7 +43,7 @@ function read_tzfile_internal(io::IO, name::AbstractString, force_version::Char=
     tzh_leapcnt = ntoh(read(io, Int32))  # Number of leap seconds
     tzh_timecnt = ntoh(read(io, Int32))  # Number of transition dates
     tzh_typecnt = ntoh(read(io, Int32))  # Number of TransitionTimeInfos (must be > 0)
-    tzh_charcnt = ntoh(read(io, Int32))  # Number of timezone abbreviation characters
+    tzh_charcnt = ntoh(read(io, Int32))  # Number of time zone abbreviation characters
 
     time_type = force_version == '\0' ? Int32 : Int64
 
@@ -95,7 +95,7 @@ function read_tzfile_internal(io::IO, name::AbstractString, force_version::Char=
         posix_tz_str = chomp(readline(io))
     end
 
-    # Now build the timezone transitions
+    # Now build the time zone transitions
     if tzh_timecnt == 0 || (tzh_timecnt == 1 && transition_times[1] == initial_epoch)
         timezone = FixedTimeZone(Symbol(name), Offset(ttinfo[1].gmtoff))
     else
@@ -138,7 +138,7 @@ function read_tzfile_internal(io::IO, name::AbstractString, force_version::Char=
 
         # tzfile's only seem to calculate transitions up to TZFILE_MAX even with version
         # that use 64-bit values. Using a heuristic we can apply a reasonable cutoff for
-        # timezones that should probably have one.
+        # time zones that should probably have one.
         #
         # Note: that without knowing that additional transitions do exist beyond the last
         # stored transition we cannot determine with perfect accuracy what the cutoff should

@@ -29,7 +29,7 @@ open(joinpath(TZFILE_DIR, "Etc", "UTC")) do f
     @test tz == utc
 end
 
-# Fixed timezone using version 2 data.
+# Fixed time zone using version 2 data.
 utc_plus_6 = FixedTimeZone("UTC+6", 6 * 3600)
 open(joinpath(TZFILE_DIR, "Etc", "GMT-6")) do f
     tz = TimeZones.read_tzfile(f, "UTC+6")
@@ -102,7 +102,7 @@ open(joinpath(TZFILE_DIR, "America", "Godthab (Version 3)")) do f
 end
 
 
-# "Pacific/Apia" was the timezone I was thinking could be an issue for the
+# "Pacific/Apia" was the time zone I was thinking could be an issue for the
 # DST calculation. The entire day of 2011/12/30 was skipped when they changed from a
 # -11:00 GMT offset to 13:00 GMT offset
 apia = resolve("Pacific/Apia", tzdata["australasia"]...)

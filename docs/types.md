@@ -6,7 +6,7 @@ A `TimeZone` is an abstract type that represents information regarding a specifi
 TimeZone("Europe/Warsaw")
 ```
 
-To see all of the [currently available](/faq/#why-are-the-etc-timezones-unsupported) time zone names:
+To see all of the [currently available](/faq/#why-are-the-etc-time-zones-unsupported) time zone names:
 
 ```julia
 timezone_names()
@@ -14,7 +14,7 @@ timezone_names()
 
 ## ZonedDateTime
 
-A `ZonedDateTime` is a *timezone-aware* version of a `DateTime` (in Python parlance). Note that all `ZonedDateTime` instances will always be in the correct zone without requiring manual normalization (unlike Python's pytz module).
+A `ZonedDateTime` is a *time zone aware* version of a `DateTime` (in Python parlance). Note that all `ZonedDateTime` instances will always be in the correct zone without requiring manual normalization (unlike Python's pytz module).
 
 To construct a `ZonedDateTime` instance you just need a `DateTime` and a `TimeZone`:
 
@@ -110,7 +110,7 @@ julia> typeof(TimeZone("UTC"))
 TimeZones.FixedTimeZone
 ```
 
-Unlike a `VariableTimeZone` there are no issues with offsets changing over time because with a `FixedTimeZone` the offset never changes. If you need a `FixedTimeZone` that is not provided by the Olson database you can manually construct one:
+Unlike a `VariableTimeZone` there are no issues with offsets changing over time because with a `FixedTimeZone` the offset never changes. If you need a `FixedTimeZone` that is not provided by the tz database you can manually construct one:
 
 ```julia
 FixedTimeZone("UTC+6")

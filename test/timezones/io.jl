@@ -20,7 +20,7 @@ show(buffer, ZonedDateTime(dt, warsaw))
 @test takebuf_string(buffer) == "1942-12-25T01:23:45+01:00"
 
 # ZonedDateTime parsing.
-# Note: uses compiled timezone information. If these tests are failing try to rebuild
+# Note: uses compiled time zone information. If these tests are failing try to rebuild
 # the TimeZones package.
 @test ZonedDateTime("1942-12-25T01:23:45.0+01:00") == ZonedDateTime(dt, fixed)
 @test ZonedDateTime("1942-12-25T01:23:45+0100", "yyyy-mm-ddTHH:MM:SSzzz") == ZonedDateTime(dt, fixed)
@@ -44,7 +44,7 @@ f = "yyyy/m/d H:M:S zzz"
 @test Dates.format(ZonedDateTime(dt, warsaw), f) == "1942/12/25 1:23:45 +01:00"
 
 
-# The "Z" slot displays the timezone abbreviation for VariableTimeZones. It is fine to use
+# The "Z" slot displays the time zone abbreviation for VariableTimeZones. It is fine to use
 # the abbreviation for display purposes but not fine for parsing. This means that we
 # currently cannot parse all strings produced by format.
 f = Dates.DateFormat("yyyy-mm-ddTHH:MM:SS ZZZ")

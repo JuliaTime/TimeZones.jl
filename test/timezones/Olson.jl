@@ -112,7 +112,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
 
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 
-# Europe/Warsaw timezone has a combination of factors that requires computing
+# Europe/Warsaw time zone has a combination of factors that requires computing
 # the abbreviation to be done in a specific way.
 @test warsaw.transitions[1].zone.name == :LMT
 @test warsaw.transitions[2].zone.name == :WMT
@@ -311,7 +311,7 @@ zone["TDT-5"] = FixedTimeZone("TDT-5", -36000, 3600)
 #
 # Link  Europe/Oslo  Arctic/Longyearbyen
 
-# Make sure that that the link timezone was parsed.
+# Make sure that that the link time zone was parsed.
 zone_names = keys(tzdata["europe"][1])
 @test "Arctic/Longyearbyen" in zone_names
 

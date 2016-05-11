@@ -1,9 +1,9 @@
 Frequently Asked Questions
 ==========================
 
-## Why are the "Etc/*" timezones unsupported?
+## Why are the "Etc/*" time zones unsupported?
 
-According to [IANA](ftp://ftp.iana.org/tz/data/etcetera) the "Etc/*" timezones are only included in the Olson time zone database for "historical reasons". Furthermore the time zones offsets provided the Etc/GMT±HH can be misleading. For example the Etc/GMT+4 time zone is 4 hours **behind** UTC rather than 4 hours **ahead** as most people expect. Since TimeZones.jl already provides an easy way of constructing fixed offset time zones using `FixedTimeZone` it was decided to leave these time zones out.
+According to [IANA](ftp://ftp.iana.org/tz/data/etcetera) the "Etc/*" time zones are only included in the tz database for "historical reasons". Furthermore the time zones offsets provided the Etc/GMT±HH can be misleading. For example the Etc/GMT+4 time zone is 4 hours **behind** UTC rather than 4 hours **ahead** as most people expect. Since TimeZones.jl already provides an easy way of constructing fixed offset time zones using `FixedTimeZone` it was decided to leave these time zones out.
 
 If you truly do want to include the "Etc/*" time zones you just need to download the Olson database file and re-compile:
 
@@ -33,7 +33,7 @@ ERROR: TimeZone Europe/Warsaw does not handle dates on or after 2038-03-28T01:00
  in ZonedDateTime at ~/.julia/v0.4/TimeZones/src/timezones/types.jl:260
 ```
 
-It is important to note that since we are taking about future timezone transitions and the rules dictating these transitions are subject to change we cannot be sure that the offsets given will be accurate. If you still want to work with future `ZonedDateTime` past the default cutoff you can re-compile the `TimeZone` objects and specify the `max_year` keyword:
+It is important to note that since we are taking about future time zone transitions and the rules dictating these transitions are subject to change and may not be accurate. If you still want to work with future `ZonedDateTime` past the default cutoff you can re-compile the `TimeZone` objects and specify the `max_year` keyword:
 
 ```julia
 julia> using TimeZones

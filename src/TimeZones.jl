@@ -45,15 +45,15 @@ include("timezones/ranges.jl")
 """
     TimeZone(name::AbstractString) -> TimeZone
 
-Constructs a `TimeZone` instance based upon its `name`. A list of available timezones can be
-determined using `timezone_names()`.
+Constructs a `TimeZone` instance based upon its `name`. A list of available time zones can
+be determined using `timezone_names()`.
 
 See `FixedTimeZone(::AbstractString)` for making a custom `TimeZone` instances.
 """
 function TimeZone(name::AbstractString)
     tz_path = joinpath(COMPILED_DIR, split(name, "/")...)
 
-    isfile(tz_path) || error("Unknown timezone $name")
+    isfile(tz_path) || error("Unknown time zone $name")
 
     # Workaround for bug with Mocking.jl. Ideally should be using `do` syntax
     fp = open(tz_path, "r")

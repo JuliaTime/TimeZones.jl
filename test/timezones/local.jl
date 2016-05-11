@@ -1,7 +1,7 @@
 import TimeZones: TimeZone, localzone
 
-# Ensure that the current system's local timezone is supported. If this test fails make sure
-# to report it as an issue.
+# Ensure that the current system's local time zone is supported. If this test fails make
+# sure to report it as an issue.
 @test isa(localzone(), TimeZone)
 
 
@@ -29,7 +29,7 @@ import TimeZones: TimeZone, localzone
         @test localzone() == warsaw
     end
 
-    # Set TZDIR and use timezone unrecognized by TimeZone
+    # Set TZDIR and use time zone unrecognized by TimeZone
     @test_throws ErrorException TimeZone("Etc/UTC")
     utc = open(joinpath(TZFILE_DIR, "Etc", "UTC")) do f
         TimeZones.read_tzfile(f, "Etc/UTC")
@@ -45,7 +45,7 @@ import TimeZones: TimeZone, localzone
         @test localzone() == gmt_minus_9
     end
 
-    # Unable to locate timezone on system
+    # Unable to locate time zone on system
     withenv("TZ" => ":") do
         @test_throws SystemError localzone()
     end

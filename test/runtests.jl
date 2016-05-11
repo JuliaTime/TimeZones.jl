@@ -10,8 +10,8 @@ const TZFILE_DIR = joinpath(PKG_DIR, "test", "tzfile")
 # This should make the development/testing cycle simplier since you won't be forced to
 # re-build the cache every time you make a change.
 #
-# Note: resolving only the timezones we want is much faster than running compile which
-# recompiles all the timezones.
+# Note: resolving only the time zones we want is much faster than running compile which
+# recompiles all the time zones.
 tzdata = Dict{AbstractString,Tuple{ZoneDict,RuleDict}}()
 for name in ("australasia", "europe", "northamerica")
     tzdata[name] = tzparse(joinpath(TZDATA_DIR, name))

@@ -15,7 +15,7 @@ julia> spring + Day(1)
 2014-03-31T00:00:00+02:00
 ```
 
-Adding a day to the `ZonedDateTime` changed the date from the 30th to the 31st as expected. Looking closely however you'll notice that the timezone offset changed from +01:00 to +02:00. The reason for this change is because the timezone "Europe/Warsaw" switched from standard time (+01:00) to daylight saving time (+02:00) on the 30th. The change in the offset caused the local DateTime 2014-03-31T02:00:00 to be skipped effectively making the 30th a day which only contained 23 hours. Alternatively if we added hours we can see the difference:
+Adding a day to the `ZonedDateTime` changed the date from the 30th to the 31st as expected. Looking closely however you'll notice that the time zone offset changed from +01:00 to +02:00. The reason for this change is because the time zone "Europe/Warsaw" switched from standard time (+01:00) to daylight saving time (+02:00) on the 30th. The change in the offset caused the local DateTime 2014-03-31T02:00:00 to be skipped effectively making the 30th a day which only contained 23 hours. Alternatively if we added hours we can see the difference:
 
 ```julia
 julia> spring + Hour(24)

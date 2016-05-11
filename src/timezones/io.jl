@@ -32,7 +32,7 @@ function slotparse(slot::Slot{TimeZone},x,locale)
         return ismatch(r"[\-\+\d\:]", x) ? FixedTimeZone(x): throw(SLOTERROR)
     elseif slot.letter == 'Z'
         # Note: TimeZones without the slash aren't well defined during parsing.
-        return contains(x, "/") ? TimeZone(x) : throw(ArgumentError("Ambiguous timezone"))
+        return contains(x, "/") ? TimeZone(x) : throw(ArgumentError("Ambiguous time zone"))
     end
 end
 

@@ -1,4 +1,4 @@
-# Determine the local systems timezone
+# Determine the local system's time zone
 # Based upon Python's tzlocal https://pypi.python.org/pypi/tzlocal
 
 import Mocking: @mendable
@@ -40,10 +40,10 @@ end
                 read_tzfile(f, "local")
             end
         else
-            # Relative name matches pre-compiled timezone name
+            # Relative name matches pre-compiled time zone name
             name in validnames && return TimeZone(name)
 
-            # The system timezone directory used depends on the (g)libc version
+            # The system time zone directory used depends on the (g)libc version
             tzdirs = ["/usr/lib/zoneinfo", "/usr/share/zoneinfo"]
             haskey(ENV, "TZDIR") && unshift!(tzdirs, ENV["TZDIR"])
 
@@ -59,7 +59,7 @@ end
         end
     end
 
-    # Look for distribution specific configuration files that contain the timezone name.
+    # Look for distribution specific configuration files that contain the time zone name.
 
     filename = "/etc/timezone"
     if @mendable isfile(filename)
@@ -117,11 +117,11 @@ end
         end
     end
 
-    error("Failed to find local timezone")
+    error("Failed to find local time zone")
 end
 
 @windows_only function localzone()
-    isfile(WIN_TRANSLATION_FILE) || error("Missing Windows to POSIX timezone translation ",
+    isfile(WIN_TRANSLATION_FILE) || error("Missing Windows to POSIX time zone translation ",
         "file. Try running Pkg.build(\"TimeZones\")")
 
     translation = open(WIN_TRANSLATION_FILE, "r") do fp
@@ -133,7 +133,7 @@ end
     if haskey(translation, win_name)
         posix_name = translation[win_name]
 
-        # Translation dict includes Etc timezones which we currently are not supporting
+        # Translation dict includes Etc time zones which we currently are not supporting
         # since they are deemed historical. To ensure compatibility with the translation
         # dict we will manually convert these fixed time zones.
         if startswith(posix_name, "Etc/GMT")
@@ -151,6 +151,6 @@ end
             return TimeZone(posix_name)
         end
     else
-        error("unable to translate to POSIX timezone name from: \"$win_name\"")
+        error("unable to translate to POSIX time zone name from: \"$win_name\"")
     end
 end

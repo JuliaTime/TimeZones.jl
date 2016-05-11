@@ -22,19 +22,19 @@ const REGIONS = (
 isdir(TZDATA_DIR) || mkdir(TZDATA_DIR)
 isdir(COMPILED_DIR) || mkdir(COMPILED_DIR)
 
-info("Downloading TZ data")
+info("Downloading latest tz database")
 archive = ""
 for url in URLS
     try
         archive = download(url)
         break
     catch
-        warn("Failed to download TZ data from: $url")
+        warn("Failed to download tz database from: $url")
     end
 end
-isfile(archive) || error("Unable to download TZ data")
+isfile(archive) || error("Unable to download tz database")
 
-info("Extracting TZ data")
+info("Extracting tz database archive")
 @unix_only function extract(archive, directory, files)
     run(`tar xvf $archive --directory=$directory $files`)
 end
@@ -46,7 +46,7 @@ extract(archive, TZDATA_DIR, REGIONS)
 rm(archive)
 
 
-info("Pre-processing TimeZone data")
+info("Converting tz database into TimeZone data")
 for file in readdir(COMPILED_DIR)
     rm(joinpath(COMPILED_DIR, file), recursive=true)
 end
