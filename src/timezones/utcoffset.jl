@@ -36,35 +36,28 @@ function isequal(x::UTCOffset, y::UTCOffset)
     x == y || value(x) == value(y) && isdst(x) == isdst(y)
 end
 
-function convert{S<:AbstractString}(::Type{S}, offset::UTCOffset)
-    v = value(offset)
-    h, v = divrem(v, 3600)
-    m, s  = divrem(abs(v), 60)
-
-    if s == 0
-        return @sprintf("%+03d:%02d", h, m)
-    else
-        return @sprintf("%+03d:%02d:%02d", h, m, s)
-    end
-end
-string(offset::UTCOffset) = convert(AbstractString, offset)
-
-function format_offset(seconds::Second)
+function offset_string(seconds::Second, iso8601::Bool=false)
     v = value(seconds)
     h, v = divrem(v, 3600)
     m, s  = divrem(abs(v), 60)
 
-    if m == 0 && s == 0
-        return @sprintf("%+03d", h)
+    if !iso8601 && m == 0 && s == 0
+        return @sprintf("%+02d", h)
     elseif s == 0
         return @sprintf("%+03d:%02d", h, m)
     else
-        return @sprintf("%+03d:%02d:%02d", h, m, s)
+        return @sprintf("%+03d:%02d:%02d", h, m, s)  # Not in ISO 8601
     end
 end
+function offset_string(offset::UTCOffset, iso8601::Bool=false)
+    offset_string(offset.std + offset.dst, iso8601)
+end
+
+convert{S<:AbstractString}(::Type{S}, offset::UTCOffset) = offset_string(offset, true)
+string(offset::UTCOffset) = offset_string(offset, true)
 
 function show(io::IO, o::UTCOffset)
     # Show DST as an offset since we want to distinguish between normal daylight saving
     # time offsets and midsummer time offsets.
-    print(io, "UTC", format_offset(o.std), "/", format_offset(o.dst))
+    print(io, "UTC", offset_string(o.std), "/", offset_string(o.dst))
 end
