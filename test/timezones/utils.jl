@@ -65,7 +65,7 @@ typealias I Integer
 
 # Currently demonstrates an issue when the type given doesn't match value
 # @test isequal(
-#     TimeZones.flexible(
+#     optional(
 #         :(f(a::Float64=1, b) = nothing)
 #     ),
 #     [

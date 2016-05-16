@@ -1,21 +1,21 @@
 import Base: +, -
 
-(+)(x::DateTime,y::Offset) = x + Second(y)
-(-)(x::DateTime,y::Offset) = x - Second(y)
+(+)(x::DateTime, y::Offset) = x + Second(y)
+(-)(x::DateTime, y::Offset) = x - Second(y)
 
 # ZonedDateTime arithmetic
 (+)(x::ZonedDateTime) = x
-(-)(x::ZonedDateTime,y::ZonedDateTime) = x.utc_datetime - y.utc_datetime
+(-)(x::ZonedDateTime, y::ZonedDateTime) = x.utc_datetime - y.utc_datetime
 
-function (+)(dt::ZonedDateTime,p::DatePeriod)
-    return ZonedDateTime(localtime(dt) + p, dt.timezone)
+function (+)(zdt::ZonedDateTime, p::DatePeriod)
+    return ZonedDateTime(localtime(zdt) + p, zdt.timezone)
 end
-function (+)(dt::ZonedDateTime,p::TimePeriod)
-    return ZonedDateTime(dt.utc_datetime + p, dt.timezone; from_utc=true)
+function (+)(zdt::ZonedDateTime, p::TimePeriod)
+    return ZonedDateTime(zdt.utc_datetime + p, zdt.timezone; from_utc=true)
 end
-function (-)(dt::ZonedDateTime,p::DatePeriod)
-    return ZonedDateTime(localtime(dt) - p, dt.timezone)
+function (-)(zdt::ZonedDateTime, p::DatePeriod)
+    return ZonedDateTime(localtime(zdt) - p, zdt.timezone)
 end
-function (-)(dt::ZonedDateTime,p::TimePeriod)
-    return ZonedDateTime(dt.utc_datetime - p, dt.timezone; from_utc=true)
+function (-)(zdt::ZonedDateTime, p::TimePeriod)
+    return ZonedDateTime(zdt.utc_datetime - p, zdt.timezone; from_utc=true)
 end
