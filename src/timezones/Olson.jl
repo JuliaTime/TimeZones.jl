@@ -130,6 +130,21 @@ function asutc(dt::DateTime, flag::Char, offset::Time, save::Time)
     end
 end
 
+function abbr_string(format::AbstractString, save::Time, letter::AbstractString="")
+    # Note: using @sprintf would make sense but unfortunately it doesn't accept a
+    # format as a variable.
+    abbr = replace(format,"%s",letter,1)
+
+    # If the abbreviation contains a slash then the first string is the abbreviation
+    # for standard time and the second is the abbreviation for daylight saving time.
+    abbrs = split(abbr, '/')
+    if length(abbrs) > 1
+        abbr = save == ZERO ? first(abbrs) : last(abbrs)
+    end
+
+    return abbr
+end
+
 function ruleparse(from, to, rule_type, month, on, at, save, letter)
     from_int = Nullable{Int}(from == "min" ? nothing : parse(Int, from))
     to_int = Nullable{Int}(to == "only" ? from_int : to == "max" ? nothing : parse(Int, to))
@@ -329,7 +344,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
 
         if rule_name == ""
             save = zone.save
-            abbr = format
+            abbr = abbr_string(format, save)
 
             if debug
                 rule_name = "\"\""  # Just for display purposes
@@ -374,10 +389,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
                 save = rule.save
                 letter = rule.letter
             end
-
-            # Note: using @sprintf would make sense but unfortunately it doesn't accept a
-            # format as a variable.
-            abbr = replace(format,"%s",letter,1)
+            abbr = abbr_string(format, save, letter)
 
             debug && println("Zone Start $rule_name, $(zone.gmtoffset), $save, $(start_utc)u, $(until)$(zone.until_flag), $abbr")
 
@@ -407,7 +419,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
                 # Need to be careful when we update save/letter.
                 save = rule.save
                 letter = rule.letter
-                abbr = replace(format,"%s",letter,1)
+                abbr = abbr_string(format, save, letter)
 
                 if debug
                     status = dt_utc >= start_utc ? "Rule" : "Skip"

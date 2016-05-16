@@ -229,6 +229,27 @@ zone["CEST"] = FixedTimeZone("CEST", 3600, 3600)
 @test madrid.transitions[48] == Transition(DateTime(1979,4,1,1), zone["CEST"])
 
 
+# Zone America/Anchorage contains the following properties which make it good for testing:
+# - Uses a format containing a slash which indicates the abbreviations for STD/DST
+#   Alternatives include: Europe/London, Europe/Dublin, and Europe/Moscow.
+# - Observed war/peace time
+anchorage = resolve("America/Anchorage", tzdata["northamerica"]...)
+
+zone = Dict{AbstractString,FixedTimeZone}()
+zone["CAT"] = FixedTimeZone("CAT", -36000, 0)
+zone["CAWT"] = FixedTimeZone("CAWT", -36000, 3600)
+zone["CAPT"] = FixedTimeZone("CAPT", -36000, 3600)
+zone["AHST"] = FixedTimeZone("AHST", -36000, 0)
+zone["AHDT"] = FixedTimeZone("AHDT", -36000, 3600)
+
+@test anchorage.transitions[3] == Transition(DateTime(1900,8,20,21,59,36), zone["CAT"])
+@test anchorage.transitions[4] == Transition(DateTime(1942,2,9,12), zone["CAWT"])
+@test anchorage.transitions[5] == Transition(DateTime(1945,8,14,23), zone["CAPT"])
+@test anchorage.transitions[6] == Transition(DateTime(1945,9,30,11), zone["CAT"])
+@test anchorage.transitions[7] == Transition(DateTime(1967,4,1,10), zone["AHST"])
+@test anchorage.transitions[8] == Transition(DateTime(1969,4,27,12), zone["AHDT"])
+
+
 # Fake Zone Pacific/Cutoff contains the following properties which make it good for testing:
 # - Having a single transition on the first year allows us to test the special case where we
 #   need to include a cutoff while only having a single transition
