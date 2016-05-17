@@ -2,20 +2,24 @@ import Base: string, show, showcompact
 import Base.Dates: value, DateFormat, Slot, slotparse, slotformat, SLOT_RULE
 
 string(tz::TimeZone) = string(tz.name)
+string(tz::FixedTimeZone) = (s = string(tz.name); isempty(s) ? "UTC" * string(tz.offset) : s)
 string(dt::ZonedDateTime) = string(localtime(dt), string(dt.zone.offset))
 
-showcompact(io::IO, tz::TimeZone) = print(io, string(tz.name))
+showcompact(io::IO, tz::TimeZone) = print(io, string(tz))
 
 function show(io::IO, t::Transition)
+    name_str = string(t.zone.name)
     print(io, t.utc_datetime, " ")
     show(io, t.zone.offset)
-    print(io, " (", t.zone.name, ")")
+    !isempty(name_str) && print(io, " (", name_str, ")")
 end
 
 function show(io::IO, tz::FixedTimeZone)
     offset_str = "UTC" * offset_string(tz.offset, true)  # Use ISO 8601 for comparision
     name_str = string(tz.name)
-    if name_str != offset_str && !(value(tz.offset) == 0 && name_str in ("UTC", "GMT"))
+    if isempty(name_str)
+        print(io, offset_str)
+    elseif name_str != offset_str && !(value(tz.offset) == 0 && name_str in ("UTC", "GMT"))
         print(io, name_str, " (UTC", offset_string(tz.offset), ")")
     else
         print(io, name_str)

@@ -1,3 +1,4 @@
+null = FixedTimeZone("", 10800)
 fixed = FixedTimeZone("UTC+01:00")
 est = FixedTimeZone("EST", -18000)
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
@@ -7,6 +8,8 @@ dt = DateTime(1942,12,25,1,23,45)
 buffer = IOBuffer()
 
 # TimeZones as a string
+@test string(null) == "UTC+03:00"
+@test string(null.offset) == "+03:00"
 @test string(fixed) == "UTC+01:00"
 @test string(fixed.offset) == "+01:00"
 @test string(est) == "EST"
@@ -14,6 +17,8 @@ buffer = IOBuffer()
 @test string(warsaw) == "Europe/Warsaw"
 @test string(apia) == "Pacific/Apia"
 
+showcompact(buffer, null)
+@test takebuf_string(buffer) == "UTC+03:00"
 showcompact(buffer, fixed)
 @test takebuf_string(buffer) == "UTC+01:00"
 showcompact(buffer, est)
@@ -23,6 +28,8 @@ showcompact(buffer, warsaw)
 showcompact(buffer, apia)
 @test takebuf_string(buffer) == "Pacific/Apia"
 
+show(buffer, null)
+@test takebuf_string(buffer) == "UTC+03:00"
 show(buffer, fixed)
 @test takebuf_string(buffer) == "UTC+01:00"
 show(buffer, est)

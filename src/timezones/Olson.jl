@@ -142,6 +142,12 @@ function abbr_string(format::AbstractString, save::Time, letter::AbstractString=
         abbr = save == ZERO ? first(abbrs) : last(abbrs)
     end
 
+    # Some time zones (e.g. "Europe/Ulyanovsk") do not have abbreviations for the various
+    # rules and instead hardcode the offset as the name.
+    if ismatch(r"[+-]\d{2}", abbr)
+        abbr = ""
+    end
+
     return abbr
 end
 
@@ -206,6 +212,7 @@ function zoneparse(gmtoff, rules, format, until="")
     offset < MIN_GMT_OFFSET && warn("Discovered offset $offset less than the expected min $MIN_GMT_OFFSET")
     offset > MAX_GMT_OFFSET && warn("Discovered offset $offset larger than the expected max $MAX_GMT_OFFSET")
 
+    # "zzz" represents a NULL entry
     format = format == "zzz" ? "" : format
 
     # Parse the date the line rule applies up to
