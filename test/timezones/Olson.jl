@@ -254,6 +254,13 @@ zone["AHDT"] = FixedTimeZone("AHDT", -36000, 3600)
 @test anchorage.transitions[8] == Transition(DateTime(1969,4,27,12), zone["AHDT"])
 
 
+# Zone Europe/Ulyanovsk contains the following properties which make it good for testing:
+# - With the exception of LMT all Zone and Rule abbreviations are UTC offsets which should
+#   be treated as NULL.
+ulyanovsk = resolve("Europe/Ulyanovsk", tzdata["europe"]...)
+@test all(t -> string(t.zone.name) == "", ulyanovsk.transitions[2:end])
+
+
 # Fake Zone Pacific/Cutoff contains the following properties which make it good for testing:
 # - Having a single transition on the first year allows us to test the special case where we
 #   need to include a cutoff while only having a single transition
