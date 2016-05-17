@@ -1,9 +1,12 @@
-import Base: string, show, showcompact
+import Base: print, show, showcompact
 import Base.Dates: value, DateFormat, Slot, slotparse, slotformat, SLOT_RULE
 
-string(tz::TimeZone) = string(tz.name)
-string(tz::FixedTimeZone) = (s = string(tz.name); isempty(s) ? "UTC" * string(tz.offset) : s)
-string(dt::ZonedDateTime) = string(localtime(dt), string(dt.zone.offset))
+print(io::IO, tz::TimeZone) = print(io, tz.name)
+function print(io::IO, tz::FixedTimeZone)
+    name = string(tz.name)
+    isempty(name) ? print(io, "UTC", tz.offset) : print(io, name)
+end
+print(io::IO, zdt::ZonedDateTime) = print(io, localtime(zdt), zdt.zone.offset)
 
 showcompact(io::IO, tz::TimeZone) = print(io, string(tz))
 

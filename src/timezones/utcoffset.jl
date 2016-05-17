@@ -1,4 +1,4 @@
-import Base: +, -, isequal, isless, convert, string, show
+import Base: +, -, isequal, isless, print, show
 import Base.Dates: AbstractTime, Second, value
 
 # Note: The Olson Database rounds offset precision to the nearest second
@@ -54,9 +54,7 @@ function offset_string(offset::UTCOffset, iso8601::Bool=false)
     offset_string(offset.std + offset.dst, iso8601)
 end
 
-convert{S<:AbstractString}(::Type{S}, offset::UTCOffset) = offset_string(offset, true)
-string(offset::UTCOffset) = offset_string(offset, true)
-
+print(io::IO, o::UTCOffset) = print(io, offset_string(o, true))
 function show(io::IO, o::UTCOffset)
     # Show DST as an offset since we want to distinguish between normal daylight saving
     # time offsets and midsummer time offsets.

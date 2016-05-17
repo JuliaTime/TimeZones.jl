@@ -57,9 +57,10 @@ show(buffer, FixedTimeZone("FOO", 0))
 @test takebuf_string(buffer) == "FOO (UTC+0)"
 
 # ZonedDateTime as a string
-@test string(ZonedDateTime(dt, warsaw)) == "1942-12-25T01:23:45+01:00"
+zdt = ZonedDateTime(dt, warsaw)
+@test string(zdt) == "1942-12-25T01:23:45+01:00"
 
-show(buffer, ZonedDateTime(dt, warsaw))
+show(buffer, zdt)
 @test takebuf_string(buffer) == "1942-12-25T01:23:45+01:00"
 
 # ZonedDateTime parsing.
