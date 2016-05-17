@@ -152,6 +152,7 @@ zone["EEST"] = FixedTimeZone("EEST", 7200, 3600)
 # Zone Pacific/Honolulu contains the following properties which make it good for testing:
 # - Zone's contain save in rules field
 # - Zone abbreviation redefined: HST
+# - Is not cutoff
 
 honolulu = resolve("Pacific/Honolulu", tzdata["northamerica"]...)
 
@@ -168,6 +169,9 @@ zone["HST_NEW"] = FixedTimeZone("HST", -36000, 0)
 @test honolulu.transitions[5] == Transition(DateTime(1942,2,9,12,30), zone["HDT"])
 @test honolulu.transitions[6] == Transition(DateTime(1945,9,30,11,30), zone["HST"])
 @test honolulu.transitions[7] == Transition(DateTime(1947,6,8,12,30), zone["HST_NEW"])
+
+@test length(honolulu.transitions) == 7
+@test isnull(honolulu.cutoff)
 
 
 # Zone Pacific/Apia contains the following properties which make it good for testing:

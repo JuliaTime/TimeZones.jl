@@ -3,19 +3,20 @@ fixed = FixedTimeZone("UTC+01:00")
 est = FixedTimeZone("EST", -18000)
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 apia = resolve("Pacific/Apia", tzdata["australasia"]...)
+honolulu = resolve("Pacific/Honolulu", tzdata["northamerica"]...)  # Uses cutoff
+ulyanovsk = resolve("Europe/Ulyanovsk", tzdata["europe"]...)  # No named abbreviations
 dt = DateTime(1942,12,25,1,23,45)
 
 buffer = IOBuffer()
 
 # TimeZones as a string
 @test string(null) == "UTC+03:00"
-@test string(null.offset) == "+03:00"
 @test string(fixed) == "UTC+01:00"
-@test string(fixed.offset) == "+01:00"
 @test string(est) == "EST"
-@test string(est.offset) == "-05:00"
 @test string(warsaw) == "Europe/Warsaw"
 @test string(apia) == "Pacific/Apia"
+@test string(honolulu) == "Pacific/Honolulu"
+@test string(ulyanovsk) == "Europe/Ulyanovsk"
 
 showcompact(buffer, null)
 @test takebuf_string(buffer) == "UTC+03:00"
@@ -27,6 +28,10 @@ showcompact(buffer, warsaw)
 @test takebuf_string(buffer) == "Europe/Warsaw"
 showcompact(buffer, apia)
 @test takebuf_string(buffer) == "Pacific/Apia"
+showcompact(buffer, honolulu)
+@test takebuf_string(buffer) == "Pacific/Honolulu"
+showcompact(buffer, ulyanovsk)
+@test takebuf_string(buffer) == "Europe/Ulyanovsk"
 
 show(buffer, null)
 @test takebuf_string(buffer) == "UTC+03:00"
@@ -38,7 +43,10 @@ show(buffer, warsaw)
 @test takebuf_string(buffer) == "Europe/Warsaw (UTC+1/UTC+2)"
 show(buffer, apia)
 @test takebuf_string(buffer) == "Pacific/Apia (UTC+13/UTC+14)"
-
+show(buffer, honolulu)
+@test takebuf_string(buffer) == "Pacific/Honolulu (UTC-10)"
+show(buffer, ulyanovsk)
+@test takebuf_string(buffer) == "Europe/Ulyanovsk (UTC+4)"
 
 # UTC and GMT are special cases
 show(buffer, FixedTimeZone("UTC"))
@@ -73,10 +81,12 @@ show(buffer, ZonedDateTime(dt, warsaw))
 f = "yyyy/m/d H:M:S ZZZ"
 @test Dates.format(ZonedDateTime(dt, fixed), f) == "1942/12/25 1:23:45 UTC+01:00"
 @test Dates.format(ZonedDateTime(dt, warsaw), f) == "1942/12/25 1:23:45 CET"
+@test Dates.format(ZonedDateTime(dt, ulyanovsk), f) == "1942/12/25 1:23:45 UTC+04:00"
 
 f = "yyyy/m/d H:M:S zzz"
 @test Dates.format(ZonedDateTime(dt, fixed), f) == "1942/12/25 1:23:45 +01:00"
 @test Dates.format(ZonedDateTime(dt, warsaw), f) == "1942/12/25 1:23:45 +01:00"
+@test Dates.format(ZonedDateTime(dt, ulyanovsk), f) == "1942/12/25 1:23:45 +04:00"
 
 
 # The "Z" slot displays the time zone abbreviation for VariableTimeZones. It is fine to use
