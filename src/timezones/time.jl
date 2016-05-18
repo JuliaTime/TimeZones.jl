@@ -1,10 +1,13 @@
+import Base: convert, promote_rule, string, print, show
+import Base.Dates: value, toms
+
 # Convenience type for working with HH:MM:SS.
 immutable Time <: TimePeriod
     seconds::Int
 end
 const ZERO = Time(0)
 
-function Time(hour::Int, minute::Int, second::Int)
+function Time(hour::Integer, minute::Integer, second::Integer)
     Time(hour * 3600 + minute * 60 + second)
 end
 
@@ -31,36 +34,35 @@ function Time(s::AbstractString)
 end
 
 # TimePeriod methods
-Base.Dates.value(t::Time) = t.seconds
-Base.Dates.toms(t::Time) = t.seconds * 1000
+value(t::Time) = t.seconds
+toms(t::Time) = value(t) * 1000
 
-toseconds(t::Time) = t.seconds
-hour(t::Time) = div(toseconds(t), 3600)
-minute(t::Time) = rem(div(toseconds(t), 60), 60)
-second(t::Time) = rem(toseconds(t), 60)
+hour(t::Time) = div(value(t), 3600)
+minute(t::Time) = rem(div(value(t), 60), 60)
+second(t::Time) = rem(value(t), 60)
 
 function hourminutesecond(t::Time)
-    h, r = divrem(toseconds(t), 3600)
+    h, r = divrem(value(t), 3600)
     m, s = divrem(r, 60)
     return h, m, s
 end
 
-Base.convert(::Type{Second}, t::Time) = Second(toseconds(t))
-Base.convert(::Type{Millisecond}, t::Time) = Millisecond(toseconds(t) * 1000)
-Base.promote_rule{P<:Union{Week,Day,Hour,Minute,Second}}(::Type{P}, ::Type{Time}) = Second
-Base.promote_rule(::Type{Millisecond}, ::Type{Time}) = Millisecond
+convert(::Type{Second}, t::Time) = Second(value(t))
+convert(::Type{Millisecond}, t::Time) = Millisecond(value(t) * 1000)
+promote_rule{P<:Union{Week,Day,Hour,Minute,Second}}(::Type{P}, ::Type{Time}) = Second
+promote_rule(::Type{Millisecond}, ::Type{Time}) = Millisecond
 
 # Should be defined in Base.Dates
 Base.isless(x::Period, y::Period) = isless(promote(x,y)...)
 
 # https://en.wikipedia.org/wiki/ISO_8601#Times
-function Base.string(t::Time)
-    neg = toseconds(t) < 0 ? "-" : ""
+function string(t::Time)
+    neg = value(t) < 0 ? "-" : ""
     h, m, s = map(abs, hourminutesecond(t))
     @sprintf("%s%02d:%02d:%02d", neg, h, m, s)
 end
-
-Base.show(io::IO, t::Time) = print(io, string(t))
+print(io::IO, t::Time) = print(io, string(t))
+show(io::IO, t::Time) = print(io, t)
 
 
 # min/max offsets across all zones and all time.

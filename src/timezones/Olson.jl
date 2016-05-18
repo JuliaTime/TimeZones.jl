@@ -3,7 +3,7 @@ module Olson
 using Base.Dates
 
 import ..TimeZones: TZDATA_DIR, COMPILED_DIR, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET,
-    MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET, Time, toseconds
+    MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET, Time
 import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition, Time
 
 # Zone type maps to an Olson Timezone database entity
@@ -358,7 +358,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
                 println("Zone Start $rule_name, $(zone.gmtoffset), $save, $(start_utc)u, $(until)$(zone.until_flag), $abbr")
             end
 
-            tz = FixedTimeZone(abbr, toseconds(offset), toseconds(save))
+            tz = FixedTimeZone(abbr, Second(offset), Second(save))
             if isempty(transitions) || last(transitions).zone != tz
                 push!(transitions, Transition(start_utc, tz))
             end
@@ -400,7 +400,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
 
             debug && println("Zone Start $rule_name, $(zone.gmtoffset), $save, $(start_utc)u, $(until)$(zone.until_flag), $abbr")
 
-            tz = FixedTimeZone(abbr, toseconds(offset), toseconds(save))
+            tz = FixedTimeZone(abbr, Second(offset), Second(save))
             if isempty(transitions) || last(transitions).zone != tz
                 push!(transitions, Transition(start_utc, tz))
             end
@@ -436,7 +436,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
                 # TODO: Is start_utc inclusive or exclusive?
                 dt_utc >= start_utc || continue
 
-                tz = FixedTimeZone(abbr, toseconds(offset), toseconds(save))
+                tz = FixedTimeZone(abbr, Second(offset), Second(save))
 
                 # TODO: We can maybe reduce memory usage by reusing the same
                 # FixedTimeZone object.

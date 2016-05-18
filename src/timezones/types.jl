@@ -35,12 +35,16 @@ immutable FixedTimeZone <: TimeZone
 end
 
 """
-    FixedTimeZone(name::AbstractString, utc_offset::Integer, dst_offset::Integer=0) -> FixedTimeZone
+    FixedTimeZone(name, utc_offset, dst_offset=0) -> FixedTimeZone
 
 Constructs a `FixedTimeZone` with the given `name`, UTC offset (in seconds), and DST offset
 (in seconds).
 """
 function FixedTimeZone(name::AbstractString, utc_offset::Integer, dst_offset::Integer=0)
+    FixedTimeZone(Symbol(name), UTCOffset(utc_offset, dst_offset))
+end
+
+function FixedTimeZone(name::AbstractString, utc_offset::Second, dst_offset::Second=Second(0))
     FixedTimeZone(Symbol(name), UTCOffset(utc_offset, dst_offset))
 end
 

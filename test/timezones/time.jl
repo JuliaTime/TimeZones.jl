@@ -1,27 +1,27 @@
-import TimeZones: Time, hour, minute, second, toseconds, hourminutesecond
+import TimeZones: Time, value, hour, minute, second, hourminutesecond
 
 # Time seconds constructor
 t = Time(5025)
 @test hour(t) == 1
 @test minute(t) == 23
 @test second(t) == 45
-@test toseconds(t) == 5025
+@test value(t) == 5025
 @test hourminutesecond(t) == (1, 23, 45)
 
 t = Time(-5025)
 @test hour(t) == -1
 @test minute(t) == -23
 @test second(t) == -45
-@test toseconds(t) == -5025
+@test value(t) == -5025
 @test hourminutesecond(t) == (-1, -23, -45)
 
 t = Time(0,61,61)
 @test t == Time(1,2,1)
-@test toseconds(t) == 3721
+@test value(t) == 3721
 
 t = Time(1,-23,-45)
 @test t == Time(0,36,15)
-@test toseconds(t) == 2175
+@test value(t) == 2175
 
 # Time String constructor
 @test Time("1") == Time(1,0,0)  # See Pacific/Apia rules for an example.
@@ -46,6 +46,9 @@ t = Time(1,-23,-45)
 @test Time(1,23,45) - Time(1,23,45) == Time(0)
 
 # Time show function
+t = Time(1,23,45)
 buffer = IOBuffer()
-show(buffer, Time(1,23,45))
+print(buffer, t)
+@test takebuf_string(buffer) == "01:23:45"
+show(buffer, t)
 @test takebuf_string(buffer) == "01:23:45"
