@@ -57,7 +57,7 @@ See `FixedTimeZone(::AbstractString)` for making a custom `TimeZone` instances.
 function TimeZone(name::AbstractString)
     tz_path = joinpath(COMPILED_DIR, split(name, "/")...)
 
-    isfile(tz_path) || error("Unknown time zone $name")
+    isfile(tz_path) || throw(ArgumentError("Unknown time zone named $name"))
 
     # Workaround for bug with Mocking.jl. Ideally should be using `do` syntax
     fp = open(tz_path, "r")

@@ -66,10 +66,25 @@ const ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.szzz")
 
 function slotparse(slot::Slot{TimeZone},x,locale)
     if slot.letter == 'z'
-        return ismatch(r"[\-\+\d\:]", x) ? FixedTimeZone(x): throw(SLOTERROR)
+        # TODO: Should 'z' only parse numeric UTC offsets? e.g. disallow "UTC-7"
+        if ismatch(r"\d", x)
+            return FixedTimeZone(x)
+        else
+            throw(ArgumentError("Time zone offset contains no digits"))
+        end
     elseif slot.letter == 'Z'
-        # Note: TimeZones without the slash aren't well defined during parsing.
-        return contains(x, "/") ? TimeZone(x) : throw(ArgumentError("Ambiguous time zone"))
+        # First attempt to create a timezone from the string. An error will be thrown if the
+        # time zone is unrecognized.
+        tz = TimeZone(x)
+
+        # If the time zone is recognized make sure that it is well-defined. For our purposes
+        # we'll treat all abbreviations except for UTC and GMT as ambiguous.
+        # e.g. "MST": "Mountain Standard Time" (UTC-7) or "Moscow Summer Time" (UTC+3:31).
+        if contains(x, "/") || x in ("UTC", "GMT")
+            return tz
+        else
+            throw(ArgumentError("Time zone is ambiguous"))
+        end
     end
 end
 

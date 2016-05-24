@@ -63,6 +63,20 @@ zdt = ZonedDateTime(dt, warsaw)
 show(buffer, zdt)
 @test takebuf_string(buffer) == "1942-12-25T01:23:45+01:00"
 
+
+# TimeZone parsing
+df = Dates.DateFormat("z")
+@test Dates.parse("+0100", df) == Any[FixedTimeZone("+01:00")]
+@test_throws ArgumentError Dates.parse("EST", df)
+@test_throws ArgumentError Dates.parse("UTC", df)
+@test_throws ArgumentError Dates.parse("Europe/Warsaw", df)
+
+df = Dates.DateFormat("Z")
+@test_throws ArgumentError Dates.parse("+0100", df)
+@test_throws ArgumentError Dates.parse("EST", df)
+@test Dates.parse("UTC", df) == Any[FixedTimeZone("UTC")]
+@test Dates.parse("Europe/Warsaw", df) == Any[warsaw]
+
 # ZonedDateTime parsing.
 # Note: uses compiled time zone information. If these tests are failing try to rebuild
 # the TimeZones package.

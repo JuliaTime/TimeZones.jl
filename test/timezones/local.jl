@@ -30,7 +30,7 @@ import TimeZones: TimeZone, localzone
     end
 
     # Set TZDIR and use time zone unrecognized by TimeZone
-    @test_throws ErrorException TimeZone("Etc/UTC")
+    @test_throws ArgumentError TimeZone("Etc/UTC")
     utc = open(joinpath(TZFILE_DIR, "Etc", "UTC")) do f
         TimeZones.read_tzfile(f, "Etc/UTC")
     end
@@ -39,7 +39,7 @@ import TimeZones: TimeZone, localzone
     end
 
     # Use system installed files
-    @test_throws ErrorException TimeZone("Etc/GMT-9")
+    @test_throws ArgumentError TimeZone("Etc/GMT-9")
     gmt_minus_9 = FixedTimeZone("Etc/GMT-9", 9 * 3600)
     withenv("TZ" => ":Etc/GMT-9") do
         @test localzone() == gmt_minus_9
