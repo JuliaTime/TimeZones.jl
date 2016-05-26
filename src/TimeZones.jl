@@ -31,6 +31,14 @@ const COMPILED_DIR = joinpath(PKG_DIR, "deps", "compiled")
     const WIN_TRANSLATION_FILE = joinpath(PKG_DIR, "deps", "windows_to_posix")
 end
 
+function __init__()
+    # SLOT_RULE extension needs to happen everytime the module is loaded (issue #24)
+    Base.Dates.SLOT_RULE['z'] = TimeZone
+    Base.Dates.SLOT_RULE['Z'] = TimeZone
+
+    global const ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.szzz")
+end
+
 include("timezones/utils.jl")
 include("timezones/time.jl")
 include("timezones/utcoffset.jl")

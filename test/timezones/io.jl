@@ -66,12 +66,14 @@ show(buffer, zdt)
 
 # TimeZone parsing
 df = Dates.DateFormat("z")
+@test !isempty(df.slots)  # Ensure that 'z' slot character is recognized (issue #24)
 @test Dates.parse("+0100", df) == Any[FixedTimeZone("+01:00")]
 @test_throws ArgumentError Dates.parse("EST", df)
 @test_throws ArgumentError Dates.parse("UTC", df)
 @test_throws ArgumentError Dates.parse("Europe/Warsaw", df)
 
 df = Dates.DateFormat("Z")
+@test !isempty(df.slots)  # Ensure that 'Z' slot character is recognized (issue #24)
 @test_throws ArgumentError Dates.parse("+0100", df)
 @test_throws ArgumentError Dates.parse("EST", df)
 @test Dates.parse("UTC", df) == Any[FixedTimeZone("UTC")]

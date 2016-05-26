@@ -1,5 +1,5 @@
 import Base: print, show, showcompact
-import Base.Dates: value, DateFormat, Slot, slotparse, slotformat, SLOT_RULE
+import Base.Dates: value, DateFormat, Slot, slotparse, slotformat
 
 print(io::IO, tz::TimeZone) = print(io, tz.name)
 function print(io::IO, tz::FixedTimeZone)
@@ -56,14 +56,7 @@ end
 
 show(io::IO,dt::ZonedDateTime) = print(io, string(dt))
 
-# NOTE: The changes below require Base.Dates to be updated to include slotrule.
-
 # DateTime Parsing
-SLOT_RULE['z'] = TimeZone
-SLOT_RULE['Z'] = TimeZone
-
-const ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.szzz")
-
 function slotparse(slot::Slot{TimeZone},x,locale)
     if slot.letter == 'z'
         # TODO: Should 'z' only parse numeric UTC offsets? e.g. disallow "UTC-7"
@@ -96,5 +89,7 @@ function slotformat(slot::Slot{TimeZone},zdt::ZonedDateTime,locale)
     end
 end
 
+# Note: ISOZonedDateTimeFormat is defined in the module __init__ which means that this
+# function can not be called from within this module. TODO: Ignore linting for this line
 ZonedDateTime(dt::AbstractString,df::DateFormat=ISOZonedDateTimeFormat) = ZonedDateTime(Base.Dates.parse(dt,df)...)
 ZonedDateTime(dt::AbstractString,format::AbstractString;locale::AbstractString="english") = ZonedDateTime(dt,DateFormat(format,locale))
