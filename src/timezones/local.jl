@@ -1,8 +1,16 @@
 # Determine the local system's time zone
 # Based upon Python's tzlocal https://pypi.python.org/pypi/tzlocal
 
-import Mocking: @mendable
+
 import Compat: readstring
+
+if VERSION < v"0.5-"
+    import Mocking: @mendable
+else
+    macro mendable(expr)
+        esc(expr)
+    end
+end
 
 """
     localzone() -> TimeZone

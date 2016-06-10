@@ -30,7 +30,7 @@ include("timezones/adjusters.jl")
 include("timezones/conversions.jl")
 include("timezones/ranges.jl")
 include("timezones/local.jl")
-# include("timezones/local_mocking.jl")
+VERSION < v"0.5-" && include("timezones/local_mocking.jl")
 include("timezones/discovery.jl")
 include("TimeZones.jl")
 
