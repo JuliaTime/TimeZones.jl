@@ -1,7 +1,7 @@
 module TimeZones
 
 using Base.Dates
-import Base.Dates: AbstractTime, days, hour, minute, second, millisecond
+import Base.Dates: TimeZone, AbstractTime, days, hour, minute, second, millisecond
 
 export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime, DateTime,
     TimeError, AmbiguousTimeError, NonExistentTimeError, UnhandledTimeError,
@@ -26,6 +26,7 @@ export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime, DateTime,
 const PKG_DIR = normpath(joinpath(dirname(@__FILE__), ".."))
 const TZDATA_DIR = joinpath(PKG_DIR, "deps", "tzdata")
 const COMPILED_DIR = joinpath(PKG_DIR, "deps", "compiled")
+const TIME_ZONES = Dict{AbstractString,TimeZone}()
 
 @windows_only begin
     const WIN_TRANSLATION_FILE = joinpath(PKG_DIR, "deps", "windows_to_posix")
@@ -63,16 +64,13 @@ be determined using `timezone_names()`.
 See `FixedTimeZone(::AbstractString)` for making a custom `TimeZone` instances.
 """
 function TimeZone(name::AbstractString)
-    tz_path = joinpath(COMPILED_DIR, split(name, "/")...)
+    return get!(TIME_ZONES, name) do
+        tz_path = joinpath(COMPILED_DIR, split(name, "/")...)
+        isfile(tz_path) || throw(ArgumentError("Unknown time zone named $name"))
 
-    isfile(tz_path) || throw(ArgumentError("Unknown time zone named $name"))
-
-    # Workaround for bug with Mocking.jl. Ideally should be using `do` syntax
-    fp = open(tz_path, "r")
-    try
-        return deserialize(fp)
-    finally
-        close(fp)
+        open(tz_path, "r") do fp
+            return deserialize(fp)
+        end
     end
 end
 
