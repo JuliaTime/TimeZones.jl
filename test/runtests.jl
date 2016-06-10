@@ -33,6 +33,3 @@ include("timezones/local.jl")
 VERSION < v"0.5-" && include("timezones/local_mocking.jl")
 include("timezones/discovery.jl")
 include("TimeZones.jl")
-
-# TODO: Doesn't seem appropriate to treat performance tests as test cases
-# include("performance.jl")
