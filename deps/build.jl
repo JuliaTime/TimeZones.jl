@@ -1,8 +1,11 @@
 import TimeZones: TZDATA_DIR, COMPILED_DIR
 import TimeZones.Olson: compile
+import Compat: @static, is_windows
 
-@windows_only import TimeZones: WIN_TRANSLATION_FILE
-@windows_only using LightXML
+if is_windows()
+    import TimeZones: WIN_TRANSLATION_FILE
+    using LightXML
+end
 
 # Various sources from which the latest compressed TZ data can be retrieved.
 # Note: HTTP sources are preferable as they tend to work behind firewalls.
@@ -35,11 +38,12 @@ end
 isfile(archive) || error("Unable to download tz database")
 
 info("Extracting tz database archive")
-@unix_only function extract(archive, directory, files)
-    run(`tar xvf $archive --directory=$directory $files`)
-end
-@windows_only function extract(archive, directory, files)
-    run(pipeline(`7z x $archive -y -so`, `7z x -si -y -ttar -o$directory $files`))
+function extract(archive, directory, files)
+    @static if is_windows()
+        run(pipeline(`7z x $archive -y -so`, `7z x -si -y -ttar -o$directory $files`))
+    else
+        run(`tar xvf $archive --directory=$directory $files`)
+    end
 end
 
 extract(archive, TZDATA_DIR, REGIONS)
@@ -52,7 +56,7 @@ for file in readdir(COMPILED_DIR)
 end
 compile(TZDATA_DIR, COMPILED_DIR)
 
-@windows_only begin
+if is_windows()
     translation_dir = dirname(WIN_TRANSLATION_FILE)
     isdir(translation_dir) || mkdir(translation_dir)
 
@@ -74,7 +78,7 @@ compile(TZDATA_DIR, COMPILED_DIR)
     map_timezones = find_element(windows_zones, "mapTimezones")
     map_zones = get_elements_by_tagname(map_timezones, "mapZone")
 
-    # TODO: Eliminate the Etc/* POSIX names here? See @windows_only localzone
+    # TODO: Eliminate the Etc/* POSIX names here? See Windows section of `localzone`
 
     # Dictionary to store the windows to timezone conversions
     translation = Dict{AbstractString,AbstractString}()

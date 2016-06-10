@@ -1,11 +1,12 @@
 import TimeZones: TimeZone, localzone
+import Compat: is_linux
 
 # Ensure that the current system's local time zone is supported. If this test fails make
 # sure to report it as an issue.
 @test isa(localzone(), TimeZone)
 
 
-@linux_only begin
+if is_linux()
     # Bad TZ environmental variables
     withenv("TZ" => "") do
         @test_throws ErrorException localzone()

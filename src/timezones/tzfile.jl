@@ -2,6 +2,7 @@
 # - http://man7.org/linux/man-pages/man5/tzfile.5.html
 # - ftp://ftp.iana.org/tz/code/tzfile.5.txt
 
+import Compat
 import Compat: read
 
 const TZFILE_MAX = unix2datetime(typemax(Int32))
@@ -12,7 +13,9 @@ immutable TransitionTimeInfo
     abbrindex::UInt8  # tt_abbrind
 end
 
-abbreviation(chars::Array{UInt8}, offset::Integer=1) = ascii(pointer(chars[offset:end]))
+function abbreviation(chars::Array{UInt8}, offset::Integer=1)
+    Compat.String(pointer(chars[offset:end]))
+end
 
 """
     read_tzfile(io::IO, name::AbstractString) -> TimeZone

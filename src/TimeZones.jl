@@ -2,6 +2,7 @@ module TimeZones
 
 using Base.Dates
 import Base.Dates: TimeZone, AbstractTime, days, hour, minute, second, millisecond
+import Compat: is_windows
 
 export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime, DateTime,
     TimeError, AmbiguousTimeError, NonExistentTimeError, UnhandledTimeError,
@@ -28,7 +29,7 @@ const TZDATA_DIR = joinpath(PKG_DIR, "deps", "tzdata")
 const COMPILED_DIR = joinpath(PKG_DIR, "deps", "compiled")
 const TIME_ZONES = Dict{AbstractString,TimeZone}()
 
-@windows_only begin
+if is_windows()
     const WIN_TRANSLATION_FILE = joinpath(PKG_DIR, "deps", "windows_to_posix")
 end
 
