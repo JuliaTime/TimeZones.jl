@@ -1,5 +1,13 @@
 import TimeZones: Transition, TZFILE_MAX
 
+
+abbrs = b"LMT\0WSST\0SDT\0WSDT\0"  # Pacific/Apia
+@test TimeZones.abbreviation(abbrs, 5) == "WSST"
+@test TimeZones.abbreviation(abbrs, 6) == "SST"
+@test TimeZones.abbreviation(abbrs, 10) == "SDT"
+@test TimeZones.abbreviation(abbrs, 14) == "WSDT"
+
+
 # Extracts Transitions such that the two arrays start and stop at the
 # same DateTimes.
 function overlap(a::Array{Transition}, b::Array{Transition})

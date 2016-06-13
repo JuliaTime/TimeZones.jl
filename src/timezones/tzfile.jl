@@ -2,7 +2,6 @@
 # - http://man7.org/linux/man-pages/man5/tzfile.5.html
 # - ftp://ftp.iana.org/tz/code/tzfile.5.txt
 
-import Compat
 import Compat: read
 
 const TZFILE_MAX = unix2datetime(typemax(Int32))
@@ -13,8 +12,16 @@ immutable TransitionTimeInfo
     abbrindex::UInt8  # tt_abbrind
 end
 
-function abbreviation(chars::Array{UInt8}, offset::Integer=1)
-    Compat.String(pointer(chars[offset:end]))
+# TODO: Once JuliaLang/Compat.jl#224 change code to a single function with:
+# `unsafe_string(pointer(chars[offset:end]))
+if VERSION < v"0.5.0-dev+4612"
+    function abbreviation(chars::Array{UInt8}, offset::Integer=1)
+        ascii(pointer(chars[offset:end]))
+    end
+else
+    function abbreviation(chars::Array{UInt8}, offset::Integer=1)
+        unsafe_string(pointer(chars[offset:end]))
+    end
 end
 
 """
@@ -123,8 +130,9 @@ function read_tzfile_internal(io::IO, name::AbstractString, force_version::Char=
                 utc = info.gmtoff - dst
             end
 
-            # Sometimes tzfiles save on storage by having multiple names in one for example
-            # "WSST\0" at index 1 turns into "WSST" where as index 2 results in "SST".
+            # Sometimes tzfiles save on storage by having multiple names in one for example:
+            # "WSST\0" at index 1 turns into "WSST" where as index 2 results in "SST"
+            # for "Pacific/Apia".
             abbr = abbreviation(abbrs, info.abbrindex)
             tz = FixedTimeZone(abbr, utc, dst)
 
