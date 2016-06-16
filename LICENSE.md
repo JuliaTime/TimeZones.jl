@@ -1,6 +1,8 @@
 The TimeZones.jl package is licensed under the MIT "Expat" License:
 
-> Copyright (c) 2014: Jacob Quinn.
+> Copyright (c) 2014-2016: Jacob Quinn, Curtis Vogt, and other contributors:
+>
+> https://github.com/JuliaTime/TimeZones.jl/contributors
 >
 > Permission is hereby granted, free of charge, to any person obtaining
 > a copy of this software and associated documentation files (the
