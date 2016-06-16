@@ -1,5 +1,5 @@
 site_name: TimeZones.jl
-repo_url: https://github.com/quinnj/TimeZones.jl
+repo_url: https://github.com/JuliaTime/TimeZones.jl
 site_description: Olson Timezone Database access for the Julia Programming Language
 theme: readthedocs
 markdown_extensions:

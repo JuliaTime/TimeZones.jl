@@ -1,7 +1,7 @@
 Time Zones
 ==========
 
-[TimeZones.jl](https://github.com/quinnj/TimeZones.jl) provides access to the [IANA time zone database](http://www.iana.org/time-zones) (also referred to as the tz database) to the programming language [Julia](http://julialang.org/). This library can handle any time zone in the tz database but some have excluded by default due to them being deemed as historical (such as "Etc/*").
+[TimeZones.jl](https://github.com/JuliaTime/TimeZones.jl) provides access to the [IANA time zone database](http://www.iana.org/time-zones) (also referred to as the tz database) to the programming language [Julia](http://julialang.org/). This library can handle any time zone in the tz database but some have excluded by default due to them being deemed as historical (such as "Etc/*").
 
 # Installation
 
