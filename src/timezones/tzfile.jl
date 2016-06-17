@@ -2,7 +2,7 @@
 # - http://man7.org/linux/man-pages/man5/tzfile.5.html
 # - ftp://ftp.iana.org/tz/code/tzfile.5.txt
 
-import Compat: read
+import Compat: read, unsafe_string
 
 const TZFILE_MAX = unix2datetime(typemax(Int32))
 
@@ -12,16 +12,8 @@ immutable TransitionTimeInfo
     abbrindex::UInt8  # tt_abbrind
 end
 
-# TODO: Once JuliaLang/Compat.jl#224 change code to a single function with:
-# `unsafe_string(pointer(chars[offset:end]))
-if VERSION < v"0.5.0-dev+4612"
-    function abbreviation(chars::Array{UInt8}, offset::Integer=1)
-        ascii(pointer(chars[offset:end]))
-    end
-else
-    function abbreviation(chars::Array{UInt8}, offset::Integer=1)
-        unsafe_string(pointer(chars[offset:end]))
-    end
+function abbreviation(chars::Array{UInt8}, offset::Integer=1)
+    unsafe_string(pointer(chars[offset:end]))
 end
 
 """

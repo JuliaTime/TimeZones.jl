@@ -1,5 +1,5 @@
 julia 0.4
-Compat
+Compat 0.8
 Mocking  # Only required for `VERSION < v"0.5-"`
 
 # Only required for building
