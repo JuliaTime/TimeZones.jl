@@ -166,17 +166,17 @@ function ruleparse(from, to, rule_type, month, on, at, save, letter)
         # The first day of the week that occurs before or after a given day of month.
         # i.e. Sun>=8 refers to the Sunday after the 8th of the month
         # or in other words, the 2nd Sunday.
-        dow = DAYS[match(r"\w\w\w", on).match]
-        dom = parse(Int, match(r"\d\d?", on).match)
+        dow::Int = DAYS[match(r"\w\w\w", on).match]
+        dom::Int = parse(Int, match(r"\d\d?", on).match)
         if ismatch(r"<=", on)
-            on_func = @eval (dt -> day(dt) <= $dom && dayofweek(dt) == $dow)
+            on_func = (dt -> day(dt) <= dom && dayofweek(dt) == dow)
         else
-            on_func = @eval (dt -> day(dt) >= $dom && dayofweek(dt) == $dow)
+            on_func = (dt -> day(dt) >= dom && dayofweek(dt) == dow)
         end
     elseif ismatch(r"\d\d?", on)
         # Matches just a plain old day of the month
         dom = parse(Int, on)
-        on_func = @eval (dt -> day(dt) == $dom)
+        on_func = dt -> day(dt) == dom
     else
         error("Can't parse day of month for DST change")
     end
