@@ -1,14 +1,7 @@
 # Determine the local system's time zone
 # Based upon Python's tzlocal https://pypi.python.org/pypi/tzlocal
 import Compat: @static, is_apple, is_unix, is_windows, readstring
-
-if VERSION < v"0.5-"
-    import Mocking: @mendable
-else
-    macro mendable(expr)
-        esc(expr)
-    end
-end
+using Mocking
 
 """
     localzone() -> TimeZone
@@ -17,12 +10,12 @@ Returns a `TimeZone` object that is equivalent to the system's current time zone
 """
 function localzone()
     @static if is_apple()
-        name = @mendable readstring(`systemsetup -gettimezone`)  # Appears to only work as root
+        name = @mock readstring(`systemsetup -gettimezone`)  # Appears to only work as root
         if contains(name, "Time Zone: ")
             name = strip(replace(name, "Time Zone: ", ""))
         else
             # link will be something like /usr/share/zoneinfo/Europe/Warsaw
-            name = @mendable readlink("/etc/localtime")
+            name = @mock readlink("/etc/localtime")
             name = match(r"(?<=zoneinfo/).*$", name).match
         end
         return TimeZone(name)
@@ -38,7 +31,7 @@ function localzone()
             name = name[2:end]
 
             if startswith(name, '/')
-                return @mendable open(name) do f
+                return @mock open(name) do f
                     read_tzfile(f, "local")
                 end
             else
@@ -51,8 +44,8 @@ function localzone()
 
                 for dir in tzdirs
                     filepath = joinpath(dir, name)
-                    @mendable isfile(filepath) || continue
-                    return @mendable open(filepath) do f
+                    (@mock isfile(filepath)) || continue
+                    return @mock open(filepath) do f
                         read_tzfile(f, name)
                     end
                 end
@@ -64,8 +57,8 @@ function localzone()
         # Look for distribution specific configuration files that contain the time zone name.
 
         filename = "/etc/timezone"
-        if @mendable isfile(filename)
-            @mendable open(filename) do file
+        if @mock isfile(filename)
+            @mock open(filename) do file
                 name = readstring(file)
 
                 # Get rid of host definitions and comments:
@@ -82,8 +75,8 @@ function localzone()
 
         zone_re = r"(TIME)?ZONE\s*=\s*\"(?<name>.*?)\""
         for filepath in ("/etc/sysconfig/clock", "/etc/conf.d/clock")
-            @mendable isfile(filepath) || continue
-            @mendable open(filepath) do file
+            (@mock isfile(filepath)) || continue
+            @mock open(filepath) do file
                 for line in readlines(file)
                     matched = match(zone_re, line)
                     if matched != nothing
@@ -100,8 +93,8 @@ function localzone()
         # systemd distributions use symlinks that include the zone name,
         # see manpage of localtime(5) and timedatectl(1)
         link = "/etc/localtime"
-        if @mendable islink(link)
-            filepath = @mendable readlink(link)
+        if @mock islink(link)
+            filepath = @mock readlink(link)
             start = search(filepath, '/')
 
             while start != 0
@@ -113,8 +106,8 @@ function localzone()
 
         # No explicit setting existed. Use localtime
         for filepath in ("/etc/localtime", "/usr/local/etc/localtime")
-            @mendable isfile(filepath) || continue
-            return @mendable open(filepath) do f
+            (@mock isfile(filepath)) || continue
+            return @mock open(filepath) do f
                 read_tzfile(f, "local")
             end
         end
@@ -127,7 +120,7 @@ function localzone()
         end
 
         # Windows powershell should be available on Windows 7 and above
-        win_name = strip(@mendable readstring(`powershell -Command "[TimeZoneInfo]::Local.Id"`))
+        win_name = strip(@mock readstring(`powershell -Command "[TimeZoneInfo]::Local.Id"`))
         if haskey(translation, win_name)
             posix_name = translation[win_name]
 

@@ -1,6 +1,8 @@
-using TimeZones
-using Base.Test
+using Mocking
+Mocking.enable()
 
+using Base.Test
+using TimeZones
 import TimeZones: PKG_DIR, TZDATA_DIR
 import TimeZones.Olson: ZoneDict, RuleDict, tzparse, resolve
 
@@ -30,6 +32,6 @@ include(joinpath("timezones", "adjusters.jl"))
 include(joinpath("timezones", "conversions.jl"))
 include(joinpath("timezones", "ranges.jl"))
 include(joinpath("timezones", "local.jl"))
-VERSION < v"0.5-" && include(joinpath("timezones", "local_mocking.jl"))
+include(joinpath("timezones", "local_mocking.jl"))
 include(joinpath("timezones", "discovery.jl"))
 include("TimeZones.jl")
