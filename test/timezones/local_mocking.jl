@@ -1,7 +1,7 @@
 import TimeZones: TimeZone, localzone
 import Mocking: @patch, apply
 import Base: AbstractCmd
-import Compat: readstring
+import Compat: is_apple, is_windows, is_linux, readstring
 
 # For mocking make sure we are actually changing the time zone
 name = string(localzone()) == "Europe/Warsaw" ? "Pacific/Apia" : "Europe/Warsaw"
@@ -11,7 +11,7 @@ tzfile_path = joinpath(TZFILE_DIR, split(name, '/')...)
 win_name = name == "Europe/Warsaw" ? "Central European Standard Time" : "Samoa Standard Time"
 timezone = TimeZone(name)
 
-if OS_NAME == :Darwin
+if is_apple()
     # Determine time zone via systemsetup.
     patch = @patch readstring(cmd::AbstractCmd) = "Time Zone:  " * name * "\n"
     apply(patch) do
@@ -27,7 +27,7 @@ if OS_NAME == :Darwin
         @test localzone() == timezone
     end
 
-elseif OS_NAME == :Windows
+elseif is_windows()
     patch = @patch readstring(cmd::AbstractCmd) = "$win_name\r\n"
     apply(patch) do
         @test localzone() == timezone
@@ -35,7 +35,7 @@ elseif OS_NAME == :Windows
 
     # Dateline Standard Time -> Etc/GMT+12 -> UTC-12:00
 
-elseif OS_NAME == :Linux
+elseif is_linux()
     # Test TZ environmental variable
     withenv("TZ" => ":$name") do
         @test localzone() == timezone
