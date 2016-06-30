@@ -4,7 +4,7 @@
 Returns a sorted list of all of the valid names for constructing a `TimeZone`.
 """
 function timezone_names()
-    # Note: Olson time zone names are typically encoded only in ASCII.
+    # Note: IANA time zone names are typically encoded only in ASCII.
     names = AbstractString[]
     check = Tuple{AbstractString,AbstractString}[(COMPILED_DIR, "")]
 
@@ -35,6 +35,47 @@ function all_timezones()
     results = TimeZone[]
     for name in timezone_names()
         push!(results, TimeZone(name))
+    end
+    return results
+end
+
+"""
+    all_timezones(criteria::Function) -> Array{TimeZone}
+
+Returns `TimeZone`s that match the given `criteria` function. The `criteria` function takes
+two parameters: UTC transition (`DateTime`) and transition zone (`FixedTimeZone`).
+
+## Examples
+
+Find all time zones which contain an absolute UTC offset greater than 15 hours:
+
+```julia
+all_timezones() do dt, zone
+    abs(zone.offset.std) > Dates.Second(Dates.Hour(15))
+end
+```
+
+Determine all time zones which have a non-hourly daylight saving time offset:
+
+```julia
+all_timezones() do dt, zone
+    zone.offset.dst % Dates.Second(Dates.Hour(1)) != 0
+end
+```
+"""
+function all_timezones(criteria::Function)
+    results = TimeZone[]
+    for tz in all_timezones()
+        if isa(tz, FixedTimeZone)
+            criteria(typemin(DateTime), tz) && push!(results, tz)
+        else
+            for t in tz.transitions
+                if criteria(t.utc_datetime, t.zone)
+                    push!(results, tz)
+                    break
+                end
+            end
+        end
     end
     return results
 end
