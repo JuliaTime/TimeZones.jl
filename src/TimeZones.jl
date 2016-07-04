@@ -54,6 +54,7 @@ include(joinpath("timezones", "Olson.jl"))
 include(joinpath("timezones", "conversions.jl"))
 include(joinpath("timezones", "local.jl"))
 include(joinpath("timezones", "ranges.jl"))
+include(joinpath("timezones", "rounding.jl"))
 include(joinpath("timezones", "discovery.jl"))
 
 """
