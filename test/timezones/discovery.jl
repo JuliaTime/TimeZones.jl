@@ -18,7 +18,9 @@ timezones = timezones_from_abbr("EET")
 @test length(timezones) >= 29
 @test isa(timezones, Array{TimeZone})
 
+# Note: Unlike time zone names it is possible, although unlikely, for the number of
+# abbreviations to decrease over time.
 abbrs = timezone_abbrs()
-@test length(abbrs) >= 336
+@test length(abbrs) >= 334  # Updated for release: 2016f
 @test isa(abbrs, Array{AbstractString})
 @test issorted(abbrs)
