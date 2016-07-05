@@ -1,8 +1,8 @@
 import Base: +, -, isequal, isless, print, show
 import Base.Dates: AbstractTime, Second, value
 
-# Note: The Olson Database rounds offset precision to the nearest second
-# See "America/New_York" notes in Olson file "northamerica" for an example.
+# Note: The IANA time zone database rounds offset precision to the nearest second
+# See "America/New_York" notes in tzdata file "northamerica" for an example.
 """
     UTCOffset
 
@@ -10,8 +10,8 @@ A `UTCOffset` is an amount of time subtracted from or added to UTC to get the cu
 local time – whether it's standard time or daylight saving time.
 """
 immutable UTCOffset <: AbstractTime
-    std::Second  # Standard offset from UTC in seconds
-    dst::Second  # Addition daylight saving time offset applied to UTC offset in seconds
+    std::Second  # Standard time offset from UTC in seconds
+    dst::Second  # Daylight saving time offset in seconds
 
     function UTCOffset(std_offset::Second, dst_offset::Second=Second(0))
         new(std_offset, dst_offset)
@@ -47,7 +47,7 @@ function offset_string(seconds::Second, iso8601::Bool=false)
     elseif s == 0
         return @sprintf("%+03d:%02d", h, m)
     else
-        return @sprintf("%+03d:%02d:%02d", h, m, s)  # Not in ISO 8601
+        return @sprintf("%+03d:%02d:%02d", h, m, s)  # Not in the ISO 8601 standard
     end
 end
 function offset_string(offset::UTCOffset, iso8601::Bool=false)
@@ -56,7 +56,7 @@ end
 
 print(io::IO, o::UTCOffset) = print(io, offset_string(o, true))
 function show(io::IO, o::UTCOffset)
-    # Show DST as an offset since we want to distinguish between normal daylight saving
-    # time offsets and midsummer time offsets.
+    # Show DST as a separate offset since we want to distinguish between normal hourly
+    # daylight saving time offsets and exotic DST offsets (e.g. midsummer time).
     print(io, "UTC", offset_string(o.std), "/", offset_string(o.dst))
 end
