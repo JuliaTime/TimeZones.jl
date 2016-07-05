@@ -7,11 +7,11 @@ TimeZones.jl
 [![TimeZones](http://pkg.julialang.org/badges/TimeZones_0.4.svg)](http://pkg.julialang.org/?pkg=TimeZones&ver=0.4)
 [![TimeZones](http://pkg.julialang.org/badges/TimeZones_0.5.svg)](http://pkg.julialang.org/?pkg=TimeZones)
 
-[IANA time zone database](http://www.iana.org/time-zones) access for the [Julia](http://julialang.org/) programming language. TimeZones.jl extends the Date/DateTime support for Julia to include a new time zone aware DateTime type: ZonedDateTime.
+[IANA time zone database](http://www.iana.org/time-zones) access for the [Julia](http://julialang.org/) programming language. TimeZones.jl extends the Date/DateTime support for Julia to include a new time zone aware TimeType: ZonedDateTime.
 
 ## Features
 
-* A new time zone aware DateTime type: ZonedDateTime
+* A new time zone aware TimeType: ZonedDateTime
 * Support for all time zones in the IANA time zone database (also known as the tz/zoneinfo/Olson database)
 * ZonedDateTime-Period arithmetic [similar to that of DateTime](http://julia.readthedocs.io/en/latest/manual/dates/#timetype-period-arithmetic)
 * Local system time zone information as a TimeZone

@@ -14,7 +14,7 @@ timezone_names()
 
 ## ZonedDateTime
 
-A `ZonedDateTime` is a *time zone aware* version of a `DateTime` (in Python parlance). Note that all `ZonedDateTime` instances will always be in the correct zone without requiring manual normalization (unlike Python's pytz module).
+A `ZonedDateTime` is a *time zone aware* version of a `DateTime` (in Python parlance). Note that all `ZonedDateTime` instances will always be in the correct zone without requiring manual normalization (unlike Python's [pytz](http://pytz.sourceforge.net/) module).
 
 To construct a `ZonedDateTime` instance you just need a `DateTime` and a `TimeZone`:
 
