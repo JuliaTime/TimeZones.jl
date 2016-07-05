@@ -17,6 +17,35 @@ colombo = TimeZone("Asia/Colombo")                  # See note below
 # NO TRANSITIONS #
 ##################
 
+# Test rounding where no rounding is necessary.
+
+dt = DateTime(2016)
+
+for tz in [utc, fixed, winnipeg, st_johns, eucla, colombo]
+    zdt = ZonedDateTime(dt, tz)
+
+    @test floor(zdt, Dates.Year) == zdt
+    @test floor(zdt, Dates.Month) == zdt
+    @test floor(zdt, Dates.Day) == zdt
+    @test floor(zdt, Dates.Hour) == zdt
+    @test floor(zdt, Dates.Minute) == zdt
+    @test floor(zdt, Dates.Second) == zdt
+
+    @test ceil(zdt, Dates.Year) == zdt
+    @test ceil(zdt, Dates.Month) == zdt
+    @test ceil(zdt, Dates.Day) == zdt
+    @test ceil(zdt, Dates.Hour) == zdt
+    @test ceil(zdt, Dates.Minute) == zdt
+    @test ceil(zdt, Dates.Second) == zdt
+
+    @test round(zdt, Dates.Year) == zdt
+    @test round(zdt, Dates.Month) == zdt
+    @test round(zdt, Dates.Day) == zdt
+    @test round(zdt, Dates.Hour) == zdt
+    @test round(zdt, Dates.Minute) == zdt
+    @test round(zdt, Dates.Second) == zdt
+end
+
 # Test rounding non-controversial ZonedDateTimes (no transitions).
 
 dt = DateTime(2016, 2, 5, 13, 10, 20, 500)
@@ -111,11 +140,14 @@ dt = DateTime(2015, 11, 1, 2, 15)             # 15 minutes after ambiguous hour
 zdt = ZonedDateTime(dt, fixed)
 @test floor(zdt, Dates.Day) == ZonedDateTime(2015, 11, 1, fixed)
 @test floor(zdt, Dates.Hour(3)) == ZonedDateTime(2015, 11, 1, fixed)
+# Rounding to Hour(3) will give 00:00, 03:00, 06:00, 09:00, etc.
 
 for tz in [winnipeg, st_johns]
     zdt = ZonedDateTime(dt, tz)
     @test floor(zdt, Dates.Day) == ZonedDateTime(2015, 11, 1, tz)
     @test floor(zdt, Dates.Hour(3)) == ZonedDateTime(2015, 11, 1, 1, tz, 1)
+    # Rounding is performed in the current fixed zone, then relocalized if a transition has
+    # occurred. This means that instead of 00:00, 03:00, etc., we expect 01:00, 04:00, etc.
 end
 
 # Test rounding forward, toward the ambiguous hour.
@@ -155,9 +187,9 @@ zdt = ZonedDateTime(dt, fixed)
 
 for tz in [winnipeg, st_johns]
     zdt = ZonedDateTime(dt, tz, 1)                  # First 1:25, before "falling back"
-    prev_hour = ZonedDateTime(DateTime(2015, 11, 1, 1), tz, 1)
-    between_hours = ZonedDateTime(DateTime(2015, 11, 1, 1, 30), tz, 1)
-    next_hour = ZonedDateTime(DateTime(2015, 11, 1, 1), tz, 2)
+    prev_hour = ZonedDateTime(2015, 11, 1, 1, tz, 1)
+    between_hours = ZonedDateTime(2015, 11, 1, 1, 30, tz, 1)
+    next_hour = ZonedDateTime(2015, 11, 1, 1, tz, 2)
     @test floor(zdt, Dates.Day) == ZonedDateTime(2015, 11, 1, tz)
     @test ceil(zdt, Dates.Day) == ZonedDateTime(2015, 11, 2, tz)
     @test round(zdt, Dates.Day) == ZonedDateTime(2015, 11, 1, tz)
@@ -183,37 +215,37 @@ zdt = ZonedDateTime(1996, 10, 25, 23, 55, colombo)  # 5 minutes before ambiguous
 
 zdt = ZonedDateTime(1996, 10, 26, 0, 35, colombo)   # 5 minutes after ambiguous half-hour
 @test_throws AmbiguousTimeError floor(zdt, Dates.Day)
-@test_throws AmbiguousTimeError ceil(zdt, Dates.Day)    # floor is called during ceil
+@test ceil(zdt, Dates.Day) == ZonedDateTime(1996, 10, 27, colombo)
 @test_throws AmbiguousTimeError round(zdt, Dates.Day)
 
 # Rounding to the ambiguous midnight works fine using a TimePeriod resolution, however.
 
 zdt = ZonedDateTime(1996, 10, 25, 23, 55, colombo)  # 5 minutes before ambiguous half-hour
-@test ceil(zdt, Dates.Hour) == ZonedDateTime(DateTime(1996, 10, 26), colombo, 1)
-@test round(zdt, Dates.Hour) == ZonedDateTime(DateTime(1996, 10, 26), colombo, 1)
+@test ceil(zdt, Dates.Hour) == ZonedDateTime(1996, 10, 26, colombo, 1)
+@test round(zdt, Dates.Hour) == ZonedDateTime(1996, 10, 26, colombo, 1)
 
 zdt = ZonedDateTime(1996, 10, 26, 0, 35, colombo)   # 5 minutes after ambiguous half-hour
-@test floor(zdt, Dates.Hour) == ZonedDateTime(DateTime(1996, 10, 26), colombo, 2)
+@test floor(zdt, Dates.Hour) == ZonedDateTime(1996, 10, 26, colombo, 2)
 
 # Rounding during the first half-hour between 00:00 and 00:30.
 
-zdt = ZonedDateTime(DateTime(1996, 10, 26, 0, 15), colombo, 1)
-@test floor(zdt, Dates.Hour) == ZonedDateTime(DateTime(1996, 10, 26), colombo, 1)
-@test ceil(zdt, Dates.Hour) == ZonedDateTime(DateTime(1996, 10, 26, 0, 30), colombo)
-@test round(zdt, Dates.Hour) == ZonedDateTime(DateTime(1996, 10, 26), colombo, 1)
-@test floor(zdt, Dates.Minute(30)) == ZonedDateTime(DateTime(1996, 10, 26), colombo, 1)
-@test ceil(zdt, Dates.Minute(30)) == ZonedDateTime(DateTime(1996, 10, 26, 0), colombo, 2)
-@test round(zdt, Dates.Minute(30)) == ZonedDateTime(DateTime(1996, 10, 26, 0), colombo, 2)
+zdt = ZonedDateTime(1996, 10, 26, 0, 15, colombo, 1)
+@test floor(zdt, Dates.Hour) == ZonedDateTime(1996, 10, 26, colombo, 1)
+@test ceil(zdt, Dates.Hour) == ZonedDateTime(1996, 10, 26, 0, 30, colombo)
+@test round(zdt, Dates.Hour) == ZonedDateTime(1996, 10, 26, colombo, 1)
+@test floor(zdt, Dates.Minute(30)) == ZonedDateTime(1996, 10, 26, colombo, 1)
+@test ceil(zdt, Dates.Minute(30)) == ZonedDateTime(1996, 10, 26, colombo, 2)
+@test round(zdt, Dates.Minute(30)) == ZonedDateTime(1996, 10, 26, colombo, 2)
 
 # Rounding during the second half-hour between 00:00 and 00:30.
 
-zdt = ZonedDateTime(DateTime(1996, 10, 26, 0, 15), colombo, 2)
-@test floor(zdt, Dates.Hour) == ZonedDateTime(DateTime(1996, 10, 26), colombo, 2)
-@test ceil(zdt, Dates.Hour) == ZonedDateTime(DateTime(1996, 10, 26, 1), colombo)
-@test round(zdt, Dates.Hour) == ZonedDateTime(DateTime(1996, 10, 26), colombo, 2)
-@test floor(zdt, Dates.Minute(30)) == ZonedDateTime(DateTime(1996, 10, 26), colombo, 2)
-@test ceil(zdt, Dates.Minute(30)) == ZonedDateTime(DateTime(1996, 10, 26, 0, 30), colombo)
-@test round(zdt, Dates.Minute(30)) == ZonedDateTime(DateTime(1996, 10, 26, 0, 30), colombo)
+zdt = ZonedDateTime(1996, 10, 26, 0, 15, colombo, 2)
+@test floor(zdt, Dates.Hour) == ZonedDateTime(1996, 10, 26, colombo, 2)
+@test ceil(zdt, Dates.Hour) == ZonedDateTime(1996, 10, 26, 1, colombo)
+@test round(zdt, Dates.Hour) == ZonedDateTime(1996, 10, 26, colombo, 2)
+@test floor(zdt, Dates.Minute(30)) == ZonedDateTime(1996, 10, 26, colombo, 2)
+@test ceil(zdt, Dates.Minute(30)) == ZonedDateTime(1996, 10, 26, 0, 30, colombo)
+@test round(zdt, Dates.Minute(30)) == ZonedDateTime(1996, 10, 26, 0, 30, colombo)
 
 ###############
 # ERROR CASES #

@@ -9,11 +9,19 @@ function Base.floor(zdt::ZonedDateTime, p::Dates.TimePeriod)
     return ZonedDateTime(utc_dt, zdt.timezone; from_utc=true)
 end
 
+function Base.ceil(zdt::ZonedDateTime, p::Dates.DatePeriod)
+    return ZonedDateTime(ceil(localtime(zdt), p), zdt.timezone)
+end
+
+#function Base.Dates.floorceil(zdt::ZonedDateTime, p::Dates.DatePeriod)
+    #return floor(zdt, p), ceil(zdt, p)
+#end
+
 """
     floor(zdt::ZonedDateTime, p::Period) -> ZonedDateTime
 
 Returns the nearest `ZonedDateTime` less than or equal to `zdt` at resolution `p`. The
-result will be in the same time zone as `zdt`. 
+result will be in the same time zone as `zdt`.
 
 For convenience, `p` may be a type instead of a value: `floor(zdt, Dates.Hour)` is a
 shortcut for `floor(zdt, Dates.Hour(1))`.
@@ -25,9 +33,15 @@ shortcut for `floor(zdt, Dates.Hour(1))`.
 The `America/Winnipeg` time zone transitioned from Central Standard Time (UTC-6:00) to
 Central Daylight Time (UTC-5:00) on 2016-03-13, moving directly from 01:59:59 to 03:00:00.
 
-```
-julia> floor(ZonedDateTime(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg")), Dates.Day)
+```julia
+julia> zdt = ZonedDateTime(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg"))
+2016-03-13T01:45:00-06:00
+
+julia> floor(zdt, Dates.Day)
 2016-03-13T00:00:00-06:00
+
+julia> floor(zdt, Dates.Hour)
+2016-03-13T01:00:00-06:00
 ```
 """
 Base.floor(::TimeZones.ZonedDateTime, ::Dates.Period)
@@ -36,7 +50,7 @@ Base.floor(::TimeZones.ZonedDateTime, ::Dates.Period)
     ceil(zdt::ZonedDateTime, p::Period) -> ZonedDateTime
 
 Returns the nearest `ZonedDateTime` greater than or equal to `zdt` at resolution `p`.
-The result will be in the same time zone as `zdt`. 
+The result will be in the same time zone as `zdt`.
 
 For convenience, `p` may be a type instead of a value: `ceil(zdt, Dates.Hour)` is a
 shortcut for `ceil(zdt, Dates.Hour(1))`.
@@ -48,21 +62,25 @@ shortcut for `ceil(zdt, Dates.Hour(1))`.
 The `America/Winnipeg` time zone transitioned from Central Standard Time (UTC-6:00) to
 Central Daylight Time (UTC-5:00) on 2016-03-13, moving directly from 01:59:59 to 03:00:00.
 
-```
-julia> ceil(ZonedDateTime(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg")), Dates.Hour)
-2016-03-13T03:00:00-05:00
+```julia
+julia> zdt = ZonedDateTime(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg"))
+2016-03-13T01:45:00-06:00
 
-julia> ceil(ZonedDateTime(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg")), Dates.Day)
+julia> ceil(zdt, Dates.Day)
 2016-03-14T00:00:00-05:00
+
+julia> ceilj(zdt, Dates.Hour)
+2016-03-13T03:00:00-05:00
 ```
 """
-Base.ceil(::TimeZones.ZonedDateTime, ::Dates.Period)
+Base.ceil(::TimeZones.ZonedDateTime, ::Dates.Period)    # Defined in base/dates/rounding.jl
 
 """
     round(zdt::ZonedDateTime, p::Period, [r::RoundingMode]) -> ZonedDateTime
 
-Returns the `ZonedDateTime` nearest to `zdt` at resolution `p`. By default
-(`RoundNearestTiesUp`), ties (e.g., rounding 9:30 to the nearest hour) will be rounded up.
+Returns the `ZonedDateTime` nearest to `zdt` at resolution `p`. The result will be in the
+same time zone as `zdt`. By default (`RoundNearestTiesUp`), ties (e.g., rounding 9:30 to the
+nearest hour) will be rounded up.
 
 For convenience, `p` may be a type instead of a value: `round(zdt, Dates.Hour)` is a
 shortcut for `round(zdt, Dates.Hour(1))`.
@@ -74,9 +92,12 @@ Valid rounding modes for `round(::TimeType, ::Period, ::RoundingMode)` are
 
 Instead of performing rounding operations on the `ZonedDateTime`'s internal UTC `DateTime`,
 which would be computationally less expensive, rounding is done in the local time zone.
-This ensures that rounding behaves as expected and is maximally meaningful. (Consider how
-rounding to the nearest day would be resolved for non-UTC time zones, or even rounding to
-the nearest hour for time zones like `America/St_Johns` or `Australia/Eucla`.)
+This ensures that rounding behaves as expected and is maximally meaningful.
+
+If rounding were done in UTC, consider how rounding to the nearest day would be resolved for
+non-UTC time zones: the result would be 00:00 UTC, which wouldn't be midnight local time.
+Similarly, when rounding to the nearest hour in `Australia/Eucla (UTC+08:45)`, the result
+wouldn't be on the hour in the local time zone.
 
 When `p` is a `DatePeriod` rounding is done in the local time zone in a straightforward
 fashion. When `p` is a `TimePeriod` the likelihood of encountering an ambiguous or
@@ -97,12 +118,29 @@ Regular daylight saving time transitions should be safe.
 The `America/Winnipeg` time zone transitioned from Central Standard Time (UTC-6:00) to
 Central Daylight Time (UTC-5:00) on 2016-03-13, moving directly from 01:59:59 to 03:00:00.
 
-```
-julia> round(ZonedDateTime(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg")), Dates.Hour)
+```julia
+julia> zdt = ZonedDateTime(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg"))
+2016-03-13T01:45:00-06:00
+
+julia> round(zdt, Dates.Hour)
 2016-03-13T03:00:00-05:00
 
-julia> round(ZonedDateTime(2016, 3, 13, 6, TimeZone("America/Winnipeg")), Dates.Day)
+julia> round(zdt, Dates.Day)
 2016-03-13T00:00:00-06:00
 ```
+
+The `Asia/Colombo` time zone revised the definition of Lanka Time from UTC+6:30 to UTC+6:00
+on 1996-10-26, moving from 00:29:59 back to 00:00:00.
+
+```julia
+julia> zdt = ZonedDateTime(1996, 10, 25, 23, 45, TimeZone("Asia/Colombo"))
+1996-10-25T23:45:00+06:30
+
+julia> round(zdt, Dates.Hour)
+1996-10-26T00:00:00+06:30
+
+julia> round(zdt, Dates.Day)
+ERROR: Local DateTime 1996-10-26T00:00:00 is ambiguious
+```
 """
-Base.round(::TimeZones.ZonedDateTime, ::Dates.Period)
+Base.round(::TimeZones.ZonedDateTime, ::Dates.Period)   # Defined in base/dates/rounding.jl

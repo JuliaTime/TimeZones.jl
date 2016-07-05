@@ -1,4 +1,4 @@
-## Rounding ZonedDateTimes
+## Rounding a ZonedDateTime
 
 Rounding operations (`floor`, `ceil`, and `round`) on `ZonedDateTime`s are performed in a
 [similar manner to `DateTime`](http://julia.readthedocs.org/en/latest/manual/dates/#rounding)
@@ -7,9 +7,12 @@ however, unexpected behaviour may be encountered.
 
 Instead of performing rounding operations on the `ZonedDateTime`'s internal UTC `DateTime`,
 which would be computationally less expensive, rounding is done in the local time zone.
-This ensures that rounding behaves as expected and is maximally meaningful. (Consider how
-rounding to the nearest day would be resolved for non-UTC time zones, or even rounding to
-the nearest hour for time zones like `America/St_Johns` or `Australia/Eucla`.)
+This ensures that rounding behaves as expected and is maximally meaningful.
+
+If rounding were done in UTC, consider how rounding to the nearest day would be resolved for
+non-UTC time zones: the result would be 00:00 UTC, which wouldn't be midnight local time.
+Similarly, when rounding to the nearest hour in `Australia/Eucla (UTC+08:45)`, the result
+wouldn't be on the hour in the local time zone.
 
 ### Rounding to a TimePeriod
 
@@ -25,7 +28,7 @@ When the target resolution is a `DatePeriod` rounding is done in the local time 
 straightforward fashion.
 
 Rounding is not an entirely "safe" operation for `ZonedDateTime`s, as in some cases
-historical transitions for some time zones (`Asia/Colombo, for example) occur at midnight.
+historical transitions for some time zones (`Asia/Colombo`, for example) occur at midnight.
 In such cases rounding to a `DatePeriod` may still result in an `AmbiguousTimeError` or a
 `NonExistentTimeError`s. (But such occurrences should be relatively rare.)
 
@@ -37,18 +40,38 @@ The `America/Winnipeg` time zone transitioned from Central Standard Time (UTC-6:
 Central Daylight Time (UTC-5:00) on 2016-03-13, moving directly from 01:59:59 to 03:00:00.
 
 ```julia
-julia> floor(ZonedDateTime(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg")), Dates.Day)
+julia> zdt = ZonedDateTime(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg"))
+2016-03-13T01:45:00-06:00
+
+julia> floor(zdt, Dates.Day)
 2016-03-13T00:00:00-06:00
 
-julia> ceil(ZonedDateTime(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg")), Dates.Day)
+julia> ceil(zdt, Dates.Day)
 2016-03-14T00:00:00-05:00
 
-julia> round(ZonedDateTime(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg")), Dates.Day)
+julia> round(zdt, Dates.Day)
 2016-03-13T00:00:00-06:00
 
-julia> ceil(ZonedDateTime(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg")), Dates.Hour)
+julia> floor(zdt, Dates.Hour)
+2016-03-13T01:00:00-06:00
+
+julia> ceil(zdt, Dates.Hour)
 2016-03-13T03:00:00-05:00
 
-julia> round(ZonedDateTime(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg")), Dates.Hour)
+julia> round(zdt, Dates.Hour)
 2016-03-13T03:00:00-05:00
+```
+
+The `Asia/Colombo` time zone revised the definition of Lanka Time from UTC+6:30 to UTC+6:00
+on 1996-10-26, moving from 00:29:59 back to 00:00:00.
+
+```julia
+julia> zdt = ZonedDateTime(1996, 10, 25, 23, 45, TimeZone("Asia/Colombo"))
+1996-10-25T23:45:00+06:30
+
+julia> round(zdt, Dates.Hour)
+1996-10-26T00:00:00+06:30
+
+julia> round(zdt, Dates.Day)
+ERROR: Local DateTime 1996-10-26T00:00:00 is ambiguious
 ```
