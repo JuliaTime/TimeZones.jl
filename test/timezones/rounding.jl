@@ -23,27 +23,11 @@ dt = DateTime(2016)
 
 for tz in [utc, fixed, winnipeg, st_johns, eucla, colombo]
     zdt = ZonedDateTime(dt, tz)
-
-    @test floor(zdt, Dates.Year) == zdt
-    @test floor(zdt, Dates.Month) == zdt
-    @test floor(zdt, Dates.Day) == zdt
-    @test floor(zdt, Dates.Hour) == zdt
-    @test floor(zdt, Dates.Minute) == zdt
-    @test floor(zdt, Dates.Second) == zdt
-
-    @test ceil(zdt, Dates.Year) == zdt
-    @test ceil(zdt, Dates.Month) == zdt
-    @test ceil(zdt, Dates.Day) == zdt
-    @test ceil(zdt, Dates.Hour) == zdt
-    @test ceil(zdt, Dates.Minute) == zdt
-    @test ceil(zdt, Dates.Second) == zdt
-
-    @test round(zdt, Dates.Year) == zdt
-    @test round(zdt, Dates.Month) == zdt
-    @test round(zdt, Dates.Day) == zdt
-    @test round(zdt, Dates.Hour) == zdt
-    @test round(zdt, Dates.Minute) == zdt
-    @test round(zdt, Dates.Second) == zdt
+    for p in [Dates.Year, Dates.Month, Dates.Day, Dates.Hour, Dates.Minute, Dates.Second]
+        @test floor(zdt, p) == zdt
+        @test ceil(zdt, p) == zdt
+        @test round(zdt, p) == zdt
+    end
 end
 
 # Test rounding non-controversial ZonedDateTimes (no transitions).
@@ -55,6 +39,7 @@ for tz in [utc, fixed, winnipeg, st_johns, eucla, colombo]
 
     @test floor(zdt, Dates.Year) == ZonedDateTime(2016, tz)
     @test floor(zdt, Dates.Month) == ZonedDateTime(2016, 2, tz)
+    @test floor(zdt, Dates.Week) == ZonedDateTime(2016, 2, tz)      # Previous Monday
     @test floor(zdt, Dates.Day) == ZonedDateTime(2016, 2, 5, tz)
     @test floor(zdt, Dates.Hour) == ZonedDateTime(2016, 2, 5, 13, tz)
     @test floor(zdt, Dates.Minute) == ZonedDateTime(2016, 2, 5, 13, 10, tz)
@@ -62,6 +47,7 @@ for tz in [utc, fixed, winnipeg, st_johns, eucla, colombo]
 
     @test ceil(zdt, Dates.Year) == ZonedDateTime(2017, tz)
     @test ceil(zdt, Dates.Month) == ZonedDateTime(2016, 3, tz)
+    @test ceil(zdt, Dates.Week) == ZonedDateTime(2016, 2, 8, tz)    # Following Monday
     @test ceil(zdt, Dates.Day) == ZonedDateTime(2016, 2, 6, tz)
     @test ceil(zdt, Dates.Hour) == ZonedDateTime(2016, 2, 5, 14, tz)
     @test ceil(zdt, Dates.Minute) == ZonedDateTime(2016, 2, 5, 13, 11, tz)
@@ -69,6 +55,7 @@ for tz in [utc, fixed, winnipeg, st_johns, eucla, colombo]
 
     @test round(zdt, Dates.Year) == ZonedDateTime(2016, tz)
     @test round(zdt, Dates.Month) == ZonedDateTime(2016, 2, tz)
+    @test round(zdt, Dates.Week) == ZonedDateTime(2016, 2, 8, tz)   # Following Monday
     @test round(zdt, Dates.Day) == ZonedDateTime(2016, 2, 6, tz)
     @test round(zdt, Dates.Hour) == ZonedDateTime(2016, 2, 5, 13, tz)
     @test round(zdt, Dates.Minute) == ZonedDateTime(2016, 2, 5, 13, 10, tz)
