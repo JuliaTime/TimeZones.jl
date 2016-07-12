@@ -1,9 +1,9 @@
 utc = FixedTimeZone("UTC")
 fixed = FixedTimeZone("UTC-06:00")
-winnipeg = TimeZone("America/Winnipeg")             # UTC-6:00 (UTC-5:00 during DST)
-st_johns = TimeZone("America/St_Johns")             # UTC-3:30 (UTC-2:30 during DST)
-eucla = TimeZone("Australia/Eucla")                 # UTC+8:45
-colombo = TimeZone("Asia/Colombo")                  # See note below
+winnipeg = resolve("America/Winnipeg", tzdata["northamerica"]...)   # UTC-6:00 (or UTC-5:00)
+st_johns = resolve("America/St_Johns", tzdata["northamerica"]...)   # UTC-3:30 (or UTC-2:30)
+eucla = resolve("Australia/Eucla", tzdata["australasia"]...)        # UTC+8:45
+colombo = resolve("Asia/Colombo", tzdata["asia"]...)                # See note below
 
 # On 1996-05-25 at 00:00, the Asia/Colombo time zone in Sri Lanka moved from Indian Standard
 # Time (UTC+5:30) to Lanka Time (UTC+6:30). On 1996-10-26 at 00:30, Lanka Time was revised

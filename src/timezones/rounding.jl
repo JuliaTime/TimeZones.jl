@@ -19,6 +19,7 @@ end
 
 """
     floor(zdt::ZonedDateTime, p::Period) -> ZonedDateTime
+    floor(zdt::ZonedDateTime, p::Type{Period}) -> ZonedDateTime
 
 Returns the nearest `ZonedDateTime` less than or equal to `zdt` at resolution `p`. The
 result will be in the same time zone as `zdt`.
@@ -44,10 +45,11 @@ julia> floor(zdt, Dates.Hour)
 2016-03-13T01:00:00-06:00
 ```
 """
-Base.floor(::TimeZones.ZonedDateTime, ::Dates.Period)
+Base.floor(::TimeZones.ZonedDateTime, ::Union{Dates.Period, Type{Dates.Period}})
 
 """
     ceil(zdt::ZonedDateTime, p::Period) -> ZonedDateTime
+    ceil(zdt::ZonedDateTime, p::Type{Period}) -> ZonedDateTime
 
 Returns the nearest `ZonedDateTime` greater than or equal to `zdt` at resolution `p`.
 The result will be in the same time zone as `zdt`.
@@ -69,14 +71,15 @@ julia> zdt = ZonedDateTime(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg"))
 julia> ceil(zdt, Dates.Day)
 2016-03-14T00:00:00-05:00
 
-julia> ceilj(zdt, Dates.Hour)
+julia> ceil(zdt, Dates.Hour)
 2016-03-13T03:00:00-05:00
 ```
 """
-Base.ceil(::TimeZones.ZonedDateTime, ::Dates.Period)    # Defined in base/dates/rounding.jl
+Base.ceil(::TimeZones.ZonedDateTime, ::Union{Dates.Period, Type{Dates.Period}})
 
 """
     round(zdt::ZonedDateTime, p::Period, [r::RoundingMode]) -> ZonedDateTime
+    round(zdt::ZonedDateTime, p::Type{Period}, [r::RoundingMode]) -> ZonedDateTime
 
 Returns the `ZonedDateTime` nearest to `zdt` at resolution `p`. The result will be in the
 same time zone as `zdt`. By default (`RoundNearestTiesUp`), ties (e.g., rounding 9:30 to the
@@ -142,5 +145,5 @@ julia> round(zdt, Dates.Hour)
 julia> round(zdt, Dates.Day)
 ERROR: Local DateTime 1996-10-26T00:00:00 is ambiguious
 ```
-"""
-Base.round(::TimeZones.ZonedDateTime, ::Dates.Period)   # Defined in base/dates/rounding.jl
+"""     # Defined in base/dates/rounding.jl
+Base.round(::TimeZones.ZonedDateTime, ::Union{Dates.Period, Type{Dates.Period}})

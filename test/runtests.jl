@@ -15,7 +15,7 @@ const TZFILE_DIR = joinpath(PKG_DIR, "test", "tzfile")
 # Note: resolving only the time zones we want is much faster than running compile which
 # recompiles all the time zones.
 tzdata = Dict{AbstractString,Tuple{ZoneDict,RuleDict}}()
-for name in ("australasia", "europe", "northamerica")
+for name in ("asia", "australasia", "europe", "northamerica")
     tzdata[name] = tzparse(joinpath(TZDATA_DIR, name))
 end
 

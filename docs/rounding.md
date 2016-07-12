@@ -7,9 +7,9 @@ Rounding operations (`floor`, `ceil`, and `round`) on `ZonedDateTime`s are perfo
 and should generally behave as expected. When `VariableTimeZone` transitions are involved,
 however, unexpected behaviour may be encountered.
 
-Instead of performing rounding operations on the `ZonedDateTime`'s internal UTC `DateTime`,
-which would be computationally less expensive, rounding is done in the local time zone.
-This ensures that rounding behaves as expected and is maximally meaningful.
+Instead of performing rounding operations on a UTC representation of the `ZonedDateTime`,
+which would in some cases be computationally less expensive, rounding is done in the local
+time zone. This ensures that rounding behaves as expected and is maximally meaningful.
 
 If rounding were done in UTC, consider how rounding to the nearest day would be resolved for
 non-UTC time zones: the result would be 00:00 UTC, which wouldn't be midnight local time.
@@ -22,7 +22,7 @@ When the target resolution is a `TimePeriod` the likelihood of encountering an a
 non-existent time (due to daylight saving time transitions) is increased. To resolve this
 issue, rounding a `ZonedDateTime` with a `VariableTimeZone` to a `TimePeriod` uses the
 `DateTime` value in the appropriate `FixedTimeZone`, then reconverts it to a `ZonedDateTime`
-in the appropriate `VariableTimeZone` afterward.
+in the appropriate `VariableTimeZone` afterward. (See [Examples](#examples) below.)
 
 ### Rounding to a DatePeriod
 
