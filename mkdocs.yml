@@ -10,5 +10,6 @@ pages:
 - Types: types.md
 - Converting: conversions.md
 - Arithmetic: arithmetic.md
+- Rounding: rounding.md
 - Current Time: current.md
 - Frequently Asked Questions: faq.md

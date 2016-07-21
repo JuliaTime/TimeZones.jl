@@ -15,7 +15,7 @@ const TZFILE_DIR = joinpath(PKG_DIR, "test", "tzfile")
 # Note: resolving only the time zones we want is much faster than running compile which
 # recompiles all the time zones.
 tzdata = Dict{AbstractString,Tuple{ZoneDict,RuleDict}}()
-for name in ("australasia", "europe", "northamerica")
+for name in ("asia", "australasia", "europe", "northamerica")
     tzdata[name] = tzparse(joinpath(TZDATA_DIR, name))
 end
 
@@ -34,4 +34,5 @@ include(joinpath("timezones", "ranges.jl"))
 include(joinpath("timezones", "local.jl"))
 include(joinpath("timezones", "local_mocking.jl"))
 include(joinpath("timezones", "discovery.jl"))
+VERSION >= v"0.5.0-dev+5244" && include(joinpath("timezones", "rounding.jl"))
 include("TimeZones.jl")

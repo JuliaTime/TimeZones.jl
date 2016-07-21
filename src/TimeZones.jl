@@ -55,6 +55,7 @@ include(joinpath("timezones", "conversions.jl"))
 include(joinpath("timezones", "local.jl"))
 include(joinpath("timezones", "ranges.jl"))
 include(joinpath("timezones", "discovery.jl"))
+VERSION >= v"0.5.0-dev+5244" && include(joinpath("timezones", "rounding.jl"))
 
 """
     TimeZone(name::AbstractString) -> TimeZone
