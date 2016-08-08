@@ -3,13 +3,13 @@ import Base.Dates: firstdayofweek, lastdayofweek, firstdayofmonth, lastdayofmont
     firstdayofyear, lastdayofyear, firstdayofquarter, lastdayofquarter
 
 # Truncation
-function Base.trunc{P<:Union{Year,Month,Day}}(dt::ZonedDateTime, t::Type{P})
-    ZonedDateTime(trunc(localtime(dt), t), dt.timezone)
+function Base.trunc{P<:DatePeriod}(zdt::ZonedDateTime, ::Type{P})
+    ZonedDateTime(trunc(localtime(zdt), P), timezone(zdt))
 end
-function Base.trunc{P<:Union{Hour,Minute,Second}}(dt::ZonedDateTime, t::Type{P})
-    ZonedDateTime(trunc(utc(dt), t), dt.timezone, from_utc=true)
+function Base.trunc{P<:TimePeriod}(zdt::ZonedDateTime, ::Type{P})
+    ZonedDateTime(trunc(utc(zdt), P), timezone(zdt), from_utc=true)
 end
-Base.trunc(dt::ZonedDateTime,::Type{Millisecond}) = dt
+Base.trunc(zdt::ZonedDateTime, ::Type{Millisecond}) = zdt
 
 # Adjusters
 for prefix in ("firstdayof", "lastdayof"), suffix in ("week", "month", "year", "quarter")
