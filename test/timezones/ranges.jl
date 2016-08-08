@@ -77,3 +77,17 @@ fixed_range = ZonedDateTime(d, fixed):Hour(1):ZonedDateTime(d, fixed) + Day(1)
 ]
 @test collect(map(TimeZones.utc, no_dst_range)) == raw_range .+ Hour(6)
 @test collect(map(TimeZones.utc, fixed_range)) == raw_range .+ Hour(5)
+
+# recur behaviour with a non-existent hour
+range = ZonedDateTime(2015, 3, 8, dst):Dates.Hour(1):ZonedDateTime(2015, 3, 10, dst)
+@test Dates.recur(dt -> Dates.hour(dt) == 2, range) == [
+    ZonedDateTime(2015, 3, 9, 2, dst)
+]
+
+# recur behaviour with ambiguoous hour
+range = ZonedDateTime(2015, 11, 1, dst):Dates.Hour(1):ZonedDateTime(2015, 11, 3, dst)
+@test Dates.recur(dt -> Dates.hour(dt) == 1, range) == [
+    ZonedDateTime(2015, 11, 1, 1, dst, 1)
+    ZonedDateTime(2015, 11, 1, 1, dst, 2)
+    ZonedDateTime(2015, 11, 2, 1, dst)
+]
