@@ -38,3 +38,20 @@ hour_day = (ZonedDateTime(spring, warsaw) + Hour(24)) + Day(1)
 day_hour = (ZonedDateTime(spring, warsaw) + Day(1)) + Hour(24)
 
 @test hour_day - day_hour == Hour(1)
+
+
+
+ambiguous = DateTime(2015, 10, 25, 2)  # Ambiguous hour in Warsaw
+nonexistent = DateTime(2014, 3, 30, 2)  # Non-existent hour in Warsaw
+
+range = ZonedDateTime(ambiguous - Day(1), warsaw):Hour(1):ZonedDateTime(ambiguous - Day(1) + Hour(1), warsaw)
+@test range .+ Day(1) == ZonedDateTime(ambiguous, warsaw, 1):Hour(1):ZonedDateTime(ambiguous + Hour(1), warsaw)
+
+range = ZonedDateTime(ambiguous - Day(1) - Hour(1), warsaw):Hour(1):ZonedDateTime(ambiguous - Day(1), warsaw)
+@test range .+ Day(1) == ZonedDateTime(ambiguous - Hour(1), warsaw, 1):Hour(1):ZonedDateTime(ambiguous, warsaw, 2)
+
+range = ZonedDateTime(nonexistent - Day(1), warsaw):Hour(1):ZonedDateTime(nonexistent - Day(1) + Hour(1), warsaw)
+@test range .+ Day(1) == ZonedDateTime(nonexistent + Hour(1), warsaw):Hour(1):ZonedDateTime(nonexistent + Hour(1), warsaw)
+
+range = ZonedDateTime(nonexistent - Day(1) - Hour(1), warsaw):Hour(1):ZonedDateTime(nonexistent - Day(1), warsaw)
+@test range .+ Day(1) == ZonedDateTime(nonexistent - Hour(1), warsaw):Hour(1):ZonedDateTime(nonexistent - Hour(1), warsaw)

@@ -34,3 +34,16 @@ zdt = ZonedDateTime(DateTime(2013,9,9), warsaw) # Monday
 
 # TODO: Should be in Base.Dates.
 @test Dates.lastdayofyear(DateTime(2013,9,9)) == DateTime(2013,12,31)
+
+
+dt = DateTime(2014,1,1)
+@test TimeZones.closest(dt, warsaw, Hour(1)) == ZonedDateTime(dt, warsaw)
+@test TimeZones.closest(dt, warsaw, -Hour(1)) == ZonedDateTime(dt, warsaw)
+
+nonexistent = DateTime(2014,3,30,2)
+@test TimeZones.closest(nonexistent, warsaw, Hour(1)) == ZonedDateTime(2014,3,30,1,warsaw)
+@test TimeZones.closest(nonexistent, warsaw, -Hour(1)) == ZonedDateTime(2014,3,30,3,warsaw)
+
+ambiguous = DateTime(2014,10,26,2)
+@test TimeZones.closest(ambiguous, warsaw, Hour(1)) == ZonedDateTime(2014,10,26,2,warsaw,2)
+@test TimeZones.closest(ambiguous, warsaw, -Hour(1)) == ZonedDateTime(2014,10,26,2,warsaw,1)
