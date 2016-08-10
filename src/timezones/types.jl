@@ -165,51 +165,6 @@ immutable ZonedDateTime <: TimeType
 end
 
 """
-    possible_dates(dt, tz, from_utc=false) -> Array{Tuple{DateTime,FixedTimeZone}}
-
-Produces a list of possible UTC `DateTime`s given a local `DateTime` and a
-`VariableTimeZone`. Results are returned in ascending order.
-"""
-function possible_dates(dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
-    possible = Tuple{DateTime,FixedTimeZone}[]
-    t = tz.transitions
-
-    # Determine the earliest and latest possible UTC DateTime
-    # that this local DateTime could be.
-    if from_utc
-        earliest = latest = dt
-    else
-        # TODO: Alternatively we should only look at the range of offsets available within
-        # this TimeZone.
-        earliest = dt + MIN_OFFSET
-        latest = dt + MAX_OFFSET
-    end
-
-    # Determine the earliest transition the local DateTime could
-    # occur within.
-    i = searchsortedlast(
-        t, earliest,
-        by=v -> isa(v, Transition) ? v.utc_datetime : v,
-    )
-    i = max(i, 1)
-
-    n = length(t)
-    while i <= n && t[i].utc_datetime <= latest
-        # Convert the given DateTime into UTC
-        utc_dt = from_utc ? dt : dt - t[i].zone.offset
-
-        if utc_dt >= t[i].utc_datetime && (i == n || utc_dt < t[i + 1].utc_datetime)
-            push!(possible, (utc_dt, t[i].zone))
-        end
-
-        i += 1
-    end
-
-    return possible
-end
-
-
-"""
     ZonedDateTime(dt::DateTime, tz::TimeZone; from_utc=false) -> ZonedDateTime
 
 Construct a `ZonedDateTime` by applying a `TimeZone` to a `DateTime`. When the `from_utc`
@@ -218,12 +173,11 @@ converted to the specified `TimeZone`.  Note that when `from_utc` is true the gi
 `DateTime` can never be ambiguious.
 """
 function ZonedDateTime(dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
-    possible = possible_dates(dt, tz; from_utc=from_utc)
+    possible = interpret(dt, tz, from_utc ? UTC : Local)
 
     num = length(possible)
     if num == 1
-        utc_dt, zone = possible[1]
-        return ZonedDateTime(utc_dt, tz, zone)
+        return first(possible)
     elseif num == 0
         throw(NonExistentTimeError(dt, tz))
     else
@@ -244,17 +198,15 @@ ambiguious within the given time zone you can set `occurrence` to a positive int
 resolve the ambiguity.
 """
 function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, occurrence::Integer)
-    possible = possible_dates(dt, tz)
+    possible = interpret(dt, tz, Local)
 
     num = length(possible)
     if num == 1
-        utc_dt, zone = possible[1]
-        return ZonedDateTime(utc_dt, tz, zone)
+        return first(possible)
     elseif num == 0
         throw(NonExistentTimeError(dt, tz))
     elseif occurrence > 0
-        utc_dt, zone = possible[occurrence]
-        return ZonedDateTime(utc_dt, tz, zone)
+        return possible[occurrence]
     else
         throw(AmbiguousTimeError(dt, tz))
     end
@@ -267,23 +219,21 @@ Construct a `ZonedDateTime` by applying a `TimeZone` to a `DateTime`. If the `Da
 ambiguious within the given time zone you can set `is_dst` to resolve the ambiguity.
 """
 function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
-    possible = possible_dates(dt, tz)
+    possible = interpret(dt, tz, Local)
 
     num = length(possible)
     if num == 1
-        utc_dt, zone = possible[1]
-        return ZonedDateTime(utc_dt, tz, zone)
+        return first(possible)
     elseif num == 0
         throw(NonExistentTimeError(dt, tz))
     elseif num == 2
-        mask = [isdst(zone.offset) for (utc_dt, zone) in possible]
+        mask = [isdst(zdt.zone.offset) for zdt in possible]
 
         # Mask is expected to be unambiguous.
         !($)(mask...) && throw(AmbiguousTimeError(dt, tz))
 
         occurrence = is_dst ? findfirst(mask) : findfirst(!mask)
-        utc_dt, zone = possible[occurrence]
-        return ZonedDateTime(utc_dt, tz, zone)
+        return possible[occurrence]
     else
         throw(AmbiguousTimeError(dt, tz))
     end

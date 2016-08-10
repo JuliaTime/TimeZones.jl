@@ -31,17 +31,16 @@ function closest(dt::DateTime, tz::TimeZone, step::Period)
 end
 
 function closest(dt::DateTime, tz::VariableTimeZone, step::Period)
-    possible = possible_dates(dt, tz)
+    possible = interpret(dt, tz, Local)
 
     # Skip all non-existent local datetimes.
     while isempty(possible)
         dt -= step
-        possible = possible_dates(dt, tz)
+        possible = interpret(dt, tz, Local)
     end
 
     # Is step positive?
-    dt, fixed = step == abs(step) ? last(possible) : first(possible)
-    return ZonedDateTime(dt, tz, fixed)
+    return step == abs(step) ? last(possible) : first(possible)
 end
 
 
