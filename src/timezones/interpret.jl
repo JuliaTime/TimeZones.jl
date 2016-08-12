@@ -181,3 +181,13 @@ function last_valid(local_dt::DateTime, tz::VariableTimeZone, step::Period)
 
     return last(possible)
 end
+
+function first_valid(local_dt::DateTime, tz::VariableTimeZone)
+    possible = interpret(local_dt, tz, Local)
+    return isempty(possible) ? last(shift_gap(local_dt, tz)) : first(possible)
+end
+
+function last_valid(local_dt::DateTime, tz::VariableTimeZone)
+    possible = interpret(local_dt, tz, Local)
+    return isempty(possible) ? first(shift_gap(local_dt, tz)) : last(possible)
+end

@@ -81,3 +81,16 @@ nonexistent = DateTime(2014,3,30,2)
 ambiguous = DateTime(2014,10,26,2)
 @test TimeZones.first_valid(ambiguous, warsaw, Hour(1)) == ZonedDateTime(2014,10,26,2,warsaw,1)
 @test TimeZones.last_valid(ambiguous, warsaw, Hour(1)) == ZonedDateTime(2014,10,26,2,warsaw,2)
+
+
+dt = DateTime(2014,1,1)
+@test TimeZones.first_valid(dt, warsaw) == ZonedDateTime(dt, warsaw)
+@test TimeZones.last_valid(dt, warsaw) == ZonedDateTime(dt, warsaw)
+
+nonexistent = DateTime(2014,3,30,2)
+@test TimeZones.first_valid(nonexistent, warsaw) == ZonedDateTime(2014,3,30,3,warsaw)
+@test TimeZones.last_valid(nonexistent, warsaw) == ZonedDateTime(2014,3,30,1,59,59,999,warsaw)
+
+ambiguous = DateTime(2014,10,26,2)
+@test TimeZones.first_valid(ambiguous, warsaw) == ZonedDateTime(2014,10,26,2,warsaw,1)
+@test TimeZones.last_valid(ambiguous, warsaw) == ZonedDateTime(2014,10,26,2,warsaw,2)
