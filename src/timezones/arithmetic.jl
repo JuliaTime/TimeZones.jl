@@ -18,14 +18,27 @@ function (-)(zdt::ZonedDateTime, p::TimePeriod)
 end
 
 function (.+)(r::StepRange{ZonedDateTime}, p::DatePeriod)
-    start, s, finish = first(r), step(r), last(r)
+    start, step, stop = first(r), Base.step(r), last(r)
 
-    # Since the localtime + period can result in an invalid local datetime we'll use
-    # `closest` to always return a valid ZonedDateTime.
-    start = closest(localtime(start) + p, timezone(start), -s)
-    finish = closest(localtime(finish) + p, timezone(finish), s)
+    # Since the localtime + period can result in an invalid local datetime when working with
+    # VariableTimeZones we will use `first_valid` and `last_valid` which avoids issues with
+    # non-existent and ambiguous dates.
 
-    return StepRange(start, s, finish)
+    tz = timezone(start)
+    if isa(tz, VariableTimeZone)
+        start = first_valid(localtime(start) + p, tz, step)
+    else
+        start = start + p
+    end
+
+    tz = timezone(stop)
+    if isa(tz, VariableTimeZone)
+        stop = last_valid(localtime(stop) + p, tz, step)
+    else
+        stop = stop + p
+    end
+
+    return StepRange(start, step, stop)
 end
 
 (.-)(r::StepRange{ZonedDateTime}, p::DatePeriod) = r .+ (-p)

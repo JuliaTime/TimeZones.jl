@@ -71,13 +71,13 @@ end
 # TODO: Switch time zone in tests to apia?
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 dt = DateTime(2014,1,1)
-@test TimeZones.closest(dt, warsaw, Hour(1)) == ZonedDateTime(dt, warsaw)
-@test TimeZones.closest(dt, warsaw, -Hour(1)) == ZonedDateTime(dt, warsaw)
+@test TimeZones.first_valid(dt, warsaw, Hour(1)) == ZonedDateTime(dt, warsaw)
+@test TimeZones.last_valid(dt, warsaw, Hour(1)) == ZonedDateTime(dt, warsaw)
 
 nonexistent = DateTime(2014,3,30,2)
-@test TimeZones.closest(nonexistent, warsaw, Hour(1)) == ZonedDateTime(2014,3,30,1,warsaw)
-@test TimeZones.closest(nonexistent, warsaw, -Hour(1)) == ZonedDateTime(2014,3,30,3,warsaw)
+@test TimeZones.first_valid(nonexistent, warsaw, Hour(1)) == ZonedDateTime(2014,3,30,3,warsaw)
+@test TimeZones.last_valid(nonexistent, warsaw, Hour(1)) == ZonedDateTime(2014,3,30,1,warsaw)
 
 ambiguous = DateTime(2014,10,26,2)
-@test TimeZones.closest(ambiguous, warsaw, Hour(1)) == ZonedDateTime(2014,10,26,2,warsaw,2)
-@test TimeZones.closest(ambiguous, warsaw, -Hour(1)) == ZonedDateTime(2014,10,26,2,warsaw,1)
+@test TimeZones.first_valid(ambiguous, warsaw, Hour(1)) == ZonedDateTime(2014,10,26,2,warsaw,1)
+@test TimeZones.last_valid(ambiguous, warsaw, Hour(1)) == ZonedDateTime(2014,10,26,2,warsaw,2)

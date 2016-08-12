@@ -145,15 +145,32 @@ function shift_gap(local_dt::DateTime, tz::VariableTimeZone)
 end
 
 """
-    closest(local_dt::DateTime, tz::TimeZone, step::Period)
+    first_valid(local_dt::DateTime, tz::VariableTimeZone, step::Period)
 
-Always construct a valid `ZonedDateTime` by adjusting local `DateTime by the given
-`step` when `local_dt` lands on a non-existent or ambiguous hour. Currently only meant for
-internal use.
+Construct a valid `ZonedDateTime` by adjusting the local `DateTime`. If the local `DateTime`
+is non-existent then it will be adjusted using the `step` to be *after* the gap. When the
+local `DateTime` is ambiguous the *first* ambiguous `DateTime` will be returned.
 """
-closest
+function first_valid(local_dt::DateTime, tz::VariableTimeZone, step::Period)
+    possible = interpret(local_dt, tz, Local)
 
-function closest(local_dt::DateTime, tz::VariableTimeZone, step::Period)
+    # Skip all non-existent local datetimes.
+    while isempty(possible)
+        local_dt += step
+        possible = interpret(local_dt, tz, Local)
+    end
+
+    return first(possible)
+end
+
+"""
+    last_valid(local_dt::DateTime, tz::VariableTimeZone, step::Period)
+
+Construct a valid `ZonedDateTime` by adjusting the local `DateTime`. If the local `DateTime`
+is non-existent then it will be adjusted using the `step` to be *before* the gap. When the
+local `DateTime` is ambiguous the *last* ambiguous `DateTime` will be returned.
+"""
+function last_valid(local_dt::DateTime, tz::VariableTimeZone, step::Period)
     possible = interpret(local_dt, tz, Local)
 
     # Skip all non-existent local datetimes.
@@ -162,10 +179,5 @@ function closest(local_dt::DateTime, tz::VariableTimeZone, step::Period)
         possible = interpret(local_dt, tz, Local)
     end
 
-    # Is step positive?
-    return step == abs(step) ? last(possible) : first(possible)
-end
-
-function closest(local_dt::DateTime, tz::FixedTimeZone, step::Period)
-    return ZonedDateTime(local_dt, tz)
+    return last(possible)
 end
