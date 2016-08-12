@@ -143,3 +143,29 @@ function shift_gap(local_dt::DateTime, tz::VariableTimeZone)
     # empty array or a 2-element array.
     return boundaries
 end
+
+"""
+    closest(local_dt::DateTime, tz::TimeZone, step::Period)
+
+Always construct a valid `ZonedDateTime` by adjusting local `DateTime by the given
+`step` when `local_dt` lands on a non-existent or ambiguous hour. Currently only meant for
+internal use.
+"""
+closest
+
+function closest(local_dt::DateTime, tz::VariableTimeZone, step::Period)
+    possible = interpret(local_dt, tz, Local)
+
+    # Skip all non-existent local datetimes.
+    while isempty(possible)
+        local_dt -= step
+        possible = interpret(local_dt, tz, Local)
+    end
+
+    # Is step positive?
+    return step == abs(step) ? last(possible) : first(possible)
+end
+
+function closest(local_dt::DateTime, tz::FixedTimeZone, step::Period)
+    return ZonedDateTime(local_dt, tz)
+end

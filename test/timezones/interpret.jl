@@ -67,3 +67,17 @@ for tz in (long, hidden)
     @test TimeZones.shift_gap(non_existent_1, tz) == boundaries
     @test TimeZones.shift_gap(non_existent_2, tz) == boundaries
 end
+
+# TODO: Switch time zone in tests to apia?
+warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
+dt = DateTime(2014,1,1)
+@test TimeZones.closest(dt, warsaw, Hour(1)) == ZonedDateTime(dt, warsaw)
+@test TimeZones.closest(dt, warsaw, -Hour(1)) == ZonedDateTime(dt, warsaw)
+
+nonexistent = DateTime(2014,3,30,2)
+@test TimeZones.closest(nonexistent, warsaw, Hour(1)) == ZonedDateTime(2014,3,30,1,warsaw)
+@test TimeZones.closest(nonexistent, warsaw, -Hour(1)) == ZonedDateTime(2014,3,30,3,warsaw)
+
+ambiguous = DateTime(2014,10,26,2)
+@test TimeZones.closest(ambiguous, warsaw, Hour(1)) == ZonedDateTime(2014,10,26,2,warsaw,2)
+@test TimeZones.closest(ambiguous, warsaw, -Hour(1)) == ZonedDateTime(2014,10,26,2,warsaw,1)
