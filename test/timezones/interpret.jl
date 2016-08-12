@@ -68,29 +68,28 @@ for tz in (long, hidden)
     @test TimeZones.shift_gap(non_existent_2, tz) == boundaries
 end
 
-# TODO: Switch time zone in tests to apia?
-warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
-dt = DateTime(2014,1,1)
-@test TimeZones.first_valid(dt, warsaw, Hour(1)) == ZonedDateTime(dt, warsaw)
-@test TimeZones.last_valid(dt, warsaw, Hour(1)) == ZonedDateTime(dt, warsaw)
 
-nonexistent = DateTime(2014,3,30,2)
-@test TimeZones.first_valid(nonexistent, warsaw, Hour(1)) == ZonedDateTime(2014,3,30,3,warsaw)
-@test TimeZones.last_valid(nonexistent, warsaw, Hour(1)) == ZonedDateTime(2014,3,30,1,warsaw)
+# Various DateTimes in Pacific/Apia
+valid = DateTime(2013,1,1)
+ambiguous = ambiguous_pos
+non_existent = non_existent_pos
 
-ambiguous = DateTime(2014,10,26,2)
-@test TimeZones.first_valid(ambiguous, warsaw, Hour(1)) == ZonedDateTime(2014,10,26,2,warsaw,1)
-@test TimeZones.last_valid(ambiguous, warsaw, Hour(1)) == ZonedDateTime(2014,10,26,2,warsaw,2)
+# first_valid/last_valid with a step
+@test TimeZones.first_valid(valid, apia, Hour(1)) == ZonedDateTime(valid, apia)
+@test TimeZones.last_valid(valid, apia, Hour(1)) == ZonedDateTime(valid, apia)
 
+@test TimeZones.first_valid(non_existent, apia, Hour(1)) == ZonedDateTime(2011,9,24,4,apia)
+@test TimeZones.last_valid(non_existent, apia, Hour(1)) == ZonedDateTime(2011,9,24,2,apia)
 
-dt = DateTime(2014,1,1)
-@test TimeZones.first_valid(dt, warsaw) == ZonedDateTime(dt, warsaw)
-@test TimeZones.last_valid(dt, warsaw) == ZonedDateTime(dt, warsaw)
+@test TimeZones.first_valid(ambiguous, apia, Hour(1)) == ZonedDateTime(ambiguous,apia,1)
+@test TimeZones.last_valid(ambiguous, apia, Hour(1)) == ZonedDateTime(ambiguous,apia,2)
 
-nonexistent = DateTime(2014,3,30,2)
-@test TimeZones.first_valid(nonexistent, warsaw) == ZonedDateTime(2014,3,30,3,warsaw)
-@test TimeZones.last_valid(nonexistent, warsaw) == ZonedDateTime(2014,3,30,1,59,59,999,warsaw)
+# first_valid/last_valid with no step
+@test TimeZones.first_valid(valid, apia) == ZonedDateTime(valid, apia)
+@test TimeZones.last_valid(valid, apia) == ZonedDateTime(valid, apia)
 
-ambiguous = DateTime(2014,10,26,2)
-@test TimeZones.first_valid(ambiguous, warsaw) == ZonedDateTime(2014,10,26,2,warsaw,1)
-@test TimeZones.last_valid(ambiguous, warsaw) == ZonedDateTime(2014,10,26,2,warsaw,2)
+@test TimeZones.first_valid(non_existent, apia) == ZonedDateTime(2011,9,24,4,apia)
+@test TimeZones.last_valid(non_existent, apia) == ZonedDateTime(2011,9,24,2,59,59,999,apia)
+
+@test TimeZones.first_valid(ambiguous, apia) == ZonedDateTime(ambiguous,apia,1)
+@test TimeZones.last_valid(ambiguous, apia) == ZonedDateTime(ambiguous,apia,2)
