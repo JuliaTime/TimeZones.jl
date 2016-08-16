@@ -2,15 +2,6 @@
 # abstract UTC <: TimeZone  # Defined in Base.Dates
 abstract Local <: TimeZone
 
-"""
-    transition_range(dt::DateTime, tz::VariableTimeZone, context::Type{Union{Local,UTC}}) -> UnitRange
-
-Finds the indexes of the `tz` transitions which may be applicable for the `dt`. The given
-DateTime is expected to be local to the time zone or in UTC as specified by `context`. Note
-that UTC context will always return a range of length one.
-"""
-transition_range
-
 function transition_range(local_dt::DateTime, tz::VariableTimeZone, ::Type{Local})
     transitions = tz.transitions
 
@@ -49,13 +40,13 @@ function transition_range(utc_dt::DateTime, tz::VariableTimeZone, ::Type{UTC})
 end
 
 """
-    interpret(dt::DateTime, tz::VariableTimeZone, context::Type{Union{Local,UTC}}) -> Array{ZonedDateTime}
+    transition_range(dt::DateTime, tz::VariableTimeZone, context::Type{Union{Local,UTC}}) -> UnitRange
 
-Produces a list of possible `ZonedDateTime`s given a `DateTime` and `VariableTimeZone`.
-The result will be returned in chronological order. Note that `DateTime`s in the local
-context typically return 0-2 results while the UTC context will always return 1 result.
+Finds the indexes of the `tz` transitions which may be applicable for the `dt`. The given
+DateTime is expected to be local to the time zone or in UTC as specified by `context`. Note
+that UTC context will always return a range of length one.
 """
-interpret
+transition_range(dt::DateTime, tz::VariableTimeZone, context::Type{Union{Local,UTC}})
 
 function interpret(local_dt::DateTime, tz::VariableTimeZone, ::Type{Local})
     interpretations = ZonedDateTime[]
@@ -79,6 +70,15 @@ function interpret(utc_dt::DateTime, tz::VariableTimeZone, ::Type{UTC})
     i = first(range)
     return [ZonedDateTime(utc_dt, tz, tz.transitions[i].zone)]
 end
+
+"""
+    interpret(dt::DateTime, tz::VariableTimeZone, context::Type{Union{Local,UTC}}) -> Array{ZonedDateTime}
+
+Produces a list of possible `ZonedDateTime`s given a `DateTime` and `VariableTimeZone`.
+The result will be returned in chronological order. Note that `DateTime`s in the local
+context typically return 0-2 results while the UTC context will always return 1 result.
+"""
+interpret(dt::DateTime, tz::VariableTimeZone, context::Type{Union{Local,UTC}})
 
 """
     shift_gap(local_dt::DateTime, tz::VariableTimeZone) -> Array{ZonedDateTime}
