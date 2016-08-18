@@ -81,10 +81,11 @@ fixed_range = ZonedDateTime(d, fixed):Hour(1):ZonedDateTime(d, fixed) + Day(1)
 # recur behaviour with a non-existent hour
 range = ZonedDateTime(2015, 3, 8, dst):Dates.Hour(1):ZonedDateTime(2015, 3, 10, dst)
 @test Dates.recur(dt -> Dates.hour(dt) == 2, range) == [
+    # ZonedDateTime(2015, 3, 8, 2, dst)  # Non-existent hour
     ZonedDateTime(2015, 3, 9, 2, dst)
 ]
 
-# recur behaviour with ambiguoous hour
+# recur behaviour with ambiguous hour
 range = ZonedDateTime(2015, 11, 1, dst):Dates.Hour(1):ZonedDateTime(2015, 11, 3, dst)
 @test Dates.recur(dt -> Dates.hour(dt) == 1, range) == [
     ZonedDateTime(2015, 11, 1, 1, dst, 1)
