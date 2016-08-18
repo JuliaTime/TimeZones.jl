@@ -66,7 +66,7 @@ end
 
 function interpret(utc_dt::DateTime, tz::VariableTimeZone, ::Type{UTC})
     range = transition_range(utc_dt, tz, UTC)
-    length(range) == 1 || error("A UTC DateTimes should only have a single interpretation")
+    length(range) == 1 || error("Internal TimeZones error: A UTC DateTime should only have a single interpretation")
     i = first(range)
     return [ZonedDateTime(utc_dt, tz, tz.transitions[i].zone)]
 end
