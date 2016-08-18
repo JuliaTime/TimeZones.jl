@@ -46,7 +46,7 @@ Finds the indexes of the `tz` transitions which may be applicable for the `dt`. 
 DateTime is expected to be local to the time zone or in UTC as specified by `context`. Note
 that UTC context will always return a range of length one.
 """
-transition_range(dt::DateTime, tz::VariableTimeZone, context::Type{Union{Local,UTC}})
+transition_range(::DateTime, ::VariableTimeZone, ::Type{Union{Local,UTC}})
 
 function interpret(local_dt::DateTime, tz::VariableTimeZone, ::Type{Local})
     interpretations = ZonedDateTime[]
@@ -78,7 +78,7 @@ Produces a list of possible `ZonedDateTime`s given a `DateTime` and `VariableTim
 The result will be returned in chronological order. Note that `DateTime`s in the local
 context typically return 0-2 results while the UTC context will always return 1 result.
 """
-interpret(dt::DateTime, tz::VariableTimeZone, context::Type{Union{Local,UTC}})
+interpret(::DateTime, ::VariableTimeZone, ::Type{Union{Local,UTC}})
 
 """
     shift_gap(local_dt::DateTime, tz::VariableTimeZone) -> Array{ZonedDateTime}
