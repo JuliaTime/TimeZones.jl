@@ -14,6 +14,13 @@ Creates a utc `DateTime` from the given `ZonedDateTime`. For example the
 """
 utc(zdt::ZonedDateTime) = zdt.utc_datetime
 
+"""
+    timezone(::ZonedDateTime) -> TimeZone
+
+Returns the `TimeZone` used by the `ZonedDateTime`.
+"""
+timezone(zdt::ZonedDateTime) = zdt.timezone
+
 days(zdt::ZonedDateTime) = days(localtime(zdt))
 
 for period in (:Hour, :Minute, :Second, :Millisecond)

@@ -1,16 +1,18 @@
-function Base.floor(zdt::ZonedDateTime, p::Dates.DatePeriod)
-    return ZonedDateTime(floor(localtime(zdt), p), zdt.timezone)
+import Base.Dates: Period, DatePeriod, TimePeriod
+
+function Base.floor(zdt::ZonedDateTime, p::DatePeriod)
+    return ZonedDateTime(floor(localtime(zdt), p), timezone(zdt))
 end
 
-function Base.floor(zdt::ZonedDateTime, p::Dates.TimePeriod)
+function Base.floor(zdt::ZonedDateTime, p::TimePeriod)
     # Rounding is done using the current fixed offset to avoid transitional ambiguities.
     dt = floor(localtime(zdt), p)
     utc_dt = dt - zdt.zone.offset
-    return ZonedDateTime(utc_dt, zdt.timezone; from_utc=true)
+    return ZonedDateTime(utc_dt, timezone(zdt); from_utc=true)
 end
 
-function Base.ceil(zdt::ZonedDateTime, p::Dates.DatePeriod)
-    return ZonedDateTime(ceil(localtime(zdt), p), zdt.timezone)
+function Base.ceil(zdt::ZonedDateTime, p::DatePeriod)
+    return ZonedDateTime(ceil(localtime(zdt), p), timezone(zdt))
 end
 
 #function Base.Dates.floorceil(zdt::ZonedDateTime, p::Dates.DatePeriod)
@@ -45,7 +47,7 @@ julia> floor(zdt, Dates.Hour)
 2016-03-13T01:00:00-06:00
 ```
 """
-Base.floor(::TimeZones.ZonedDateTime, ::Union{Dates.Period, Type{Dates.Period}})
+Base.floor(::TimeZones.ZonedDateTime, ::Union{Period, Type{Period}})
 
 """
     ceil(zdt::ZonedDateTime, p::Period) -> ZonedDateTime
@@ -75,7 +77,7 @@ julia> ceil(zdt, Dates.Hour)
 2016-03-13T03:00:00-05:00
 ```
 """
-Base.ceil(::TimeZones.ZonedDateTime, ::Union{Dates.Period, Type{Dates.Period}})
+Base.ceil(::TimeZones.ZonedDateTime, ::Union{Period, Type{Period}})
 
 """
     round(zdt::ZonedDateTime, p::Period, [r::RoundingMode]) -> ZonedDateTime
@@ -146,4 +148,4 @@ julia> round(zdt, Dates.Day)
 ERROR: Local DateTime 1996-10-26T00:00:00 is ambiguious
 ```
 """     # Defined in base/dates/rounding.jl
-Base.round(::TimeZones.ZonedDateTime, ::Union{Dates.Period, Type{Dates.Period}})
+Base.round(::TimeZones.ZonedDateTime, ::Union{Period, Type{Period}})
