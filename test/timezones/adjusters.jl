@@ -18,6 +18,10 @@ dt = DateTime(2014,10,26,2)
 @test trunc(ZonedDateTime(dt + Minute(59), warsaw, 1), Hour) == ZonedDateTime(dt, warsaw, 1)
 @test trunc(ZonedDateTime(dt + Minute(59), warsaw, 2), Hour) == ZonedDateTime(dt, warsaw, 2)
 
+# Sub-hourly offsets (Issue #33)
+st_johns = resolve("America/St_Johns", tzdata["northamerica"]...)   # UTC-3:30 or UTC-2:30
+zdt = ZonedDateTime(DateTime(2016,8,18,17,57,56,513), st_johns)
+@test trunc(zdt, Hour) == ZonedDateTime(DateTime(2016,8,18,17), st_johns)
 
 # Adjuster functions
 zdt = ZonedDateTime(DateTime(2013,9,9), warsaw) # Monday
