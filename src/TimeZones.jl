@@ -65,13 +65,11 @@ be determined using `timezone_names()`.
 See `FixedTimeZone(::AbstractString)` for making a custom `TimeZone` instances.
 """
 function TimeZone(name::AbstractString)
-    return get!(TIME_ZONES, name) do
-        tz_path = joinpath(COMPILED_DIR, split(name, "/")...)
-        isfile(tz_path) || throw(ArgumentError("Unknown time zone named $name"))
+    tz_path = joinpath(COMPILED_DIR, split(name, "/")...)
+    isfile(tz_path) || throw(ArgumentError("Unknown time zone named $name"))
 
-        open(tz_path, "r") do fp
-            return deserialize(fp)
-        end
+    open(tz_path, "r") do fp
+        return deserialize(fp)
     end
 end
 
