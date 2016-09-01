@@ -2,10 +2,14 @@
 *.swp
 .DS_Store
 
-# Ignore dependencies that are build/retrieved
+# Ignore dependencies that are built/retrieved
 deps/tzarchive
 deps/tzsource
 deps/compiled
 deps/local
 deps/active_version
 test/tzsource
+
+# PkgBenchmark
+benchmark/.results
+benchmark/.tune.jld
