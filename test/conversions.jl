@@ -11,7 +11,7 @@ zdt = ZonedDateTime(dt, warsaw)
 
 # Vectorized accessors
 arr = repmat([zdt], 10)
-@test Dates.DateTime(arr) == repmat([dt], 10)
+@test Dates.DateTime.(arr) == repmat([dt], 10)
 
 # now function
 dt = Dates.unix2datetime(time())  # Base.now in UTC
