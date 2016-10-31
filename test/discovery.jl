@@ -20,9 +20,9 @@ timezones = timezones_from_abbr("EET")
 
 # Note: Unlike time zone names it is possible, although unlikely, for the number of
 # abbreviations to decrease over time.
-# Note: Release 2016g switched to using numeric time zone abbreviations instead of using
-# invented or obsolete alphanumeric time zone abbreviations.
+# Note: Release 2016g and 2016h switched to using numeric time zone abbreviations instead of
+# using invented or obsolete alphanumeric time zone abbreviations.
 abbrs = timezone_abbrs()
-@test length(abbrs) >= 269  # Updated for release: 2016g
+@test length(abbrs) >= 267  # Updated for release: 2016h
 @test isa(abbrs, Array{AbstractString})
 @test issorted(abbrs)
