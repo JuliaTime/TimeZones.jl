@@ -92,3 +92,12 @@ range = ZonedDateTime(2015, 11, 1, dst):Dates.Hour(1):ZonedDateTime(2015, 11, 3,
     ZonedDateTime(2015, 11, 1, 1, dst, 2)
     ZonedDateTime(2015, 11, 2, 1, dst)
 ]
+
+
+### StepRange with DatePeriod ###
+
+range = ZonedDateTime(2015,3,6,2,dst):Day(1):ZonedDateTime(2015,3,10,wpg)
+@test length(range) > 0
+
+range = ZonedDateTime(2015,3,6,2,wpg):Day(1):ZonedDateTime(2015,3,9,wpg)
+@test length(range) > 0
