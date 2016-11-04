@@ -96,14 +96,42 @@ range = ZonedDateTime(2015, 11, 1, dst):Dates.Hour(1):ZonedDateTime(2015, 11, 3,
 
 ### StepRange with DatePeriod ###
 
-# Note: 2015-03-08T02:00 America/Winnipeg is non-existent
-@test ==(
-    ZonedDateTime(2015,3,7,2,dst):Day(1):ZonedDateTime(2015,3,9,dst),
-    ZonedDateTime(2015,3,7,2,dst):Day(1):ZonedDateTime(2015,3,7,2,dst),
-)
+# 2015-03-08T02:00 America/Winnipeg is non-existent
+range = ZonedDateTime(2015,3,7,2,dst):Day(1):ZonedDateTime(2015,3,10,dst)
 
-# Note: 2015-11-01T01:00 America/Winnipeg is ambiguous
-@test ==(
-    ZonedDateTime(2015,10,31,1,dst):Day(1):ZonedDateTime(2015,11,2,dst),
-    ZonedDateTime(2015,10,31,1,dst):Day(1):ZonedDateTime(2015,11,1,2,dst,2),  # should be last
-)
+@test range == ZonedDateTime(2015,3,7,2,dst):Day(1):ZonedDateTime(2015,3,9,2,dst)
+@test_throws NonExistentTimeError collect(range)
+@test collect(range; non_existent=:skip) == [
+    ZonedDateTime(2015,3,7,2,dst),
+    ZonedDateTime(2015,3,9,2,dst),
+]
+
+# Note: Behaviour is rather odd and may change in the future.
+range = ZonedDateTime(2015,3,7,2,dst):Day(1):ZonedDateTime(2015,3,9,dst)
+
+@test range == ZonedDateTime(2015,3,7,2,dst):Day(1):ZonedDateTime(2015,3,7,2,dst)
+@test collect(range) == [
+    ZonedDateTime(2015,3,7,2,dst),
+]
+
+# 2015-11-01T01:00 America/Winnipeg is ambiguous
+range = ZonedDateTime(2015,10,31,1,dst):Day(1):ZonedDateTime(2015,11,2,dst)
+
+@test range == ZonedDateTime(2015,10,31,1,dst):Day(1):ZonedDateTime(2015,11,1,2,dst,2)  # should be last
+@test_throws AmbiguousTimeError collect(range)
+@test collect(range; ambiguous=:skip) == [
+    ZonedDateTime(2015,10,31,1,dst),
+]
+@test collect(range; ambiguous=:first) == [
+    ZonedDateTime(2015,10,31,1,dst),
+    ZonedDateTime(2015,11,1,1,dst,1),
+]
+@test collect(range; ambiguous=:last) == [
+    ZonedDateTime(2015,10,31,1,dst),
+    ZonedDateTime(2015,11,1,1,dst,2),
+]
+@test collect(range; ambiguous=:all) == [
+    ZonedDateTime(2015,10,31,1,dst),
+    ZonedDateTime(2015,11,1,1,dst,1),
+    ZonedDateTime(2015,11,1,1,dst,2),
+]
