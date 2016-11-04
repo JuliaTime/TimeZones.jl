@@ -96,8 +96,14 @@ range = ZonedDateTime(2015, 11, 1, dst):Dates.Hour(1):ZonedDateTime(2015, 11, 3,
 
 ### StepRange with DatePeriod ###
 
-range = ZonedDateTime(2015,3,6,2,dst):Day(1):ZonedDateTime(2015,3,10,wpg)
-@test length(range) > 0
+# Note: 2015-03-08T02:00 America/Winnipeg is non-existent
+@test ==(
+    ZonedDateTime(2015,3,7,2,dst):Day(1):ZonedDateTime(2015,3,9,dst),
+    ZonedDateTime(2015,3,7,2,dst):Day(1):ZonedDateTime(2015,3,7,2,dst),
+)
 
-range = ZonedDateTime(2015,3,6,2,wpg):Day(1):ZonedDateTime(2015,3,9,wpg)
-@test length(range) > 0
+# Note: 2015-11-01T01:00 America/Winnipeg is ambiguous
+@test ==(
+    ZonedDateTime(2015,10,31,1,dst):Day(1):ZonedDateTime(2015,11,2,dst),
+    ZonedDateTime(2015,10,31,1,dst):Day(1):ZonedDateTime(2015,11,1,2,dst,2),  # should be last
+)
