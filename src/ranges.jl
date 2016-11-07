@@ -54,3 +54,7 @@ function collect{P<:DatePeriod}(r::OrdinalRange{ZonedDateTime,P}; non_existent=:
 
     return results
 end
+
+function collect{P<:TimePeriod}(r::OrdinalRange{ZonedDateTime,P}; non_existent=:invalid, ambiguous=:invalid)
+    invoke(collect, (OrdinalRange,), r)
+end
