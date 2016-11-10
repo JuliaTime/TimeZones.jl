@@ -5,6 +5,7 @@ using Base.Test
 using TimeZones
 import TimeZones: PKG_DIR
 import TimeZones.Olson: ZoneDict, RuleDict, tzparse, resolve
+import Compat: @compat
 
 const TZDATA_VERSION = "2016j"
 const TZDATA_DIR = get(ENV, "TZDATA_DIR", joinpath(PKG_DIR, "test", "tzdata"))
