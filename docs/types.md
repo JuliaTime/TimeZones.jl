@@ -98,7 +98,7 @@ ERROR: TimeZone Europe/Warsaw does not handle dates on or after 2038-03-28T01:00
  in ZonedDateTime at ~/.julia/v0.4/TimeZones/src/timezones/types.jl:260
 ```
 
-It is possible to have [timezones that work beyond 2038](faq/#far-future-zoneddatetime-with-variabletimezone) but it since these dates are in the future it is possible the timezone rules may change and will not be accurate.
+It is possible to have [timezones that work beyond 2038](http://timezonesjl.readthedocs.io/en/stable/faq/#far-future-zoneddatetime-with-variabletimezone) but it since these dates are in the future it is possible the timezone rules may change and will not be accurate.
 
 
 ## FixedTimeZone
