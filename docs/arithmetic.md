@@ -1,12 +1,12 @@
 ## ZonedDateTime-Period Arithmetic
 
-`ZonedDateTime` uses calendrical arithmetic in a [similar manner to `DateTime`](http://julia.readthedocs.org/en/latest/manual/dates/#timetype-period-arithmetic) but with some key differences. Lets look at these differences by adding a day to March 30th 2014 in Europe/Warsaw.
+`ZonedDateTime` uses calendrical arithmetic in a [similar manner to `DateTime`](http://julia.readthedocs.io/en/latest/manual/dates/#timetype-period-arithmetic) but with some key differences. Lets look at these differences by adding a day to March 30th 2014 in Europe/Warsaw.
 
 ```julia
-julia> using Dates
+julia> using Base.Dates
 
 julia> warsaw = TimeZone("Europe/Warsaw")
-Europe/Warsaw
+Europe/Warsaw (UTC+1/UTC+2)
 
 julia> spring = ZonedDateTime(2014, 3, 30, warsaw)
 2014-03-30T00:00:00+01:00
@@ -42,10 +42,11 @@ Take particular note of the last example which ends up merging the two periods i
 
 ## Ranges
 
-Julia allows for the use of powerful [adjuster functions](http://julia.readthedocs.org/en/latest/manual/dates/#adjuster-functions) to perform certain cendrical and temporal calculations. The `recur()` function, for example, can take a `StepRange` of `TimeType`s and apply a function to produce a vector of dates that fit certain inclusion criteria (for example, "every fifth Wednesday of the month in 2014 at 09:00"):
+Julia allows for the use of powerful [adjuster functions](http://julia.readthedocs.io/en/latest/manual/dates/#adjuster-functions) to perform certain cendrical and temporal calculations. The `recur()` function, for example, can take a `StepRange` of `TimeType`s and apply a function to produce a vector of dates that fit certain inclusion criteria (for example, "every fifth Wednesday of the month in 2014 at 09:00"):
 
 ```julia
 julia> warsaw = TimeZone("Europe/Warsaw")
+Europe/Warsaw (UTC+1/UTC+2)
 
 julia> start = ZonedDateTime(2014, warsaw)
 2014-01-01T00:00:00+01:00

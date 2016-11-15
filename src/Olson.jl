@@ -3,7 +3,7 @@ module Olson
 using Base.Dates
 
 import ..TimeZones: TZDATA_DIR, COMPILED_DIR, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET,
-    MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET, Time
+    MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET, TIME_ZONES, Time
 import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition, Time
 
 # Zone type maps to an Olson Timezone database entity
@@ -546,6 +546,7 @@ function compile(tzdata_dir::AbstractString=TZDATA_DIR, dest_dir::AbstractString
     timezones = load(tzdata_dir; max_year=max_year)
 
     isdir(dest_dir) || error("Destination directory doesn't exist")
+    empty!(TIME_ZONES)
 
     for (name, timezone) in timezones
         parts = split(name, "/")

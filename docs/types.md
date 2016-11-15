@@ -6,7 +6,7 @@ A `TimeZone` is an abstract type that represents information regarding a specifi
 TimeZone("Europe/Warsaw")
 ```
 
-To see all of the [currently available](/faq/#why-are-the-etc-time-zones-unsupported) time zone names:
+To see all of the [currently available](faq#why-are-the-etc-time-zones-unsupported) time zone names:
 
 ```julia
 timezone_names()
@@ -32,7 +32,7 @@ A `VariableTimeZone` is a concrete type that is a subtype of `TimeZone` that has
 
 ```julia
 julia> warsaw = TimeZone("Europe/Warsaw")
-Europe/Warsaw
+Europe/Warsaw (UTC+1/UTC+2)
 
 julia> typeof(warsaw)
 TimeZones.VariableTimeZone
@@ -52,8 +52,6 @@ julia> ZonedDateTime(DateTime(2014,3,30,1), warsaw)
 
 julia> ZonedDateTime(DateTime(2014,3,30,2), warsaw)
 ERROR: DateTime 2014-03-30T02:00:00 does not exist within Europe/Warsaw
- in ZonedDateTime at ~/.julia/v0.4/TimeZones/src/timezones/types.jl:184
- in ZonedDateTime at ~/.julia/v0.4/TimeZones/src/timezones/types.jl:177
 
 julia> ZonedDateTime(DateTime(2014,3,30,3), warsaw)
 2014-03-30T03:00:00+02:00
@@ -67,12 +65,11 @@ julia> dt = DateTime(2014,10,26,2)
 
 julia> ZonedDateTime(dt, warsaw)
 ERROR: Local DateTime 2014-10-26T02:00:00 is ambiguious
- in ZonedDateTime at ~/.julia/v0.4/TimeZones/src/timezones/types.jl:264
 
-julia> ZonedDateTime(dt, warsaw, 1)  # use the first occurrence of the duplicate hour
+julia> ZonedDateTime(dt, warsaw, 1)  # first occurrence of the duplicate hour
 2014-10-26T02:00:00+02:00
 
-julia> ZonedDateTime(dt, warsaw, 2)  # use second occurrence of the duplicate hour
+julia> ZonedDateTime(dt, warsaw, 2)  # second occurrence of the duplicate hour
 2014-10-26T02:00:00+01:00
 
 julia> ZonedDateTime(dt, warsaw, true)  # use the hour which is in daylight saving time
@@ -94,11 +91,9 @@ Alternatively, when using future dates past the year 2038 will result in an erro
 ```julia
 julia> ZonedDateTime(2039, warsaw)
 ERROR: TimeZone Europe/Warsaw does not handle dates on or after 2038-03-28T01:00:00 UTC
- in call at ~/.julia/v0.4/TimeZones/src/timezones/types.jl:146
- in ZonedDateTime at ~/.julia/v0.4/TimeZones/src/timezones/types.jl:260
 ```
 
-It is possible to have [timezones that work beyond 2038](faq/#far-future-zoneddatetime-with-variabletimezone) but it since these dates are in the future it is possible the timezone rules may change and will not be accurate.
+It is possible to have [timezones that work beyond 2038](faq#far-future-zoneddatetime-with-variabletimezone) but it since these dates are in the future it is possible the timezone rules may change and will not be accurate.
 
 
 ## FixedTimeZone

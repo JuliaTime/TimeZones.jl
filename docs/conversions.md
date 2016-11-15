@@ -63,6 +63,6 @@ julia> zdt = ZonedDateTime(2015,8,6,22,25,TimeZone("Europe/Warsaw"))
 julia> Dates.format(zdt, "yyyymmddzzzz")
 "20150806+02:00"
 
-julia> julia> Dates.format(zdt, "yyyy-mm-dd HH:MM ZZZ")
+julia> Dates.format(zdt, "yyyy-mm-dd HH:MM ZZZ")
 "2015-08-06 22:25 CEST"
 ```
