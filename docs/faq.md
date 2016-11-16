@@ -19,18 +19,16 @@ Due to the internal representation of a `VariableTimeZone` it is infeasible to d
 
 ```julia
 julia> warsaw = TimeZone("Europe/Warsaw")
-Europe/Warsaw
+Europe/Warsaw (UTC+1/UTC+2)
 
 julia> last(warsaw.transitions)
-TimeZones.Transition(2037-10-25T01:00:00,TimeZones.FixedTimeZone(:CET,TimeZones.Offset(3600 seconds,0 seconds)))
+2037-10-25T01:00:00 UTC+1/+0 (CET)
 
 julia> warsaw.cutoff  # DateTime up until the last transition is effective
-Nullable(2038-03-28T01:00:00)
+Nullable{DateTime}(2038-03-28T01:00:00)
 
 julia> ZonedDateTime(DateTime(2039), warsaw)
 ERROR: TimeZone Europe/Warsaw does not handle dates on or after 2038-03-28T01:00:00 UTC
- in call at ~/.julia/v0.4/TimeZones/src/timezones/types.jl:146
- in ZonedDateTime at ~/.julia/v0.4/TimeZones/src/timezones/types.jl:260
 ```
 
 It is important to note that since we are taking about future time zone transitions and the rules dictating these transitions are subject to change and may not be accurate. If you still want to work with future `ZonedDateTime` past the default cutoff you can re-compile the `TimeZone` objects and specify the `max_year` keyword:
