@@ -19,49 +19,49 @@ buffer = IOBuffer()
 @test string(ulyanovsk) == "Europe/Ulyanovsk"
 
 showcompact(buffer, null)
-@test takebuf_string(buffer) == "UTC+03:00"
+@test Compat.String(take!(buffer)) == "UTC+03:00"
 showcompact(buffer, fixed)
-@test takebuf_string(buffer) == "UTC+01:00"
+@test Compat.String(take!(buffer)) == "UTC+01:00"
 showcompact(buffer, est)
-@test takebuf_string(buffer) == "EST"
+@test Compat.String(take!(buffer)) == "EST"
 showcompact(buffer, warsaw)
-@test takebuf_string(buffer) == "Europe/Warsaw"
+@test Compat.String(take!(buffer)) == "Europe/Warsaw"
 showcompact(buffer, apia)
-@test takebuf_string(buffer) == "Pacific/Apia"
+@test Compat.String(take!(buffer)) == "Pacific/Apia"
 showcompact(buffer, honolulu)
-@test takebuf_string(buffer) == "Pacific/Honolulu"
+@test Compat.String(take!(buffer)) == "Pacific/Honolulu"
 showcompact(buffer, ulyanovsk)
-@test takebuf_string(buffer) == "Europe/Ulyanovsk"
+@test Compat.String(take!(buffer)) == "Europe/Ulyanovsk"
 
 show(buffer, null)
-@test takebuf_string(buffer) == "UTC+03:00"
+@test Compat.String(take!(buffer)) == "UTC+03:00"
 show(buffer, fixed)
-@test takebuf_string(buffer) == "UTC+01:00"
+@test Compat.String(take!(buffer)) == "UTC+01:00"
 show(buffer, est)
-@test takebuf_string(buffer) == "EST (UTC-5)"
+@test Compat.String(take!(buffer)) == "EST (UTC-5)"
 show(buffer, warsaw)
-@test takebuf_string(buffer) == "Europe/Warsaw (UTC+1/UTC+2)"
+@test Compat.String(take!(buffer)) == "Europe/Warsaw (UTC+1/UTC+2)"
 show(buffer, apia)
-@test takebuf_string(buffer) == "Pacific/Apia (UTC+13/UTC+14)"
+@test Compat.String(take!(buffer)) == "Pacific/Apia (UTC+13/UTC+14)"
 show(buffer, honolulu)
-@test takebuf_string(buffer) == "Pacific/Honolulu (UTC-10)"
+@test Compat.String(take!(buffer)) == "Pacific/Honolulu (UTC-10)"
 show(buffer, ulyanovsk)
-@test takebuf_string(buffer) == "Europe/Ulyanovsk (UTC+4)"
+@test Compat.String(take!(buffer)) == "Europe/Ulyanovsk (UTC+4)"
 
 # UTC and GMT are special cases
 show(buffer, FixedTimeZone("UTC"))
-@test takebuf_string(buffer) == "UTC"
+@test Compat.String(take!(buffer)) == "UTC"
 show(buffer, FixedTimeZone("GMT", 0))
-@test takebuf_string(buffer) == "GMT"
+@test Compat.String(take!(buffer)) == "GMT"
 show(buffer, FixedTimeZone("FOO", 0))
-@test takebuf_string(buffer) == "FOO (UTC+0)"
+@test Compat.String(take!(buffer)) == "FOO (UTC+0)"
 
 # ZonedDateTime as a string
 zdt = ZonedDateTime(dt, warsaw)
 @test string(zdt) == "1942-12-25T01:23:45+01:00"
 
 show(buffer, zdt)
-@test takebuf_string(buffer) == "1942-12-25T01:23:45+01:00"
+@test Compat.String(take!(buffer)) == "1942-12-25T01:23:45+01:00"
 
 
 # TimeZone parsing

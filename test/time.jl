@@ -49,6 +49,6 @@ t = Time(1,-23,-45)
 t = Time(1,23,45)
 buffer = IOBuffer()
 print(buffer, t)
-@test takebuf_string(buffer) == "01:23:45"
+@test Compat.String(take!(buffer)) == "01:23:45"
 show(buffer, t)
-@test takebuf_string(buffer) == "01:23:45"
+@test Compat.String(take!(buffer)) == "01:23:45"
