@@ -82,9 +82,12 @@ df = Dates.DateFormat("Z")
 # ZonedDateTime parsing.
 # Note: uses compiled time zone information. If these tests are failing try to rebuild
 # the TimeZones package.
-@test ZonedDateTime("1942-12-25T01:23:45.0+01:00") == ZonedDateTime(dt, fixed)
+@test ZonedDateTime("1942-12-25T01:23:45.000+01:00") == ZonedDateTime(dt, fixed)
 @test ZonedDateTime("1942-12-25T01:23:45+0100", "yyyy-mm-ddTHH:MM:SSzzz") == ZonedDateTime(dt, fixed)
 @test ZonedDateTime("1942-12-25T01:23:45 Europe/Warsaw", "yyyy-mm-ddTHH:MM:SS ZZZ") == ZonedDateTime(dt, warsaw)
+
+x = "1942-12-25T01:23:45.123+01:00"
+@test string(ZonedDateTime(x)) == x
 
 # Note: CET here represents the FixedTimeZone used in Europe/Warsaw and not the
 # VariableTimeZone CET.
