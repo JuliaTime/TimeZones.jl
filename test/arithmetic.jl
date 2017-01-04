@@ -34,10 +34,15 @@ fall = DateTime(2015, 10, 25, 0)   # a 25 hour day in warsaw
 @test ZonedDateTime(fall, warsaw) + Hour(3) == ZonedDateTime(fall + Hour(2), warsaw, 2)
 
 # Non-Associativity
-hour_day = (ZonedDateTime(spring, warsaw) + Hour(24)) + Day(1)
-day_hour = (ZonedDateTime(spring, warsaw) + Day(1)) + Hour(24)
+explicit_hour_day = (ZonedDateTime(spring, warsaw) + Hour(24)) + Day(1)
+explicit_day_hour = (ZonedDateTime(spring, warsaw) + Day(1)) + Hour(24)
+implicit_hour_day = ZonedDateTime(spring, warsaw) + Hour(24) + Day(1)
+implicit_day_hour = ZonedDateTime(spring, warsaw) + Day(1) + Hour(24)
 
-@test hour_day - day_hour == Hour(1)
+# @test explicit_hour_day == implicit_hour_day
+# @test explicit_day_hour == implicit_day_hour
+# @test implicit_hour_day != implicit_day_hour
+@test explicit_day_hour < explicit_hour_day
 
 # CompoundPeriod canonicalization interacting with period arithmetic. Since `spring_zdt` is
 # a 23 hour day this means adding `Day(1)` and `Hour(23)` are equivalent.

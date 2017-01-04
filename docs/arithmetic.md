@@ -33,12 +33,17 @@ julia> (spring + Day(1)) + Hour(24)
 
 julia> (spring + Hour(24)) + Day(1)
 2014-04-01T01:00:00+02:00
-
-julia> spring + Hour(24) + Day(1)
-2014-04-01T00:00:00+02:00
 ```
 
-Take particular note of the last example which ends up merging the two periods into a single unit of 2 days.
+The first example adds 1 day to 2014-03-30T00:00:00+01:00, which results in 2014-03-31T00:00:00+02:00; then we add 24 hours to get 2014-04-01T00:00:00+02:00. The second example add 24 hours *first* to get 2014-03-31T01:00:00+02:00, and *then* add 1 day which results in 2014-04-01T01:00:00+02:00. When working with operations using multiple periods the operations will be ordered by the Period's *types* and not their positional order; this means `Day` will be added before `Hour`. Hence the following does result in associativity (in Julia 0.6 and above):
+
+```julia
+julia> spring + Hour(24) + Day(1)
+2014-04-01T00:00:00+02:00
+
+julia> spring + Day(1) + Hour(24)
+2014-04-01T00:00:00+02:00
+```
 
 ## Ranges
 
