@@ -11,15 +11,21 @@ type AmbiguousTimeError <: TimeError
     dt::DateTime
     tz::TimeZone
 end
-Base.showerror(io::IO, e::AmbiguousTimeError) = print(io, "Local DateTime $(e.dt) is ambiguous");
 
 type NonExistentTimeError <: TimeError
     dt::DateTime
     tz::TimeZone
 end
-Base.showerror(io::IO, e::NonExistentTimeError) = print(io, "DateTime $(e.dt) does not exist within $(string(e.tz))");
 
+function Base.showerror(io::IO, e::AmbiguousTimeError)
+    print(io, "AmbiguousTimeError: ")
+    print(io, "Local DateTime $(e.dt) is ambiguous")
+end
 
+function Base.showerror(io::IO, e::NonExistentTimeError)
+    print(io, "NonExistentTimeError: ")
+    print(io, "DateTime $(e.dt) does not exist within $(string(e.tz))")
+end
 
 # Using type Symbol instead of AbstractString for name since it
 # gets us ==, and hash for free.
