@@ -39,7 +39,7 @@ tz = FixedTimeZone("Imaginary/Zone", 0, 0)
 
 buffer = IOBuffer()
 showerror(buffer, AmbiguousTimeError(DateTime(2015,1,1), tz))
-@test takebuf_string(buffer) == "Local DateTime 2015-01-01T00:00:00 is ambiguious"
+@test takebuf_string(buffer) == "Local DateTime 2015-01-01T00:00:00 is ambiguous"
 
 buffer = IOBuffer()
 showerror(buffer, NonExistentTimeError(DateTime(2015,1,1), tz))
@@ -134,7 +134,7 @@ utc_dts = (DateTime(1916, 9, 30, 22), DateTime(1916, 9, 30, 23))
 @test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).utc_datetime == utc_dts[1]
 @test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).utc_datetime == utc_dts[2]
 
-# Zone offset reduced creating an ambigious hour
+# Zone offset reduced creating an ambiguous hour
 local_dt = DateTime(1922,5,31,23)
 utc_dts = (DateTime(1922, 5, 31, 21), DateTime(1922, 5, 31, 22))
 @test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw)

@@ -145,7 +145,7 @@ julia> round(zdt, Dates.Hour)
 1996-10-26T00:00:00+06:30
 
 julia> round(zdt, Dates.Day)
-ERROR: Local DateTime 1996-10-26T00:00:00 is ambiguious
+ERROR: Local DateTime 1996-10-26T00:00:00 is ambiguous
 ```
 """     # Defined in base/dates/rounding.jl
 Base.round(::TimeZones.ZonedDateTime, ::Union{Period, Type{Period}})

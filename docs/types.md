@@ -64,7 +64,7 @@ julia> dt = DateTime(2014,10,26,2)
 2014-10-26T02:00:00
 
 julia> ZonedDateTime(dt, warsaw)
-ERROR: Local DateTime 2014-10-26T02:00:00 is ambiguious
+ERROR: Local DateTime 2014-10-26T02:00:00 is ambiguous
 
 julia> ZonedDateTime(dt, warsaw, 1)  # first occurrence of the duplicate hour
 2014-10-26T02:00:00+02:00

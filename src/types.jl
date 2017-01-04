@@ -11,7 +11,7 @@ type AmbiguousTimeError <: TimeError
     dt::DateTime
     tz::TimeZone
 end
-Base.showerror(io::IO, e::AmbiguousTimeError) = print(io, "Local DateTime $(e.dt) is ambiguious");
+Base.showerror(io::IO, e::AmbiguousTimeError) = print(io, "Local DateTime $(e.dt) is ambiguous");
 
 type NonExistentTimeError <: TimeError
     dt::DateTime
@@ -170,7 +170,7 @@ end
 Construct a `ZonedDateTime` by applying a `TimeZone` to a `DateTime`. When the `from_utc`
 keyword is true the given `DateTime` is assumed to be in UTC instead of in local time and is
 converted to the specified `TimeZone`.  Note that when `from_utc` is true the given
-`DateTime` can never be ambiguious.
+`DateTime` can never be ambiguous.
 """
 function ZonedDateTime(dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
     possible = interpret(dt, tz, from_utc ? UTC : Local)
@@ -194,7 +194,7 @@ end
     ZonedDateTime(dt::DateTime, tz::VariableTimeZone, occurrence::Integer) -> ZonedDateTime
 
 Construct a `ZonedDateTime` by applying a `TimeZone` to a `DateTime`. If the `DateTime` is
-ambiguious within the given time zone you can set `occurrence` to a positive integer to
+ambiguous within the given time zone you can set `occurrence` to a positive integer to
 resolve the ambiguity.
 """
 function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, occurrence::Integer)
@@ -216,7 +216,7 @@ end
     ZonedDateTime(dt::DateTime, tz::VariableTimeZone, is_dst::Bool) -> ZonedDateTime
 
 Construct a `ZonedDateTime` by applying a `TimeZone` to a `DateTime`. If the `DateTime` is
-ambiguious within the given time zone you can set `is_dst` to resolve the ambiguity.
+ambiguous within the given time zone you can set `is_dst` to resolve the ambiguity.
 """
 function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
     possible = interpret(dt, tz, Local)
@@ -244,7 +244,7 @@ end
     ZonedDateTime(y, [m, d, h, mi, s, ms], tz, [amb]) -> DateTime
 
 Construct a `ZonedDateTime` type by parts. Arguments `y, m, ..., ms` must be convertible to
-`Int64` and `tz` must be a `TimeZone`. If the given `DateTime` is ambiguious in the given
+`Int64` and `tz` must be a `TimeZone`. If the given `DateTime` is ambiguous in the given
 `TimeZone` then `amb` can be supplied to resolve ambiguity.
 """ ZonedDateTime
 
