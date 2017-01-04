@@ -8,23 +8,23 @@ import Base: ==, isequal, isless
 abstract TimeError <: Exception
 
 type AmbiguousTimeError <: TimeError
-    dt::DateTime
-    tz::TimeZone
+    local_dt::DateTime
+    timezone::TimeZone
 end
 
 type NonExistentTimeError <: TimeError
-    dt::DateTime
-    tz::TimeZone
+    local_dt::DateTime
+    timezone::TimeZone
 end
 
 function Base.showerror(io::IO, e::AmbiguousTimeError)
     print(io, "AmbiguousTimeError: ")
-    print(io, "Local DateTime $(e.dt) is ambiguous")
+    print(io, "Local DateTime $(e.local_dt) is ambiguous within $(string(e.timezone))")
 end
 
 function Base.showerror(io::IO, e::NonExistentTimeError)
     print(io, "NonExistentTimeError: ")
-    print(io, "DateTime $(e.dt) does not exist within $(string(e.tz))")
+    print(io, "Local DateTime $(e.local_dt) does not exist within $(string(e.timezone))")
 end
 
 # Using type Symbol instead of AbstractString for name since it
@@ -176,7 +176,7 @@ end
 Construct a `ZonedDateTime` by applying a `TimeZone` to a `DateTime`. When the `from_utc`
 keyword is true the given `DateTime` is assumed to be in UTC instead of in local time and is
 converted to the specified `TimeZone`.  Note that when `from_utc` is true the given
-`DateTime` can never be ambiguous.
+`DateTime` will always exists and is never ambiguous.
 """
 function ZonedDateTime(dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
     possible = interpret(dt, tz, from_utc ? UTC : Local)
