@@ -284,6 +284,8 @@ end
 ==(a::ZonedDateTime, b::ZonedDateTime) = a.utc_datetime == b.utc_datetime
 isless(a::ZonedDateTime, b::ZonedDateTime) = isless(a.utc_datetime, b.utc_datetime)
 
+# Note: a more efficient version of: `hash(a) == hash(b)`. Assumes that the "zone" of the
+# ZonedDateTimes is not being set incorrectly.
 function isequal(a::ZonedDateTime, b::ZonedDateTime)
     isequal(a.utc_datetime, b.utc_datetime) && isequal(a.timezone, b.timezone)
 end
