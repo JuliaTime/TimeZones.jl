@@ -1,5 +1,5 @@
 import Base: print, show, showcompact
-import Base.Dates: value, DateFormat, Slot, slotparse, slotformat
+import Base.Dates: value, DateFormat
 
 print(io::IO, tz::TimeZone) = print(io, tz.name)
 function print(io::IO, tz::FixedTimeZone)
@@ -57,6 +57,8 @@ end
 show(io::IO,dt::ZonedDateTime) = print(io, string(dt))
 
 # DateTime Parsing
+if VERSION < v"0.6.0-dev.2307"
+import Base.Dates: Slot, slotparse, slotformat
 function slotparse(slot::Slot{TimeZone},x,locale)
     if slot.letter == 'z'
         # TODO: Should 'z' only parse numeric UTC offsets? e.g. disallow "UTC-7"
@@ -93,3 +95,4 @@ end
 # function can not be called from within this module. TODO: Ignore linting for this line
 ZonedDateTime(dt::AbstractString,df::DateFormat=ISOZonedDateTimeFormat) = ZonedDateTime(Base.Dates.parse(dt,df)...)
 ZonedDateTime(dt::AbstractString,format::AbstractString;locale::AbstractString="english") = ZonedDateTime(dt,DateFormat(format,locale))
+end

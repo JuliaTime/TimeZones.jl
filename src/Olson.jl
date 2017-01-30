@@ -6,6 +6,16 @@ import ..TimeZones: TZDATA_DIR, COMPILED_DIR, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFS
     MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET, TIME_ZONES
 import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition, TimeOffset
 
+if isdefined(Base.Dates, :parse_components)
+    parse_components = Base.Dates.parse_components
+else
+    # Note: On older versions of Julia this will sort the Periods. Since our DateFormat
+    # is already in reverse sorted order there shouldn't be a difference.
+    function parse_components(str::AbstractString, df::DateFormat)
+        convert(Array{Any}, Dates.parse(str, df))
+    end
+end
+
 const DEFAULT_FLAG = 'w'
 
 # Zone type maps to an Olson Timezone database entity
@@ -96,7 +106,7 @@ function parsedate(s::AbstractString)
         dt = tonext(d -> dayofweek(d) == Sun, dt; same=true)
     else
         format = join(split("yyyy uuu dd HH:MM:SS", " ")[1:num_periods], ' ')
-        periods = Dates.parse(s, DateFormat(format))
+        periods = parse_components(s, DateFormat(format))
 
         # Deal with zone "Pacific/Apia" which has a 24:00 datetime.
         if length(periods) > 3 && periods[4] == Hour(24)

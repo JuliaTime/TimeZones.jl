@@ -65,6 +65,7 @@ show(buffer, zdt)
 
 
 # TimeZone parsing
+if VERSION < v"0.6.0-dev.2307"
 df = Dates.DateFormat("z")
 @test !isempty(df.slots)  # Ensure that 'z' slot character is recognized (issue #24)
 @test Dates.parse("+0100", df) == Any[FixedTimeZone("+01:00")]
@@ -114,3 +115,4 @@ f = "yyyy/m/d H:M:S zzz"
 # currently cannot parse all strings produced by format.
 f = Dates.DateFormat("yyyy-mm-ddTHH:MM:SS ZZZ")
 @test_throws ArgumentError Dates.parse(Dates.format(ZonedDateTime(dt, warsaw), f), f)
+end

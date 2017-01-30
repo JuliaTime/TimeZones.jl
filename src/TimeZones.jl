@@ -34,11 +34,13 @@ if is_windows()
 end
 
 function __init__()
-    # SLOT_RULE extension needs to happen everytime the module is loaded (issue #24)
-    Base.Dates.SLOT_RULE['z'] = TimeZone
-    Base.Dates.SLOT_RULE['Z'] = TimeZone
+    if VERSION < v"0.6.0-dev.2307"
+        # SLOT_RULE extension needs to happen everytime the module is loaded (issue #24)
+        Base.Dates.SLOT_RULE['z'] = TimeZone
+        Base.Dates.SLOT_RULE['Z'] = TimeZone
 
-    global const ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
+        global const ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
+    end
 end
 
 include("utils.jl")
