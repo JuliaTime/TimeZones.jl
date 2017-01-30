@@ -1,18 +1,17 @@
 language: julia
-sudo: false
 os:
-    - osx
-    - linux
+  - osx
+  - linux
 julia:
-    - "0.4"
-    - "0.5"
-    - nightly
+  - "0.4"
+  - "0.5"
+  - nightly
 notifications:
-    email: false
+  email: false
 script:
-    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-    - OPTIONS=$(julia -e 'isdefined(Base.JLOptions(), :use_compilecache) && print("--compilecache=no")')
-    - julia $OPTIONS -e 'Pkg.clone(pwd()); Pkg.build("TimeZones"); Pkg.test("TimeZones"; coverage=true)';
+  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+  - OPTIONS=$(julia -e 'isdefined(Base.JLOptions(), :use_compilecache) && print("--compilecache=no")')
+  - julia $OPTIONS -e 'Pkg.clone(pwd()); Pkg.build("TimeZones"); Pkg.test("TimeZones"; coverage=true)';
 after_success:
-    - julia -e 'cd(Pkg.dir("TimeZones")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())';
-    - julia -e 'cd(Pkg.dir("TimeZones")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
+  - julia -e 'cd(Pkg.dir("TimeZones")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())';
+  - julia -e 'cd(Pkg.dir("TimeZones")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
