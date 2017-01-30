@@ -1,5 +1,12 @@
 using Mocking
-Mocking.enable()
+
+opts = Base.JLOptions()
+use_compilecache = isdefined(opts, :use_compilecache) && Bool(opts.use_compilecache)
+if use_compilecache
+    warn("Julia not started with `--compilecache=no`. Disabling tests that require Mocking")
+else
+    Mocking.enable()
+end
 
 using Base.Test
 using TimeZones
@@ -50,7 +57,7 @@ include("adjusters.jl")
 include("conversions.jl")
 include("ranges.jl")
 include("local.jl")
-include("local_mocking.jl")
+!use_compilecache && include("local_mocking.jl")
 include("discovery.jl")
 VERSION >= v"0.5.0-dev+5244" && include("rounding.jl")
 include("TimeZones.jl")
