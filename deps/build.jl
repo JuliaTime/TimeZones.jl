@@ -1,6 +1,6 @@
 import TimeZones: TZDATA_DIR, COMPILED_DIR, extract
 import TimeZones.Olson: compile
-import Compat: @static, is_windows
+import Compat: is_windows
 
 if is_windows()
     import TimeZones: WIN_TRANSLATION_FILE

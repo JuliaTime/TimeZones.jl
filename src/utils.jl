@@ -1,3 +1,5 @@
+import Compat: @static, is_windows
+
 """
     extract(archive, directory, [files]) -> Void
 
