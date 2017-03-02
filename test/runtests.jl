@@ -3,10 +3,26 @@ Mocking.enable()
 
 using Base.Test
 using TimeZones
-import TimeZones: PKG_DIR, TZDATA_DIR
+import TimeZones: PKG_DIR
 import TimeZones.Olson: ZoneDict, RuleDict, tzparse, resolve
 
+const TZDATA_VERSION = "2016j"
+const TZDATA_DIR = get(ENV, "TZDATA_DIR", joinpath(PKG_DIR, "test", "tzdata"))
 const TZFILE_DIR = joinpath(PKG_DIR, "test", "tzfile")
+const TEST_REGIONS = ("asia", "australasia", "europe", "northamerica")
+
+# By default use a specific version of the tz database so we just testing for TimeZones.jl
+# changes and not changes to the tzdata.
+if !isdir(TZDATA_DIR)
+    mkdir(TZDATA_DIR)
+
+    info("Downloading $TZDATA_VERSION tz database")
+    archive = download("http://www.iana.org/time-zones/repository/releases/tzdata$TZDATA_VERSION.tar.gz")
+
+    info("Extracting tz database archive")
+    TimeZones.extract(archive, TZDATA_DIR, TEST_REGIONS)
+    rm(archive)
+end
 
 # For testing we'll reparse the tzdata every time to instead of using the serialized data.
 # This should make the development/testing cycle simplier since you won't be forced to
@@ -15,7 +31,7 @@ const TZFILE_DIR = joinpath(PKG_DIR, "test", "tzfile")
 # Note: resolving only the time zones we want is much faster than running compile which
 # recompiles all the time zones.
 tzdata = Dict{AbstractString,Tuple{ZoneDict,RuleDict}}()
-for name in ("asia", "australasia", "europe", "northamerica")
+for name in TEST_REGIONS
     tzdata[name] = tzparse(joinpath(TZDATA_DIR, name))
 end
 
