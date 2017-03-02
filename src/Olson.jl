@@ -6,6 +6,8 @@ import ..TimeZones: TZDATA_DIR, COMPILED_DIR, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFS
     MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET, TIME_ZONES, Time
 import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition, Time
 
+const DEFAULT_FLAG = 'w'
+
 # Zone type maps to an Olson Timezone database entity
 type Zone
     gmtoffset::Time
@@ -39,6 +41,14 @@ type Rule
     at_flag::Char        # Local wall time (w), UTC time (u), Local Standard time (s)
     save::Time           # How much time is "saved" in daylight savings transition
     letter::AbstractString  # Timezone abbr letter(s). ie. CKT ("") => CKHST ("HS")
+
+    function Rule(
+        from::Nullable{Int}, to::Nullable{Int}, month::Int, on::Function, at::Time,
+        at_flag::Char, save::Time, letter::AbstractString,
+    )
+        isflag(at_flag) || throw(ArgumentError("Unhandled flag '$at_flag'"))
+        new(from, to, month, on, at, at_flag, save, letter)
+    end
 end
 
 typealias ZoneDict Dict{AbstractString,Array{Zone}}
@@ -66,18 +76,7 @@ for (abbr, dayofweek) in DAYS
     )
 end
 
-
-function parseflag(s::AbstractString)
-    if s == "" || s == "w"
-        return 'w'
-    elseif s == "u"
-        return 'u'
-    elseif s == "s"
-        return 's'
-    else
-        throw(ArgumentError("Unhandled flag $s"))
-    end
-end
+isflag(flag::Char) = flag in ('w', 'u', 's')
 
 # Olson time zone dates can be a single year (1900), yyyy-mm-dd (1900-Jan-01),
 # or minute-precision (1900-Jan-01 2:00).
@@ -85,7 +84,7 @@ end
 function parsedate(s::AbstractString)
     s = replace(s, r"\s+", " ")
     num_periods = length(split(s, " "))
-    s, flag = num_periods > 3 && isalpha(s[end]) ? (s[1:end-1], s[end:end]) : (s, "")
+    s, flag = num_periods > 3 && isflag(s[end]) ? (s[1:end-1], s[end]) : (s, DEFAULT_FLAG)
     if contains(s,"lastSun")
         dt = DateTime(replace(s, "lastSun", "1", 1), "yyyy uuu d H:MM:SS")
         dt = tonext(lastSun, dt; same=true)
@@ -112,7 +111,7 @@ function parsedate(s::AbstractString)
     # If it's local standard time, we just need to add any saved amount
     # return letter == 's' ? (dt - save) : (dt - offset - save)
 
-    return dt, parseflag(flag)
+    return dt, flag
 end
 
 function asutc(dt::DateTime, flag::Char, offset::Time, save::Time)
@@ -181,9 +180,9 @@ function ruleparse(from, to, rule_type, month, on, at, save, letter)
         error("Can't parse day of month for DST change")
     end
     # Now we get the time of the transition
-    c = at[end:end]
-    at_hm = Time(isalpha(c) ? at[1:end-1] : at)
-    at_flag = parseflag(isalpha(c) ? c : "")
+    c = at[end]
+    at_hm = Time(isflag(c) ? at[1:end-1] : at)
+    at_flag = isflag(c) ? c : DEFAULT_FLAG
     save_hm = Time(save)
     letter = letter == "-" ? "" : letter
 
