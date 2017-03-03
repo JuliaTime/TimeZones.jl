@@ -44,7 +44,7 @@ for name in TEST_REGIONS
 end
 
 include("utils.jl")
-include("time.jl")
+include("timeoffset.jl")
 include("Olson.jl")
 include("utcoffset.jl")
 include("types.jl")
