@@ -3,15 +3,15 @@ module Olson
 using Base.Dates
 
 import ..TimeZones: TZDATA_DIR, COMPILED_DIR, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET,
-    MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET, TIME_ZONES, Time
-import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition, Time
+    MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET, TIME_ZONES
+import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition, TimeOffset
 
 const DEFAULT_FLAG = 'w'
 
 # Zone type maps to an Olson Timezone database entity
 type Zone
-    gmtoffset::Time
-    save::Time
+    gmtoffset::TimeOffset
+    save::TimeOffset
     rules::AbstractString
     format::AbstractString
     until::Nullable{DateTime}
@@ -37,14 +37,14 @@ type Rule
     to::Nullable{Int}    # Rule applies up until, but not including this year
     month::Int           # Month in which DST transition happens
     on::Function         # Anonymous boolean function to determine day
-    at::Time             # Hour and minute at which the transition happens
+    at::TimeOffset       # Hour and minute at which the transition happens
     at_flag::Char        # Local wall time (w), UTC time (u), Local Standard time (s)
-    save::Time           # How much time is "saved" in daylight savings transition
+    save::TimeOffset     # How much time is "saved" in daylight savings transition
     letter::AbstractString  # Timezone abbr letter(s). ie. CKT ("") => CKHST ("HS")
 
     function Rule(
-        from::Nullable{Int}, to::Nullable{Int}, month::Int, on::Function, at::Time,
-        at_flag::Char, save::Time, letter::AbstractString,
+        from::Nullable{Int}, to::Nullable{Int}, month::Int, on::Function, at::TimeOffset,
+        at_flag::Char, save::TimeOffset, letter::AbstractString,
     )
         isflag(at_flag) || throw(ArgumentError("Unhandled flag '$at_flag'"))
         new(from, to, month, on, at, at_flag, save, letter)
@@ -114,7 +114,7 @@ function parsedate(s::AbstractString)
     return dt, flag
 end
 
-function asutc(dt::DateTime, flag::Char, offset::Time, save::Time)
+function asutc(dt::DateTime, flag::Char, offset::TimeOffset, save::TimeOffset)
     if flag == 'u'
         # In UTC
         return dt
@@ -129,7 +129,7 @@ function asutc(dt::DateTime, flag::Char, offset::Time, save::Time)
     end
 end
 
-function abbr_string(format::AbstractString, save::Time, letter::AbstractString="")
+function abbr_string(format::AbstractString, save::TimeOffset, letter::AbstractString="")
     # Note: using @sprintf would make sense but unfortunately it doesn't accept a
     # format as a variable.
     abbr = replace(format,"%s",letter,1)
@@ -181,9 +181,9 @@ function ruleparse(from, to, rule_type, month, on, at, save, letter)
     end
     # Now we get the time of the transition
     c = at[end]
-    at_hm = Time(isflag(c) ? at[1:end-1] : at)
+    at_hm = TimeOffset(isflag(c) ? at[1:end-1] : at)
     at_flag = isflag(c) ? c : DEFAULT_FLAG
-    save_hm = Time(save)
+    save_hm = TimeOffset(save)
     letter = letter == "-" ? "" : letter
 
     # Report unexpected save values that could cause issues during resolve.
@@ -205,7 +205,7 @@ end
 
 function zoneparse(gmtoff, rules, format, until="")
     # Get our offset and abbreviation string for this period
-    offset = Time(gmtoff)
+    offset = TimeOffset(gmtoff)
 
     # Report unexpected offsets that could cause issues during resolve.
     offset < MIN_GMT_OFFSET && warn("Discovered offset $offset less than the expected min $MIN_GMT_OFFSET")
@@ -219,7 +219,7 @@ function zoneparse(gmtoff, rules, format, until="")
     until_dt, until_flag = Nullable{DateTime}(until_tuple[1]), until_tuple[2]
 
     if rules == "-" || ismatch(r"\d",rules)
-        save = Time(rules)
+        save = TimeOffset(rules)
         rules = ""
     else
         save = ZERO
