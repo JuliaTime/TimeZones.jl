@@ -238,7 +238,7 @@ function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
         # Mask is expected to be unambiguous.
         !xor(mask...) && throw(AmbiguousTimeError(dt, tz))
 
-        occurrence = is_dst ? findfirst(mask) : findfirst(!mask)
+        occurrence = findfirst(d -> d == is_dst, mask)
         return possible[occurrence]
     else
         throw(AmbiguousTimeError(dt, tz))
