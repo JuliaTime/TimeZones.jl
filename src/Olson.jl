@@ -108,7 +108,8 @@ function parsedate(s::AbstractString)
         format = join(split("yyyy uuu dd HH:MM:SS", " ")[1:num_periods], ' ')
         periods = parse_components(s, DateFormat(format))
 
-        # Deal with zone "Pacific/Apia" which has a 24:00 datetime.
+        # Roll over 24:00 to the next day which occurs in "Pacific/Apia".
+        # Not a general purpose solution. For example won't work at the end of the month.
         if length(periods) > 3 && periods[4] == Hour(24)
             periods[4] = Hour(0)
             periods[3] += Day(1)

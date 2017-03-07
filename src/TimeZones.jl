@@ -34,12 +34,48 @@ if is_windows()
 end
 
 function __init__()
-    if VERSION < v"0.6.0-dev.2307"
-        # SLOT_RULE extension needs to happen everytime the module is loaded (issue #24)
+    # Base extension needs to happen everytime the module is loaded (issue #24)
+    if isdefined(Base.Dates, :SLOT_RULE)
         Base.Dates.SLOT_RULE['z'] = TimeZone
         Base.Dates.SLOT_RULE['Z'] = TimeZone
+    else
+        Base.Dates.CONVERSION_SPECIFIERS['z'] = TimeZone
+        Base.Dates.CONVERSION_SPECIFIERS['Z'] = TimeZone
+        Base.Dates.CONVERSION_DEFAULTS[TimeZone] = ""
+        Base.Dates.CONVERSION_TRANSLATIONS[ZonedDateTime] = (
+            Year, Month, Day, Hour, Minute, Second, Millisecond, TimeZone,
+        )
+    end
 
-        global const ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
+    global const ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
+end
+
+"""
+    TimeZone(str::AbstractString) -> TimeZone
+
+Constructs a `TimeZone` subtype based upon the string. If the string is a recognized time
+zone name then data is loaded from the compiled IANA time zone database. Otherwise the
+string is assumed to be a static time zone.
+
+A list of recognized time zones names is available from `timezone_names()`. Supported static
+time zone string formats can be found in `FixedTimeZone(::AbstractString)`.
+"""
+function TimeZone(str::AbstractString)
+    return get!(TIME_ZONES, str) do
+        tz_path = joinpath(COMPILED_DIR, split(str, "/")...)
+
+        # Only parse string as an explicit FixedTimeZone if there is no file to load
+        if !isfile(tz_path)
+            try
+                return FixedTimeZone(str)
+            catch
+                throw(ArgumentError("Unknown time zone named $str"))
+            end
+        end
+
+        open(tz_path, "r") do fp
+            return deserialize(fp)
+        end
     end
 end
 
@@ -59,24 +95,6 @@ include("local.jl")
 include("ranges.jl")
 include("discovery.jl")
 VERSION >= v"0.5.0-dev+5244" && include("rounding.jl")
-
-"""
-    TimeZone(name::AbstractString) -> TimeZone
-
-Constructs a `TimeZone` instance based upon its `name`. A list of available time zones can
-be determined using `timezone_names()`.
-
-See `FixedTimeZone(::AbstractString)` for making a custom `TimeZone` instances.
-"""
-function TimeZone(name::AbstractString)
-    return get!(TIME_ZONES, name) do
-        tz_path = joinpath(COMPILED_DIR, split(name, "/")...)
-        isfile(tz_path) || throw(ArgumentError("Unknown time zone named $name"))
-
-        open(tz_path, "r") do fp
-            return deserialize(fp)
-        end
-    end
-end
+VERSION < v"0.6.0-dev.2307" ? include("parse-old.jl") : include("parse.jl")
 
 end # module
