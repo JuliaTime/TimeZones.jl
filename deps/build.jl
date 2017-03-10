@@ -1,6 +1,6 @@
-import TimeZones: TZDATA_DIR, COMPILED_DIR
+import TimeZones: TZDATA_DIR, COMPILED_DIR, extract
 import TimeZones.Olson: compile
-import Compat: @static, is_windows
+import Compat: is_windows
 
 if is_windows()
     import TimeZones: WIN_TRANSLATION_FILE
@@ -38,14 +38,6 @@ end
 isfile(archive) || error("Unable to download tz database")
 
 info("Extracting tz database archive")
-function extract(archive, directory, files)
-    @static if is_windows()
-        run(pipeline(`7z x $archive -y -so`, `7z x -si -y -ttar -o$directory $files`))
-    else
-        run(`tar xvf $archive --directory=$directory $files`)
-    end
-end
-
 extract(archive, TZDATA_DIR, REGIONS)
 rm(archive)
 
