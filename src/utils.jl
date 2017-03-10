@@ -1,3 +1,19 @@
+import Compat: @static, is_windows
+
+"""
+    extract(archive, directory, [files]) -> Void
+
+Extracts files from a compressed tar `archive` to the specified `directory`. If `files` is
+specified only the files given will be extracted.
+"""
+function extract(archive, directory, files=String[])
+    @static if is_windows()
+        run(pipeline(`7z x $archive -y -so`, `7z x -si -y -ttar -o$directory $files`))
+    else
+        run(`tar xvf $archive --directory=$directory $files`)
+    end
+end
+
 """
     @optional(expr)
 
