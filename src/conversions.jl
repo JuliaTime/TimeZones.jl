@@ -1,5 +1,8 @@
 import Base.Dates: now, unix2datetime
 
+# UTC is an abstract type defined in Base.Dates, for some reason
+const utc_tz = FixedTimeZone("UTC")
+
 """
     DateTime(::ZonedDateTime) -> DateTime
 
@@ -41,4 +44,16 @@ end
 
 function astimezone(zdt::ZonedDateTime, tz::FixedTimeZone)
     return ZonedDateTime(zdt.utc_datetime, tz, tz)
+end
+
+function zdt2unix(zdt::ZonedDateTime)
+    Dates.datetime2unix(utc(zdt))
+end
+
+function zdt2unix{T<:Number}(t::Type{T}, zdt::ZonedDateTime)
+    floor(t, Dates.datetime2unix(utc(zdt)))
+end
+
+function unix2zdt(seconds::Integer)
+    ZonedDateTime(Dates.unix2datetime(seconds), utc_tz, from_utc=true)
 end

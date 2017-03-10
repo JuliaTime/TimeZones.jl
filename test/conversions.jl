@@ -28,3 +28,23 @@ zdt_warsaw = ZonedDateTime(dt, warsaw; from_utc=true)
 # Identical since ZonedDateTime is immutable
 @test astimezone(zdt_utc, warsaw) === zdt_warsaw
 @test astimezone(zdt_warsaw, utc) === zdt_utc
+
+# ZonedDateTime to Unix timestamp (and vice versa)
+@test TimeZones.zdt2unix(ZonedDateTime(1970, utc)) == 0
+@test TimeZones.unix2zdt(0) == ZonedDateTime(1970, utc)
+
+no_dst = DateTime(2013, 2, 13)
+no_dst_zdt = ZonedDateTime(no_dst, warsaw)
+no_dst_offset = 3600
+@test TimeZones.zdt2unix(no_dst_zdt) == datetime2unix(no_dst) - no_dst_offset
+
+dst = DateTime(2016, 8, 11)
+dst_zdt = ZonedDateTime(dst, warsaw)
+dst_offset = 7200
+@test TimeZones.zdt2unix(dst_zdt) == datetime2unix(dst) - dst_offset
+
+@test typeof(TimeZones.zdt2unix(ZonedDateTime(1970, utc))) == Float64
+@test typeof(TimeZones.zdt2unix(Int64, ZonedDateTime(1970, utc))) == Int64
+
+@test TimeZones.zdt2unix(ZonedDateTime(1970, 1, 1, 0, 0, 0, 750, utc)) == 0.75
+@test TimeZones.zdt2unix(Int64, ZonedDateTime(1970, 1, 1, 0, 0, 0, 750, utc)) == 0
