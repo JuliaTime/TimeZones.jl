@@ -50,12 +50,12 @@ function zdt2unix(zdt::ZonedDateTime)
     Dates.datetime2unix(utc(zdt))
 end
 
-function zdt2unix{T<:Integer}(t::Type{T}, zdt::ZonedDateTime)
-    floor(t, Dates.datetime2unix(utc(zdt)))
+function zdt2unix{T<:Integer}(::Type{T}, zdt::ZonedDateTime)
+    floor(T, Dates.datetime2unix(utc(zdt)))
 end
 
-function zdt2unix{T<:Number}(t::Type{T}, zdt::ZonedDateTime)
-    convert(t, Dates.datetime2unix(utc(zdt)))
+function zdt2unix{T<:Number}(::Type{T}, zdt::ZonedDateTime)
+    convert(T, Dates.datetime2unix(utc(zdt)))
 end
 
 function unix2zdt(seconds::Integer)
