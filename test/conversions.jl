@@ -33,15 +33,11 @@ zdt_warsaw = ZonedDateTime(dt, warsaw; from_utc=true)
 @test TimeZones.zdt2unix(ZonedDateTime(1970, utc)) == 0
 @test TimeZones.unix2zdt(0) == ZonedDateTime(1970, utc)
 
-no_dst = DateTime(2013, 2, 13)
-no_dst_zdt = ZonedDateTime(no_dst, warsaw)
-no_dst_offset = 3600
-@test TimeZones.zdt2unix(no_dst_zdt) == datetime2unix(no_dst) - no_dst_offset
-
-dst = DateTime(2016, 8, 11)
-dst_zdt = ZonedDateTime(dst, warsaw)
-dst_offset = 7200
-@test TimeZones.zdt2unix(dst_zdt) == datetime2unix(dst) - dst_offset
+for dt in (DateTime(2013, 2, 13), DateTime(2016, 8, 11))
+    zdt = ZonedDateTime(dt, warsaw)
+    offset = TimeZones.value(zdt.zone.offset)   # Total offset in seconds
+    @test TimeZones.zdt2unix(zdt) == datetime2unix(dt) - offset
+end
 
 @test isa(TimeZones.zdt2unix(ZonedDateTime(1970, utc)), Float64)
 @test isa(TimeZones.zdt2unix(Float32, ZonedDateTime(1970, utc)), Float32)
