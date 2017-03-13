@@ -44,7 +44,11 @@ dst_offset = 7200
 @test TimeZones.zdt2unix(dst_zdt) == datetime2unix(dst) - dst_offset
 
 @test typeof(TimeZones.zdt2unix(ZonedDateTime(1970, utc))) == Float64
+@test typeof(TimeZones.zdt2unix(Float32, ZonedDateTime(1970, utc))) == Float32
 @test typeof(TimeZones.zdt2unix(Int64, ZonedDateTime(1970, utc))) == Int64
+@test typeof(TimeZones.zdt2unix(Int32, ZonedDateTime(1970, utc))) == Int32
 
 @test TimeZones.zdt2unix(ZonedDateTime(1970, 1, 1, 0, 0, 0, 750, utc)) == 0.75
+@test TimeZones.zdt2unix(Float32, ZonedDateTime(1970, 1, 1, 0, 0, 0, 750, utc)) == 0.75
 @test TimeZones.zdt2unix(Int64, ZonedDateTime(1970, 1, 1, 0, 0, 0, 750, utc)) == 0
+@test TimeZones.zdt2unix(Int32, ZonedDateTime(1970, 1, 1, 0, 0, 0, 750, utc)) == 0
