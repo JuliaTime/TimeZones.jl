@@ -57,9 +57,14 @@ if is_windows()
     # Retrieve a mapping of Windows timezone names to Olson timezone names.
     # Details on the contents of this file can be found at:
     # http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping
-    xml_source = "http://unicode.org/cldr/data/common/supplemental/windowsZones.xml"
+    xml_source = "http://unicode.org/repos/cldr/trunk/common/supplemental/windowsZones.xml"
     xml_file = joinpath(translation_dir, "windowsZones.xml")
-    download(xml_source, xml_file)
+    try
+        download(xml_source, xml_file)
+    catch err
+        warn(err)
+        info("Falling back to cached XML")
+    end
 
     info("Pre-processing Windows translation")
 
