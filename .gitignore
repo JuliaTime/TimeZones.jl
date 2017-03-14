@@ -5,5 +5,4 @@
 # Ignore dependencies that are build/retrieved
 deps/tzdata
 deps/compiled
-deps/windowsZones.xml
 deps/windows_to_posix
