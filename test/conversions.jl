@@ -28,3 +28,23 @@ zdt_warsaw = ZonedDateTime(dt, warsaw; from_utc=true)
 # Identical since ZonedDateTime is immutable
 @test astimezone(zdt_utc, warsaw) === zdt_warsaw
 @test astimezone(zdt_warsaw, utc) === zdt_utc
+
+# ZonedDateTime to Unix timestamp (and vice versa)
+@test TimeZones.zdt2unix(ZonedDateTime(1970, utc)) == 0
+@test TimeZones.unix2zdt(0) == ZonedDateTime(1970, utc)
+
+for dt in (DateTime(2013, 2, 13), DateTime(2016, 8, 11))
+    zdt = ZonedDateTime(dt, warsaw)
+    offset = TimeZones.value(zdt.zone.offset)   # Total offset in seconds
+    @test TimeZones.zdt2unix(zdt) == datetime2unix(dt) - offset
+end
+
+@test isa(TimeZones.zdt2unix(ZonedDateTime(1970, utc)), Float64)
+@test isa(TimeZones.zdt2unix(Float32, ZonedDateTime(1970, utc)), Float32)
+@test isa(TimeZones.zdt2unix(Int64, ZonedDateTime(1970, utc)), Int64)
+@test isa(TimeZones.zdt2unix(Int32, ZonedDateTime(1970, utc)), Int32)
+
+@test TimeZones.zdt2unix(ZonedDateTime(1970, 1, 1, 0, 0, 0, 750, utc)) == 0.75
+@test TimeZones.zdt2unix(Float32, ZonedDateTime(1970, 1, 1, 0, 0, 0, 750, utc)) == 0.75
+@test TimeZones.zdt2unix(Int64, ZonedDateTime(1970, 1, 1, 0, 0, 0, 750, utc)) == 0
+@test TimeZones.zdt2unix(Int32, ZonedDateTime(1970, 1, 1, 0, 0, 0, 750, utc)) == 0
