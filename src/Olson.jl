@@ -51,9 +51,9 @@ type Rule
     end
 end
 
-typealias ZoneDict Dict{AbstractString,Array{Zone}}
-typealias RuleDict Dict{AbstractString,Array{Rule}}
-typealias OrderedRuleDict Dict{AbstractString,Tuple{Array{Date},Array{Rule}}}
+const ZoneDict = Dict{AbstractString,Array{Zone}}
+const RuleDict = Dict{AbstractString,Array{Rule}}
+const OrderedRuleDict = Dict{AbstractString,Tuple{Array{Date},Array{Rule}}}
 
 # Min and max years that we create DST transition DateTimes for (inclusive)
 const MIN_YEAR = year(typemin(DateTime))  # Essentially the begining of time
