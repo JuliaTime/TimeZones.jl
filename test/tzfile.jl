@@ -135,9 +135,10 @@ open(joinpath(TZFILE_DIR, "Europe", "Paris")) do f
 
     # Indices 56:2:58 don't match due to issues with Midsummer time.
     mask = tz_transitions .== paris_transitions
-    @test sum(!mask) == 2
+    neg_mask = map(!, mask)
+    @test sum(neg_mask) == 2
     @test tz_transitions[mask] == paris_transitions[mask]
-    @test all(map(issimilar, tz_transitions[!mask], paris_transitions[!mask]))
+    @test all(map(issimilar, tz_transitions[neg_mask], paris_transitions[neg_mask]))
 end
 
 madrid = resolve("Europe/Madrid", tzdata["europe"]...)
@@ -152,9 +153,10 @@ open(joinpath(TZFILE_DIR, "Europe", "Madrid")) do f
 
     # Indices 24:2:32 don't match due to issues with Midsummer time.
     mask = tz_transitions .== madrid_transitions
-    @test sum(!mask) == 5
+    neg_mask = map(!, mask)
+    @test sum(neg_mask) == 5
     @test tz_transitions[mask] == madrid_transitions[mask]
-    @test all(map(issimilar, tz_transitions[!mask], madrid_transitions[!mask]))
+    @test all(map(issimilar, tz_transitions[neg_mask], madrid_transitions[neg_mask]))
 end
 
 
@@ -171,7 +173,8 @@ open(joinpath(TZFILE_DIR, "Australia", "Perth")) do f
 
     # Index 1 doesn't match up
     mask = tz_transitions .== perth_transitions
-    @test sum(!mask) == 1
+    neg_mask = map(!, mask)
+    @test sum(neg_mask) == 1
     @test tz_transitions[mask] == perth_transitions[mask]
-    @test all(map(issimilar, tz_transitions[!mask], perth_transitions[!mask]))
+    @test all(map(issimilar, tz_transitions[neg_mask], perth_transitions[neg_mask]))
 end

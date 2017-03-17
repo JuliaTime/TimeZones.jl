@@ -3,7 +3,22 @@
 using Base.Dates
 import Base.Dates: value
 import Base: ==, isequal, isless
+import Compat: xor
 
+const FIXED_TIME_ZONE_REGEX = r"""
+^(?|
+    UTC([+-]\d{1,2})?
+    |
+    (?:UTC(?=[+-]))?
+    ([+-]?\d{2})
+    (?|
+        (\d{2})
+        |
+        \:(\d{2})
+        (?:\:(\d{2}))?
+    )
+)$
+"""x
 
 abstract TimeError <: Exception
 
@@ -73,22 +88,7 @@ UTC+15:45:21
 ```
 """
 function FixedTimeZone(s::AbstractString)
-    const regex = r"""
-    ^(?|
-        UTC([+-]\d{1,2})?
-        |
-        (?:UTC(?=[+-]))?
-        ([+-]?\d{2})
-        (?|
-            (\d{2})
-            |
-            \:(\d{2})
-            (?:\:(\d{2}))?
-        )
-    )$
-    """x
-
-    m = match(regex, s)
+    m = match(FIXED_TIME_ZONE_REGEX, s)
     m == nothing && throw(ArgumentError("Unrecognized time zone: $s"))
 
     values = map(n -> n == nothing ? 0 : Base.parse(Int, n), m.captures)
@@ -236,9 +236,9 @@ function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
         mask = [isdst(zdt.zone.offset) for zdt in possible]
 
         # Mask is expected to be unambiguous.
-        !($)(mask...) && throw(AmbiguousTimeError(dt, tz))
+        !xor(mask...) && throw(AmbiguousTimeError(dt, tz))
 
-        occurrence = is_dst ? findfirst(mask) : findfirst(!mask)
+        occurrence = findfirst(d -> d == is_dst, mask)
         return possible[occurrence]
     else
         throw(AmbiguousTimeError(dt, tz))
@@ -260,6 +260,12 @@ end
 
 @optional function ZonedDateTime(y::Integer, m::Integer=1, d::Integer=1, h::Integer=0, mi::Integer=0, s::Integer=0, ms::Integer=0, tz::TimeZone)
     ZonedDateTime(DateTime(y,m,d,h,mi,s,ms), tz)
+end
+
+# Parsing constructor. Note we typically don't support passing in time zone information as a
+# string since we cannot do not know if we need to support resolving ambiguity.
+function ZonedDateTime(y::Int64, m::Int64, d::Int64, h::Int64, mi::Int64, s::Int64, ms::Int64, tz::String)
+    ZonedDateTime(DateTime(y,m,d,h,mi,s,ms), TimeZone(tz))
 end
 
 

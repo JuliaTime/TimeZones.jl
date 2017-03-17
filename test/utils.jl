@@ -43,7 +43,7 @@ Base.isequal(a::Array{Expr}, b::Array{Expr}) = map(strip, a) == map(strip, b)
     ],
 )
 
-typealias I Integer
+const I = Integer
 @test isequal(
     optional(
         :(function ZonedDateTime(y::I, m::I=1, d::I=1, h::I=0, mi::I=0, s::I=0, ms::I=0, tz::TimeZone)

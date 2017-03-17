@@ -1,4 +1,5 @@
-import Base: +, -, .+, .-
+import Base: +, -, .+, .-, broadcast
+import Compat: @static
 
 # ZonedDateTime arithmetic
 (+)(x::ZonedDateTime) = x
@@ -17,7 +18,7 @@ function (-)(zdt::ZonedDateTime, p::TimePeriod)
     return ZonedDateTime(zdt.utc_datetime - p, timezone(zdt); from_utc=true)
 end
 
-function (.+)(r::StepRange{ZonedDateTime}, p::DatePeriod)
+function _dot_add(r::StepRange{ZonedDateTime}, p::DatePeriod)
     start, step, stop = first(r), Base.step(r), last(r)
 
     # Since the localtime + period can result in an invalid local datetime when working with
@@ -41,4 +42,11 @@ function (.+)(r::StepRange{ZonedDateTime}, p::DatePeriod)
     return StepRange(start, step, stop)
 end
 
-(.-)(r::StepRange{ZonedDateTime}, p::DatePeriod) = r .+ (-p)
+# static needed to stop 0.6 from complaining about `.+` and `.-` definitions
+@static if VERSION < v"0.6-"
+    (.+)(r::StepRange{ZonedDateTime}, p::DatePeriod) = _dot_add(r, p)
+    (.-)(r::StepRange{ZonedDateTime}, p::DatePeriod) = _dot_add(r, -p)
+else
+    broadcast(::typeof(+), r::StepRange{ZonedDateTime}, p::DatePeriod) = _dot_add(r, p)
+    broadcast(::typeof(-), r::StepRange{ZonedDateTime}, p::DatePeriod) = _dot_add(r, -p)
+end

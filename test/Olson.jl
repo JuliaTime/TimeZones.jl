@@ -21,7 +21,7 @@ import Base.Dates: Hour, Minute, Second
 
 # Explicit zone "local wall time"
 @test_throws ArgumentError parsedate("1945w")
-@test_throws KeyError parsedate("1945 Augw")
+@test_throws Exception parsedate("1945 Augw")  # Julia <=0.6 KeyError, 0.6 ArgumentError
 @test_throws ArgumentError parsedate("1945 Aug 2w")
 @test parsedate("1945 Aug 2 12w") == (DateTime(1945,8,2,12), 'w')
 @test parsedate("1945 Aug 2 12:34w") == (DateTime(1945,8,2,12,34), 'w')
@@ -29,7 +29,7 @@ import Base.Dates: Hour, Minute, Second
 
 # Explicit zone "UTC time"
 @test_throws ArgumentError parsedate("1945u")
-@test_throws KeyError parsedate("1945 Augu")
+@test_throws Exception parsedate("1945 Augu")
 @test_throws ArgumentError parsedate("1945 Aug 2u")
 @test parsedate("1945 Aug 2 12u") == (DateTime(1945,8,2,12), 'u')
 @test parsedate("1945 Aug 2 12:34u") == (DateTime(1945,8,2,12,34), 'u')
@@ -37,7 +37,7 @@ import Base.Dates: Hour, Minute, Second
 
 # Explicit zone "standard time"
 @test_throws ArgumentError parsedate("1945s")
-@test_throws KeyError parsedate("1945 Augs")
+@test_throws Exception parsedate("1945 Augs")
 @test_throws ArgumentError parsedate("1945 Aug 2s")
 @test parsedate("1945 Aug 2 12s") == (DateTime(1945,8,2,12), 's')
 @test parsedate("1945 Aug 2 12:34s") == (DateTime(1945,8,2,12,34), 's')

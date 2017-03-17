@@ -3,13 +3,25 @@ module Olson
 using Base.Dates
 
 import ..TimeZones: TZDATA_DIR, COMPILED_DIR, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET,
-    MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET, TIME_ZONES, Time
-import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition, Time
+    MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET, TIME_ZONES
+import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition, TimeOffset
+
+if isdefined(Base.Dates, :parse_components)
+    parse_components = Base.Dates.parse_components
+else
+    # Note: On older versions of Julia this will sort the Periods. Since our DateFormat
+    # is already in reverse sorted order there shouldn't be a difference.
+    function parse_components(str::AbstractString, df::DateFormat)
+        convert(Array{Any}, Dates.parse(str, df))
+    end
+end
+
+const DEFAULT_FLAG = 'w'
 
 # Zone type maps to an Olson Timezone database entity
 type Zone
-    gmtoffset::Time
-    save::Time
+    gmtoffset::TimeOffset
+    save::TimeOffset
     rules::AbstractString
     format::AbstractString
     until::Nullable{DateTime}
@@ -35,15 +47,23 @@ type Rule
     to::Nullable{Int}    # Rule applies up until, but not including this year
     month::Int           # Month in which DST transition happens
     on::Function         # Anonymous boolean function to determine day
-    at::Time             # Hour and minute at which the transition happens
+    at::TimeOffset       # Hour and minute at which the transition happens
     at_flag::Char        # Local wall time (w), UTC time (u), Local Standard time (s)
-    save::Time           # How much time is "saved" in daylight savings transition
+    save::TimeOffset     # How much time is "saved" in daylight savings transition
     letter::AbstractString  # Timezone abbr letter(s). ie. CKT ("") => CKHST ("HS")
+
+    function Rule(
+        from::Nullable{Int}, to::Nullable{Int}, month::Int, on::Function, at::TimeOffset,
+        at_flag::Char, save::TimeOffset, letter::AbstractString,
+    )
+        isflag(at_flag) || throw(ArgumentError("Unhandled flag '$at_flag'"))
+        new(from, to, month, on, at, at_flag, save, letter)
+    end
 end
 
-typealias ZoneDict Dict{AbstractString,Array{Zone}}
-typealias RuleDict Dict{AbstractString,Array{Rule}}
-typealias OrderedRuleDict Dict{AbstractString,Tuple{Array{Date},Array{Rule}}}
+const ZoneDict = Dict{AbstractString,Array{Zone}}
+const RuleDict = Dict{AbstractString,Array{Rule}}
+const OrderedRuleDict = Dict{AbstractString,Tuple{Array{Date},Array{Rule}}}
 
 # Min and max years that we create DST transition DateTimes for (inclusive)
 const MIN_YEAR = year(typemin(DateTime))  # Essentially the begining of time
@@ -66,18 +86,7 @@ for (abbr, dayofweek) in DAYS
     )
 end
 
-
-function parseflag(s::AbstractString)
-    if s == "" || s == "w"
-        return 'w'
-    elseif s == "u"
-        return 'u'
-    elseif s == "s"
-        return 's'
-    else
-        throw(ArgumentError("Unhandled flag $s"))
-    end
-end
+isflag(flag::Char) = flag in ('w', 'u', 's')
 
 # Olson time zone dates can be a single year (1900), yyyy-mm-dd (1900-Jan-01),
 # or minute-precision (1900-Jan-01 2:00).
@@ -85,7 +94,7 @@ end
 function parsedate(s::AbstractString)
     s = replace(s, r"\s+", " ")
     num_periods = length(split(s, " "))
-    s, flag = num_periods > 3 && isalpha(s[end]) ? (s[1:end-1], s[end:end]) : (s, "")
+    s, flag = num_periods > 3 && isflag(s[end]) ? (s[1:end-1], s[end]) : (s, DEFAULT_FLAG)
     if contains(s,"lastSun")
         dt = DateTime(replace(s, "lastSun", "1", 1), "yyyy uuu d H:MM:SS")
         dt = tonext(lastSun, dt; same=true)
@@ -97,9 +106,10 @@ function parsedate(s::AbstractString)
         dt = tonext(d -> dayofweek(d) == Sun, dt; same=true)
     else
         format = join(split("yyyy uuu dd HH:MM:SS", " ")[1:num_periods], ' ')
-        periods = Dates.parse(s, DateFormat(format))
+        periods = parse_components(s, DateFormat(format))
 
-        # Deal with zone "Pacific/Apia" which has a 24:00 datetime.
+        # Roll over 24:00 to the next day which occurs in "Pacific/Apia".
+        # Not a general purpose solution. For example won't work at the end of the month.
         if length(periods) > 3 && periods[4] == Hour(24)
             periods[4] = Hour(0)
             periods[3] += Day(1)
@@ -112,10 +122,10 @@ function parsedate(s::AbstractString)
     # If it's local standard time, we just need to add any saved amount
     # return letter == 's' ? (dt - save) : (dt - offset - save)
 
-    return dt, parseflag(flag)
+    return dt, flag
 end
 
-function asutc(dt::DateTime, flag::Char, offset::Time, save::Time)
+function asutc(dt::DateTime, flag::Char, offset::TimeOffset, save::TimeOffset)
     if flag == 'u'
         # In UTC
         return dt
@@ -130,7 +140,7 @@ function asutc(dt::DateTime, flag::Char, offset::Time, save::Time)
     end
 end
 
-function abbr_string(format::AbstractString, save::Time, letter::AbstractString="")
+function abbr_string(format::AbstractString, save::TimeOffset, letter::AbstractString="")
     # Note: using @sprintf would make sense but unfortunately it doesn't accept a
     # format as a variable.
     abbr = replace(format,"%s",letter,1)
@@ -181,10 +191,10 @@ function ruleparse(from, to, rule_type, month, on, at, save, letter)
         error("Can't parse day of month for DST change")
     end
     # Now we get the time of the transition
-    c = at[end:end]
-    at_hm = Time(isalpha(c) ? at[1:end-1] : at)
-    at_flag = parseflag(isalpha(c) ? c : "")
-    save_hm = Time(save)
+    c = at[end]
+    at_hm = TimeOffset(isflag(c) ? at[1:end-1] : at)
+    at_flag = isflag(c) ? c : DEFAULT_FLAG
+    save_hm = TimeOffset(save)
     letter = letter == "-" ? "" : letter
 
     # Report unexpected save values that could cause issues during resolve.
@@ -206,7 +216,7 @@ end
 
 function zoneparse(gmtoff, rules, format, until="")
     # Get our offset and abbreviation string for this period
-    offset = Time(gmtoff)
+    offset = TimeOffset(gmtoff)
 
     # Report unexpected offsets that could cause issues during resolve.
     offset < MIN_GMT_OFFSET && warn("Discovered offset $offset less than the expected min $MIN_GMT_OFFSET")
@@ -220,7 +230,7 @@ function zoneparse(gmtoff, rules, format, until="")
     until_dt, until_flag = Nullable{DateTime}(until_tuple[1]), until_tuple[2]
 
     if rules == "-" || ismatch(r"\d",rules)
-        save = Time(rules)
+        save = TimeOffset(rules)
         rules = ""
     else
         save = ZERO

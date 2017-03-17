@@ -42,6 +42,6 @@ end
 
 buffer = IOBuffer()
 show(buffer, UTCOffset(0, 0))
-@test takebuf_string(buffer) == "UTC+0/+0"
+@test Compat.String(take!(buffer)) == "UTC+0/+0"
 show(buffer, UTCOffset(3600, 7200))
-@test takebuf_string(buffer) == "UTC+1/+2"
+@test Compat.String(take!(buffer)) == "UTC+1/+2"
