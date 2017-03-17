@@ -5,6 +5,21 @@ import Base.Dates: value
 import Base: ==, isequal, isless
 import Compat: xor
 
+const FIXED_TIME_ZONE_REGEX = r"""
+^(?|
+    UTC([+-]\d{1,2})?
+    |
+    (?:UTC(?=[+-]))?
+    ([+-]?\d{2})
+    (?|
+        (\d{2})
+        |
+        \:(\d{2})
+        (?:\:(\d{2}))?
+    )
+)$
+"""x
+
 abstract TimeError <: Exception
 
 type AmbiguousTimeError <: TimeError
@@ -73,22 +88,7 @@ UTC+15:45:21
 ```
 """
 function FixedTimeZone(s::AbstractString)
-    const regex = r"""
-    ^(?|
-        UTC([+-]\d{1,2})?
-        |
-        (?:UTC(?=[+-]))?
-        ([+-]?\d{2})
-        (?|
-            (\d{2})
-            |
-            \:(\d{2})
-            (?:\:(\d{2}))?
-        )
-    )$
-    """x
-
-    m = match(regex, s)
+    m = match(FIXED_TIME_ZONE_REGEX, s)
     m == nothing && throw(ArgumentError("Unrecognized time zone: $s"))
 
     values = map(n -> n == nothing ? 0 : Base.parse(Int, n), m.captures)

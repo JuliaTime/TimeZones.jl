@@ -62,16 +62,12 @@ time zone string formats can be found in `FixedTimeZone(::AbstractString)`.
 """
 function TimeZone(str::AbstractString)
     return get!(TIME_ZONES, str) do
-        tz_path = joinpath(COMPILED_DIR, split(str, "/")...)
-
-        # Only parse string as an explicit FixedTimeZone if there is no file to load
-        if !isfile(tz_path)
-            try
-                return FixedTimeZone(str)
-            catch
-                throw(ArgumentError("Unknown time zone named $str"))
-            end
+        if ismatch(FIXED_TIME_ZONE_REGEX, str)
+            return FixedTimeZone(str)
         end
+
+        tz_path = joinpath(COMPILED_DIR, split(str, "/")...)
+        isfile(tz_path) || throw(ArgumentError("Unknown time zone \"$str\""))
 
         open(tz_path, "r") do fp
             return deserialize(fp)
