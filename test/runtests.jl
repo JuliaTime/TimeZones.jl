@@ -10,7 +10,7 @@ end
 
 using Base.Test
 using TimeZones
-import TimeZones: PKG_DIR
+import TimeZones: PKG_DIR, ARCHIVE_DIR, build
 import TimeZones.Olson: ZoneDict, RuleDict, tzparse, resolve
 import Compat: @compat
 
@@ -19,18 +19,12 @@ const TZDATA_DIR = get(ENV, "TZDATA_DIR", joinpath(PKG_DIR, "test", "tzdata"))
 const TZFILE_DIR = joinpath(PKG_DIR, "test", "tzfile")
 const TEST_REGIONS = ("asia", "australasia", "europe", "northamerica")
 
+isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
+isdir(TZDATA_DIR) || mkdir(TZDATA_DIR)
+
 # By default use a specific version of the tz database so we just testing for TimeZones.jl
 # changes and not changes to the tzdata.
-if !isdir(TZDATA_DIR)
-    mkdir(TZDATA_DIR)
-
-    info("Downloading $TZDATA_VERSION tz database")
-    archive = download("http://www.iana.org/time-zones/repository/releases/tzdata$TZDATA_VERSION.tar.gz")
-
-    info("Extracting tz database archive")
-    TimeZones.extract(archive, TZDATA_DIR, TEST_REGIONS)
-    rm(archive)
-end
+build(TZDATA_VERSION, TEST_REGIONS, ARCHIVE_DIR, TZDATA_DIR)
 
 # For testing we'll reparse the tzdata every time to instead of using the serialized data.
 # This should make the development/testing cycle simplier since you won't be forced to
@@ -46,6 +40,7 @@ end
 include("utils.jl")
 include("timeoffset.jl")
 include("Olson.jl")
+include("TZData.jl")
 include("utcoffset.jl")
 include("types.jl")
 include("interpret.jl")

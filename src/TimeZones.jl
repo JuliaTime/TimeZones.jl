@@ -25,6 +25,7 @@ export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime, DateTime,
     guess
 
 const PKG_DIR = normpath(joinpath(dirname(@__FILE__), ".."))
+const ARCHIVE_DIR = joinpath(PKG_DIR, "deps", "archives")
 const TZDATA_DIR = joinpath(PKG_DIR, "deps", "tzdata")
 const COMPILED_DIR = joinpath(PKG_DIR, "deps", "compiled")
 const TIME_ZONES = Dict{AbstractString,TimeZone}()
@@ -86,11 +87,14 @@ include("io.jl")
 include("tzfile.jl")
 include("adjusters.jl")
 include("Olson.jl")
+include("tzdata/TZData.jl")
 include("conversions.jl")
 include("local.jl")
 include("ranges.jl")
 include("discovery.jl")
 VERSION >= v"0.5.0-dev+5244" && include("rounding.jl")
 VERSION < v"0.6.0-dev.2307" ? include("parse-old.jl") : include("parse.jl")
+
+import TimeZones.TZData: build
 
 end # module

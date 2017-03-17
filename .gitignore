@@ -6,3 +6,4 @@
 deps/tzdata
 deps/compiled
 deps/windows_to_posix
+test/tzdata

@@ -1,5 +1,4 @@
-import TimeZones: TZDATA_DIR, COMPILED_DIR, extract
-import TimeZones.Olson: compile
+import TimeZones: build
 import Compat: is_windows
 
 if is_windows()
@@ -7,46 +6,7 @@ if is_windows()
     using LightXML
 end
 
-# Various sources from which the latest compressed TZ data can be retrieved.
-# Note: HTTP sources are preferable as they tend to work behind firewalls.
-const URLS = (
-    "https://www.iana.org/time-zones/repository/tzdata-latest.tar.gz",
-    "ftp://ftp.iana.org/tz/tzdata-latest.tar.gz",  # Unreliable source
-)
-
-# See "ftp://ftp.iana.org/tz/data/Makefile" PRIMARY_YDATA for listing of
-# regions to include. YDATA includes historical zones which we'll ignore.
-const REGIONS = (
-    "africa", "antarctica", "asia", "australasia",
-    "europe", "northamerica", "southamerica",
-    # "pacificnew", "etcetera", "backward",  # Historical zones
-)
-
-isdir(TZDATA_DIR) || mkdir(TZDATA_DIR)
-isdir(COMPILED_DIR) || mkdir(COMPILED_DIR)
-
-info("Downloading latest tz database")
-archive = ""
-for url in URLS
-    try
-        archive = download(url)
-        break
-    catch
-        warn("Failed to download tz database from: $url")
-    end
-end
-isfile(archive) || error("Unable to download tz database")
-
-info("Extracting tz database archive")
-extract(archive, TZDATA_DIR, REGIONS)
-rm(archive)
-
-
-info("Converting tz database into TimeZone data")
-for file in readdir(COMPILED_DIR)
-    rm(joinpath(COMPILED_DIR, file), recursive=true)
-end
-compile(TZDATA_DIR, COMPILED_DIR)
+build()
 
 if is_windows()
     translation_dir = dirname(WIN_TRANSLATION_FILE)
