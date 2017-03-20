@@ -2,7 +2,7 @@
 # import Base.Dates: UTInstant, DateTime, TimeZone, Millisecond
 using Base.Dates
 import Base.Dates: value
-import Base: ==, isequal, isless
+import Base: ==, promote_rule, isequal, isless
 import Compat: xor
 
 const FIXED_TIME_ZONE_REGEX = r"""
@@ -284,6 +284,20 @@ function ZonedDateTime(parts::Union{Period,TimeZone}...)
 
     isnull(timezone) && throw(ArgumentError("Missing time zone"))
     return ZonedDateTime(DateTime(periods...), get(timezone))
+end
+
+# Promotion
+promote_rule{T<:ZonedDateTime}(::Type{T}, ::Type{T}) = T
+
+# Because of the promoting fallback definitions for TimeType, we need a special case for
+# undefined promote_rule on TimeType types.
+# Otherwise, typejoin(T,S) is called (returning TimeType) so no conversion happens, and
+# isless(promote(x,y)...) is called again, causing a stack overflow.
+function promote_rule{T<:TimeType,S<:ZonedDateTime}(::Type{T}, ::Type{S})
+    error("no promotion exists for ", T, " and ", S)
+end
+function promote_rule{T<:ZonedDateTime,S<:TimeType}(::Type{T}, ::Type{S})
+    error("no promotion exists for ", T, " and ", S)
 end
 
 # Equality
