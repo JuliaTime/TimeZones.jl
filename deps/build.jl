@@ -58,12 +58,12 @@ if is_windows()
     # Details on the contents of this file can be found at:
     # http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping
     xml_source = "http://unicode.org/repos/cldr/trunk/common/supplemental/windowsZones.xml"
-    xml_file = joinpath(translation_dir, "windowsZones.xml")
     try
-        download(xml_source, xml_file)
+        xml_file = download(xml_source)
     catch err
         warn(err)
         info("Falling back to cached XML")
+        xml_file = joinpath(translation_dir, "windowsZones.xml")
     end
 
     info("Pre-processing Windows translation")
