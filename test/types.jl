@@ -351,3 +351,14 @@ for i in eachindex(digits)
     @test ZonedDateTime(digits[1:i]..., warsaw, true) == expected[1]
     @test ZonedDateTime(digits[1:i]..., warsaw, false) == expected[2]
 end
+
+# Promotion
+@test_throws ErrorException promote_type(ZonedDateTime, Date)
+@test_throws ErrorException promote_type(ZonedDateTime, DateTime)
+@test_throws ErrorException promote_type(Date, ZonedDateTime)
+@test_throws ErrorException promote_type(DateTime, ZonedDateTime)
+@test promote_type(ZonedDateTime, ZonedDateTime) == ZonedDateTime
+
+# Issue #52
+dt = now()
+@test_throws ErrorException ZonedDateTime(dt, warsaw) > dt
