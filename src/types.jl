@@ -3,7 +3,7 @@
 using Base.Dates
 import Base.Dates: value
 import Base: ==, promote_rule, isequal, isless
-import Compat: xor
+import Compat: @compat, xor
 
 const FIXED_TIME_ZONE_REGEX = r"""
 ^(?|
@@ -20,7 +20,7 @@ const FIXED_TIME_ZONE_REGEX = r"""
 )$
 """x
 
-abstract TimeError <: Exception
+@compat abstract type TimeError <: Exception end
 
 type AmbiguousTimeError <: TimeError
     local_dt::DateTime
