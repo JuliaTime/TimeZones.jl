@@ -1,6 +1,8 @@
+import Compat: @compat
+
 # TimeZone concepts used to disambiguate context of DateTimes
 # abstract UTC <: TimeZone  # Defined in Base.Dates
-abstract Local <: TimeZone
+@compat abstract type Local <: TimeZone end
 
 function transition_range(local_dt::DateTime, tz::VariableTimeZone, ::Type{Local})
     transitions = tz.transitions
