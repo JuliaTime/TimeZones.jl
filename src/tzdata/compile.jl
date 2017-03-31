@@ -15,8 +15,6 @@ else
     end
 end
 
-const DEFAULT_FLAG = 'w'
-
 # Zone type maps to an Olson Timezone database entity
 type Zone
     gmtoffset::TimeOffset
@@ -68,11 +66,17 @@ const OrderedRuleDict = Dict{AbstractString,Tuple{Array{Date},Array{Rule}}}
 const MIN_YEAR = year(typemin(DateTime))  # Essentially the begining of time
 const MAX_YEAR = 2037                     # year(unix2datetime(typemax(Int32))) - 1
 
-# Helper functions/data
-const MONTHS = Dict("Jan"=>1,"Feb"=>2,"Mar"=>3,"Apr"=>4,"May"=>5,"Jun"=>6,
-                "Jul"=>7,"Aug"=>8,"Sep"=>9,"Oct"=>10,"Nov"=>11,"Dec"=>12)
+const DEFAULT_FLAG = 'w'
 
-const DAYS = Dict("Mon"=>1,"Tue"=>2,"Wed"=>3,"Thu"=>4,"Fri"=>5,"Sat"=>6,"Sun"=>7)
+# Helper functions/data
+const MONTHS = Dict(
+    "Jan" => 1, "Feb" => 2, "Mar" => 3, "Apr" => 4, "May" => 5, "Jun" => 6,
+    "Jul" => 7, "Aug" => 8, "Sep" => 9, "Oct" => 10, "Nov" => 11, "Dec" => 12,
+)
+
+const DAYS = Dict(
+    "Mon" => 1, "Tue" => 2, "Wed" => 3, "Thu" => 4, "Fri" => 5, "Sat" => 6, "Sun" => 7,
+)
 
 # Create adjuster functions such as "lastSun".
 for (abbr, dayofweek) in DAYS
