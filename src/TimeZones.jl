@@ -28,7 +28,7 @@ export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime, DateTime,
     build
 
 const PKG_DIR = normpath(joinpath(dirname(@__FILE__), ".."))
-const ARCHIVE_DIR = joinpath(PKG_DIR, "deps", "archives")
+const ARCHIVE_DIR = joinpath(PKG_DIR, "deps", "tzarchive")
 const TZ_SOURCE_DIR = joinpath(PKG_DIR, "deps", "tzsource")
 const COMPILED_DIR = joinpath(PKG_DIR, "deps", "compiled")
 const TIME_ZONES = Dict{AbstractString,TimeZone}()

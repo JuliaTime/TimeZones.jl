@@ -3,6 +3,7 @@
 .DS_Store
 
 # Ignore dependencies that are build/retrieved
+deps/tzarchive
 deps/tzsource
 deps/compiled
 deps/windows_to_posix
