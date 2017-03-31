@@ -31,8 +31,20 @@ get_latest() = LATEST[]
 function set_latest(version::AbstractString, retrieved_utc::DateTime)
     LATEST[] = version, retrieved_utc
     open(LATEST_FILE, "w") do io
-        write_latest(io)
+        write_latest(io, version, retrieved_utc)
     end
+end
+
+function latest_version(now_utc::DateTime=now(Dates.UTC))
+    if is_latest_defined()
+        latest_version, latest_retrieved_utc = get_latest()
+
+        if now_utc - latest_retrieved_utc < LATEST_DELAY
+            return Nullable{AbstractString}(latest_version)
+        end
+    end
+
+    return Nullable{AbstractString}()
 end
 
 """
@@ -66,11 +78,10 @@ directory. See `tzdata_url` for details on tzdata version strings.
 """
 function tzdata_download(version::AbstractString="latest", dir::AbstractString=tempdir())
     now_utc = now(Dates.UTC)
-    if version == "latest" && is_latest_defined()
-        latest_version, latest_retrieved_utc = get_latest()
-
-        if now_utc - latest_retrieved_utc < LATEST_DELAY
-            return joinpath(dir, "tzdata$latest_version.tar.gz")
+    if version == "latest"
+        v = latest_version(now_utc)
+        if !isnull(v)
+            return joinpath(dir, "tzdata$(unsafe_get(v)).tar.gz")
         end
     end
 

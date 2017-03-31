@@ -17,6 +17,15 @@ function build(
     compiled_dir::AbstractString="";
     verbose::Bool=true,
 )
+    # Avoids spaming remote servers requesting the latest version
+    if version == "latest"
+        version = get(latest_version(), "latest")
+
+        if version != "latest"
+            info("Latest tzdata is $version")
+        end
+    end
+
     archive = joinpath(archive_dir, "tzdata$version.tar.gz")
 
     # Avoid downloading a tzdata archive if we already have a local copy
