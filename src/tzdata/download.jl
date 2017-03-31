@@ -4,30 +4,36 @@ const LATEST_FILE = joinpath(DEPS_DIR, "latest")
 const LATEST_FORMAT = Base.Dates.DateFormat("yyyy-mm-ddTHH:MM:SS")
 const LATEST_DELAY = Hour(1)  # In 1996 a correction to a release was made an hour later
 
-type Latest
-    version::AbstractString
-    retrieved_utc::DateTime
-end
-
-function _read(::Type{Latest}, io::IO)
+function read_latest(io::IO)
     version = readline(io)
     retrieved_utc = DateTime(readline(io), LATEST_FORMAT)
-    return Latest(version, retrieved_utc)
+    return version, retrieved_utc
 end
 
-function _read(filename::AbstractString, ::Type{Latest})
+function read_latest(filename::AbstractString)
     open(filename, "r") do io
-        _read(Latest, io)
+        read_latest(io)
     end
 end
 
-function _write(io::IO, latest::Latest)
-    write(io, latest.version)
+function write_latest(io::IO, version::AbstractString, retrieved_utc::DateTime)
+    write(io, version)
     write(io, "\n")
-    write(io, Dates.format(latest.retrieved_utc, LATEST_FORMAT))
+    write(io, Dates.format(retrieved_utc, LATEST_FORMAT))
 end
 
-const LATEST = isfile(LATEST_FILE) ? Ref{Latest}(_read(LATEST_FILE, Latest)) : Ref{Latest}()
+T = Tuple{AbstractString, DateTime}
+const LATEST = isfile(LATEST_FILE) ? Ref{T}(read_latest(LATEST_FILE)) : Ref{T}()
+
+is_latest_defined() = isdefined(LATEST, :x)
+get_latest() = LATEST[]
+
+function set_latest(version::AbstractString, retrieved_utc::DateTime)
+    LATEST[] = version, retrieved_utc
+    open(LATEST_FILE, "w") do io
+        write_latest(io)
+    end
+end
 
 """
     tzdata_url(version="latest") -> AbstractString
@@ -60,11 +66,11 @@ directory. See `tzdata_url` for details on tzdata version strings.
 """
 function tzdata_download(version::AbstractString="latest", dir::AbstractString=tempdir())
     now_utc = now(Dates.UTC)
-    if version == "latest" && isdefined(LATEST, :x)
-        latest = LATEST[]
+    if version == "latest" && is_latest_defined()
+        latest_version, latest_retrieved_utc = get_latest()
 
-        if now_utc - latest.retrieved_utc < Second(5)
-            return joinpath(dir, "tzdata$(latest.version).tar.gz")
+        if now_utc - latest_retrieved_utc < LATEST_DELAY
+            return joinpath(dir, "tzdata$latest_version.tar.gz")
         end
     end
 
@@ -85,11 +91,7 @@ function tzdata_download(version::AbstractString="latest", dir::AbstractString=t
         mv(archive, archive_versioned, remove_destination=true)
         archive = archive_versioned
 
-        latest = Latest(version, now_utc)
-        open(LATEST_FILE, "w") do io
-            _write(io, latest)
-        end
-        LATEST[] = latest
+        set_latest(version, now_utc)
     end
 
     return archive
