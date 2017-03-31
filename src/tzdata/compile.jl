@@ -58,9 +58,9 @@ type Rule
     end
 end
 
-const ZoneDict = Dict{AbstractString,Array{Zone}}
-const RuleDict = Dict{AbstractString,Array{Rule}}
-const OrderedRuleDict = Dict{AbstractString,Tuple{Array{Date},Array{Rule}}}
+const ZoneDict = Dict{AbstractString, Vector{Zone}}
+const RuleDict = Dict{AbstractString, Vector{Rule}}
+const OrderedRuleDict = Dict{AbstractString, Tuple{Vector{Date}, Vector{Rule}}}
 
 # Min and max years that we create DST transition DateTimes for (inclusive)
 const MIN_YEAR = year(typemin(DateTime))  # Essentially the begining of time
@@ -278,7 +278,7 @@ Example:
     1919-09-16   2:00s   0       -
     1944-04-03   2:00s   1:00    S
 """
-function order_rules(rules::Array{Rule}; max_year::Integer=MAX_YEAR)
+function order_rules(rules::Vector{Rule}; max_year::Integer=MAX_YEAR)
     dates = Date[]
     ordered = Rule[]
 
