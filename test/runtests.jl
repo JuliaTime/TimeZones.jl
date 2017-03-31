@@ -15,16 +15,16 @@ import TimeZones.TZData: ZoneDict, RuleDict, tzparse, resolve, build
 import Compat: @compat
 
 const TZDATA_VERSION = "2016j"
-const TZDATA_DIR = get(ENV, "TZDATA_DIR", joinpath(PKG_DIR, "test", "tzdata"))
+const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(PKG_DIR, "test", "tzsource"))
 const TZFILE_DIR = joinpath(PKG_DIR, "test", "tzfile")
 const TEST_REGIONS = ("asia", "australasia", "europe", "northamerica")
 
 isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
-isdir(TZDATA_DIR) || mkdir(TZDATA_DIR)
+isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)
 
 # By default use a specific version of the tz database so we just testing for TimeZones.jl
 # changes and not changes to the tzdata.
-build(TZDATA_VERSION, TEST_REGIONS, ARCHIVE_DIR, TZDATA_DIR)
+build(TZDATA_VERSION, TEST_REGIONS, ARCHIVE_DIR, TZ_SOURCE_DIR)
 
 # For testing we'll reparse the tzdata every time to instead of using the serialized data.
 # This should make the development/testing cycle simplier since you won't be forced to
@@ -34,7 +34,7 @@ build(TZDATA_VERSION, TEST_REGIONS, ARCHIVE_DIR, TZDATA_DIR)
 # recompiles all the time zones.
 tzdata = Dict{AbstractString,Tuple{ZoneDict,RuleDict}}()
 for name in TEST_REGIONS
-    tzdata[name] = tzparse(joinpath(TZDATA_DIR, name))
+    tzdata[name] = tzparse(joinpath(TZ_SOURCE_DIR, name))
 end
 
 include("utils.jl")

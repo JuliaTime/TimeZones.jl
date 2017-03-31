@@ -29,7 +29,7 @@ export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime, DateTime,
 
 const PKG_DIR = normpath(joinpath(dirname(@__FILE__), ".."))
 const ARCHIVE_DIR = joinpath(PKG_DIR, "deps", "archives")
-const TZDATA_DIR = joinpath(PKG_DIR, "deps", "tzdata")
+const TZ_SOURCE_DIR = joinpath(PKG_DIR, "deps", "tzsource")
 const COMPILED_DIR = joinpath(PKG_DIR, "deps", "compiled")
 const TIME_ZONES = Dict{AbstractString,TimeZone}()
 
@@ -100,5 +100,6 @@ import TimeZones.TZData: build
 
 # deprecations
 @deprecate_binding Olson TZData
+@deprecate_binding TZDATA_DIR TZ_SOURCE_DIR
 
 end # module

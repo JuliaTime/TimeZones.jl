@@ -9,7 +9,7 @@ If you truly do want to include the "Etc/*" time zones you just need to download
 
 ```julia
 using TimeZones
-download("ftp://ftp.iana.org/tz/data/etcetera", joinpath(TimeZones.TZDATA_DIR, "etcetera"))
+download("ftp://ftp.iana.org/tz/data/etcetera", joinpath(TimeZones.TZ_SOURCE_DIR, "etcetera"))
 TimeZones.TZData.compile()
 ```
 

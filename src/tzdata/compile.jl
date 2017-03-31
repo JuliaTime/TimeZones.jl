@@ -1,6 +1,6 @@
 using Base.Dates
 
-import ...TimeZones: TZDATA_DIR, COMPILED_DIR, TIME_ZONES
+import ...TimeZones: TZ_SOURCE_DIR, COMPILED_DIR, TIME_ZONES
 import ...TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
 import ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET,
     MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET
@@ -500,13 +500,13 @@ function resolve(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDict
     return resolve!(zone_name, zoneset, ruleset, ordered; max_year=max_year, debug=debug)
 end
 
-function tzparse(tzfile::AbstractString)
+function tzparse(tz_source_file::AbstractString)
     zones = ZoneDict()
     rules = RuleDict()
     links = Dict{AbstractString,AbstractString}()
 
     # For the intial pass we'll collect the zone and rule lines.
-    open(tzfile) do fp
+    open(tz_source_file) do fp
         kind = name = ""
         for line in eachline(fp)
             # Lines that start with whitespace can be considered a "continuation line"
@@ -546,17 +546,17 @@ function tzparse(tzfile::AbstractString)
     return zones, rules
 end
 
-function load(tzdata_dir::AbstractString=TZDATA_DIR; max_year::Integer=MAX_YEAR)
+function load(tz_source_dir::AbstractString=TZ_SOURCE_DIR; max_year::Integer=MAX_YEAR)
     timezones = Dict{AbstractString,TimeZone}()
-    for filename in readdir(tzdata_dir)
-        zones, rules = tzparse(joinpath(tzdata_dir, filename))
+    for filename in readdir(tz_source_dir)
+        zones, rules = tzparse(joinpath(tz_source_dir, filename))
         merge!(timezones, resolve(zones, rules; max_year=max_year))
     end
     return timezones
 end
 
-function compile(tzdata_dir::AbstractString=TZDATA_DIR, dest_dir::AbstractString=COMPILED_DIR; max_year::Integer=MAX_YEAR)
-    timezones = load(tzdata_dir; max_year=max_year)
+function compile(tz_source_dir::AbstractString=TZ_SOURCE_DIR, dest_dir::AbstractString=COMPILED_DIR; max_year::Integer=MAX_YEAR)
+    timezones = load(tz_source_dir; max_year=max_year)
 
     isdir(dest_dir) || error("Destination directory doesn't exist")
     empty!(TIME_ZONES)
