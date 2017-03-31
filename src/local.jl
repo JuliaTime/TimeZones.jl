@@ -3,6 +3,10 @@
 import Compat: @static, is_apple, is_unix, is_windows, readstring
 using Mocking
 
+if is_windows()
+    import TimeZones.WindowsTimeZoneIDs: WIN_TRANSLATION_FILE
+end
+
 """
     localzone() -> TimeZone
 

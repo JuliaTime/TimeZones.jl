@@ -34,10 +34,6 @@ const TZ_SOURCE_DIR = joinpath(DEPS_DIR, "tzsource")
 const COMPILED_DIR = joinpath(DEPS_DIR, "compiled")
 const TIME_ZONES = Dict{AbstractString,TimeZone}()
 
-if is_windows()
-    const WIN_TRANSLATION_FILE = joinpath(PKG_DIR, "deps", "windows_to_posix")
-end
-
 function __init__()
     # Base extension needs to happen everytime the module is loaded (issue #24)
     if isdefined(Base.Dates, :SLOT_RULE)
@@ -84,6 +80,7 @@ include("utils.jl")
 include("utcoffset.jl")
 include("types.jl")
 include("tzdata/TZData.jl")
+is_windows() && include("winzone/WindowsTimeZoneIDs.jl")
 include("interpret.jl")
 include("accessors.jl")
 include("arithmetic.jl")
@@ -97,7 +94,15 @@ include("discovery.jl")
 VERSION >= v"0.5.0-dev+5244" && include("rounding.jl")
 VERSION < v"0.6.0-dev.2307" ? include("parse-old.jl") : include("parse.jl")
 
-import TimeZones.TZData: build
+function build(version::AbstractString="latest", regions=TimeZones.TZData.REGIONS; force::Bool=false)
+    TimeZones.TZData.build(version, regions)
+
+    if is_windows()
+        TimeZones.WindowsTimeZoneIDs.build(force=force)
+    end
+
+    info("Successfully built TimeZones")
+end
 
 # deprecations
 @deprecate_binding Olson TZData
