@@ -10,8 +10,8 @@ end
 
 using Base.Test
 using TimeZones
-import TimeZones: PKG_DIR, ARCHIVE_DIR, build
-import TimeZones.Olson: ZoneDict, RuleDict, tzparse, resolve
+import TimeZones: PKG_DIR, ARCHIVE_DIR
+import TimeZones.TZData: ZoneDict, RuleDict, tzparse, resolve, build
 import Compat: @compat
 
 const TZDATA_VERSION = "2016j"
@@ -39,7 +39,7 @@ end
 
 include("utils.jl")
 include("timeoffset.jl")
-include("Olson.jl")
+include("compile.jl")
 include("TZData.jl")
 include("utcoffset.jl")
 include("types.jl")

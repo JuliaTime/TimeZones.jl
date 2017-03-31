@@ -1,12 +1,12 @@
 module TZData
 
-export Olson, build
+export build
 
 include("timeoffset.jl")
-include("Olson.jl")
 include("version.jl")
 include("archive.jl")
 include("download.jl")
+include("compile.jl")
 include("build.jl")
 
 end

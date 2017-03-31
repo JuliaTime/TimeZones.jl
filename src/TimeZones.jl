@@ -2,6 +2,7 @@ module TimeZones
 
 using Base.Dates
 import Base.Dates: TimeZone, AbstractTime
+import Base: @deprecate_binding
 import Compat: is_windows
 
 export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime, DateTime,
@@ -22,7 +23,9 @@ export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime, DateTime,
     # local.jl
     localzone,
     # ranges.jl
-    guess
+    guess,
+    # TZData
+    build
 
 const PKG_DIR = normpath(joinpath(dirname(@__FILE__), ".."))
 const ARCHIVE_DIR = joinpath(PKG_DIR, "deps", "archives")
@@ -93,6 +96,9 @@ include("discovery.jl")
 VERSION >= v"0.5.0-dev+5244" && include("rounding.jl")
 VERSION < v"0.6.0-dev.2307" ? include("parse-old.jl") : include("parse.jl")
 
-using TimeZones.TZData
+import TimeZones.TZData: build
+
+# deprecations
+@deprecate_binding Olson TZData
 
 end # module

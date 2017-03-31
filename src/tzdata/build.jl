@@ -1,4 +1,3 @@
-import .Olson: compile
 import TimeZones: ARCHIVE_DIR, TZDATA_DIR, COMPILED_DIR
 
 # The default tzdata region files we care about. See "ftp://ftp.iana.org/tz/data/Makefile"

@@ -1,5 +1,3 @@
-module Olson
-
 using Base.Dates
 
 import ...TimeZones: TZDATA_DIR, COMPILED_DIR, TIME_ZONES
@@ -570,5 +568,3 @@ function compile(tzdata_dir::AbstractString=TZDATA_DIR, dest_dir::AbstractString
         end
     end
 end
-
-end # module
