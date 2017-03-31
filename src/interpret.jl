@@ -1,3 +1,4 @@
+import TimeZones.TZData: MIN_OFFSET, MAX_OFFSET
 import Compat: @compat
 
 # TimeZone concepts used to disambiguate context of DateTimes

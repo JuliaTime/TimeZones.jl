@@ -2,9 +2,10 @@ module Olson
 
 using Base.Dates
 
-import ..TimeZones: TZDATA_DIR, COMPILED_DIR, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET,
-    MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET, TIME_ZONES
-import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition, TimeOffset
+import ...TimeZones: TZDATA_DIR, COMPILED_DIR, TIME_ZONES
+import ...TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
+import ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET,
+    MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET
 
 if isdefined(Base.Dates, :parse_components)
     parse_components = Base.Dates.parse_components

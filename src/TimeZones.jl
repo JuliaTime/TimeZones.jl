@@ -1,7 +1,7 @@
 module TimeZones
 
 using Base.Dates
-import Base.Dates: TimeZone, AbstractTime, days, hour, minute, second, millisecond
+import Base.Dates: TimeZone, AbstractTime
 import Compat: is_windows
 
 export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime, DateTime,
@@ -77,17 +77,15 @@ function TimeZone(str::AbstractString)
 end
 
 include("utils.jl")
-include("timeoffset.jl")
 include("utcoffset.jl")
 include("types.jl")
+include("tzdata/TZData.jl")
 include("interpret.jl")
 include("accessors.jl")
 include("arithmetic.jl")
 include("io.jl")
 include("tzfile.jl")
 include("adjusters.jl")
-include("Olson.jl")
-include("tzdata/TZData.jl")
 include("conversions.jl")
 include("local.jl")
 include("ranges.jl")
@@ -95,6 +93,6 @@ include("discovery.jl")
 VERSION >= v"0.5.0-dev+5244" && include("rounding.jl")
 VERSION < v"0.6.0-dev.2307" ? include("parse-old.jl") : include("parse.jl")
 
-import TimeZones.TZData: build
+using TimeZones.TZData
 
 end # module
