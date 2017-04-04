@@ -42,11 +42,12 @@ end
 
 function build(; force::Bool=false)
     clean = false
-    xml_file = joinpath(dirname(WIN_TRANSLATION_FILE), "windowsZones.xml")
+    win_zone_dir = joinpath(DEPS_DIR, "local")
+    xml_file = joinpath(win_zone_dir, "windowsZones2017a.xml")
 
     if !isfile(xml_file) || force
         info("Downloading latest Windows to POSIX timezone ID XML")
-        xml_file = download(WINDOWS_ZONES_URL)
+        xml_file = download(WINDOWS_ZONES_URL, joinpath(win_zone_dir, "windowsZones.xml"))
         clean = true
     end
 
