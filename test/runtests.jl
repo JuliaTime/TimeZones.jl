@@ -38,6 +38,7 @@ for name in TEST_REGIONS
 end
 
 include("utils.jl")
+include(joinpath("tzdata", "archive.jl"))
 include("timeoffset.jl")
 include("compile.jl")
 include("TZData.jl")

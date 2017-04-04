@@ -65,7 +65,7 @@ function readarchive(archive)
 
         return files
     else
-        output = readchomp(`tar tf $archive`)
+        output = readchomp(pipeline(`tar tf $archive`, stderr=DevNull))
         return split(output, '\n')
     end
 end
