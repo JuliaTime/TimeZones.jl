@@ -15,7 +15,7 @@ function build(
     archive_dir::AbstractString,
     tz_source_dir::AbstractString="",
     compiled_dir::AbstractString="";
-    verbose::Bool=true,
+    verbose::Bool=false,
 )
     # Avoids spaming remote servers requesting the latest version
     if version == "latest"
@@ -64,5 +64,5 @@ function build(version::AbstractString="latest", regions=REGIONS)
         rm(joinpath(COMPILED_DIR, file), recursive=true)
     end
 
-    build(version, regions, ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR)
+    build(version, regions, ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, verbose=true)
 end
