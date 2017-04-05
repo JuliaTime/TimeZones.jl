@@ -1,10 +1,11 @@
 import Compat: @static, is_windows
 
 """
-    extract(archive, directory, [files]) -> Void
+    extract(archive, directory, [files]; [verbose=false]) -> Void
 
 Extracts files from a compressed tar `archive` to the specified `directory`. If `files` is
-specified only the files given will be extracted.
+specified only the files given will be extracted. The `verbose` flag can be used to display
+additional information to STDOUT.
 """
 function extract(archive, directory, files=AbstractString[]; verbose::Bool=false)
     @static if is_windows()

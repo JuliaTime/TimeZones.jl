@@ -1,4 +1,5 @@
 import TimeZones: DEPS_DIR
+import Compat: unsafe_get
 
 const LATEST_FILE = joinpath(DEPS_DIR, "latest")
 const LATEST_FORMAT = Base.Dates.DateFormat("yyyy-mm-ddTHH:MM:SS")
@@ -57,7 +58,7 @@ are listed on "ftp://ftp.iana.org/tz/releases/" which start with "tzdata".
 # Examples
 ```julia
 julia> tzdata_url("2017a")
-"http://www.iana.org/time-zones/repository/releases/tzdata2017a.tar.gz"
+"https://www.iana.org/time-zones/repository/releases/tzdata2017a.tar.gz"
 ```
 """
 function tzdata_url(version::AbstractString="latest")
@@ -88,13 +89,14 @@ function tzdata_download(version::AbstractString="latest", dir::AbstractString=t
     url = tzdata_url(version)
     archive = Base.download(url, joinpath(dir, basename(url)))  # Overwrites the local file if any
 
-    # HTTP 404 Not Found can result in a empty file being created
+    # Note: An "HTTP 404 Not Found" may result in the 404 page being downloaded. Also,
+    # catches issues with corrupt archives
     if !isarchive(archive)
         rm(archive)
         error("Unable to download $version tzdata")
     end
 
-    # Update the filename as if an explicit version was given
+    # Rename the file to have an explicit version
     if version == "latest"
         version = tzdata_version_archive(archive)
 
