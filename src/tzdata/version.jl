@@ -75,8 +75,8 @@ Determines the tzdata version by inspecting the contents within the archive. Use
 downloading the latest archive "tzdata-latest.tar.gz".
 """
 function tzdata_version_archive(archive::AbstractString)
-    # Determine what files are available in the archive as attempting to extract a missing
-    # file will result in an exception.
+    # Attempting to extract files that do not exist in the archive will result in an
+    # exception.
     files = readarchive(archive)
     available_files = intersect(Set(["NEWS", "version"]), Set(files))
     isempty(available_files) && error("Unable to determine tzdata release")

@@ -39,6 +39,7 @@ end
 
 include("utils.jl")
 include(joinpath("tzdata", "archive.jl"))
+include(joinpath("tzdata", "version.jl"))
 include("timeoffset.jl")
 include("compile.jl")
 include("TZData.jl")
