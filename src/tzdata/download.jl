@@ -82,7 +82,8 @@ function tzdata_download(version::AbstractString="latest", dir::AbstractString=t
     if version == "latest"
         v = latest_version(now_utc)
         if !isnull(v)
-            return joinpath(dir, "tzdata$(unsafe_get(v)).tar.gz")
+            archive = joinpath(dir, "tzdata$(unsafe_get(v)).tar.gz")
+            isfile(archive) && return archive
         end
     end
 

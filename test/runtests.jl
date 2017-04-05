@@ -37,10 +37,13 @@ for name in TEST_REGIONS
     tzdata[name] = tzparse(joinpath(TZ_SOURCE_DIR, name))
 end
 
+include("helpers.jl")
+
 include("utils.jl")
 include(joinpath("tzdata", "timeoffset.jl"))
 include(joinpath("tzdata", "archive.jl"))
 include(joinpath("tzdata", "version.jl"))
+include(joinpath("tzdata", "download.jl"))
 include(joinpath("tzdata", "compile.jl"))
 include("utcoffset.jl")
 include("types.jl")
