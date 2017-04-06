@@ -54,6 +54,8 @@ function build(
         info("Converting tz source files into TimeZone data")
         compile(tz_source_dir, compiled_dir)
     end
+
+    return version
 end
 
 function build(version::AbstractString="latest", regions=REGIONS)
@@ -67,5 +69,5 @@ function build(version::AbstractString="latest", regions=REGIONS)
         rm(joinpath(COMPILED_DIR, file), recursive=true)
     end
 
-    build(version, regions, ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, verbose=true)
+    return build(version, regions, ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, verbose=true)
 end
