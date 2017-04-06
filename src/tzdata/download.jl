@@ -1,6 +1,11 @@
 import TimeZones: DEPS_DIR
 import Compat: unsafe_get
 
+# https://github.com/JuliaLang/Compat.jl/pull/345
+if VERSION < v"0.6.0-dev.2347"
+    Base.isassigned(x::Base.RefValue) = isdefined(x, :x)
+end
+
 const LATEST_FILE = joinpath(DEPS_DIR, "latest")
 const LATEST_FORMAT = Base.Dates.DateFormat("yyyy-mm-ddTHH:MM:SS")
 const LATEST_DELAY = Hour(1)  # In 1996 a correction to a release was made an hour later
@@ -26,9 +31,6 @@ end
 T = Tuple{AbstractString, DateTime}
 const LATEST = isfile(LATEST_FILE) ? Ref{T}(read_latest(LATEST_FILE)) : Ref{T}()
 
-is_latest_defined() = isdefined(LATEST, :x)
-get_latest() = LATEST[]
-
 function set_latest(version::AbstractString, retrieved_utc::DateTime)
     LATEST[] = version, retrieved_utc
     open(LATEST_FILE, "w") do io
@@ -37,8 +39,8 @@ function set_latest(version::AbstractString, retrieved_utc::DateTime)
 end
 
 function latest_version(now_utc::DateTime=now(Dates.UTC))
-    if is_latest_defined()
-        latest_version, latest_retrieved_utc = get_latest()
+    if isassigned(LATEST)
+        latest_version, latest_retrieved_utc = LATEST[]
 
         if now_utc - latest_retrieved_utc < LATEST_DELAY
             return Nullable{AbstractString}(latest_version)
