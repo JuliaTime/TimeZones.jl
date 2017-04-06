@@ -4,7 +4,7 @@ import Compat: @static, is_apple, is_unix, is_windows, readstring
 using Mocking
 
 if is_windows()
-    import TimeZones.WindowsTimeZoneIDs: WIN_TRANSLATION_FILE
+    import TimeZones.WindowsTimeZoneIDs: get_windows_translation
 end
 
 """
@@ -116,12 +116,7 @@ function localzone()
             end
         end
     elseif is_windows()
-        isfile(WIN_TRANSLATION_FILE) || error("Missing Windows to POSIX time zone translation ",
-            "file. Try running Pkg.build(\"TimeZones\")")
-
-        translation = open(WIN_TRANSLATION_FILE, "r") do fp
-            deserialize(fp)
-        end
+        translation = get_windows_translation()
 
         # Windows powershell should be available on Windows 7 and above
         win_name = strip(@mock readstring(`powershell -Command "[TimeZoneInfo]::Local.Id"`))
