@@ -1,13 +1,16 @@
 import TimeZones: ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR
 
-# The default tzdata region files we care about. See "ftp://ftp.iana.org/tz/data/Makefile"
-# PRIMARY_YDATA for listing of regions to include. YDATA includes historical zones which
-# we'll ignore.
-const REGIONS = (
+# The default tz source files we care about. See "ftp://ftp.iana.org/tz/data/Makefile"
+# "PRIMARY_YDATA" for listing of tz source files to include.
+const REGIONS = [
     "africa", "antarctica", "asia", "australasia",
     "europe", "northamerica", "southamerica",
-    # "pacificnew", "etcetera", "backward",  # Historical zones
-)
+]
+
+# Legacy tz source files TimeZones.jl typically ignores ("YDATA" in Makefile).
+const LEGACY_REGIONS = [
+    "pacificnew", "etcetera", "backward",
+]
 
 function build(
     version::AbstractString,

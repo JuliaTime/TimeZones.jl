@@ -76,6 +76,25 @@ function TimeZone(str::AbstractString)
     end
 end
 
+"""
+    build(version="latest", regions=REGIONS; force=false) -> Void
+
+Builds the TimeZones package with the specified tzdata `version` and `regions`. The
+`version` is typically a 4-digit year followed by a lowercase ASCII letter (e.g. "2016j").
+Users can also specify which `regions`, or tz source files, should be compiled. Available
+regions are listed under `TimeZones.REGIONS` and `TimeZones.LEGACY_REGIONS`. The `force`
+flag is used to re-download tzdata archives.
+"""
+function build(version::AbstractString="latest", regions=REGIONS; force::Bool=false)
+    TimeZones.TZData.build(version, regions)
+
+    if is_windows()
+        TimeZones.WindowsTimeZoneIDs.build(force=force)
+    end
+
+    info("Successfully built TimeZones")
+end
+
 include("utils.jl")
 include("utcoffset.jl")
 include("types.jl")
@@ -94,15 +113,7 @@ include("discovery.jl")
 VERSION >= v"0.5.0-dev+5244" && include("rounding.jl")
 VERSION < v"0.6.0-dev.2307" ? include("parse-old.jl") : include("parse.jl")
 
-function build(version::AbstractString="latest", regions=TimeZones.TZData.REGIONS; force::Bool=false)
-    TimeZones.TZData.build(version, regions)
-
-    if is_windows()
-        TimeZones.WindowsTimeZoneIDs.build(force=force)
-    end
-
-    info("Successfully built TimeZones")
-end
+import TimeZones.TZData: REGIONS, LEGACY_REGIONS
 
 # deprecations
 @deprecate_binding Olson TZData
