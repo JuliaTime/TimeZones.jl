@@ -8,11 +8,10 @@ using LightXML
 # http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping
 const WINDOWS_ZONE_URL = "http://unicode.org/repos/cldr/trunk/common/supplemental/windowsZones.xml"
 
-const WINDOWS_TRANSLATION_FILE = joinpath(DEPS_DIR, "windows_to_posix")
-const WINDOWS_TRANSLATION = Dict{AbstractString,AbstractString}()
+const WINDOWS_XML_DIR = joinpath(DEPS_DIR, "local")
+const WINDOWS_XML_FILE = joinpath(WINDOWS_XML_DIR, "windowsZones.xml")
 
-translation_dir = dirname(WINDOWS_TRANSLATION_FILE)
-isdir(translation_dir) || mkdir(translation_dir)
+isdir(WINDOWS_XML_DIR) || mkdir(WINDOWS_XML_DIR)
 
 function compile(xml_file::AbstractString)
     # Get the timezone conversions from the file
@@ -38,64 +37,32 @@ function compile(xml_file::AbstractString)
     return translation
 end
 
-function compile(xml_file::AbstractString, translation_file::AbstractString)
-    open(translation_file, "w") do fp
-        serialize(fp, compile(xml_file))
-    end
+const WINDOWS_TRANSLATION = if isfile(WINDOWS_XML_FILE)
+    compile(WINDOWS_XML_FILE)
+else
+    Dict{AbstractString, AbstractString}()
 end
 
-function build(
-    xml_dir::AbstractString=joinpath(DEPS_DIR, "local"),
-    translation_file::AbstractString=WINDOWS_TRANSLATION_FILE;
-    force::Bool=false,
-)
-    clean = false
-    xml_file = joinpath(xml_dir, "windowsZones2017a.xml")
+function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
+    fallback_xml_file = joinpath(WINDOWS_XML_DIR, "windowsZones2017a.xml")
 
-    if !isfile(xml_file) || force
-        info("Downloading latest Windows to POSIX timezone ID XML")
-        xml_file = download(WINDOWS_ZONE_URL, joinpath(xml_dir, "windowsZones.xml"))
-        clean = true
+    if !isfile(xml_file)
+        if isfile(fallback_xml_file) && !force
+            cp(fallback_xml_file, xml_file)
+        else
+            info("Downloading latest Windows to POSIX timezone ID XML")
+            download(WINDOWS_ZONE_URL, xml_file)
+        end
     end
 
     info("Compiling Windows time zone name translation")
-    compile(xml_file, translation_file)
+    translation = compile(xml_file)
 
-    # Remove temporary XML file
-    if clean
-        rm(xml_file)
-    end
-end
-
-function build(; force::Bool=false)
-    build(force=force)
+    # Copy contents into translation constant
     empty!(WINDOWS_TRANSLATION)
-end
-
-function load_translation(translation_file::AbstractString)
-    return open(translation_file, "r") do fp
-        deserialize(fp)
+    for (k, v) in translation
+        WINDOWS_TRANSLATION[k] = v
     end
-end
-
-function get_windows_translation()
-    if isempty(WINDOWS_TRANSLATION)
-        if !isfile(WINDOWS_TRANSLATION_FILE)
-            error(
-                "Missing Windows to POSIX time zone translation file. ",
-                "Try running Pkg.build(\"TimeZones\").",
-            )
-        end
-
-        translation = load_translation(WINDOWS_TRANSLATION_FILE)
-
-        # Copy contents into translation constant
-        for (k, v) in translation
-            WINDOWS_TRANSLATION[k] = v
-        end
-    end
-
-    return WINDOWS_TRANSLATION
 end
 
 end

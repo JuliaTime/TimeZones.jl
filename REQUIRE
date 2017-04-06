@@ -1,6 +1,4 @@
 julia 0.4
 Compat 0.17
 Mocking 0.2
-
-# Only required for building
 @windows LightXML

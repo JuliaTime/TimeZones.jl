@@ -4,7 +4,7 @@ import Compat: @static, is_apple, is_unix, is_windows, readstring
 using Mocking
 
 if is_windows()
-    import TimeZones.WindowsTimeZoneIDs: get_windows_translation
+    import TimeZones.WindowsTimeZoneIDs: WINDOWS_TRANSLATION
 end
 
 """
@@ -116,12 +116,11 @@ function localzone()
             end
         end
     elseif is_windows()
-        translation = get_windows_translation()
-
         # Windows powershell should be available on Windows 7 and above
         win_name = strip(@mock readstring(`powershell -Command "[TimeZoneInfo]::Local.Id"`))
-        if haskey(translation, win_name)
-            posix_name = translation[win_name]
+
+        if haskey(WINDOWS_TRANSLATION, win_name)
+            posix_name = WINDOWS_TRANSLATION[win_name]
 
             # Translation dict includes Etc time zones which we currently are not supporting
             # since they are deemed historical. To ensure compatibility with the translation

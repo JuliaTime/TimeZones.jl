@@ -6,5 +6,5 @@
 deps/tzarchive
 deps/tzsource
 deps/compiled
-deps/windows_to_posix
+deps/local
 test/tzsource

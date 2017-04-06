@@ -1,18 +1,20 @@
 import TimeZones.WindowsTimeZoneIDs
 
-xml_file = joinpath(DEPS_DIR, "local", "windowsZones2017a.xml")
+xml_file = TimeZones.WindowsTimeZoneIDs.WINDOWS_XML_FILE
+!isfile(xml_file) && error("Missing required XML file. Run Pkg.build(\"TimeZones\").")
 
 trans = TimeZones.WindowsTimeZoneIDs.compile(xml_file)
 @test trans["Central European Standard Time"] == "Europe/Warsaw"
 
 mktempdir() do temp_dir
-    translation_file = joinpath(temp_dir, "windows_to_posix")
-    @test !isfile(translation_file)
+    xml_file = joinpath(temp_dir, "windowZones.xml")
+    @test !isfile(xml_file)
+
+    empty!(TimeZones.WindowsTimeZoneIDs.WINDOWS_TRANSLATION)
+    @test isempty(TimeZones.WindowsTimeZoneIDs.WINDOWS_TRANSLATION)
 
     # Does not perform download
-    TimeZones.WindowsTimeZoneIDs.build(dirname(xml_file), translation_file)
-    @test isfile(translation_file)
-
-    trans = TimeZones.WindowsTimeZoneIDs.load_translation(translation_file)
-    @test isa(trans, Dict{AbstractString, AbstractString})
+    TimeZones.WindowsTimeZoneIDs.build(xml_file)
+    @test isfile(xml_file)
+    @test !isempty(TimeZones.WindowsTimeZoneIDs.WINDOWS_TRANSLATION)
 end
