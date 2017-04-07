@@ -1,5 +1,5 @@
 import TimeZones: Transition
-import TimeZones.Olson: ZoneDict, RuleDict, zoneparse, ruleparse, resolve, parsedate, order_rules
+import TimeZones.TZData: ZoneDict, RuleDict, zoneparse, ruleparse, resolve, parsedate, order_rules
 import Base.Dates: Hour, Minute, Second
 
 ### parsedate ###

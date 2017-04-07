@@ -1,4 +1,4 @@
-import TimeZones.Olson: parse_components
+import TimeZones.TZData: parse_components
 
 null = FixedTimeZone("", 10800)
 fixed = FixedTimeZone("UTC+01:00")

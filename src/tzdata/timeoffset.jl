@@ -1,5 +1,6 @@
 import Base: convert, promote_rule, string, print, show
-import Base.Dates: value, toms
+import Base.Dates: Period, TimePeriod, Week, Day, Hour, Minute, Second, Millisecond,
+    value, toms, hour, minute, second
 
 # Convenience type for working with HH:MM:SS.
 immutable TimeOffset <: TimePeriod

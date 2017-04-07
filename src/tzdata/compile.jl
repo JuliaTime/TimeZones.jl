@@ -1,10 +1,9 @@
-module Olson
-
 using Base.Dates
 
-import ..TimeZones: TZDATA_DIR, COMPILED_DIR, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET,
-    MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET, TIME_ZONES
-import ..TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition, TimeOffset
+import ...TimeZones: TZ_SOURCE_DIR, COMPILED_DIR, TIME_ZONES
+import ...TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
+import ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET,
+    MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET
 
 if isdefined(Base.Dates, :parse_components)
     parse_components = Base.Dates.parse_components
@@ -15,8 +14,6 @@ else
         convert(Array{Any}, Dates.parse(str, df))
     end
 end
-
-const DEFAULT_FLAG = 'w'
 
 # Zone type maps to an Olson Timezone database entity
 type Zone
@@ -61,19 +58,25 @@ type Rule
     end
 end
 
-const ZoneDict = Dict{AbstractString,Array{Zone}}
-const RuleDict = Dict{AbstractString,Array{Rule}}
-const OrderedRuleDict = Dict{AbstractString,Tuple{Array{Date},Array{Rule}}}
+const ZoneDict = Dict{AbstractString, Vector{Zone}}
+const RuleDict = Dict{AbstractString, Vector{Rule}}
+const OrderedRuleDict = Dict{AbstractString, Tuple{Vector{Date}, Vector{Rule}}}
 
 # Min and max years that we create DST transition DateTimes for (inclusive)
 const MIN_YEAR = year(typemin(DateTime))  # Essentially the begining of time
 const MAX_YEAR = 2037                     # year(unix2datetime(typemax(Int32))) - 1
 
-# Helper functions/data
-const MONTHS = Dict("Jan"=>1,"Feb"=>2,"Mar"=>3,"Apr"=>4,"May"=>5,"Jun"=>6,
-                "Jul"=>7,"Aug"=>8,"Sep"=>9,"Oct"=>10,"Nov"=>11,"Dec"=>12)
+const DEFAULT_FLAG = 'w'
 
-const DAYS = Dict("Mon"=>1,"Tue"=>2,"Wed"=>3,"Thu"=>4,"Fri"=>5,"Sat"=>6,"Sun"=>7)
+# Helper functions/data
+const MONTHS = Dict(
+    "Jan" => 1, "Feb" => 2, "Mar" => 3, "Apr" => 4, "May" => 5, "Jun" => 6,
+    "Jul" => 7, "Aug" => 8, "Sep" => 9, "Oct" => 10, "Nov" => 11, "Dec" => 12,
+)
+
+const DAYS = Dict(
+    "Mon" => 1, "Tue" => 2, "Wed" => 3, "Thu" => 4, "Fri" => 5, "Sat" => 6, "Sun" => 7,
+)
 
 # Create adjuster functions such as "lastSun".
 for (abbr, dayofweek) in DAYS
@@ -275,7 +278,7 @@ Example:
     1919-09-16   2:00s   0       -
     1944-04-03   2:00s   1:00    S
 """
-function order_rules(rules::Array{Rule}; max_year::Integer=MAX_YEAR)
+function order_rules(rules::Vector{Rule}; max_year::Integer=MAX_YEAR)
     dates = Date[]
     ordered = Rule[]
 
@@ -475,8 +478,9 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
         return VariableTimeZone(zone_name, transitions, cutoff)
     else
         # Although unlikely the time zone name in the transition and the zone_name
-        # could be different. We'll ignore this issue at the moment.
-        return transitions[1].zone
+        # could be different.
+        offset = first(transitions).zone.offset
+        return FixedTimeZone(zone_name, offset)
     end
 end
 
@@ -497,13 +501,13 @@ function resolve(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDict
     return resolve!(zone_name, zoneset, ruleset, ordered; max_year=max_year, debug=debug)
 end
 
-function tzparse(tzfile::AbstractString)
+function tzparse(tz_source_file::AbstractString)
     zones = ZoneDict()
     rules = RuleDict()
     links = Dict{AbstractString,AbstractString}()
 
     # For the intial pass we'll collect the zone and rule lines.
-    open(tzfile) do fp
+    open(tz_source_file) do fp
         kind = name = ""
         for line in eachline(fp)
             # Lines that start with whitespace can be considered a "continuation line"
@@ -543,17 +547,17 @@ function tzparse(tzfile::AbstractString)
     return zones, rules
 end
 
-function load(tzdata_dir::AbstractString=TZDATA_DIR; max_year::Integer=MAX_YEAR)
+function load(tz_source_dir::AbstractString=TZ_SOURCE_DIR; max_year::Integer=MAX_YEAR)
     timezones = Dict{AbstractString,TimeZone}()
-    for filename in readdir(tzdata_dir)
-        zones, rules = tzparse(joinpath(tzdata_dir, filename))
+    for filename in readdir(tz_source_dir)
+        zones, rules = tzparse(joinpath(tz_source_dir, filename))
         merge!(timezones, resolve(zones, rules; max_year=max_year))
     end
     return timezones
 end
 
-function compile(tzdata_dir::AbstractString=TZDATA_DIR, dest_dir::AbstractString=COMPILED_DIR; max_year::Integer=MAX_YEAR)
-    timezones = load(tzdata_dir; max_year=max_year)
+function compile(tz_source_dir::AbstractString=TZ_SOURCE_DIR, dest_dir::AbstractString=COMPILED_DIR; max_year::Integer=MAX_YEAR)
+    timezones = load(tz_source_dir; max_year=max_year)
 
     isdir(dest_dir) || error("Destination directory doesn't exist")
     empty!(TIME_ZONES)
@@ -569,5 +573,3 @@ function compile(tzdata_dir::AbstractString=TZDATA_DIR, dest_dir::AbstractString
         end
     end
 end
-
-end # module
