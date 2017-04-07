@@ -8,9 +8,9 @@ According to [IANA](ftp://ftp.iana.org/tz/data/etcetera) the "Etc/*" time zones 
 If you truly do want to include the "Etc/*" time zones you just need to download the tz source file and re-compile:
 
 ```julia
-using TimeZones
-download("ftp://ftp.iana.org/tz/data/etcetera", joinpath(TimeZones.TZ_SOURCE_DIR, "etcetera"))
-TimeZones.TZData.compile()
+import TimeZones.TZData: extract, active_archive, compile
+extract(active_archive(), TimeZones.TZ_SOURCE_DIR, "etcetera")
+compile()
 ```
 
 ## Far-future ZonedDateTime with VariableTimeZone

@@ -478,8 +478,9 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
         return VariableTimeZone(zone_name, transitions, cutoff)
     else
         # Although unlikely the time zone name in the transition and the zone_name
-        # could be different. We'll ignore this issue at the moment.
-        return transitions[1].zone
+        # could be different.
+        offset = first(transitions).zone.offset
+        return FixedTimeZone(zone_name, offset)
     end
 end
 
