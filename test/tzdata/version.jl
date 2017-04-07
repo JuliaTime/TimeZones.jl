@@ -1,6 +1,7 @@
 import TimeZones: ARCHIVE_DIR
 import TimeZones.TZData: TZDATA_VERSION_REGEX, TZDATA_NEWS_REGEX
 import TimeZones.TZData: read_news, extract, tzdata_version_dir, tzdata_version_archive
+import TimeZones.TZData: active_version, active_archive
 
 for year = ("12", "1234"), letter = ("", "z")
     version = year * letter
@@ -53,3 +54,14 @@ end
 
 @test tzdata_version_archive(archive) == TZDATA_VERSION
 @test_throws ErrorException tzdata_version_archive(@__FILE__) == TZDATA_VERSION
+
+
+# Active/built tzdata version
+version = active_version()
+@test version != "latest"  # Could happen if the logic to resolve the version fails
+@test ismatch(TZDATA_VERSION_REGEX, version)
+
+archive = active_archive()
+@test isfile(archive)
+@test dirname(archive) == ARCHIVE_DIR
+@test basename(archive) == "tzdata$version.tar.gz"

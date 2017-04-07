@@ -1,3 +1,6 @@
+import ...TimeZones: DEPS_DIR, ARCHIVE_DIR
+import Compat: readstring
+
 # Note: A tz code or data version consists of a year and letter while a release consists of
 # a pair of tz code and data versions. In recent releases the tz code and data use the same
 # version.
@@ -21,6 +24,8 @@ const TZDATA_NEWS_REGEX = r"""
     (?<version>(?:\d{2}){1,2}[a-z]?)
     \b
 """x
+
+const ACTIVE_VERSION_FILE = joinpath(DEPS_DIR, "active_version")
 
 """
     read_news(news, [limit]) -> Vector{AbstractString}
@@ -85,4 +90,16 @@ function tzdata_version_archive(archive::AbstractString)
         extract(archive, temp_dir, available_files)
         tzdata_version_dir(temp_dir)
     end
+end
+
+function active_version()
+    !isfile(ACTIVE_VERSION_FILE) && error("No active tzdata version")
+    readstring(ACTIVE_VERSION_FILE)
+end
+
+function active_archive()
+    version = active_version()
+    archive = joinpath(ARCHIVE_DIR, "tzdata$version.tar.gz")
+    !isfile(archive) && error("Missing $version tzdata archive")
+    return archive
 end

@@ -7,4 +7,5 @@ deps/tzarchive
 deps/tzsource
 deps/compiled
 deps/local
+deps/active_version
 test/tzsource

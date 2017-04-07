@@ -1,4 +1,4 @@
-import TimeZones: ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR
+import ...TimeZones: ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR
 
 # The default tz source files we care about. See "ftp://ftp.iana.org/tz/data/Makefile"
 # "PRIMARY_YDATA" for listing of tz source files to include.
@@ -39,8 +39,8 @@ function build(
         if version == "latest"
             m = match(TZDATA_VERSION_REGEX, basename(archive))
             if m !== nothing
-                abs_release = m.match
-                info("Latest tzdata is $abs_release")
+                version = m.match
+                info("Latest tzdata is $version")
             end
         end
     end
@@ -69,5 +69,8 @@ function build(version::AbstractString="latest", regions=REGIONS)
         rm(joinpath(COMPILED_DIR, file), recursive=true)
     end
 
-    return build(version, regions, ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, verbose=true)
+    version = build(version, regions, ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, verbose=true)
+    write(ACTIVE_VERSION_FILE, version)
+
+    return version
 end
