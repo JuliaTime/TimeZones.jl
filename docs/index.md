@@ -14,15 +14,3 @@ julia> Pkg.add("TimeZones")
 ```
 
 This command will install the latest version of TimeZones, automatically download the latest tz database, and convert the data into an Julia optimized format.
-
-Sometimes the official server where we get the tz database is inaccessible. If this occurs you'll see an error similar to:
-
-```julia
-ERROR: Unable to download tz database
-```
-
-To correct this problem try to downloading the tz database at a later time. You can trigger a download again with:
-
-```julia
-julia> Pkg.build("TimeZones")
-```
