@@ -3,7 +3,9 @@ environment:
 
   matrix:
   - JULIAVERSION: "julialang/bin/winnt/x86/0.4/julia-0.4-latest-win32.exe"
+    COVERAGE: "true"
   - JULIAVERSION: "julialang/bin/winnt/x64/0.4/julia-0.4-latest-win64.exe"
+    COVERAGE: "true"
   - JULIAVERSION: "julialang/bin/winnt/x86/0.5/julia-0.5-latest-win32.exe"
   - JULIAVERSION: "julialang/bin/winnt/x64/0.5/julia-0.5-latest-win64.exe"
   - JULIAVERSION: "julialang/bin/winnt/x86/0.6/julia-0.6-latest-win32.exe"
@@ -42,4 +44,25 @@ build_script:
       Pkg.clone(pwd(), \"TimeZones\"); Pkg.build(\"TimeZones\")"
 
 test_script:
-  - C:\projects\julia\bin\julia -e "Pkg.test(\"TimeZones\")"
+# Using coverage keyword with Julia 0.5+ is broken ()
+  - IF DEFINED COVERAGE (
+      C:\projects\julia\bin\julia -e "Pkg.test(\"TimeZones\", coverage=true)"
+    ) ELSE (
+      C:\projects\julia\bin\julia -e "Pkg.test(\"TimeZones\")"
+    )
+
+after_test:
+# Only processing coverage if we ran with the coverage keyword
+  - IF DEFINED COVERAGE (
+      C:\projects\julia\bin\julia -e "
+        cd(Pkg.dir(\"TimeZones\")); Pkg.add(\"Coverage\"); Pkg.add(\"URIParser\"); using Coverage, URIParser;
+        Codecov.submit_generic(process_folder(),
+          service=\"appveyor\",
+          branch=ENV[\"APPVEYOR_REPO_BRANCH\"],
+          commit=ENV[\"APPVEYOR_REPO_COMMIT\"],
+          pull_request=get(ENV, \"APPVEYOR_PULL_REQUEST_NUMBER\", \"\"),
+          job=escape(join([ENV[\"APPVEYOR_ACCOUNT_NAME\"], ENV[\"APPVEYOR_PROJECT_SLUG\"], ENV[\"APPVEYOR_BUILD_VERSION\"]], '/')),
+          slug=ENV[\"APPVEYOR_REPO_NAME\"],
+          build=escape(ENV[\"APPVEYOR_JOB_ID\"]),
+        )"
+    )
