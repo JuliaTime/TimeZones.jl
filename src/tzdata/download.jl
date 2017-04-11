@@ -1,10 +1,5 @@
 import TimeZones: DEPS_DIR
-import Compat: unsafe_get
-
-# https://github.com/JuliaLang/Compat.jl/pull/345
-if VERSION < v"0.6.0-dev.2347"
-    Base.isassigned(x::Base.RefValue) = isdefined(x, :x)
-end
+import Compat: unsafe_get, isassigned
 
 const LATEST_FILE = joinpath(DEPS_DIR, "latest")
 const LATEST_FORMAT = Base.Dates.DateFormat("yyyy-mm-ddTHH:MM:SS")
