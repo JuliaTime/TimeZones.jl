@@ -5,9 +5,8 @@ import Base.Dates: TimeZone, AbstractTime
 import Base: @deprecate_binding
 import Compat: is_windows
 
-export TimeZone, FixedTimeZone, VariableTimeZone, ZonedDateTime, DateTime,
+export TimeZone, @tz_str, FixedTimeZone, VariableTimeZone, ZonedDateTime, DateTime,
     TimeError, AmbiguousTimeError, NonExistentTimeError, UnhandledTimeError,
-    @tz_str,
     # discovery.jl
     timezone_names, all_timezones, timezones_from_abbr, timezone_abbrs,
     # accessors.jl
@@ -77,22 +76,20 @@ function TimeZone(str::AbstractString)
     end
 end
 
-
 """
     @tz_str -> TimeZone
 
-Constructs a `TimeZone` subtype based upon the string `str`.  See docstring of `TimeZone`
-for reference.
+Constructs a `TimeZone` subtype based upon the string at parse time. See docstring of
+`TimeZone` for more details.
 
 ```julia
-julia> TimeZone("Africa/Nairobi")
-Africa/Nairobi (UTC+3)
-
 julia> tz"Africa/Nairobi"
 Africa/Nairobi (UTC+3)
 ```
 """
-macro tz_str(str) TimeZone(str) end
+macro tz_str(str)
+    TimeZone(str)
+end
 
 """
     build(version="latest", regions=REGIONS; force=false) -> Void
