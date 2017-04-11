@@ -1,5 +1,6 @@
 # Deserialization can cause us to have two immutables that are not using the same memory
 @test TimeZone("Europe/Warsaw") === TimeZone("Europe/Warsaw")
+@test tz"Africa/Nairobi" === TimeZone("Africa/Nairobi")
 
 if lowercase(get(ENV, "CI", "false")) == "true"
     info("Testing build process")
@@ -38,13 +39,17 @@ if lowercase(get(ENV, "CI", "false")) == "true"
 
     # Compile tz source files with an extended max_year. An example from the FAQ.
     warsaw = TimeZone("Europe/Warsaw")
+    windhoek = tz"Africa/Windhoek"
     @test last(warsaw.transitions).utc_datetime == DateTime(2037, 10, 25, 1)
     @test get(warsaw.cutoff) == DateTime(2038, 3, 28, 1)
     @test_throws TimeZones.UnhandledTimeError ZonedDateTime(DateTime(2039), warsaw)
 
     TimeZones.TZData.compile(max_year=2200)
     new_warsaw = TimeZone("Europe/Warsaw")
+    new_windhoek = tz"Africa/Windhoek"
 
+    @test warsaw !== new_warsaw
+    @test windhoek === new_windhoek # Instead tz".." doesn't change after re-compilation
     @test last(new_warsaw.transitions).utc_datetime == DateTime(2200, 10, 26, 1)
     @test get(new_warsaw.cutoff) == DateTime(2201, 3, 29, 1)
     ZonedDateTime(2100, new_warsaw)  # Test this doesn't throw an exception

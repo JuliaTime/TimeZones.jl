@@ -3,7 +3,15 @@
 A `TimeZone` is an abstract type that represents information regarding a specific time zone. Typically you will create an instance of a `TimeZone` by passing in a zone name to the convenience constructor `TimeZone`:
 
 ```julia
-TimeZone("Europe/Warsaw")
+julia> TimeZone("Europe/Warsaw")
+Europe/Warsaw (UTC+1/UTC+2)
+```
+
+You can also create a `TimeZone` by using a `tz` string macro:
+
+```julia
+julia> tz"Europe/Warsaw"
+Europe/Warsaw (UTC+1/UTC+2)
 ```
 
 To see all of the [currently available](faq#why-are-the-etc-time-zones-unsupported) time zone names:
