@@ -25,7 +25,7 @@ julia> spring + Hour(23)
 2014-03-31T00:00:00+02:00
 ```
 
-A potential cause of confusion regarding this behaviour is the loss in associativity. For example:
+A potential cause of confusion regarding this behaviour is the loss in associativity when ordering is forced. For example:
 
 ```julia
 julia> (spring + Day(1)) + Hour(24)
@@ -35,7 +35,7 @@ julia> (spring + Hour(24)) + Day(1)
 2014-04-01T01:00:00+02:00
 ```
 
-The first example adds 1 day to 2014-03-30T00:00:00+01:00, which results in 2014-03-31T00:00:00+02:00; then we add 24 hours to get 2014-04-01T00:00:00+02:00. The second example add 24 hours *first* to get 2014-03-31T01:00:00+02:00, and *then* add 1 day which results in 2014-04-01T01:00:00+02:00. When working with operations using multiple periods the operations will be ordered by the Period's *types* and not their positional order; this means `Day` will be added before `Hour`. Hence the following does result in associativity (in Julia 0.6 and above):
+The first example adds 1 day to 2014-03-30T00:00:00+01:00, which results in 2014-03-31T00:00:00+02:00; then we add 24 hours to get 2014-04-01T00:00:00+02:00. The second example add 24 hours *first* to get 2014-03-31T01:00:00+02:00, and *then* add 1 day which results in 2014-04-01T01:00:00+02:00. When working with operations using multiple periods the operations will be ordered by the Period's *types* and not their positional order; this means `Day` will be added before `Hour`. Hence the following *does* result in associativity:
 
 ```julia
 julia> spring + Hour(24) + Day(1)
@@ -43,6 +43,23 @@ julia> spring + Hour(24) + Day(1)
 
 julia> spring + Day(1) + Hour(24)
 2014-04-01T00:00:00+02:00
+```
+
+If using a version of Julia 0.5 or below you may want to force precedence when mixing `DatePeriod`s and `TimePeriod`s since the expression `Day(1) + Hour(24)` would be automatically canonicalized to `Day(2)`:
+
+```julia
+julia> ZonedDateTime(2014, 10, 25, warsaw) + Day(1) + Hour(24)  # On Julia 0.5 or below
+2014-10-27T00:00:00+01:00
+
+julia> ZonedDateTime(2014, 10, 25, warsaw) + Day(2)
+2014-10-27T00:00:00+01:00
+```
+
+In Julia 0.6 period canonicalization no longer happens automatically:
+
+```
+julia> ZonedDateTime(2014, 10, 25, warsaw) + Day(1) + Hour(24)  # Julia 0.6 and above
+2014-10-26T23:00:00+01:00
 ```
 
 ## Ranges

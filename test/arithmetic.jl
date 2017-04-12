@@ -39,10 +39,10 @@ explicit_day_hour = (ZonedDateTime(spring, warsaw) + Day(1)) + Hour(24)
 implicit_hour_day = ZonedDateTime(spring, warsaw) + Hour(24) + Day(1)
 implicit_day_hour = ZonedDateTime(spring, warsaw) + Day(1) + Hour(24)
 
-# @test explicit_hour_day == implicit_hour_day
-# @test explicit_day_hour == implicit_day_hour
-# @test implicit_hour_day != implicit_day_hour
-@test explicit_day_hour < explicit_hour_day
+@test explicit_hour_day == ZonedDateTime(2015, 3, 31, 1, warsaw)
+@test explicit_day_hour == ZonedDateTime(2015, 3, 31, 0, warsaw)
+@test implicit_hour_day == ZonedDateTime(2015, 3, 31, 0, warsaw)
+@test implicit_day_hour == ZonedDateTime(2015, 3, 31, 0, warsaw)
 
 # CompoundPeriod canonicalization interacting with period arithmetic. Since `spring_zdt` is
 # a 23 hour day this means adding `Day(1)` and `Hour(23)` are equivalent.
@@ -51,10 +51,10 @@ spring_zdt = ZonedDateTime(spring, warsaw)
 
 # When canonicalization happens automatically `Hour(24) + Minute(1)` is converted into
 # `Day(1) + Minute(1)`. Fixed in `JuliaLang/julia#19268`
-if VERSION < v"0.6.0-dev.1874"
-    @test spring_zdt + Hour(23) + Minute(1) == spring_zdt + Hour(24) + Minute(1)
-else
+if VERSION >= v"0.6.0-dev.1874"
     @test spring_zdt + Hour(23) + Minute(1) < spring_zdt + Hour(24) + Minute(1)
+else
+    @test spring_zdt + Hour(23) + Minute(1) == spring_zdt + Hour(24) + Minute(1)
 end
 
 # Arithmetic with a StepRange should always work even when the start/stop lands on
