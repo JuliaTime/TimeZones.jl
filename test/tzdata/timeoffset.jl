@@ -47,8 +47,5 @@ t = TimeOffset(1,-23,-45)
 
 # TimeOffset show function
 t = TimeOffset(1,23,45)
-buffer = IOBuffer()
-print(buffer, t)
-@test Compat.String(take!(buffer)) == "01:23:45"
-show(buffer, t)
-@test Compat.String(take!(buffer)) == "01:23:45"
+@test sprint(print, t) == "01:23:45"
+@test sprint(show, t) == "01:23:45"

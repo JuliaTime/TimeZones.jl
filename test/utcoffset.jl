@@ -40,8 +40,5 @@ let a = UTCOffset(7200, 3600), b = UTCOffset(3600, 7200)
     @test isequal(a, b)
 end
 
-buffer = IOBuffer()
-show(buffer, UTCOffset(0, 0))
-@test Compat.String(take!(buffer)) == "UTC+0/+0"
-show(buffer, UTCOffset(3600, 7200))
-@test Compat.String(take!(buffer)) == "UTC+1/+2"
+@test sprint(show, UTCOffset(0, 0)) == "UTC+0/+0"
+@test sprint(show, UTCOffset(3600, 7200)) == "UTC+1/+2"
