@@ -10,8 +10,6 @@ ulyanovsk = resolve("Europe/Ulyanovsk", tzdata["europe"]...)  # No named abbrevi
 new_york = resolve("America/New_York", tzdata["northamerica"]...)  # Underscore in name
 dt = DateTime(1942,12,25,1,23,45)
 
-buffer = IOBuffer()
-
 # TimeZones as a string
 @test string(null) == "UTC+03:00"
 @test string(fixed) == "UTC+01:00"
@@ -21,50 +19,31 @@ buffer = IOBuffer()
 @test string(honolulu) == "Pacific/Honolulu"
 @test string(ulyanovsk) == "Europe/Ulyanovsk"
 
-showcompact(buffer, null)
-@test Compat.String(take!(buffer)) == "UTC+03:00"
-showcompact(buffer, fixed)
-@test Compat.String(take!(buffer)) == "UTC+01:00"
-showcompact(buffer, est)
-@test Compat.String(take!(buffer)) == "EST"
-showcompact(buffer, warsaw)
-@test Compat.String(take!(buffer)) == "Europe/Warsaw"
-showcompact(buffer, apia)
-@test Compat.String(take!(buffer)) == "Pacific/Apia"
-showcompact(buffer, honolulu)
-@test Compat.String(take!(buffer)) == "Pacific/Honolulu"
-showcompact(buffer, ulyanovsk)
-@test Compat.String(take!(buffer)) == "Europe/Ulyanovsk"
+@test sprint(showcompact, null) == "UTC+03:00"
+@test sprint(showcompact, fixed) == "UTC+01:00"
+@test sprint(showcompact, est) == "EST"
+@test sprint(showcompact, warsaw) == "Europe/Warsaw"
+@test sprint(showcompact, apia) == "Pacific/Apia"
+@test sprint(showcompact, honolulu) == "Pacific/Honolulu"
+@test sprint(showcompact, ulyanovsk) == "Europe/Ulyanovsk"
 
-show(buffer, null)
-@test Compat.String(take!(buffer)) == "UTC+03:00"
-show(buffer, fixed)
-@test Compat.String(take!(buffer)) == "UTC+01:00"
-show(buffer, est)
-@test Compat.String(take!(buffer)) == "EST (UTC-5)"
-show(buffer, warsaw)
-@test Compat.String(take!(buffer)) == "Europe/Warsaw (UTC+1/UTC+2)"
-show(buffer, apia)
-@test Compat.String(take!(buffer)) == "Pacific/Apia (UTC+13/UTC+14)"
-show(buffer, honolulu)
-@test Compat.String(take!(buffer)) == "Pacific/Honolulu (UTC-10)"
-show(buffer, ulyanovsk)
-@test Compat.String(take!(buffer)) == "Europe/Ulyanovsk (UTC+4)"
+@test sprint(show, null) == "UTC+03:00"
+@test sprint(show, fixed) == "UTC+01:00"
+@test sprint(show, est) == "EST (UTC-5)"
+@test sprint(show, warsaw) == "Europe/Warsaw (UTC+1/UTC+2)"
+@test sprint(show, apia) == "Pacific/Apia (UTC+13/UTC+14)"
+@test sprint(show, honolulu) == "Pacific/Honolulu (UTC-10)"
+@test sprint(show, ulyanovsk) == "Europe/Ulyanovsk (UTC+4)"
 
 # UTC and GMT are special cases
-show(buffer, FixedTimeZone("UTC"))
-@test Compat.String(take!(buffer)) == "UTC"
-show(buffer, FixedTimeZone("GMT", 0))
-@test Compat.String(take!(buffer)) == "GMT"
-show(buffer, FixedTimeZone("FOO", 0))
-@test Compat.String(take!(buffer)) == "FOO (UTC+0)"
+@test sprint(show, FixedTimeZone("UTC")) == "UTC"
+@test sprint(show, FixedTimeZone("GMT", 0)) == "GMT"
+@test sprint(show, FixedTimeZone("FOO", 0)) == "FOO (UTC+0)"
 
 # ZonedDateTime as a string
 zdt = ZonedDateTime(dt, warsaw)
 @test string(zdt) == "1942-12-25T01:23:45+01:00"
-
-show(buffer, zdt)
-@test Compat.String(take!(buffer)) == "1942-12-25T01:23:45+01:00"
+@test sprint(show, zdt) == "1942-12-25T01:23:45+01:00"
 
 
 # TimeZone parsing

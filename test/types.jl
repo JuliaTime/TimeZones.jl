@@ -37,13 +37,10 @@ import Base.Dates: Hour, Second, UTM
 # Test exception messages
 tz = FixedTimeZone("Imaginary/Zone", 0, 0)
 
-buffer = IOBuffer()
-showerror(buffer, AmbiguousTimeError(DateTime(2015,1,1), tz))
-@test Compat.String(take!(buffer)) == "AmbiguousTimeError: Local DateTime 2015-01-01T00:00:00 is ambiguous within Imaginary/Zone"
-
-buffer = IOBuffer()
-showerror(buffer, NonExistentTimeError(DateTime(2015,1,1), tz))
-@test Compat.String(take!(buffer)) == "NonExistentTimeError: Local DateTime 2015-01-01T00:00:00 does not exist within Imaginary/Zone"
+@test sprint(showerror, AmbiguousTimeError(DateTime(2015,1,1), tz)) ==
+    "AmbiguousTimeError: Local DateTime 2015-01-01T00:00:00 is ambiguous within Imaginary/Zone"
+@test sprint(showerror, NonExistentTimeError(DateTime(2015,1,1), tz)) ==
+    "NonExistentTimeError: Local DateTime 2015-01-01T00:00:00 does not exist within Imaginary/Zone"
 
 
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
