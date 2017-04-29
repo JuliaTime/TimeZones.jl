@@ -1,5 +1,9 @@
 import Compat: @static, is_windows
 
+if is_windows()
+    const exe7z = joinpath(JULIA_HOME, "7z.exe")
+end
+
 """
     extract(archive, directory, [files]; [verbose=false]) -> Void
 
@@ -9,7 +13,7 @@ additional information to STDOUT.
 """
 function extract(archive, directory, files=AbstractString[]; verbose::Bool=false)
     @static if is_windows()
-        cmd = pipeline(`7z x $archive -y -so`, `7z x -si -y -ttar -o$directory $files`)
+        cmd = pipeline(`$exe7z x $archive -y -so`, `$exe7z x -si -y -ttar -o$directory $files`)
     else
         cmd = `tar xvf $archive --directory=$directory $files`
     end
@@ -28,7 +32,7 @@ Determines if the given `path` is an archive.
 """
 function isarchive(path)
     @static if is_windows()
-        success(`7z t $path -y`)
+        success(`$exe7z t $path -y`)
     else
         success(`tar tf $path`)
     end
@@ -45,7 +49,7 @@ function readarchive(archive)
         header = "-" ^ 24
         content = false
 
-        cmd = pipeline(`7z x $archive -y -so`, `7z l -si -y -ttar`)
+        cmd = pipeline(`$exe7z x $archive -y -so`, `$exe7z l -si -y -ttar`)
         output = readchomp(pipeline(cmd, stderr=DevNull))
         for line in split(output, "\r\n")
             # Extract the file name from the last column in the 7-zip output table.
