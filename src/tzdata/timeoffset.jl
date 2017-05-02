@@ -53,9 +53,6 @@ convert(::Type{Millisecond}, t::TimeOffset) = Millisecond(value(t) * 1000)
 promote_rule{P<:Union{Week,Day,Hour,Minute,Second}}(::Type{P}, ::Type{TimeOffset}) = Second
 promote_rule(::Type{Millisecond}, ::Type{TimeOffset}) = Millisecond
 
-# Should be defined in Base.Dates
-Base.isless(x::Period, y::Period) = isless(promote(x,y)...)
-
 # https://en.wikipedia.org/wiki/ISO_8601#Times
 function string(t::TimeOffset)
     neg = value(t) < 0 ? "-" : ""
