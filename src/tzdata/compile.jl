@@ -10,8 +10,24 @@ if isdefined(Base.Dates, :parse_components)
 else
     # Note: On older versions of Julia this will sort the Periods. Since our DateFormat
     # is already in reverse sorted order there shouldn't be a difference.
-    function parse_components(str::AbstractString, df::DateFormat)
-        convert(Array{Any}, Dates.parse(str, df))
+    if method_exists(parse, Tuple{Type{TimeType}, AbstractString, Base.Dates.DateFormat})
+        # 0.6
+        function parse_components(str::AbstractString, df::DateFormat)
+            # wrap to next day if hour is 24
+            wrap = ismatch(r" 24:00$", str)
+            if wrap
+                str = replace(str, r" 24:00$", " 00:00")
+            end
+            x = Dates.parse(DateTime, str, df)
+            if wrap
+                x += Day(1)
+            end
+            [Year(x), Month(x), Day(x), Hour(x), Minute(x), Second(x)]
+        end
+    else
+        function parse_components(str::AbstractString, df::DateFormat)
+            convert(Array{Any}, Dates.parse(str, df))
+        end
     end
 end
 
