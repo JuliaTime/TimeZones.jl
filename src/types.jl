@@ -22,6 +22,12 @@ const FIXED_TIME_ZONE_REGEX = r"""
 
 @compat abstract type TimeError <: Exception end
 
+"""
+    AmbiguousTimeError(local_datetime, timezone)
+
+The provided local datetime is ambiguous within the specified timezone. Typically occurs on
+daylight saving time transitions which "fall back" causing duplicate hour long period.
+"""
 type AmbiguousTimeError <: TimeError
     local_dt::DateTime
     timezone::TimeZone
@@ -32,6 +38,13 @@ function Base.showerror(io::IO, e::AmbiguousTimeError)
     print(io, "Local DateTime $(e.local_dt) is ambiguous within $(string(e.timezone))")
 end
 
+"""
+    NonExistentTimeError(local_datetime, timezone)
+
+The provided local datetime is does not exist within the specified timezone. Typically
+occurs on daylight saving time transitions which "spring forward" causing an hour long
+period to be skipped.
+"""
 type NonExistentTimeError <: TimeError
     local_dt::DateTime
     timezone::TimeZone
@@ -42,6 +55,11 @@ function Base.showerror(io::IO, e::NonExistentTimeError)
     print(io, "Local DateTime $(e.local_dt) does not exist within $(string(e.timezone))")
 end
 
+"""
+    UnhandledTimeError(timezone)
+
+The timezone calculation occurs beyond the last calculated transition.
+"""
 type UnhandledTimeError <: TimeError
     tz::VariableTimeZone
 end
