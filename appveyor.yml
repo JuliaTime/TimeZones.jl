@@ -45,7 +45,7 @@ build_script:
       Pkg.clone(pwd(), \"TimeZones\"); Pkg.build(\"TimeZones\")"
 
 test_script:
-# Using coverage keyword with Julia 0.5+ is broken ()
+# Using coverage keyword with Julia 0.5+ is broken (https://github.com/JuliaLang/julia/issues/21289)
   - IF DEFINED COVERAGE (
       C:\projects\julia\bin\julia -e "Pkg.test(\"TimeZones\", coverage=true)"
     ) ELSE (
@@ -53,17 +53,7 @@ test_script:
     )
 
 after_test:
-# Only processing coverage if we ran with the coverage keyword
+# Only processing coverage if we ran with the coverage keyword. Note we need Coverage.jl > v0.3.3
   - IF DEFINED COVERAGE (
-      C:\projects\julia\bin\julia -e "
-        cd(Pkg.dir(\"TimeZones\")); Pkg.add(\"Coverage\"); Pkg.add(\"URIParser\"); using Coverage, URIParser;
-        Codecov.submit_generic(process_folder(),
-          service=\"appveyor\",
-          branch=ENV[\"APPVEYOR_REPO_BRANCH\"],
-          commit=ENV[\"APPVEYOR_REPO_COMMIT\"],
-          pull_request=get(ENV, \"APPVEYOR_PULL_REQUEST_NUMBER\", \"\"),
-          job=escape(join([ENV[\"APPVEYOR_ACCOUNT_NAME\"], ENV[\"APPVEYOR_PROJECT_SLUG\"], ENV[\"APPVEYOR_BUILD_VERSION\"]], '/')),
-          slug=ENV[\"APPVEYOR_REPO_NAME\"],
-          build=escape(ENV[\"APPVEYOR_JOB_ID\"]),
-        )"
+      C:\projects\julia\bin\julia -e "cd(Pkg.dir(\"TimeZones\")); Pkg.add(\"Coverage\"); Pkg.checkout(\"Coverage\"); using Coverage; Codecov.submit(process_folder())"
     )
