@@ -27,14 +27,14 @@ type AmbiguousTimeError <: TimeError
     timezone::TimeZone
 end
 
-type NonExistentTimeError <: TimeError
-    local_dt::DateTime
-    timezone::TimeZone
-end
-
 function Base.showerror(io::IO, e::AmbiguousTimeError)
     print(io, "AmbiguousTimeError: ")
     print(io, "Local DateTime $(e.local_dt) is ambiguous within $(string(e.timezone))")
+end
+
+type NonExistentTimeError <: TimeError
+    local_dt::DateTime
+    timezone::TimeZone
 end
 
 function Base.showerror(io::IO, e::NonExistentTimeError)
