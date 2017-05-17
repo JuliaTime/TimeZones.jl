@@ -1,3 +1,4 @@
+import Base: showerror
 import Compat: @compat
 
 @compat abstract type TimeError <: Exception end
@@ -13,7 +14,7 @@ type AmbiguousTimeError <: TimeError
     timezone::TimeZone
 end
 
-function Base.showerror(io::IO, e::AmbiguousTimeError)
+function showerror(io::IO, e::AmbiguousTimeError)
     print(io, "AmbiguousTimeError: ")
     print(io, "Local DateTime $(e.local_dt) is ambiguous within $(string(e.timezone))")
 end
@@ -30,7 +31,7 @@ type NonExistentTimeError <: TimeError
     timezone::TimeZone
 end
 
-function Base.showerror(io::IO, e::NonExistentTimeError)
+function showerror(io::IO, e::NonExistentTimeError)
     print(io, "NonExistentTimeError: ")
     print(io, "Local DateTime $(e.local_dt) does not exist within $(string(e.timezone))")
 end
@@ -44,7 +45,7 @@ type UnhandledTimeError <: TimeError
     tz::VariableTimeZone
 end
 
-function Base.showerror(io::IO, e::UnhandledTimeError)
+function showerror(io::IO, e::UnhandledTimeError)
     print(io, "UnhandledTimeError: ")
     print(io, "TimeZone $(string(e.tz)) does not handle dates on or after $(get(e.tz.cutoff)) UTC")
 end
