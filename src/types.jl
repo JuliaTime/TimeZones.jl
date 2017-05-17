@@ -42,6 +42,15 @@ function Base.showerror(io::IO, e::NonExistentTimeError)
     print(io, "Local DateTime $(e.local_dt) does not exist within $(string(e.timezone))")
 end
 
+type UnhandledTimeError <: TimeError
+    tz::VariableTimeZone
+end
+
+function Base.showerror(io::IO, e::UnhandledTimeError)
+    print(io, "UnhandledTimeError: ")
+    print(io, "TimeZone $(string(e.tz)) does not handle dates on or after $(get(e.tz.cutoff)) UTC")
+end
+
 # Using type Symbol instead of AbstractString for name since it
 # gets us ==, and hash for free.
 
@@ -141,10 +150,6 @@ function VariableTimeZone(name::AbstractString, transitions::Vector{Transition})
     return VariableTimeZone(Symbol(name), transitions, Nullable{DateTime}())
 end
 
-type UnhandledTimeError <: TimeError
-    tz::VariableTimeZone
-end
-Base.showerror(io::IO, e::UnhandledTimeError) = print(io, "TimeZone $(string(e.tz)) does not handle dates on or after $(get(e.tz.cutoff)) UTC")
 
 # """
 #     ZonedDateTime
