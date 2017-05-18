@@ -113,6 +113,7 @@ end
 include("utils.jl")
 include("utcoffset.jl")
 include("types.jl")
+include("exceptions.jl")
 include(joinpath("tzdata", "TZData.jl"))
 is_windows() && include(joinpath("winzone", "WindowsTimeZoneIDs.jl"))
 include("interpret.jl")

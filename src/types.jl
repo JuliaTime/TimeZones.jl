@@ -3,7 +3,7 @@
 using Base.Dates
 import Base.Dates: value
 import Base: ==, promote_rule, isequal, isless
-import Compat: @compat, xor
+import Compat: xor
 
 const FIXED_TIME_ZONE_REGEX = r"""
 ^(?|
@@ -19,28 +19,6 @@ const FIXED_TIME_ZONE_REGEX = r"""
     )
 )$
 """x
-
-@compat abstract type TimeError <: Exception end
-
-type AmbiguousTimeError <: TimeError
-    local_dt::DateTime
-    timezone::TimeZone
-end
-
-type NonExistentTimeError <: TimeError
-    local_dt::DateTime
-    timezone::TimeZone
-end
-
-function Base.showerror(io::IO, e::AmbiguousTimeError)
-    print(io, "AmbiguousTimeError: ")
-    print(io, "Local DateTime $(e.local_dt) is ambiguous within $(string(e.timezone))")
-end
-
-function Base.showerror(io::IO, e::NonExistentTimeError)
-    print(io, "NonExistentTimeError: ")
-    print(io, "Local DateTime $(e.local_dt) does not exist within $(string(e.timezone))")
-end
 
 # Using type Symbol instead of AbstractString for name since it
 # gets us ==, and hash for free.
@@ -141,10 +119,6 @@ function VariableTimeZone(name::AbstractString, transitions::Vector{Transition})
     return VariableTimeZone(Symbol(name), transitions, Nullable{DateTime}())
 end
 
-type UnhandledTimeError <: TimeError
-    tz::VariableTimeZone
-end
-Base.showerror(io::IO, e::UnhandledTimeError) = print(io, "TimeZone $(string(e.tz)) does not handle dates on or after $(get(e.tz.cutoff)) UTC")
 
 # """
 #     ZonedDateTime
