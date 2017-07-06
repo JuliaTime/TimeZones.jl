@@ -365,3 +365,14 @@ end
 # Issue #52
 dt = now()
 @test_throws ErrorException ZonedDateTime(dt, warsaw) > dt
+
+# Issue #78
+let x, y
+    x = ZonedDateTime(2017, 7, 6, 15, 44, 55, 28, warsaw)
+    y = deepcopy(x)
+
+    @test x !== y
+    @test x == y
+    @test isequal(x, y)
+    @test hash(x) == hash(y)
+end
