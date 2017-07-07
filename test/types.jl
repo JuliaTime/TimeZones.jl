@@ -293,6 +293,18 @@ fall_apia = ZonedDateTime(DateTime(2010, 10, 1, 2), apia)
 @test isequal(astimezone(fall_utc, apia), fall_apia)
 @test hash(astimezone(fall_utc, apia)) == hash(fall_apia)
 
+# Issue #78
+x = ZonedDateTime(2017, 7, 6, 15, 44, 55, 28, warsaw)
+y = deepcopy(x)
+
+@test x == y
+@test x !== y
+@test !(x < y)
+@test !(x > y)
+@test isequal(x, y)
+@test hash(x) == hash(y)
+
+
 # A FixedTimeZone is effective for all of time where as a VariableTimeZone has as start.
 @test TimeZones.utc(early_utc) < apia.transitions[1].utc_datetime
 @test_throws NonExistentTimeError astimezone(early_utc, apia)
@@ -309,6 +321,8 @@ another_warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 @test warsaw === warsaw
 @test warsaw == another_warsaw
 @test warsaw !== another_warsaw
+@test isequal(warsaw, another_warsaw)
+@test hash(warsaw) == hash(another_warsaw)
 
 
 # VariableTimeZone with a cutoff set
@@ -365,14 +379,3 @@ end
 # Issue #52
 dt = now()
 @test_throws ErrorException ZonedDateTime(dt, warsaw) > dt
-
-# Issue #78
-let x, y
-    x = ZonedDateTime(2017, 7, 6, 15, 44, 55, 28, warsaw)
-    y = deepcopy(x)
-
-    @test x !== y
-    @test x == y
-    @test isequal(x, y)
-    @test hash(x) == hash(y)
-end
