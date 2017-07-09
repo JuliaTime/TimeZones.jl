@@ -2,7 +2,7 @@
 # import Base.Dates: UTInstant, DateTime, TimeZone, Millisecond
 using Base.Dates
 import Base.Dates: value
-import Base: ==, promote_rule, isequal, isless
+import Base: promote_rule, ==, hash, isequal, isless
 import Compat: xor
 
 const FIXED_TIME_ZONE_REGEX = r"""
@@ -274,12 +274,26 @@ end
 ==(a::ZonedDateTime, b::ZonedDateTime) = a.utc_datetime == b.utc_datetime
 isless(a::ZonedDateTime, b::ZonedDateTime) = isless(a.utc_datetime, b.utc_datetime)
 
-# Note: a more efficient version of: `hash(a) == hash(b)`. Assumes that the "zone" of the
-# ZonedDateTimes is not being set incorrectly.
+# Note: `hash` and `isequal` assume that the "zone" of a ZonedDateTime is not being set
+# incorrectly.
+
+function hash(zdt::ZonedDateTime, h::UInt)
+    h = hash(zdt.utc_datetime, h)
+    h = hash(zdt.timezone, h)
+    return h
+end
+
 function isequal(a::ZonedDateTime, b::ZonedDateTime)
     isequal(a.utc_datetime, b.utc_datetime) && isequal(a.timezone, b.timezone)
 end
 
 function ==(a::VariableTimeZone, b::VariableTimeZone)
     a.name == b.name && a.transitions == b.transitions
+end
+
+function hash(tz::VariableTimeZone, h::UInt)
+    h = hash(tz.name, h)
+    h = hash(tz.transitions, h)
+    h = hash(tz.cutoff, h)
+    return h
 end
