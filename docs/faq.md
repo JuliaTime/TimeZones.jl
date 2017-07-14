@@ -18,7 +18,7 @@ compile()
 Due to the internal representation of a `VariableTimeZone` it is infeasible to determine a time zones transitions to infinity. Since [2038-01-19T03:14:07](https://en.wikipedia.org/wiki/Year_2038_problem) is the last `DateTime` that can be represented by an `Int32` (`Dates.unix2datetime(typemax(Int32))`) it was decided that 2037 would be the last year in which all transition dates are computed. If additional transitions are known to exist after the last transition then a cutoff date is specified.
 
 ```julia
-julia> warsaw = TimeZone("Europe/Warsaw")
+julia> warsaw = tz"Europe/Warsaw"
 Europe/Warsaw (UTC+1/UTC+2)
 
 julia> last(warsaw.transitions)
@@ -38,6 +38,22 @@ julia> using TimeZones
 
 julia> TimeZones.TZData.compile(max_year=2200)
 
-julia> ZonedDateTime(DateTime(2100), TimeZone("Europe/Warsaw"))
+julia> ZonedDateTime(DateTime(2100), tz"Europe/Warsaw")
 2100-01-01T00:00:00+01:00
+```
+
+Warning: since the `tz` string macro loads the `TimeZone` at compile time the time zone will be loaded before the tz data is recompiled. You can avoid this problem by using the `TimeZone` constructor.
+
+```julia
+julia> begin
+           TimeZones.TZData.compile(max_year=2210)
+           ZonedDateTime(DateTime(2205), tz"Europe/Warsaw")
+       end
+ERROR: UnhandledTimeError: TimeZone Europe/Warsaw does not handle dates on or after 2038-03-28T01:00:00 UTC
+
+julia> begin
+           TimeZones.TZData.compile(max_year=2220)
+           ZonedDateTime(DateTime(2215), TimeZone("Europe/Warsaw"))
+       end
+2215-01-01T00:00:00+01:00
 ```
