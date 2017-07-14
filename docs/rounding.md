@@ -42,7 +42,7 @@ The `America/Winnipeg` time zone transitioned from Central Standard Time (UTC-6:
 Central Daylight Time (UTC-5:00) on 2016-03-13, moving directly from 01:59:59 to 03:00:00.
 
 ```julia
-julia> zdt = ZonedDateTime(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg"))
+julia> zdt = ZonedDateTime(2016, 3, 13, 1, 45, tz"America/Winnipeg")
 2016-03-13T01:45:00-06:00
 
 julia> floor(zdt, Dates.Day)
@@ -68,7 +68,7 @@ The `Asia/Colombo` time zone revised the definition of Lanka Time from UTC+6:30 
 on 1996-10-26, moving from 00:29:59 back to 00:00:00.
 
 ```julia
-julia> zdt = ZonedDateTime(1996, 10, 25, 23, 45, TimeZone("Asia/Colombo"))
+julia> zdt = ZonedDateTime(1996, 10, 25, 23, 45, tz"Asia/Colombo")
 1996-10-25T23:45:00+06:30
 
 julia> round(zdt, Dates.Hour)

@@ -3,10 +3,10 @@
 Switching an existing `ZonedDateTime` from one `TimeZone` to another can be done with the function `astimezone`:
 
 ```julia
-julia> zdt = ZonedDateTime(2014, 1, 1, TimeZone("UTC"))
+julia> zdt = ZonedDateTime(2014, 1, 1, tz"UTC")
 2014-01-01T00:00:00+00:00
 
-julia> astimezone(zdt, TimeZone("Asia/Tokyo"))
+julia> astimezone(zdt, tz"Asia/Tokyo")
 2014-01-01T09:00:00+09:00
 ```
 
@@ -57,7 +57,7 @@ It is recommended that you prefer the use of the `z` character code over `Z` tim
 Formatting uses the `Dates.format` function with a `ZonedDateTime` and a format string:
 
 ```julia
-julia> zdt = ZonedDateTime(2015,8,6,22,25,TimeZone("Europe/Warsaw"))
+julia> zdt = ZonedDateTime(2015,8,6,22,25,tz"Europe/Warsaw")
 2015-08-06T22:25:00+02:00
 
 julia> Dates.format(zdt, "yyyymmddzzzz")

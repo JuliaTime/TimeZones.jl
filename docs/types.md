@@ -27,10 +27,10 @@ A `ZonedDateTime` is a *time zone aware* version of a `DateTime` (in Python parl
 To construct a `ZonedDateTime` instance you just need a `DateTime` and a `TimeZone`:
 
 ```julia
-julia> ZonedDateTime(DateTime(2014,1,1), TimeZone("Europe/Warsaw"))
+julia> ZonedDateTime(DateTime(2014,1,1), tz"Europe/Warsaw")
 2014-01-01T00:00:00+01:00
 
-julia> ZonedDateTime(2014, 1, 1, TimeZone("Europe/Warsaw"))
+julia> ZonedDateTime(2014, 1, 1, tz"Europe/Warsaw")
 2014-01-01T00:00:00+01:00
 ```
 
@@ -39,7 +39,7 @@ julia> ZonedDateTime(2014, 1, 1, TimeZone("Europe/Warsaw"))
 A `VariableTimeZone` is a concrete type that is a subtype of `TimeZone` that has offsets that change depending on the specified time. We've already seen an example of a `VariableTimeZone`: "Europe/Warsaw"
 
 ```julia
-julia> warsaw = TimeZone("Europe/Warsaw")
+julia> warsaw = tz"Europe/Warsaw"
 Europe/Warsaw (UTC+1/UTC+2)
 
 julia> typeof(warsaw)
@@ -126,6 +126,6 @@ FixedTimeZone("FOO", -6 * 3600)  # 6 hours in seconds
 Constructing a `ZonedDateTime` works similarly to `VariableTimeZone`:
 
 ```julia
-julia> ZonedDateTime(1960, 1, 1, TimeZone("UTC"))
+julia> ZonedDateTime(1960, 1, 1, tz"UTC")
 1960-01-01T00:00:00+00:00
 ```
