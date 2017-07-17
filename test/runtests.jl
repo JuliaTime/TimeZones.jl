@@ -1,7 +1,7 @@
 using Mocking
 
 opts = Base.JLOptions()
-use_compilecache = isdefined(opts, :use_compilecache) && Bool(opts.use_compilecache)
+use_compilecache = !isdefined(opts, :use_compilecache) || Bool(opts.use_compilecache)
 if use_compilecache
     warn("Julia not started with `--compilecache=no`. Disabling tests that require Mocking")
 else
