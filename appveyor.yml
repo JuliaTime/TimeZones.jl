@@ -57,7 +57,7 @@ test_script:
     )
 
 after_test:
-# Only processing coverage if we ran with the coverage keyword. Note we need Coverage.jl > v0.3.3
+# Only processing coverage if we ran with the coverage keyword. Note we need Coverage.jl >= v0.4.0
   - IF DEFINED COVERAGE (
-      C:\projects\julia\bin\julia -e "cd(Pkg.dir(\"TimeZones\")); Pkg.add(\"Coverage\"); Pkg.checkout(\"Coverage\"); using Coverage; Codecov.submit(process_folder())"
+      C:\projects\julia\bin\julia -e "cd(Pkg.dir(\"TimeZones\")); Pkg.add(\"Coverage\"); using Coverage; Codecov.submit(process_folder())"
     )
