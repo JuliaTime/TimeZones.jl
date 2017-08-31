@@ -48,3 +48,20 @@ end
 @test TimeZones.zdt2unix(Float32, ZonedDateTime(1970, 1, 1, 0, 0, 0, 750, utc)) == 0.75
 @test TimeZones.zdt2unix(Int64, ZonedDateTime(1970, 1, 1, 0, 0, 0, 750, utc)) == 0
 @test TimeZones.zdt2unix(Int32, ZonedDateTime(1970, 1, 1, 0, 0, 0, 750, utc)) == 0
+
+# round-trip
+zdt = ZonedDateTime(2010, 1, 2, 3, 4, 5, utc)
+round_trip = TimeZones.unix2zdt(TimeZones.zdt2unix(Int64, zdt))
+@test round_trip == zdt
+
+# millisecond loss
+zdt = ZonedDateTime(2010, 1, 2, 3, 4, 5, 999, utc)
+round_trip = TimeZones.unix2zdt(TimeZones.zdt2unix(Int64, zdt))
+@test round_trip != zdt
+@test round_trip == floor(zdt, Dates.Second)
+
+# timezone loss
+zdt = ZonedDateTime(2010, 1, 2, 3, 4, 5, warsaw)
+round_trip = TimeZones.unix2zdt(TimeZones.zdt2unix(Int64, zdt))
+@test round_trip == zdt
+@test !isequal(round_trip, zdt)
