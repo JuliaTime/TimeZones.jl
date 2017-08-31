@@ -6,7 +6,7 @@ import Compat: read, unsafe_string
 
 const TZFILE_MAX = unix2datetime(typemax(Int32))
 
-immutable TransitionTimeInfo
+struct TransitionTimeInfo
     gmtoff::Int32     # tt_gmtoff
     isdst::Int8       # tt_isdst
     abbrindex::UInt8  # tt_abbrind

@@ -9,7 +9,7 @@ import Compat: @compat
 The provided local datetime is ambiguous within the specified timezone. Typically occurs on
 daylight saving time transitions which "fall back" causing duplicate hour long period.
 """
-type AmbiguousTimeError <: TimeError
+mutable struct AmbiguousTimeError <: TimeError
     local_dt::DateTime
     timezone::TimeZone
 end
@@ -26,7 +26,7 @@ The provided local datetime is does not exist within the specified timezone. Typ
 occurs on daylight saving time transitions which "spring forward" causing an hour long
 period to be skipped.
 """
-type NonExistentTimeError <: TimeError
+mutable struct NonExistentTimeError <: TimeError
     local_dt::DateTime
     timezone::TimeZone
 end
@@ -41,7 +41,7 @@ end
 
 The timezone calculation occurs beyond the last calculated transition.
 """
-type UnhandledTimeError <: TimeError
+mutable struct UnhandledTimeError <: TimeError
     tz::VariableTimeZone
 end
 
