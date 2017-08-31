@@ -89,7 +89,7 @@ function FixedTimeZone(s::AbstractString)
     return FixedTimeZone(name, offset)
 end
 
-immutable Transition
+struct Transition
     utc_datetime::DateTime  # Instant where new zone applies
     zone::FixedTimeZone
 end
