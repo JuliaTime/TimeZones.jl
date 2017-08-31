@@ -50,7 +50,9 @@ end
 
 convert(::Type{Second}, t::TimeOffset) = Second(value(t))
 convert(::Type{Millisecond}, t::TimeOffset) = Millisecond(value(t) * 1000)
-promote_rule{P<:Union{Week,Day,Hour,Minute,Second}}(::Type{P}, ::Type{TimeOffset}) = Second
+
+const WDHMS = Union{Week,Day,Hour,Minute,Second}
+promote_rule(::Type{P}, ::Type{TimeOffset}) where P<:WDHMS = Second
 promote_rule(::Type{Millisecond}, ::Type{TimeOffset}) = Millisecond
 
 # https://en.wikipedia.org/wiki/ISO_8601#Times
