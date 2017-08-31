@@ -49,11 +49,11 @@ function zdt2unix(zdt::ZonedDateTime)
     Dates.datetime2unix(utc(zdt))
 end
 
-function zdt2unix{T<:Integer}(::Type{T}, zdt::ZonedDateTime)
+function zdt2unix(::Type{T}, zdt::ZonedDateTime) where T<:Integer
     floor(T, Dates.datetime2unix(utc(zdt)))
 end
 
-function zdt2unix{T<:Number}(::Type{T}, zdt::ZonedDateTime)
+function zdt2unix(::Type{T}, zdt::ZonedDateTime) where T<:Number
     convert(T, Dates.datetime2unix(utc(zdt)))
 end
 
