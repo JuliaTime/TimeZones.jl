@@ -28,7 +28,7 @@ const FIXED_TIME_ZONE_REGEX = r"""
 
 A `TimeZone` with a constant offset for all of time.
 """
-immutable FixedTimeZone <: TimeZone
+struct FixedTimeZone <: TimeZone
     name::Symbol
     offset::UTCOffset
 end
@@ -101,7 +101,7 @@ Base.isless(x::Transition,y::Transition) = isless(x.utc_datetime,y.utc_datetime)
 
 A `TimeZone` with an offset that changes over time.
 """
-immutable VariableTimeZone <: TimeZone
+struct VariableTimeZone <: TimeZone
     name::Symbol
     transitions::Vector{Transition}
     cutoff::Nullable{DateTime}
@@ -126,7 +126,7 @@ end
 # A `DateTime` that includes `TimeZone` information.
 # """
 
-immutable ZonedDateTime <: TimeType
+struct ZonedDateTime <: TimeType
     utc_datetime::DateTime
     timezone::TimeZone
     zone::FixedTimeZone  # The current zone for the utc_datetime.
