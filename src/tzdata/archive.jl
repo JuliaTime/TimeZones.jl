@@ -1,6 +1,6 @@
-import Compat: @static, is_windows
+import Compat: @static
 
-if is_windows()
+if Sys.iswindows()
     const exe7z = joinpath(JULIA_HOME, "7z.exe")
 end
 
@@ -12,7 +12,7 @@ specified only the files given will be extracted. The `verbose` flag can be used
 additional information to STDOUT.
 """
 function extract(archive, directory, files=AbstractString[]; verbose::Bool=false)
-    @static if is_windows()
+    @static if Sys.iswindows()
         cmd = pipeline(`$exe7z x $archive -y -so`, `$exe7z x -si -y -ttar -o$directory $files`)
     else
         cmd = `tar xvf $archive --directory=$directory $files`
@@ -31,7 +31,7 @@ end
 Determines if the given `path` is an archive.
 """
 function isarchive(path)
-    @static if is_windows()
+    @static if Sys.iswindows()
         success(`$exe7z t $path -y`)
     else
         success(`tar tf $path`)
@@ -44,7 +44,7 @@ end
 Returns the file names contained in the `archive`.
 """
 function readarchive(archive)
-    @static if is_windows()
+    @static if Sys.iswindows()
         files = AbstractString[]
         header = "-" ^ 24
         content = false
