@@ -5,10 +5,11 @@ import Base.Dates: firstdayofweek, lastdayofweek, firstdayofmonth, lastdayofmont
 
 # Truncation
 # TODO: Just utilize floor code for truncation?
-function trunc{P<:DatePeriod}(zdt::ZonedDateTime, ::Type{P})
+
+function trunc(zdt::ZonedDateTime, ::Type{P}) where P<:DatePeriod
     ZonedDateTime(trunc(localtime(zdt), P), timezone(zdt))
 end
-function trunc{P<:TimePeriod}(zdt::ZonedDateTime, ::Type{P})
+function trunc(zdt::ZonedDateTime, ::Type{P}) where P<:DatePeriod
     local_dt = trunc(localtime(zdt), P)
     utc_dt = local_dt - zdt.zone.offset
     ZonedDateTime(utc_dt, timezone(zdt); from_utc=true)
