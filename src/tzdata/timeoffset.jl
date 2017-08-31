@@ -3,7 +3,7 @@ import Base.Dates: Period, TimePeriod, Week, Day, Hour, Minute, Second, Millisec
     value, toms, hour, minute, second
 
 # Convenience type for working with HH:MM:SS.
-immutable TimeOffset <: TimePeriod
+struct TimeOffset <: TimePeriod
     seconds::Int
 end
 const ZERO = TimeOffset(0)
