@@ -1,5 +1,5 @@
 import TimeZones: TimeZone, localzone, parse_tz_format
-import Compat: is_linux
+import Compat: Sys
 
 # Parse the TZ environment variable format
 # Should mirror the behaviour of running:
@@ -39,7 +39,7 @@ import Compat: is_linux
 @test isa(localzone(), TimeZone)
 
 
-if is_linux()
+if Sys.islinux()
     # Bad TZ environment variable formats
     withenv("TZ" => "+12:00") do
         @test_throws ArgumentError localzone()
