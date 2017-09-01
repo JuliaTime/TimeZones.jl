@@ -1,4 +1,4 @@
-import Compat: @static
+import Compat: @static, Sys
 
 if Sys.iswindows()
     const exe7z = joinpath(JULIA_HOME, "7z.exe")
