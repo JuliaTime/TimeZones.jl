@@ -2,10 +2,6 @@ environment:
   JULIA_TZ_VERSION: "2016j"
 
   matrix:
-  - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x86/0.4/julia-0.4-latest-win32.exe"
-  - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x64/0.4/julia-0.4-latest-win64.exe"
-  - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x86/0.5/julia-0.5-latest-win32.exe"
-  - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x64/0.5/julia-0.5-latest-win64.exe"
   - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x86/0.6/julia-0.6-latest-win32.exe"
     COVERAGE: "true"
   - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x64/0.6/julia-0.6-latest-win64.exe"
