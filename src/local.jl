@@ -3,7 +3,7 @@
 import Compat: @static, readstring, Sys
 using Mocking
 
-if Sys.iswindows
+if Sys.iswindows()
     import TimeZones.WindowsTimeZoneIDs: WINDOWS_TRANSLATION
 end
 
