@@ -16,7 +16,7 @@ else
 end
 
 # Zone type maps to an Olson Timezone database entity
-type Zone
+mutable struct Zone
     gmtoffset::TimeOffset
     save::TimeOffset
     rules::AbstractString
@@ -39,7 +39,7 @@ function Base.isless(x::Zone,y::Zone)
 end
 
 # Rules govern how Daylight Savings transitions happen for a given time zone
-type Rule
+mutable struct Rule
     from::Nullable{Int}  # First year rule applies
     to::Nullable{Int}    # Rule applies up until, but not including this year
     month::Int           # Month in which DST transition happens

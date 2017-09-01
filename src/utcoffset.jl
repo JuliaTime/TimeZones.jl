@@ -9,7 +9,7 @@ import Base.Dates: AbstractTime, Second, value
 A `UTCOffset` is an amount of time subtracted from or added to UTC to get the current
 local time – whether it's standard time or daylight saving time.
 """
-immutable UTCOffset <: AbstractTime
+struct UTCOffset <: AbstractTime
     std::Second  # Standard time offset from UTC in seconds
     dst::Second  # Daylight saving time offset in seconds
 
