@@ -31,7 +31,14 @@ function localzone()
         # http://linux.die.net/man/3/tzset
         if haskey(ENV, "TZ")
             name = ENV["TZ"]
-            startswith(name, ':') || error("Currently only support filespec for TZ variable")
+
+            # Currently the only supported TZ format is reading time zone information from
+            # a file.
+            if !startswith(name, ':')
+                error("Encountered an unhandled TZ environment variable format: \"$name\"")
+            end
+
+            # Strip the leading colon
             name = name[2:end]
 
             if startswith(name, '/')
