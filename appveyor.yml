@@ -3,9 +3,7 @@ environment:
 
   matrix:
   - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x86/0.4/julia-0.4-latest-win32.exe"
-    COVERAGE: "true"
   - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x64/0.4/julia-0.4-latest-win64.exe"
-    COVERAGE: "true"
   - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x86/0.5/julia-0.5-latest-win32.exe"
   - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x64/0.5/julia-0.5-latest-win64.exe"
   - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x86/0.6/julia-0.6-latest-win32.exe"
@@ -59,5 +57,5 @@ test_script:
 after_test:
 # Only processing coverage if we ran with the coverage keyword. Note we need Coverage.jl > v0.3.3
   - IF DEFINED COVERAGE (
-      C:\projects\julia\bin\julia -e "cd(Pkg.dir(\"TimeZones\")); Pkg.add(\"Coverage\"); Pkg.checkout(\"Coverage\"); using Coverage; Codecov.submit(process_folder())"
+      C:\projects\julia\bin\julia -e "cd(Pkg.dir(\"TimeZones\")); Pkg.add(\"Coverage\"); using Coverage; Codecov.submit(process_folder())"
     )
