@@ -32,14 +32,13 @@ function localzone()
         if haskey(ENV, "TZ")
             name = ENV["TZ"]
 
-            # Currently the only supported TZ format is reading time zone information from
-            # a file.
-            if !startswith(name, ':')
-                error("Encountered an unhandled TZ environment variable format: \"$name\"")
+            # When the TZ format starts with a colon this indicates that the time zone information
+            # should be read from a file.
+            if startswith(name, ':')
+                name = name[2:end]
+            else
+                return parse_tz_format(name)
             end
-
-            # Strip the leading colon
-            name = name[2:end]
 
             if startswith(name, '/')
                 return @mock open(name) do f
@@ -152,4 +151,55 @@ function localzone()
     end
 
     error("Failed to find local time zone")
+end
+
+# Using conditional expressions `(?(condition)yes-regexp)` as control flow to indicate that
+# that a captured group is dependent on a previous group begin matched. This could also be
+# accomplished using nested groups.
+const TZ_REGEX = r"""
+    ^
+    (?<name>[a-zA-Z]{3,})?
+    (?(name)(?<sign>[+-]))?
+    (?(name)(?<hour>\d+))?
+    (?(hour)\:(?<minute>\d+))?
+    (?(minute)\:(?<second>\d+))?
+    $
+    """x
+
+"""
+    parse_tz_format(str) -> TimeZone
+
+Parse the time zone format typically provided via the "TZ" environment variable. Details on
+the format can be found under the [tzset man page](http://linux.die.net/man/3/tzset).
+
+Currently this function handles only the first format which is a fixed time zone without
+daylight saving time.
+"""
+function parse_tz_format(str::AbstractString)
+    m = match(TZ_REGEX, str)
+
+    # Currently the only supported TZ format is reading time zone information from
+    # a file.
+    if m === nothing
+        throw(ArgumentError("Unhandled TZ environment variable format: \"$str\""))
+    end
+
+    parse_digits(s) = s === nothing ? 0 : Base.parse(Int, s)
+
+    name = m[:name] === nothing ? "UTC" : m[:name]
+
+    # Note: positive indidates the local time zone is west of the Prime Meridian and
+    # negative if it is east. This is the opposite of what FixedTimeZone expects.
+    sign_val = m[:sign] == "-" ? 1 : -1
+
+    # The tzset specification indicates that hours must be between 0 and 24 and minutes and
+    # seconds 0 and 59. If values exceed these bounds they are clamped rather than treating
+    # the entire format as invalid.
+    hour = clamp(parse_digits(m[:hour]), 0, 24)
+    minute = clamp(parse_digits(m[:minute]), 0, 59)
+    second = clamp(parse_digits(m[:second]), 0, 59)
+
+    offset = sign_val * (hour * 3600 + minute * 60 + second)
+
+    FixedTimeZone(name, offset)
 end
