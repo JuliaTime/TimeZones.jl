@@ -58,7 +58,7 @@ round_trip = TimeZones.unix2zdt(TimeZones.zdt2unix(Int64, zdt))
 zdt = ZonedDateTime(2010, 1, 2, 3, 4, 5, 999, utc)
 round_trip = TimeZones.unix2zdt(TimeZones.zdt2unix(Int64, zdt))
 @test round_trip != zdt
-@test round_trip == floor(zdt, Dates.Second)
+@test round_trip == floor(zdt, Dates.Second(1))
 
 # timezone loss
 zdt = ZonedDateTime(2010, 1, 2, 3, 4, 5, warsaw)
