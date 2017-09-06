@@ -3,13 +3,9 @@ environment:
 
   matrix:
   - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x86/0.6/julia-0.6-latest-win32.exe"
-    COVERAGE: "true"
   - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x64/0.6/julia-0.6-latest-win64.exe"
-    COVERAGE: "true"
   - JULIA_URL: "https://julialangnightlies-s3.julialang.org/bin/winnt/x86/julia-latest-win32.exe"
-    COVERAGE: "true"
   - JULIA_URL: "https://julialangnightlies-s3.julialang.org/bin/winnt/x64/julia-latest-win64.exe"
-    COVERAGE: "true"
 
 # branches:
 #   only:
@@ -43,15 +39,7 @@ build_script:
       Pkg.clone(pwd(), \"TimeZones\"); Pkg.build(\"TimeZones\")"
 
 test_script:
-# Using coverage keyword with Julia 0.5+ is broken (https://github.com/JuliaLang/julia/issues/21289)
-  - IF DEFINED COVERAGE (
-      C:\projects\julia\bin\julia -e "Pkg.test(\"TimeZones\", coverage=true)"
-    ) ELSE (
-      C:\projects\julia\bin\julia -e "Pkg.test(\"TimeZones\")"
-    )
+  - C:\projects\julia\bin\julia -e "Pkg.test(\"TimeZones\", coverage=true)"
 
 after_test:
-# Only processing coverage if we ran with the coverage keyword. Note we need Coverage.jl > v0.3.3
-  - IF DEFINED COVERAGE (
-      C:\projects\julia\bin\julia -e "cd(Pkg.dir(\"TimeZones\")); Pkg.add(\"Coverage\"); using Coverage; Codecov.submit(process_folder())"
-    )
+  - C:\projects\julia\bin\julia -e "cd(Pkg.dir(\"TimeZones\")); Pkg.add(\"Coverage\"); using Coverage; Codecov.submit(process_folder())"
