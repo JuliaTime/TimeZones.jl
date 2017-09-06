@@ -1,7 +1,6 @@
 import Base: showerror
-import Compat: @compat
 
-@compat abstract type TimeError <: Exception end
+abstract type TimeError <: Exception end
 
 """
     AmbiguousTimeError(local_datetime, timezone)
