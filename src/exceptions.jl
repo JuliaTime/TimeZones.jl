@@ -8,7 +8,7 @@ abstract type TimeError <: Exception end
 The provided local datetime is ambiguous within the specified timezone. Typically occurs on
 daylight saving time transitions which "fall back" causing duplicate hour long period.
 """
-mutable struct AmbiguousTimeError <: TimeError
+struct AmbiguousTimeError <: TimeError
     local_dt::DateTime
     timezone::TimeZone
 end
@@ -25,7 +25,7 @@ The provided local datetime is does not exist within the specified timezone. Typ
 occurs on daylight saving time transitions which "spring forward" causing an hour long
 period to be skipped.
 """
-mutable struct NonExistentTimeError <: TimeError
+struct NonExistentTimeError <: TimeError
     local_dt::DateTime
     timezone::TimeZone
 end
@@ -40,7 +40,7 @@ end
 
 The timezone calculation occurs beyond the last calculated transition.
 """
-mutable struct UnhandledTimeError <: TimeError
+struct UnhandledTimeError <: TimeError
     tz::VariableTimeZone
 end
 
