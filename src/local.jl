@@ -60,7 +60,7 @@ function localzone()
                     end
                 end
 
-                throw(SystemError("unable to locate tzfile: $name"))
+                error("unable to locate tzfile: $name")
             end
         end
 

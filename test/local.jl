@@ -85,18 +85,29 @@ if is_linux()
         @test localzone() == utc
     end
 
-    # Use system installed files
+    # Attempt to use system installed time zone files. On some minimal systems no time zone
+    # information will be available.
     @test_throws ArgumentError TimeZone("Etc/GMT-9")
     gmt_minus_9 = FixedTimeZone("Etc/GMT-9", 9 * 3600)
     withenv("TZ" => ":Etc/GMT-9") do
-        @test localzone() == gmt_minus_9
+        try
+            tz = localzone()
+            @test tz == gmt_minus_9
+        catch err
+            msg = sprint(showerror, err)
+            if isa(err, ErrorException) && msg == "unable to locate tzfile: Etc/GMT-9"
+                warn("Skipping test: missing system time zone information")
+            else
+                rethrow()
+            end
+        end
     end
 
     # Unable to locate time zone on system
     withenv("TZ" => ":") do
-        @test_throws SystemError localzone()
+        @test_throws ErrorException localzone()
     end
     withenv("TZ" => ":Etc/Foo") do
-        @test_throws SystemError localzone()
+        @test_throws ErrorException localzone()
     end
 end
