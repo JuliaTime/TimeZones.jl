@@ -266,7 +266,7 @@ end
 # undefined promote_rule on TimeType types.
 # Otherwise, typejoin(T,S) is called (returning TimeType) so no conversion happens, and
 # isless(promote(x,y)...) is called again, causing a stack overflow.
-function promote_rule(::Type{T}, ::Type{S}) where {S<:ZonedDateTime, T<:TimeType}
+function promote_rule(::Type{T}, ::Type{S}) where {T<:TimeType, S<:ZonedDateTime}
     error("no promotion exists for ", T, " and ", S)
 end
 
