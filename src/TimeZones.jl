@@ -5,7 +5,7 @@ module TimeZones
 using Base.Dates
 import Base.Dates: TimeZone, AbstractTime
 import Base: @deprecate_binding
-import Compat: is_windows
+import Compat: Sys
 
 export TimeZone, @tz_str, FixedTimeZone, VariableTimeZone, ZonedDateTime, DateTime,
     TimeError, AmbiguousTimeError, NonExistentTimeError, UnhandledTimeError,
@@ -105,7 +105,7 @@ flag is used to re-download tzdata archives.
 function build(version::AbstractString="latest", regions=REGIONS; force::Bool=false)
     TimeZones.TZData.build(version, regions)
 
-    if is_windows()
+    if Sys.iswindows()
         TimeZones.WindowsTimeZoneIDs.build(force=force)
     end
 
@@ -117,7 +117,7 @@ include("utcoffset.jl")
 include("types.jl")
 include("exceptions.jl")
 include(joinpath("tzdata", "TZData.jl"))
-is_windows() && include(joinpath("winzone", "WindowsTimeZoneIDs.jl"))
+Sys.iswindows() && include(joinpath("winzone", "WindowsTimeZoneIDs.jl"))
 include("interpret.jl")
 include("accessors.jl")
 include("arithmetic.jl")

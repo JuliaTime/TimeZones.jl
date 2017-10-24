@@ -11,7 +11,7 @@ using Base.Test
 using TimeZones
 import TimeZones: PKG_DIR, ARCHIVE_DIR
 import TimeZones.TZData: ZoneDict, RuleDict, tzparse, resolve, build
-import Compat: @compat, is_windows
+import Compat: @compat, Sys
 
 const TZDATA_VERSION = "2016j"
 const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(PKG_DIR, "test", "tzsource"))
@@ -44,7 +44,7 @@ include(joinpath("tzdata", "archive.jl"))
 include(joinpath("tzdata", "version.jl"))
 include(joinpath("tzdata", "download.jl"))
 include(joinpath("tzdata", "compile.jl"))
-is_windows() && include(joinpath("winzone", "WindowsTimeZoneIDs.jl"))
+Sys.iswindows() && include(joinpath("winzone", "WindowsTimeZoneIDs.jl"))
 include("utcoffset.jl")
 include("types.jl")
 include("interpret.jl")
