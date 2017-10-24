@@ -1,7 +1,7 @@
 import TimeZones: TimeZone, localzone
 import Mocking: @patch, apply
 import Base: AbstractCmd
-import Compat: Sys, readstring
+import Compat: Sys, read
 
 # For mocking make sure we are actually changing the time zone
 name = string(localzone()) == "Europe/Warsaw" ? "Pacific/Apia" : "Europe/Warsaw"
@@ -13,14 +13,14 @@ timezone = TimeZone(name)
 
 if Sys.isapple()
     # Determine time zone via systemsetup.
-    patch = @patch readstring(cmd::AbstractCmd) = "Time Zone:  " * name * "\n"
+    patch = @patch read(cmd::AbstractCmd, ::Type{String}) = "Time Zone:  " * name * "\n"
     apply(patch) do
         @test localzone() == timezone
     end
 
     # Determine time zone from /etc/localtime.
     patches = [
-        @patch readstring(cmd::AbstractCmd) = ""
+        @patch read(cmd::AbstractCmd, ::Type{String}) = ""
         @patch readlink(filename::AbstractString) = "/usr/share/zoneinfo/$name"
     ]
     apply(patches) do
@@ -28,7 +28,7 @@ if Sys.isapple()
     end
 
 elseif Sys.iswindows()
-    patch = @patch readstring(cmd::AbstractCmd) = "$win_name\r\n"
+    patch = @patch read(cmd::AbstractCmd, ::Type{String}) = "$win_name\r\n"
     apply(patch) do
         @test localzone() == timezone
     end

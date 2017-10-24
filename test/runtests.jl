@@ -1,8 +1,7 @@
 using Mocking
 
-opts = Base.JLOptions()
-use_compilecache = !isdefined(opts, :use_compilecache) || Bool(opts.use_compilecache)
-if use_compilecache
+precompile_enabled = Mocking.is_precompile_enabled()
+if precompile_enabled
     warn("Julia not started with `--compilecache=no`. Disabling tests that require Mocking")
 else
     Mocking.enable()
@@ -57,7 +56,7 @@ include("adjusters.jl")
 include("conversions.jl")
 include("ranges.jl")
 include("local.jl")
-!use_compilecache && include("local_mocking.jl")
+!precompile_enabled && include("local_mocking.jl")
 include("discovery.jl")
 VERSION >= v"0.5.0-dev+5244" && include("rounding.jl")
 include("TimeZones.jl")
