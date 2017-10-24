@@ -7,7 +7,8 @@ else
     Mocking.enable()
 end
 
-using Base.Test
+VERSION < v"0.7-" && import Compat: Test
+using Test
 using TimeZones
 import TimeZones: PKG_DIR, ARCHIVE_DIR
 import TimeZones.TZData: ZoneDict, RuleDict, tzparse, resolve, build
