@@ -33,6 +33,8 @@ struct FixedTimeZone <: TimeZone
     offset::UTCOffset
 end
 
+FixedTimeZone(name::AbstractString, offset::UTCOffset) = FixedTimeZone(Symbol(name), offset)
+
 """
     FixedTimeZone(name, utc_offset, dst_offset=0) -> FixedTimeZone
 
