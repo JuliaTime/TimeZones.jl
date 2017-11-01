@@ -7,6 +7,7 @@ deps/tzarchive
 deps/tzsource
 deps/compiled
 deps/local
+!deps/local/windowsZones.xml
 deps/active_version
 test/tzsource
 
