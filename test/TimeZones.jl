@@ -58,6 +58,6 @@ if lowercase(get(ENV, "CI", "false")) == "true"
     # Using the tz string macro which runs at parse time means that the resulting TimeZone
     # will not reflect changes made from compile or new builds during runtime.
     @test tz"Africa/Windhoek" != TimeZone("Africa/Windhoek")
-    @test get(tz"Africa/Windhoek".cutoff) == DateTime(2038, 4, 4)
+    @test get(tz"Africa/Windhoek".cutoff, typemax(DateTime)) != DateTime(2201, 4, 5)
     @test get(TimeZone("Africa/Windhoek").cutoff) == DateTime(2201, 4, 5)
 end
