@@ -11,6 +11,8 @@ env:
   - JULIA_TZ_VERSION="2016j"
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+  # Avoid setting JULIA_TZ_VERSION if the deps/build.jl file has been modified
+  - git fetch origin +:refs/remotes/origin/HEAD; git diff --name-only origin/HEAD HEAD | grep -qx "deps/build.jl" && unset JULIA_TZ_VERSION
   - OPTIONS=$(julia -e 'isdefined(Base.JLOptions(), :use_compilecache) && print("--compilecache=no")')
   - julia $OPTIONS -e 'Pkg.clone(pwd()); Pkg.build("TimeZones"); Pkg.test("TimeZones"; coverage=true)';
 after_success:
