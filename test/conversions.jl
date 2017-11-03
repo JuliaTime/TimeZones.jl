@@ -34,7 +34,8 @@ zdt_warsaw = ZonedDateTime(dt, warsaw; from_utc=true)
 @test TimeZones.unix2zdt(0) == ZonedDateTime(1970, utc)
 
 for dt in (DateTime(2013, 2, 13), DateTime(2016, 8, 11))
-    zdt = ZonedDateTime(dt, warsaw)
+    local dt
+    local zdt = ZonedDateTime(dt, warsaw)
     offset = TimeZones.value(zdt.zone.offset)   # Total offset in seconds
     @test TimeZones.zdt2unix(zdt) == datetime2unix(dt) - offset
 end
