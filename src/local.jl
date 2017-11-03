@@ -1,6 +1,6 @@
 # Determine the local system's time zone
 # Based upon Python's tzlocal https://pypi.python.org/pypi/tzlocal
-import Compat: @static, Sys, readstring
+import Compat: @static, Sys, read
 using Mocking
 
 if Sys.iswindows()
@@ -14,7 +14,7 @@ Returns a `TimeZone` object that is equivalent to the system's current time zone
 """
 function localzone()
     @static if Sys.isapple()
-        name = @mock readstring(`systemsetup -gettimezone`)  # Appears to only work as root
+        name = @mock read(`systemsetup -gettimezone`, String)  # Appears to only work as root
         if contains(name, "Time Zone: ")
             name = strip(replace(name, "Time Zone: ", ""))
         else
@@ -69,7 +69,7 @@ function localzone()
         filename = "/etc/timezone"
         if @mock isfile(filename)
             @mock open(filename) do file
-                name = readstring(file)
+                name = read(file, String)
 
                 # Get rid of host definitions and comments:
                 name = strip(replace(name, r"#.*", ""))
@@ -123,7 +123,7 @@ function localzone()
         end
     elseif Sys.iswindows()
         # Windows powershell should be available on Windows 7 and above
-        win_name = strip(@mock readstring(`powershell -Command "[TimeZoneInfo]::Local.Id"`))
+        win_name = strip(@mock read(`powershell -Command "[TimeZoneInfo]::Local.Id"`, String))
 
         if haskey(WINDOWS_TRANSLATION, win_name)
             posix_name = WINDOWS_TRANSLATION[win_name]

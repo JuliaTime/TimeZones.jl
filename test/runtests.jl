@@ -1,18 +1,18 @@
 using Mocking
 
-opts = Base.JLOptions()
-use_compilecache = !isdefined(opts, :use_compilecache) || Bool(opts.use_compilecache)
-if use_compilecache
+precompile_enabled = Mocking.is_precompile_enabled()
+if precompile_enabled
     warn("Julia not started with `--compilecache=no`. Disabling tests that require Mocking")
 else
     Mocking.enable()
 end
 
-using Base.Test
+VERSION < v"0.7-" && import Compat: Test
+using Test
 using TimeZones
 import TimeZones: PKG_DIR, ARCHIVE_DIR
 import TimeZones.TZData: ZoneDict, RuleDict, tzparse, resolve, build
-import Compat: @compat, is_windows
+import Compat: @compat, Sys
 
 const TZDATA_VERSION = "2016j"
 const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(PKG_DIR, "test", "tzsource"))
@@ -45,7 +45,7 @@ include(joinpath("tzdata", "archive.jl"))
 include(joinpath("tzdata", "version.jl"))
 include(joinpath("tzdata", "download.jl"))
 include(joinpath("tzdata", "compile.jl"))
-is_windows() && include(joinpath("winzone", "WindowsTimeZoneIDs.jl"))
+Sys.iswindows() && include(joinpath("winzone", "WindowsTimeZoneIDs.jl"))
 include("utcoffset.jl")
 include("types.jl")
 include("interpret.jl")
@@ -57,7 +57,7 @@ include("adjusters.jl")
 include("conversions.jl")
 include("ranges.jl")
 include("local.jl")
-!use_compilecache && include("local_mocking.jl")
+!precompile_enabled && include("local_mocking.jl")
 include("discovery.jl")
 VERSION >= v"0.5.0-dev+5244" && include("rounding.jl")
 include("TimeZones.jl")

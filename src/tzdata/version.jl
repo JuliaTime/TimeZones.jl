@@ -1,5 +1,5 @@
 import ...TimeZones: DEPS_DIR, ARCHIVE_DIR
-import Compat: readstring
+import Compat: read
 
 # Note: A tz code or data version consists of a year and letter while a release consists of
 # a pair of tz code and data versions. In recent releases the tz code and data use the same
@@ -94,7 +94,7 @@ end
 
 function active_version()
     !isfile(ACTIVE_VERSION_FILE) && error("No active tzdata version")
-    readstring(ACTIVE_VERSION_FILE)
+    read(ACTIVE_VERSION_FILE, String)
 end
 
 function active_archive()

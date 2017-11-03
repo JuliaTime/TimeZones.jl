@@ -56,6 +56,7 @@ non_existent_2 = DateTime(1935,4,1,3)
 
 # Both "long" and "hidden" are identical for the following tests
 for tz in (long, hidden)
+    local tz
     boundaries = [
         ZonedDateTime(1935, 4, 1, 1, 59, 59, 999, tz),
         ZonedDateTime(1935, 4, 1, 4, tz),

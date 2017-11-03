@@ -22,7 +22,8 @@ colombo = resolve("Asia/Colombo", tzdata["asia"]...)                # See note b
 dt = DateTime(2016)
 
 for tz in [utc, fixed, winnipeg, st_johns, eucla, colombo]
-    zdt = ZonedDateTime(dt, tz)
+    local tz
+    local zdt = ZonedDateTime(dt, tz)
     for p in [Dates.Year, Dates.Month, Dates.Day, Dates.Hour, Dates.Minute, Dates.Second]
         @test floor(zdt, p) == zdt
         @test ceil(zdt, p) == zdt
@@ -35,7 +36,8 @@ end
 dt = DateTime(2016, 2, 5, 13, 10, 20, 500)
 
 for tz in [utc, fixed, winnipeg, st_johns, eucla, colombo]
-    zdt = ZonedDateTime(dt, tz)
+    local tz
+    local zdt = ZonedDateTime(dt, tz)
 
     @test floor(zdt, Dates.Year) == ZonedDateTime(2016, tz)
     @test floor(zdt, Dates.Month) == ZonedDateTime(2016, 2, tz)
@@ -79,7 +81,8 @@ zdt = ZonedDateTime(dt, fixed)
 @test floor(zdt, Dates.Hour(2)) == ZonedDateTime(2016, 3, 13, 2, fixed)
 
 for tz in [winnipeg, st_johns]
-    zdt = ZonedDateTime(dt, tz)
+    local tz
+    local zdt = ZonedDateTime(dt, tz)
     @test floor(zdt, Dates.Day) == ZonedDateTime(2016, 3, 13, tz)
     @test floor(zdt, Dates.Hour(2)) == ZonedDateTime(2016, 3, 13, 1, tz)
 end
@@ -95,7 +98,8 @@ zdt = ZonedDateTime(dt, fixed)
 @test round(zdt, Dates.Minute(30)) == ZonedDateTime(2016, 3, 13, 2, fixed)
 
 for tz in [winnipeg, st_johns]
-    zdt = ZonedDateTime(dt, tz)
+    local tz
+    local zdt = ZonedDateTime(dt, tz)
 
     @test ceil(zdt, Dates.Day) == ZonedDateTime(2016, 3, 14, tz)
     @test ceil(zdt, Dates.Hour) == ZonedDateTime(2016, 3, 13, 3, tz)
@@ -130,7 +134,8 @@ zdt = ZonedDateTime(dt, fixed)
 # Rounding to Hour(3) will give 00:00, 03:00, 06:00, 09:00, etc.
 
 for tz in [winnipeg, st_johns]
-    zdt = ZonedDateTime(dt, tz)
+    local tz
+    local zdt = ZonedDateTime(dt, tz)
     @test floor(zdt, Dates.Day) == ZonedDateTime(2015, 11, 1, tz)
     @test floor(zdt, Dates.Hour(3)) == ZonedDateTime(2015, 11, 1, 1, tz, 1)
     # Rounding is performed in the current fixed zone, then relocalized if a transition has
@@ -148,7 +153,8 @@ zdt = ZonedDateTime(dt, fixed)
 @test round(zdt, Dates.Minute(30)) == ZonedDateTime(2015, 11, 1, 1, fixed)
 
 for tz in [winnipeg, st_johns]
-    zdt = ZonedDateTime(dt, tz)
+    local tz
+    local zdt = ZonedDateTime(dt, tz)
     next_hour = ZonedDateTime(DateTime(2015, 11, 1, 1), tz, 1)
 
     @test ceil(zdt, Dates.Day) == ZonedDateTime(2015, 11, 2, tz)
@@ -173,7 +179,8 @@ zdt = ZonedDateTime(dt, fixed)
 @test round(zdt, Dates.Minute(30)) == ZonedDateTime(2015, 11, 1, 1, 30, fixed)
 
 for tz in [winnipeg, st_johns]
-    zdt = ZonedDateTime(dt, tz, 1)                  # First 1:25, before "falling back"
+    local tz
+    local zdt = ZonedDateTime(dt, tz, 1)            # First 1:25, before "falling back"
     prev_hour = ZonedDateTime(2015, 11, 1, 1, tz, 1)
     between_hours = ZonedDateTime(2015, 11, 1, 1, 30, tz, 1)
     next_hour = ZonedDateTime(2015, 11, 1, 1, tz, 2)
@@ -242,7 +249,8 @@ zdt = ZonedDateTime(1996, 10, 26, 0, 15, colombo, 2)
 
 dt = DateTime(2016, 2, 28, 12, 15, 10, 190)
 for tz in [utc, fixed, winnipeg, st_johns, eucla, colombo]
-    zdt = ZonedDateTime(dt, tz)
+    local tz
+    local zdt = ZonedDateTime(dt, tz)
     for p in [Dates.Year, Dates.Month, Dates.Day, Dates.Hour, Dates.Minute, Dates.Second]
         for v in [-1, 0]
             @test_throws DomainError floor(dt, p(v))
