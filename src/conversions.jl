@@ -1,4 +1,4 @@
-import Base.Dates: now, unix2datetime
+import Base.Dates: now, julian2datetime, unix2datetime
 
 # UTC is an abstract type defined in Base.Dates, for some reason
 const utc_tz = FixedTimeZone("UTC")
@@ -43,6 +43,22 @@ end
 
 function astimezone(zdt::ZonedDateTime, tz::FixedTimeZone)
     return ZonedDateTime(zdt.utc_datetime, tz, tz)
+end
+
+function zdt2julian(zdt::ZonedDateTime)
+    Dates.datetime2julian(utc(zdt))
+end
+
+function zdt2julian(::Type{T}, zdt::ZonedDateTime) where T<:Integer
+    floor(T, Dates.datetime2julian(utc(zdt)))
+end
+
+function zdt2julian(::Type{T}, zdt::ZonedDateTime) where T<:Number
+    convert(T, Dates.datetime2julian(utc(zdt)))
+end
+
+function julian2zdt(jd::Real)
+    ZonedDateTime(Dates.julian2datetime(jd), utc_tz, from_utc=true)
 end
 
 function zdt2unix(zdt::ZonedDateTime)
