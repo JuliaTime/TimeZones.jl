@@ -19,7 +19,7 @@ TimeZones.jl
 * Local system time zone information as a TimeZone
 * Current system time in any TimeZone
 * Support for reading the [tzfile](http://man7.org/linux/man-pages/man5/tzfile.5.html) format
-* String parsing of ZonedDateTime using [DateFormat](http://julia.readthedocs.org/en/latest/manual/dates/?highlight=dateformat#constructors)
+* String parsing of ZonedDateTime using [DateFormat](https://docs.julialang.org/en/stable/stdlib/dates/#Base.Dates.DateFormat)
 
 ## Documentation
 
