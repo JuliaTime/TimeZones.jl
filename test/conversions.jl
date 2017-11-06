@@ -66,3 +66,11 @@ zdt = ZonedDateTime(2010, 1, 2, 3, 4, 5, warsaw)
 round_trip = TimeZones.unix2zdt(TimeZones.zdt2unix(Int64, zdt))
 @test round_trip == zdt
 @test !isequal(round_trip, zdt)
+
+# Julian dates
+jd = 2457241.855
+jd_zdt = ZonedDateTime(Dates.julian2datetime(jd), warsaw, from_utc=true)
+@test TimeZones.zdt2julian(jd_zdt) == jd
+@test TimeZones.zdt2julian(Int, jd_zdt) === floor(Int, jd)
+@test TimeZones.zdt2julian(Float64, jd_zdt) === jd
+@test TimeZones.julian2zdt(jd) == jd_zdt
