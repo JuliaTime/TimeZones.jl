@@ -29,7 +29,7 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
     # Re-export from Dates
     yearmonthday, yearmonth, monthday, year, month, week, day, dayofmonth,
     # conversion.jl
-    now, astimezone,
+    now, today, astimezone,
     # local.jl
     localzone,
     # ranges.jl

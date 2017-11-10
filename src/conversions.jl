@@ -1,4 +1,5 @@
-import Compat.Dates: unix2datetime, datetime2unix, julian2datetime, datetime2julian, now
+import Compat.Dates: unix2datetime, datetime2unix, julian2datetime, datetime2julian,
+    now, today
 
 # UTC is an abstract type defined in Dates, for some reason
 const utc_tz = FixedTimeZone("UTC")
@@ -19,6 +20,26 @@ function now(tz::TimeZone)
     utc = unix2datetime(time())
     ZonedDateTime(utc, tz, from_utc=true)
 end
+
+"""
+    today(tz::TimeZone) -> Date
+
+Returns the date portion of `now(tz)` in local time.
+
+# Examples
+
+```julia
+julia> a, b = now(tz"Pacific/Midway"), now(tz"Pacific/Apia")
+(2017-11-09T03:47:04.226-11:00, 2017-11-10T04:47:04.226+14:00)
+
+julia> a - b
+0 milliseconds
+
+julia> today(tz"Pacific/Midway"), today(tz"Pacific/Apia")
+(2017-11-09, 2017-11-10)
+```
+"""
+today(tz::TimeZone) = Date(localtime(now(tz)))
 
 """
     astimezone(zdt::ZonedDateTime, tz::TimeZone) -> ZonedDateTime
