@@ -15,7 +15,7 @@ TimeZones.jl
 
 * A new time zone aware TimeType: ZonedDateTime
 * Support for all time zones in the IANA time zone database (also known as the tz/zoneinfo/Olson database)
-* ZonedDateTime-Period arithmetic [similar to that of DateTime](http://julia.readthedocs.io/en/latest/manual/dates/#timetype-period-arithmetic)
+* ZonedDateTime-Period arithmetic [similar to that of DateTime](https://docs.julialang.org/en/stable/manual/dates/#TimeType-Period-Arithmetic-1)
 * Local system time zone information as a TimeZone
 * Current system time in any TimeZone
 * Support for reading the [tzfile](http://man7.org/linux/man-pages/man5/tzfile.5.html) format
