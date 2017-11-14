@@ -1,8 +1,9 @@
 using Mocking
 
-precompile_enabled = Mocking.is_precompile_enabled()
-if precompile_enabled
-    warn("Julia not started with `--compilecache=no`. Disabling tests that require Mocking")
+compiled_modules_enabled = Mocking.compiled_modules_enabled()
+if compiled_modules_enabled
+    flag = Mocking.COMPILED_MODULES_FLAG
+    warn("`julia` not started with `--$flag=no`. Disabling tests that require Mocking")
 else
     Mocking.enable()
 end
@@ -57,7 +58,7 @@ include("adjusters.jl")
 include("conversions.jl")
 include("ranges.jl")
 include("local.jl")
-!precompile_enabled && include("local_mocking.jl")
+!compiled_modules_enabled && include("local_mocking.jl")
 include("discovery.jl")
 VERSION >= v"0.5.0-dev+5244" && include("rounding.jl")
 include("TimeZones.jl")
