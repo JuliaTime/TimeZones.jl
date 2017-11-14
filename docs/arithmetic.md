@@ -1,6 +1,6 @@
 ## ZonedDateTime-Period Arithmetic
 
-`ZonedDateTime` uses calendrical arithmetic in a [similar manner to `DateTime`](http://julia.readthedocs.io/en/latest/manual/dates/#timetype-period-arithmetic) but with some key differences. Lets look at these differences by adding a day to March 30th 2014 in Europe/Warsaw.
+`ZonedDateTime` uses calendrical arithmetic in a [similar manner to `DateTime`](https://docs.julialang.org/en/stable/manual/dates/#TimeType-Period-Arithmetic-1) but with some key differences. Lets look at these differences by adding a day to March 30th 2014 in Europe/Warsaw.
 
 ```julia
 julia> using Base.Dates
@@ -64,7 +64,7 @@ julia> ZonedDateTime(2014, 10, 25, warsaw) + Day(1) + Hour(24)  # Julia 0.6 and 
 
 ## Ranges
 
-Julia allows for the use of powerful [adjuster functions](http://julia.readthedocs.io/en/latest/manual/dates/#adjuster-functions) to perform certain cendrical and temporal calculations. The `recur()` function, for example, can take a `StepRange` of `TimeType`s and apply a function to produce a vector of dates that fit certain inclusion criteria (for example, "every fifth Wednesday of the month in 2014 at 09:00"):
+Julia allows for the use of powerful [adjuster functions](https://docs.julialang.org/en/stable/manual/dates/#Adjuster-Functions-1) to perform certain cendrical and temporal calculations. The `recur()` function, for example, can take a `StepRange` of `TimeType`s and apply a function to produce a vector of dates that fit certain inclusion criteria (for example, "every fifth Wednesday of the month in 2014 at 09:00"):
 
 ```julia
 julia> warsaw = tz"Europe/Warsaw"

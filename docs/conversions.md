@@ -12,7 +12,7 @@ julia> astimezone(zdt, tz"Asia/Tokyo")
 
 ## Parsing strings
 
-`ZonedDateTime` parsing extends the functionality provided by `Base.Dates`. If you haven't already it is recommended that you first read the official Julia manual on [Date and DateTime](http://julia.readthedocs.io/en/latest/manual/dates/#constructors). The `TimeZones` package adds `z` and `Z` to the list of available [parsing character codes](http://julia.readthedocs.io/en/latest/stdlib/dates/#man-date-parsing):
+`ZonedDateTime` parsing extends the functionality provided by `Base.Dates`. If you haven't already it is recommended that you first read the official Julia manual on [Date and DateTime](https://docs.julialang.org/en/stable/manual/dates/#Constructors-1). The `TimeZones` package adds `z` and `Z` to the list of available [parsing character codes](https://docs.julialang.org/en/stable/stdlib/dates/#Base.Dates.DateFormat):
 
 | Code | Matches              | Comment                                          |
 |:-----|:---------------------|:-------------------------------------------------|
@@ -45,7 +45,7 @@ julia> ZonedDateTime("2015-03-30+02:00", df)
 
 ## Formatting strings
 
-Formatting a `ZonedDateTime` as a string also extends the functionality provided by `Base.Dates`. The `TimeZones` package adds the new formatting character codes `z` and `Z` to the list of available [formatting character codes](http://julia.readthedocs.io/en/latest/stdlib/dates/#man-date-formatting):
+Formatting a `ZonedDateTime` as a string also extends the functionality provided by `Base.Dates`. The `TimeZones` package adds the new formatting character codes `z` and `Z` to the list of available [formatting character codes](https://docs.julialang.org/en/stable/stdlib/dates/#Base.Dates.format-Tuple{Base.Dates.TimeType,AbstractString}):
 
 | Code | Examples             | Comment                                          |
 |:-----|:---------------------|:-------------------------------------------------|
