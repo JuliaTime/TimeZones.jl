@@ -1,9 +1,7 @@
 ## Rounding a ZonedDateTime
 
-(Only supported in Julia version 0.5 and later.)
-
 Rounding operations (`floor`, `ceil`, and `round`) on `ZonedDateTime`s are performed in a
-[similar manner to `DateTime`](http://julia.readthedocs.io/en/latest/manual/dates/#rounding)
+[similar manner to `DateTime`](https://docs.julialang.org/en/stable/manual/dates/#Rounding-1)
 and should generally behave as expected. When `VariableTimeZone` transitions are involved,
 however, unexpected behaviour may be encountered.
 
