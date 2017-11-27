@@ -1,8 +1,9 @@
 import TimeZones: DEPS_DIR
 import Compat: unsafe_get, isassigned
+using Compat.Dates
 
 const LATEST_FILE = joinpath(DEPS_DIR, "latest")
-const LATEST_FORMAT = Base.Dates.DateFormat("yyyy-mm-ddTHH:MM:SS")
+const LATEST_FORMAT = Dates.DateFormat("yyyy-mm-ddTHH:MM:SS")
 const LATEST_DELAY = Hour(1)  # In 1996 a correction to a release was made an hour later
 
 function read_latest(io::IO)

@@ -1,6 +1,6 @@
 import TimeZones: Transition
 import TimeZones.TZData: ZoneDict, RuleDict, zoneparse, ruleparse, resolve, parsedate, order_rules
-import Base.Dates: Hour, Minute, Second
+import Compat.Dates: Hour, Minute, Second, DateTime, Date
 
 ### parsedate ###
 

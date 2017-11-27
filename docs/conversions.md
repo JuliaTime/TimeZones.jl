@@ -12,7 +12,7 @@ julia> astimezone(zdt, tz"Asia/Tokyo")
 
 ## Parsing strings
 
-`ZonedDateTime` parsing extends the functionality provided by `Base.Dates`. If you haven't already it is recommended that you first read the official Julia manual on [Date and DateTime](https://docs.julialang.org/en/stable/manual/dates/#Constructors-1). The `TimeZones` package adds `z` and `Z` to the list of available [parsing character codes](https://docs.julialang.org/en/stable/stdlib/dates/#Base.Dates.DateFormat):
+`ZonedDateTime` parsing extends the functionality provided by `Dates`. If you haven't already it is recommended that you first read the official Julia manual on [Date and DateTime](https://docs.julialang.org/en/stable/manual/dates/#Constructors-1). The `TimeZones` package adds `z` and `Z` to the list of available [parsing character codes](https://docs.julialang.org/en/stable/stdlib/dates/#Base.Dates.DateFormat):
 
 | Code | Matches              | Comment                                          |
 |:-----|:---------------------|:-------------------------------------------------|

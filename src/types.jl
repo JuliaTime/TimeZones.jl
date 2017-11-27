@@ -1,7 +1,7 @@
 
-# import Base.Dates: UTInstant, DateTime, TimeZone, Millisecond
-using Base.Dates
-import Base.Dates: value
+# import Compat.Dates: UTInstant, DateTime, TimeZone, Millisecond
+using Compat.Dates
+import Compat.Dates: value
 import Base: promote_rule, ==, hash, isequal, isless
 import Compat: xor
 

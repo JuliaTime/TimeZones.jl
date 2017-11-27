@@ -1,6 +1,6 @@
-import Base.Dates: now, julian2datetime, unix2datetime
+import Compat.Dates: now, julian2datetime, unix2datetime
 
-# UTC is an abstract type defined in Base.Dates, for some reason
+# UTC is an abstract type defined in Dates, for some reason
 const utc_tz = FixedTimeZone("UTC")
 
 """

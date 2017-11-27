@@ -1,4 +1,4 @@
-import Base.Dates: guess
+import Compat.Dates: guess
 
 """
     guess(start::ZonedDateTime, finish::ZonedDateTime, step) -> Integer

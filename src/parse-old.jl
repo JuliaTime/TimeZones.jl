@@ -1,5 +1,5 @@
 import Base: parse
-import Base.Dates: Slot, slotparse, slotformat
+import Compat.Dates: Slot, slotparse, slotformat
 
 function slotparse(slot::Slot{TimeZone},x,locale)
     if slot.letter == 'z'
@@ -34,7 +34,7 @@ function slotformat(slot::Slot{TimeZone},zdt::ZonedDateTime,locale)
 end
 
 function parse(::Type{ZonedDateTime}, str::AbstractString, df::DateFormat)
-    ZonedDateTime(Base.Dates.parse(str, df)...)
+    ZonedDateTime(Compat.Dates.parse(str, df)...)
 end
 
 # Note: ISOZonedDateTimeFormat is defined in the module __init__ which means that this

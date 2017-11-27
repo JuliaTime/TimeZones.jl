@@ -1,4 +1,4 @@
-import Base.Dates: DateFormat, DatePart, tryparsenext, format, min_width, max_width
+import Compat.Dates: DateFormat, DatePart, tryparsenext, format, min_width, max_width
 
 function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
     tz_start, tz_end = i, 0

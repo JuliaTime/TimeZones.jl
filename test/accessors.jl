@@ -1,4 +1,5 @@
-import Base.Dates: Second
+import Compat.Dates
+import Compat.Dates: Second
 
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 fixed = FixedTimeZone("Fixed", -7200, 3600)
@@ -14,7 +15,7 @@ zdt = ZonedDateTime(DateTime(2014,6,12,23,59,58,57), fixed)
 @test TimeZones.second(zdt) == 58
 @test TimeZones.millisecond(zdt) == 57
 
-# Make sure that Base.Dates accessors work with ZonedDateTime.
+# Make sure that Dates accessors work with ZonedDateTime.
 @test Dates.year(zdt) == 2014
 @test Dates.month(zdt) == 6
 @test Dates.week(zdt) == 24
