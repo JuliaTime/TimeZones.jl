@@ -1,7 +1,7 @@
 import TimeZones.TZData: MIN_OFFSET, MAX_OFFSET
 
 # TimeZone concepts used to disambiguate context of DateTimes
-# abstract type UTC <: TimeZone end # Defined in Base.Dates
+# abstract type UTC <: TimeZone end # Defined in Dates
 abstract type Local <: TimeZone end
 
 function transition_range(local_dt::DateTime, tz::VariableTimeZone, ::Type{Local})

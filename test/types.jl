@@ -1,5 +1,5 @@
 import TimeZones: Transition
-import Base.Dates: Hour, Second, UTM
+import Compat.Dates: Hour, Second, UTM
 
 
 # Constructor FixedTimeZone from a string.

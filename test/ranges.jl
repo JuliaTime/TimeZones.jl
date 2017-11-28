@@ -1,4 +1,4 @@
-import Base.Dates: Day, Hour, Minute
+import Compat.Dates: Day, Hour, Minute
 
 
 utc = FixedTimeZone("UTC", 0)

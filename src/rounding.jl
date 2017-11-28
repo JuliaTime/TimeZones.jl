@@ -1,4 +1,4 @@
-import Base.Dates: Period, DatePeriod, TimePeriod
+import Compat.Dates: Period, DatePeriod, TimePeriod
 
 function Base.floor(zdt::ZonedDateTime, p::DatePeriod)
     return ZonedDateTime(floor(localtime(zdt), p), timezone(zdt))
@@ -15,7 +15,7 @@ function Base.ceil(zdt::ZonedDateTime, p::DatePeriod)
     return ZonedDateTime(ceil(localtime(zdt), p), timezone(zdt))
 end
 
-#function Base.Dates.floorceil(zdt::ZonedDateTime, p::Dates.DatePeriod)
+#function Dates.floorceil(zdt::ZonedDateTime, p::Dates.DatePeriod)
     #return floor(zdt, p), ceil(zdt, p)
 #end
 

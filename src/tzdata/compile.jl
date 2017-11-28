@@ -1,12 +1,12 @@
-using Base.Dates
+using Compat.Dates
 
 import ...TimeZones: TZ_SOURCE_DIR, COMPILED_DIR, TIME_ZONES
 import ...TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
 import ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET,
     MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET
 
-if isdefined(Base.Dates, :parse_components)
-    parse_components = Base.Dates.parse_components
+if isdefined(Dates, :parse_components)
+    parse_components = Dates.parse_components
 else
     # Note: On older versions of Julia this will sort the Periods. Since our DateFormat
     # is already in reverse sorted order there shouldn't be a difference.

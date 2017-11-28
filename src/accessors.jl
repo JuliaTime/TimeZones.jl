@@ -1,4 +1,4 @@
-import Base.Dates: Hour, Minute, Second, Millisecond,
+import Compat.Dates: Hour, Minute, Second, Millisecond,
     days, hour, minute, second, millisecond
 
 """

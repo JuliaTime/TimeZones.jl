@@ -49,7 +49,7 @@ zdt = ZonedDateTime(dt, warsaw)
 # TimeZone parsing
 
 # Make sure that TimeZone conversion specifiers are set (issue #24)
-CONVERSION_SPECIFIERS = isdefined(Base.Dates, :SLOT_RULE) ? Dates.keys(Dates.SLOT_RULE) : keys(Dates.CONVERSION_SPECIFIERS)
+CONVERSION_SPECIFIERS = isdefined(Dates, :SLOT_RULE) ? Dates.keys(Dates.SLOT_RULE) : keys(Dates.CONVERSION_SPECIFIERS)
 @test 'z' in CONVERSION_SPECIFIERS
 @test 'Z' in CONVERSION_SPECIFIERS
 

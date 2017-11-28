@@ -2,8 +2,8 @@ __precompile__()
 
 module TimeZones
 
-using Base.Dates
-import Base.Dates: TimeZone, AbstractTime
+using Compat.Dates
+import Compat.Dates: TimeZone, AbstractTime
 import Base: @deprecate_binding
 import Compat: Sys
 
@@ -18,7 +18,7 @@ export TimeZone, @tz_str, FixedTimeZone, VariableTimeZone, ZonedDateTime, DateTi
     firstdayofmonth, lastdayofmonth,
     firstdayofyear, lastdayofyear,
     firstdayofquarter, lastdayofquarter,
-    # Re-export from Base.Dates
+    # Re-export from Dates
     yearmonthday, yearmonth, monthday, year, month, week, day, dayofmonth,
     # conversion.jl
     now, astimezone,
@@ -38,14 +38,14 @@ const TIME_ZONES = Dict{AbstractString,TimeZone}()
 
 function __init__()
     # Base extension needs to happen everytime the module is loaded (issue #24)
-    if isdefined(Base.Dates, :SLOT_RULE)
-        Base.Dates.SLOT_RULE['z'] = TimeZone
-        Base.Dates.SLOT_RULE['Z'] = TimeZone
+    if isdefined(Dates, :SLOT_RULE)
+        Dates.SLOT_RULE['z'] = TimeZone
+        Dates.SLOT_RULE['Z'] = TimeZone
     else
-        Base.Dates.CONVERSION_SPECIFIERS['z'] = TimeZone
-        Base.Dates.CONVERSION_SPECIFIERS['Z'] = TimeZone
-        Base.Dates.CONVERSION_DEFAULTS[TimeZone] = ""
-        Base.Dates.CONVERSION_TRANSLATIONS[ZonedDateTime] = (
+        Dates.CONVERSION_SPECIFIERS['z'] = TimeZone
+        Dates.CONVERSION_SPECIFIERS['Z'] = TimeZone
+        Dates.CONVERSION_DEFAULTS[TimeZone] = ""
+        Dates.CONVERSION_TRANSLATIONS[ZonedDateTime] = (
             Year, Month, Day, Hour, Minute, Second, Millisecond, TimeZone,
         )
     end

@@ -1,4 +1,4 @@
-using Base.Dates
+using Compat.Dates
 
 # Basic truncation
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
@@ -36,5 +36,5 @@ zdt = ZonedDateTime(DateTime(2013,9,9), warsaw) # Monday
 @test TimeZones.lastdayofquarter(zdt) == ZonedDateTime(DateTime(2013,9,30), warsaw)
 
 
-# TODO: Should be in Base.Dates.
+# TODO: Should be in Dates.
 @test Dates.lastdayofyear(DateTime(2013,9,9)) == DateTime(2013,12,31)

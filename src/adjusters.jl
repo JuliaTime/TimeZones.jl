@@ -1,5 +1,5 @@
-import Base.Dates: trunc, DatePeriod, TimePeriod
-import Base.Dates: firstdayofweek, lastdayofweek, firstdayofmonth, lastdayofmonth,
+import Compat.Dates: trunc, DatePeriod, TimePeriod
+import Compat.Dates: firstdayofweek, lastdayofweek, firstdayofmonth, lastdayofmonth,
     firstdayofyear, lastdayofyear, firstdayofquarter, lastdayofquarter
 
 

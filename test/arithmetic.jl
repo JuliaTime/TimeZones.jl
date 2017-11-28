@@ -1,4 +1,4 @@
-import Base.Dates: Day, Hour
+import Compat.Dates: Day, Hour
 
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 
