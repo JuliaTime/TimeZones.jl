@@ -130,11 +130,8 @@ include("ranges.jl")
 include("discovery.jl")
 VERSION >= v"0.5.0-dev+5244" && include("rounding.jl")
 VERSION < v"0.6.0-dev.2307" ? include("parse-old.jl") : include("parse.jl")
+include("deprecated.jl")
 
 import TimeZones.TZData: REGIONS, LEGACY_REGIONS
-
-# deprecations
-@deprecate_binding Olson TZData
-@deprecate_binding TZDATA_DIR TZ_SOURCE_DIR
 
 end # module
