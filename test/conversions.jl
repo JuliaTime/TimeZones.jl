@@ -12,8 +12,9 @@ zdt = ZonedDateTime(dt, warsaw)
 @test_throws MethodError convert(DateTime, zdt)
 
 # Vectorized accessors
-arr = repmat([zdt], 10)
-@test @compat Dates.DateTime.(arr) == repmat([dt], 10)
+n = 10
+arr = fill(zdt, n)
+@test Dates.DateTime.(arr) == fill(dt, n)
 
 # now function
 dt = now(Dates.UTC)::DateTime
