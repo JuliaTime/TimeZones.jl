@@ -13,7 +13,7 @@ using Test
 using TimeZones
 import TimeZones: PKG_DIR, ARCHIVE_DIR
 import TimeZones.TZData: ZoneDict, RuleDict, tzparse, resolve, build
-import Compat: @compat, Sys
+import Compat: Sys
 
 const TZDATA_VERSION = "2016j"
 const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(PKG_DIR, "test", "tzsource"))
@@ -60,5 +60,5 @@ include("ranges.jl")
 include("local.jl")
 !compiled_modules_enabled && include("local_mocking.jl")
 include("discovery.jl")
-VERSION >= v"0.5.0-dev+5244" && include("rounding.jl")
+include("rounding.jl")
 include("TimeZones.jl")

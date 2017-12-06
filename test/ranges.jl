@@ -23,10 +23,10 @@ fixed_range = ZonedDateTime(d, fixed):Hour(1):ZonedDateTime(d, fixed) + Day(1)
 @test length(fixed_range) == 25
 
 # Values in ZoneDateTime range should match raw DateTime range with appropriate offsets.
-@test collect(map(TimeZones.utc, utc_range)) == raw_range
-@test collect(map(TimeZones.utc, dst_range)) == raw_range .+ Hour(6)
-@test collect(map(TimeZones.utc, no_dst_range)) == raw_range .+ Hour(6)
-@test collect(map(TimeZones.utc, fixed_range)) == raw_range .+ Hour(5)
+@test TimeZones.utc.(utc_range) == raw_range
+@test TimeZones.utc.(dst_range) == raw_range .+ Hour(6)
+@test TimeZones.utc.(no_dst_range) == raw_range .+ Hour(6)
+@test TimeZones.utc.(fixed_range) == raw_range .+ Hour(5)
 
 
 # Test date ranges for the day of the DST "spring forward".
@@ -45,13 +45,13 @@ fixed_range = ZonedDateTime(d, fixed):Hour(1):ZonedDateTime(d, fixed) + Day(1)
 @test length(fixed_range) == 25
 
 # Values in ZoneDateTime range should match raw DateTime range with appropriate offsets.
-@test collect(map(TimeZones.utc, utc_range)) == raw_range
-@test collect(map(TimeZones.utc, dst_range)) == [
+@test TimeZones.utc.(utc_range) == raw_range
+@test TimeZones.utc.(dst_range) == [
     raw_range[1:2] .+ Hour(6);
     raw_range[4:end] .+ Hour(5)
 ]
-@test collect(map(TimeZones.utc, no_dst_range)) == raw_range .+ Hour(6)
-@test collect(map(TimeZones.utc, fixed_range)) == raw_range .+ Hour(5)
+@test TimeZones.utc.(no_dst_range) == raw_range .+ Hour(6)
+@test TimeZones.utc.(fixed_range) == raw_range .+ Hour(5)
 
 
 # Test date ranges for the day of the DST "fall back".
@@ -70,13 +70,13 @@ fixed_range = ZonedDateTime(d, fixed):Hour(1):ZonedDateTime(d, fixed) + Day(1)
 @test length(fixed_range) == 25
 
 # Values in ZoneDateTime range should match raw DateTime range with appropriate offsets.
-@test collect(map(TimeZones.utc, utc_range)) == raw_range
-@test collect(map(TimeZones.utc, dst_range)) == [
+@test TimeZones.utc.(utc_range) == raw_range
+@test TimeZones.utc.(dst_range) == [
     raw_range[1:2] .+ Hour(5);
     raw_range[2:end] .+ Hour(6);
 ]
-@test collect(map(TimeZones.utc, no_dst_range)) == raw_range .+ Hour(6)
-@test collect(map(TimeZones.utc, fixed_range)) == raw_range .+ Hour(5)
+@test TimeZones.utc.(no_dst_range) == raw_range .+ Hour(6)
+@test TimeZones.utc.(fixed_range) == raw_range .+ Hour(5)
 
 # filter behaviour with a non-existent hour
 range = ZonedDateTime(2015, 3, 8, dst):Dates.Hour(1):ZonedDateTime(2015, 3, 10, dst)

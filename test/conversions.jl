@@ -1,3 +1,5 @@
+import Compat.Dates
+
 utc = FixedTimeZone("UTC")
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 
@@ -10,14 +12,15 @@ zdt = ZonedDateTime(dt, warsaw)
 @test_throws MethodError convert(DateTime, zdt)
 
 # Vectorized accessors
-arr = repmat([zdt], 10)
-@test @compat Dates.DateTime.(arr) == repmat([dt], 10)
+n = 10
+arr = fill(zdt, n)
+@test Dates.DateTime.(arr) == fill(dt, n)
 
 # now function
-dt = Dates.unix2datetime(time())  # Base.now in UTC
+dt = now(Dates.UTC)::DateTime
 zdt = now(warsaw)
 @test zdt.timezone == warsaw
-@test isapprox(map(Dates.datetime2unix, [dt, TimeZones.utc(zdt)])...)
+@test Dates.datetime2unix(TimeZones.utc(zdt)) ≈ Dates.datetime2unix(dt)
 
 
 # Changing time zones
