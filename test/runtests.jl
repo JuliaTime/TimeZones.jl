@@ -62,5 +62,6 @@ include("helpers.jl")
     !compiled_modules_enabled && include("local_mocking.jl")
     include("discovery.jl")
     include("rounding.jl")
+    include("parse.jl")
     include("TimeZones.jl")
 end
