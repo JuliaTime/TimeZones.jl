@@ -7,8 +7,8 @@ import Compat.Dates: TimeZone, AbstractTime
 import Base: @deprecate_binding
 import Compat: Sys
 
-export TimeZone, @tz_str, FixedTimeZone, VariableTimeZone, ZonedDateTime, DateTime,
-    TimeError, AmbiguousTimeError, NonExistentTimeError, UnhandledTimeError,
+export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
+    DateTime, TimeError, AmbiguousTimeError, NonExistentTimeError, UnhandledTimeError,
     # discovery.jl
     timezone_names, all_timezones, timezones_from_abbr, timezone_abbrs,
     # accessors.jl
@@ -91,6 +91,19 @@ Africa/Nairobi (UTC+3)
 """
 macro tz_str(str)
     TimeZone(str)
+end
+
+"""
+    istimezone(str::AbstractString) -> Bool
+
+Tests whether a string is a valid name for constructing a `TimeZone`.
+"""
+function istimezone(str::AbstractString)
+    return (
+        haskey(TIME_ZONES, str) ||
+        ismatch(FIXED_TIME_ZONE_REGEX, str) ||
+        isfile(joinpath(COMPILED_DIR, split(str, "/")...))
+    )
 end
 
 """
