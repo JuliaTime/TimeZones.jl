@@ -1,4 +1,4 @@
-import Compat.Dates: parse_components
+import Compat.Dates: parse_components, default_format
 
 @testset "parse" begin
     @test isequal(
@@ -35,4 +35,8 @@ end
         tz"UTC+01",
     ]
     @test parse_components(test...) == expected
+end
+
+@testset "default format" begin
+    @test default_format(ZonedDateTime) === TimeZones.ISOZonedDateTimeFormat
 end
