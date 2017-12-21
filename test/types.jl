@@ -22,6 +22,9 @@ import Compat.Dates: Hour, Second, UTM
 @test FixedTimeZone("UTC+0123") == FixedTimeZone("UTC+01:23", 4980)
 @test FixedTimeZone("UTC-0123") == FixedTimeZone("UTC-01:23", -4980)
 
+@test FixedTimeZone("+01") == FixedTimeZone("UTC+01:00", 3600)
+@test FixedTimeZone("-02") == FixedTimeZone("UTC-02:00", -7200)
+
 @test_throws ArgumentError FixedTimeZone("1")
 @test_throws ArgumentError FixedTimeZone("01")
 @test_throws ArgumentError FixedTimeZone("123")
@@ -32,6 +35,8 @@ import Compat.Dates: Hour, Second, UTM
 @test_throws ArgumentError FixedTimeZone("01:23:-45")
 @test_throws ArgumentError FixedTimeZone("01:23:45:67")
 @test_throws ArgumentError FixedTimeZone("UTC1")
+@test_throws ArgumentError FixedTimeZone("+1")
+@test_throws ArgumentError FixedTimeZone("-2")
 
 
 # Test exception messages
