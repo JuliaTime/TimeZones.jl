@@ -3,6 +3,11 @@ import Compat.Dates
 utc = FixedTimeZone("UTC")
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 
+# Converting from the stdlib UTC
+@test FixedTimeZone(UTC()) == utc
+dt = DateTime(2015, 1, 1, 0)
+@test ZonedDateTime(dt, FixedTimeZone(UTC())) == ZonedDateTime(dt, utc)
+
 # Converting a ZonedDateTime into a DateTime
 dt = DateTime(2015, 1, 1, 0)
 zdt = ZonedDateTime(dt, warsaw)

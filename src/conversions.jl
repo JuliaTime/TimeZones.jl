@@ -3,6 +3,8 @@ import Compat.Dates: now, julian2datetime, unix2datetime
 # UTC is an abstract type defined in Dates, for some reason
 const utc_tz = FixedTimeZone("UTC")
 
+FixedTimeZone(::UTC) = utc_tz
+
 """
     DateTime(::ZonedDateTime) -> DateTime
 
