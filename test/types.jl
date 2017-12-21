@@ -384,3 +384,7 @@ end
 # Issue #52
 dt = now()
 @test_throws ErrorException ZonedDateTime(dt, warsaw) > dt
+
+# type extrema
+@test typemin(ZonedDateTime) <= ZonedDateTime(typemin(DateTime), utc)
+@test typemax(ZonedDateTime) >= ZonedDateTime(typemax(DateTime), utc)

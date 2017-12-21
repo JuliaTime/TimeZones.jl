@@ -2,7 +2,7 @@
 # import Compat.Dates: UTInstant, DateTime, TimeZone, Millisecond
 using Compat.Dates
 import Compat.Dates: value, argerror, validargs
-import Base: promote_rule, ==, hash, isequal, isless
+import Base: promote_rule, ==, hash, isequal, isless, typemin, typemax
 import Compat: xor
 
 const FIXED_TIME_ZONE_REGEX = r"""
@@ -301,6 +301,9 @@ function hash(tz::VariableTimeZone, h::UInt)
     h = hash(tz.cutoff, h)
     return h
 end
+
+typemin(::Type{ZonedDateTime}) = ZonedDateTime(typemin(DateTime), utc_tz; from_utc=true)
+typemax(::Type{ZonedDateTime}) = ZonedDateTime(typemax(DateTime), utc_tz; from_utc=true)
 
 function validargs(::Type{ZonedDateTime}, y::Int64, m::Int64, d::Int64, h::Int64, mi::Int64, s::Int64, ms::Int64, tz::AbstractString)
     err = validargs(DateTime, y, m, d, h, mi, s, ms)
