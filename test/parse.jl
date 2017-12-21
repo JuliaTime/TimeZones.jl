@@ -9,6 +9,11 @@ import Compat.Dates: parse_components, default_format
         parse(ZonedDateTime, "2016-04-11 08:00 UTC", dateformat"yyyy-mm-dd HH:MM ZZZ"),
         ZonedDateTime(2016, 4, 11, 8, tz"UTC"),
     )
+    # two-digit time zone
+    @test isequal(
+        parse(ZonedDateTime, "2000+00", dateformat"yyyyz"),
+        ZonedDateTime(2000, tz"UTC"),
+    )
     @test_throws ArgumentError parse(ZonedDateTime, "2016-04-11 08:00 EST", dateformat"yyyy-mm-dd HH:MM zzz")
 end
 
