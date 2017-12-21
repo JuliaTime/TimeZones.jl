@@ -1,7 +1,7 @@
 
 # import Compat.Dates: UTInstant, DateTime, TimeZone, Millisecond
 using Compat.Dates
-import Compat.Dates: value
+import Compat.Dates: value, argerror, validargs
 import Base: promote_rule, ==, hash, isequal, isless
 import Compat: xor
 
@@ -298,4 +298,11 @@ function hash(tz::VariableTimeZone, h::UInt)
     h = hash(tz.transitions, h)
     h = hash(tz.cutoff, h)
     return h
+end
+
+function validargs(::Type{ZonedDateTime}, y::Int64, m::Int64, d::Int64, h::Int64, mi::Int64, s::Int64, ms::Int64, tz::AbstractString)
+    err = validargs(DateTime, y, m, d, h, mi, s, ms)
+    isnull(err) || return err
+    istimezone(tz) || return argerror("TimeZone: \"$str\" is not a recognized time zone")
+    return argerror()
 end

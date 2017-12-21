@@ -1,19 +1,10 @@
 using Compat.Dates
+import Compat.Dates: parse_components
 
 import ...TimeZones: TZ_SOURCE_DIR, COMPILED_DIR, TIME_ZONES
 import ...TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
 import ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET,
     MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET
-
-if isdefined(Dates, :parse_components)
-    parse_components = Dates.parse_components
-else
-    # Note: On older versions of Julia this will sort the Periods. Since our DateFormat
-    # is already in reverse sorted order there shouldn't be a difference.
-    function parse_components(str::AbstractString, df::DateFormat)
-        convert(Array{Any}, Dates.parse(str, df))
-    end
-end
 
 # Zone type maps to an Olson Timezone database entity
 struct Zone

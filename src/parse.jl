@@ -1,4 +1,5 @@
-import Compat.Dates: DateFormat, DatePart, tryparsenext, format, min_width, max_width
+import Compat.Dates: DateFormat, DatePart, tryparsenext, format, min_width, max_width,
+    default_format
 
 function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
     tz_start, tz_end = i, 0
@@ -86,3 +87,5 @@ end
 function ZonedDateTime(str::AbstractString, format::AbstractString; locale::AbstractString="english")
     ZonedDateTime(str, DateFormat(format,locale))
 end
+
+default_format(::Type{ZonedDateTime}) = ISOZonedDateTimeFormat
