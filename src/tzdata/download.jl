@@ -1,5 +1,5 @@
 import TimeZones: DEPS_DIR
-import Compat: unsafe_get, isassigned
+import Compat: isassigned
 using Compat.Dates
 
 const LATEST_FILE = joinpath(DEPS_DIR, "latest")
