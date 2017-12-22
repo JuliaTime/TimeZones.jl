@@ -6,6 +6,7 @@ using Compat.Dates
 import Compat.Dates: TimeZone, AbstractTime
 import Base: @deprecate_binding
 import Compat: Sys
+using Compat.Printf
 
 export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
     DateTime, TimeError, AmbiguousTimeError, NonExistentTimeError, UnhandledTimeError,

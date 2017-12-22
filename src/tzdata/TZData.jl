@@ -1,5 +1,8 @@
 module TZData
 
+using Compat
+using Compat.Printf
+
 # Note: The tz database is made up of two parts: code and data. TimeZones.jl only requires
 # the "tzdata" archive or more specifically the "tz source" files within the archive
 # (africa, australasia, ...)
