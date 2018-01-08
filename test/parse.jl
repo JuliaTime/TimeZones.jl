@@ -18,14 +18,25 @@ import Compat.Dates: parse_components, default_format
 end
 
 @testset "tryparse" begin
-    @test isequal(
-        tryparse(ZonedDateTime, "2013-03-20 11:00:00+04:00", dateformat"y-m-d H:M:SSz"),
-        Nullable(ZonedDateTime(2013, 3, 20, 11, tz"UTC+04")),
-    )
-    @test isequal(
-        tryparse(ZonedDateTime, "2016-04-11 08:00 EST", dateformat"yyyy-mm-dd HH:MM zzz"),
-        Nullable{ZonedDateTime}(),
-    )
+    if VERSION < v"0.7.0-DEV.3017"
+        @test isequal(
+            tryparse(ZonedDateTime, "2013-03-20 11:00:00+04:00", dateformat"y-m-d H:M:SSz"),
+            Nullable(ZonedDateTime(2013, 3, 20, 11, tz"UTC+04")),
+        )
+        @test isequal(
+            tryparse(ZonedDateTime, "2016-04-11 08:00 EST", dateformat"yyyy-mm-dd HH:MM zzz"),
+            Nullable{ZonedDateTime}(),
+        )
+    else
+        @test isequal(
+            tryparse(ZonedDateTime, "2013-03-20 11:00:00+04:00", dateformat"y-m-d H:M:SSz"),
+            ZonedDateTime(2013, 3, 20, 11, tz"UTC+04"),
+        )
+        @test isequal(
+            tryparse(ZonedDateTime, "2016-04-11 08:00 EST", dateformat"yyyy-mm-dd HH:MM zzz"),
+            nothing,
+        )
+    end
 end
 
 @testset "parse components" begin

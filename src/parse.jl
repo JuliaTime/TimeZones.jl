@@ -29,7 +29,7 @@ function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
         return Nullable{String}(), i
     else
         tz = SubString(str, tz_start, tz_end)
-        return Nullable{String}(tz), i
+        return Nullable{String}(convert(String, tz)), i
     end
 end
 
@@ -56,7 +56,7 @@ function tryparsenext_tz(str, i, len, min_width::Int=1, max_width::Int=0)
         # purposes we'll treat all abbreviations except for UTC and GMT as ambiguous.
         # e.g. "MST": "Mountain Standard Time" (UTC-7) or "Moscow Summer Time" (UTC+3:31).
         if contains(name, "/") || name in ("UTC", "GMT")
-            return Nullable{String}(name), i
+            return Nullable{String}(convert(String, name)), i
         else
             return Nullable{String}(), i
         end

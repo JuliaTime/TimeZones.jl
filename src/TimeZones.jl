@@ -66,7 +66,12 @@ string is assumed to be a static time zone.
 A list of recognized time zones names is available from `timezone_names()`. Supported static
 time zone string formats can be found in `FixedTimeZone(::AbstractString)`.
 """
-function TimeZone(str::AbstractString)
+function TimeZone(str::Union{AbstractString, Nullable{String}})
+    if str isa Nullable
+        str = isnull(str) ? throw(ArgumentError("Unknown time zone \"$str\"")) : get(str)
+        str = convert(AbstractString, str)
+    end
+
     return get!(TIME_ZONES, str) do
         if ismatch(FIXED_TIME_ZONE_REGEX, str)
             return FixedTimeZone(str)
