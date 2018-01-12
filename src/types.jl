@@ -242,7 +242,7 @@ end
 
 # Parsing constructor. Note we typically don't support passing in time zone information as a
 # string since we cannot do not know if we need to support resolving ambiguity.
-function ZonedDateTime(y::Int64, m::Int64, d::Int64, h::Int64, mi::Int64, s::Int64, ms::Int64, tz::AbstractString)
+function ZonedDateTime(y::Int64, m::Int64, d::Int64, h::Int64, mi::Int64, s::Int64, ms::Int64, tz::Union{AbstractString, Nullable{String}})
     ZonedDateTime(DateTime(y,m,d,h,mi,s,ms), TimeZone(tz))
 end
 
@@ -305,7 +305,7 @@ end
 typemin(::Type{ZonedDateTime}) = ZonedDateTime(typemin(DateTime), utc_tz; from_utc=true)
 typemax(::Type{ZonedDateTime}) = ZonedDateTime(typemax(DateTime), utc_tz; from_utc=true)
 
-function validargs(::Type{ZonedDateTime}, y::Int64, m::Int64, d::Int64, h::Int64, mi::Int64, s::Int64, ms::Int64, tz::AbstractString)
+function validargs(::Type{ZonedDateTime}, y::Int64, m::Int64, d::Int64, h::Int64, mi::Int64, s::Int64, ms::Int64, tz::Union{AbstractString, Nullable{String}})
     err = validargs(DateTime, y, m, d, h, mi, s, ms)
     isnull(err) || return err
     istimezone(tz) || return argerror("TimeZone: \"$str\" is not a recognized time zone")
