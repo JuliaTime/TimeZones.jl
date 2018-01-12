@@ -16,7 +16,7 @@ function localzone()
     @static if Sys.isapple()
         name = @mock read(`systemsetup -gettimezone`, String)  # Appears to only work as root
         if contains(name, "Time Zone: ")
-            name = strip(replace(name, "Time Zone: ", ""))
+            name = strip(replace(name, "Time Zone: " => ""))
         else
             # link will be something like /usr/share/zoneinfo/Europe/Warsaw
             name = @mock readlink("/etc/localtime")
@@ -72,8 +72,8 @@ function localzone()
                 name = read(file, String)
 
                 # Get rid of host definitions and comments:
-                name = strip(replace(name, r"#.*", ""))
-                name = replace(name, ' ', '_')
+                name = strip(replace(name, r"#.*" => ""))
+                name = replace(name, ' ' => '_')
             end
 
             name in validnames && return TimeZone(name)
@@ -91,7 +91,7 @@ function localzone()
                     matched = match(zone_re, line)
                     if matched != nothing
                         name = matched["name"]
-                        name = replace(name, ' ', '_')
+                        name = replace(name, ' ' => '_')
                         break
                     end
                 end
@@ -132,13 +132,13 @@ function localzone()
             # since they are deemed historical. To ensure compatibility with the translation
             # dict we will manually convert these fixed time zones.
             if startswith(posix_name, "Etc/GMT")
-                name = replace(posix_name, r"Etc/GMT0?", "UTC")
+                name = replace(posix_name, r"Etc/GMT0?" => "UTC")
 
                 # Note: Etc/GMT[+-] are reversed compared to UTC[+-]
                 if contains(name, "+")
-                    name = replace(name, "+", "-")
+                    name = replace(name, "+" => "-")
                 else
-                    name = replace(name, "-", "+")
+                    name = replace(name, "-" => "+")
                 end
 
                 return FixedTimeZone(name)
