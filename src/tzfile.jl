@@ -12,7 +12,7 @@ struct TransitionTimeInfo
     abbrindex::UInt8  # tt_abbrind
 end
 
-function abbreviation(chars::Array{UInt8}, offset::Integer=1)
+function abbreviation(chars::AbstractArray{UInt8,1}, offset::Integer=1)
     unsafe_string(pointer(chars[offset:end]))
 end
 
