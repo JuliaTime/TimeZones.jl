@@ -18,14 +18,13 @@ import Compat.Dates: parse_components, default_format
 end
 
 @testset "tryparse" begin
-    zdt = ZonedDateTime(2013, 3, 20, 11, tz"UTC+04")
     @test isequal(
         tryparse(ZonedDateTime, "2013-03-20 11:00:00+04:00", dateformat"y-m-d H:M:SSz"),
-        VERSION < v"0.7.0-DEV.3017" ? Nullable(zdt) : zdt,
+        TimeZones.nullable(ZonedDateTime, ZonedDateTime(2013, 3, 20, 11, tz"UTC+04")),
     )
     @test isequal(
         tryparse(ZonedDateTime, "2016-04-11 08:00 EST", dateformat"yyyy-mm-dd HH:MM zzz"),
-        VERSION < v"0.7.0-DEV.3017" ? Nullable{ZonedDateTime}() : nothing,
+        TimeZones.nullable(ZonedDateTime, nothing),
     )
 end
 

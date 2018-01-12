@@ -82,17 +82,6 @@ function TimeZone(str::AbstractString)
 end
 
 """
-    TimeZone(str::Nullable{String}) -> TimeZone
-
-Constructs a `TimeZone` subtype based upon the string. If the string is null throws an
-ArgumentError.
-"""
-function TimeZone(str::Nullable{String})
-    isnull(str) && throw(ArgumentError("Unknown time zone \"$str\""))
-    TimeZone(get(str))
-end
-
-"""
     @tz_str -> TimeZone
 
 Constructs a `TimeZone` subtype based upon the string at parse time. See docstring of
