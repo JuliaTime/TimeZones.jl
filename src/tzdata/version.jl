@@ -93,7 +93,9 @@ function tzdata_version_archive(archive::AbstractString)
 end
 
 function active_version()
-    !isfile(ACTIVE_VERSION_FILE) && error("No active tzdata version")
+    if !isfile(ACTIVE_VERSION_FILE)
+        error("No active tzdata version. Try re-building TimeZones")
+    end
     read(ACTIVE_VERSION_FILE, String)
 end
 
