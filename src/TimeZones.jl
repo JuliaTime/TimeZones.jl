@@ -41,17 +41,12 @@ const TIME_ZONES = Dict{AbstractString,TimeZone}()
 
 function __init__()
     # Base extension needs to happen everytime the module is loaded (issue #24)
-    if isdefined(Dates, :SLOT_RULE)
-        Dates.SLOT_RULE['z'] = TimeZone
-        Dates.SLOT_RULE['Z'] = TimeZone
-    else
-        Dates.CONVERSION_SPECIFIERS['z'] = TimeZone
-        Dates.CONVERSION_SPECIFIERS['Z'] = TimeZone
-        Dates.CONVERSION_DEFAULTS[TimeZone] = ""
-        Dates.CONVERSION_TRANSLATIONS[ZonedDateTime] = (
-            Year, Month, Day, Hour, Minute, Second, Millisecond, TimeZone,
-        )
-    end
+    Dates.CONVERSION_SPECIFIERS['z'] = TimeZone
+    Dates.CONVERSION_SPECIFIERS['Z'] = TimeZone
+    Dates.CONVERSION_DEFAULTS[TimeZone] = ""
+    Dates.CONVERSION_TRANSLATIONS[ZonedDateTime] = (
+        Year, Month, Day, Hour, Minute, Second, Millisecond, TimeZone,
+    )
 
     global const ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
 end
@@ -79,17 +74,6 @@ function TimeZone(str::AbstractString)
             return deserialize(fp)
         end
     end
-end
-
-"""
-    TimeZone(str::Nullable{String}) -> TimeZone
-
-Constructs a `TimeZone` subtype based upon the string. If the string is null throws an
-ArgumentError.
-"""
-function TimeZone(str::Nullable{String})
-    isnull(str) && throw(ArgumentError("Unknown time zone \"$str\""))
-    TimeZone(get(str))
 end
 
 """
