@@ -42,8 +42,8 @@ function optional(ex::Expr)
     isempty(dynamic) && return Expr[ex]
 
     # Generate a new signature which converts the dynamic arguments to required arguments
-    default = Array{Any}(length(dynamic))
-    new_sig = Array{Any}(length(sig.args))
+    default = Array{Any}(uninitialized, length(dynamic))
+    new_sig = Array{Any}(uninitialized, length(sig.args))
     for (i, arg) in enumerate(sig.args)
         if i in dynamic
             name, value = arg.args

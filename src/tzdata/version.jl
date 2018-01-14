@@ -36,7 +36,7 @@ order. Useful for identifying the version of the tzdata.
 """
 function read_news(news::IO, limit::Integer=0)
     count = 0
-    revs = sizehint!(Vector{AbstractString}(0), limit)
+    revs = sizehint!(AbstractString[], limit)
     while !eof(news) && (limit == 0 || count < limit)
         line = readline(news)
 

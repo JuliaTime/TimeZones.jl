@@ -52,15 +52,15 @@ function read_tzfile_internal(io::IO, name::AbstractString, force_version::Char=
     # Transition time that represents negative infinity
     initial_epoch = time_type == Int64 ? -Int64(2)^59 : typemin(Int32)
 
-    transition_times = Array{time_type}(tzh_timecnt)
+    transition_times = Array{time_type}(uninitialized, tzh_timecnt)
     for i in eachindex(transition_times)
         transition_times[i] = ntoh(read(io, time_type))
     end
-    lindexes = Array{UInt8}(tzh_timecnt)
+    lindexes = Array{UInt8}(uninitialized, tzh_timecnt)
     for i in eachindex(lindexes)
         lindexes[i] = ntoh(read(io, UInt8)) + 1 # Julia uses 1 indexing
     end
-    ttinfo = Array{TransitionTimeInfo}(tzh_typecnt)
+    ttinfo = Array{TransitionTimeInfo}(uninitialized, tzh_typecnt)
     for i in eachindex(ttinfo)
         ttinfo[i] = TransitionTimeInfo(
             ntoh(read(io, Int32)),
@@ -68,25 +68,25 @@ function read_tzfile_internal(io::IO, name::AbstractString, force_version::Char=
             ntoh(read(io, UInt8)) + 1 # Julia uses 1 indexing
         )
     end
-    abbrs = Array{UInt8}(tzh_charcnt)
+    abbrs = Array{UInt8}(uninitialized, tzh_charcnt)
     for i in eachindex(abbrs)
         abbrs[i] = ntoh(read(io, UInt8))
     end
 
     # leap seconds (unused)
-    leapseconds_time = Array{time_type}(tzh_leapcnt)
-    leapseconds_seconds = Array{Int32}(tzh_leapcnt)
+    leapseconds_time = Array{time_type}(uninitialized, tzh_leapcnt)
+    leapseconds_seconds = Array{Int32}(uninitialized, tzh_leapcnt)
     for i in eachindex(leapseconds_time)
         leapseconds_time[i] = ntoh(read(io, time_type))
         leapseconds_seconds[i] = ntoh(read(io, Int32))
     end
 
     # standard/wall and UTC/local indicators (unused)
-    isstd = Array{Int8}(tzh_ttisstdcnt)
+    isstd = Array{Int8}(uninitialized, tzh_ttisstdcnt)
     for i in eachindex(isstd)
         isstd[i] = ntoh(read(io, Int8))
     end
-    isgmt = Array{Int8}(tzh_ttisgmtcnt)
+    isgmt = Array{Int8}(uninitialized, tzh_ttisgmtcnt)
     for i in eachindex(isgmt)
         isgmt[i] = ntoh(read(io, Int8))
     end
