@@ -156,8 +156,8 @@ function abbr_string(format::AbstractString, save::TimeOffset, letter::AbstractS
 end
 
 function ruleparse(from, to, rule_type, month, on, at, save, letter)
-    from_int = Nullable{Int}(from == "min" ? nothing : parse(Int, from))
-    to_int = Nullable{Int}(to == "only" ? from_int : to == "max" ? nothing : parse(Int, to))
+    from_int = convert(Nullable{Int}, from == "min" ? nothing : parse(Int, from))
+    to_int = convert(Nullable{Int}, to == "only" ? from_int : to == "max" ? nothing : parse(Int, to))
     month_int = MONTHS[month]
 
     # Now we need to get the right anonymous function
@@ -221,7 +221,7 @@ function zoneparse(gmtoff, rules, format, until="")
 
     # Parse the date the line rule applies up to
     until_tuple = until == "" ? (nothing, 'w') : parsedate(until)
-    until_dt, until_flag = Nullable{DateTime}(until_tuple[1]), until_tuple[2]
+    until_dt, until_flag = convert(Nullable{DateTime}, until_tuple[1]), until_tuple[2]
 
     if rules == "-" || ismatch(r"\d",rules)
         save = TimeOffset(rules)
