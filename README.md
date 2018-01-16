@@ -1,15 +1,17 @@
 TimeZones.jl
 ============
 
-[![TimeZones](http://pkg.julialang.org/badges/TimeZones_0.4.svg)](http://pkg.julialang.org/?pkg=TimeZones)
-[![TimeZones](http://pkg.julialang.org/badges/TimeZones_0.5.svg)](http://pkg.julialang.org/?pkg=TimeZones)
-[![TimeZones](http://pkg.julialang.org/badges/TimeZones_0.6.svg)](http://pkg.julialang.org/?pkg=TimeZones)
+[![TimeZones v0.4](http://pkg.julialang.org/badges/TimeZones_0.4.svg)](http://pkg.julialang.org/?pkg=TimeZones&ver=0.4)
+[![TimeZones v0.5](http://pkg.julialang.org/badges/TimeZones_0.5.svg)](http://pkg.julialang.org/?pkg=TimeZones&ver=0.5)
+[![TimeZones v0.6](http://pkg.julialang.org/badges/TimeZones_0.6.svg)](http://pkg.julialang.org/?pkg=TimeZones&ver=0.6)
+[![TimeZones v0.7](http://pkg.julialang.org/badges/TimeZones_0.7.svg)](http://pkg.julialang.org/?pkg=TimeZones&ver=0.7)
 <br/>
-[![Linux/OS X Build Status](https://travis-ci.org/JuliaTime/TimeZones.jl.svg?branch=master)](https://travis-ci.org/JuliaTime/TimeZones.jl)
-[![Windows Build Status](https://ci.appveyor.com/api/projects/status/ru96a9u8h83j9ixu/branch/master?svg=true)](https://ci.appveyor.com/project/omus/timezones-jl)
+[![Travis CI](https://travis-ci.org/JuliaTime/TimeZones.jl.svg?branch=master)](https://travis-ci.org/JuliaTime/TimeZones.jl)
+[![AppVeyor](https://ci.appveyor.com/api/projects/status/ru96a9u8h83j9ixu/branch/master?svg=true)](https://ci.appveyor.com/project/omus/timezones-jl)
 [![codecov](https://codecov.io/gh/JuliaTime/TimeZones.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaTime/TimeZones.jl)
-[![](https://img.shields.io/badge/docs-stable-blue.svg)](http://timezonesjl.readthedocs.io/en/stable/)
-[![](https://img.shields.io/badge/docs-latest-blue.svg)](http://timezonesjl.readthedocs.io/en/latest/)
+<br/>
+[![Stable Documentation](https://img.shields.io/badge/docs-stable-blue.svg)](http://timezonesjl.readthedocs.io/en/stable/)
+[![Latest Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](http://timezonesjl.readthedocs.io/en/latest/)
 
 [IANA time zone database](http://www.iana.org/time-zones) access for the [Julia](http://julialang.org/) programming language. TimeZones.jl extends the Date/DateTime support for Julia to include a new time zone aware TimeType: ZonedDateTime.
 
@@ -22,12 +24,6 @@ TimeZones.jl
 * Current system time in any TimeZone
 * Support for reading the [tzfile](http://man7.org/linux/man-pages/man5/tzfile.5.html) format
 * String parsing of ZonedDateTime using [DateFormat](https://docs.julialang.org/en/stable/stdlib/dates/#Base.Dates.DateFormat)
-
-## Documentation
-
-Detailed documentation is available for:
-* [Latest Release](http://timezonesjl.readthedocs.org/en/stable/)
-* [Development](http://timezonesjl.readthedocs.org/en/latest/)
 
 ## Installation
 
