@@ -86,17 +86,17 @@ isflag(flag::Char) = flag in ('w', 'u', 's')
 # or minute-precision (1900-Jan-01 2:00).
 # They can also be given in Local Wall Time, UTC time (u), or Local Standard time (s)
 function parsedate(s::AbstractString)
-    s = replace(s, r"\s+", " ")
+    s = replace(s, r"\s+" => " ")
     num_periods = length(split(s, " "))
     s, flag = num_periods > 3 && isflag(s[end]) ? (s[1:end-1], s[end]) : (s, DEFAULT_FLAG)
     if contains(s,"lastSun")
-        dt = DateTime(replace(s, "lastSun", "1", 1), "yyyy uuu d H:MM:SS")
+        dt = DateTime(replace(s, "lastSun" => "1", count=1), "yyyy uuu d H:MM:SS")
         dt = tonext(lastSun, dt; same=true)
     elseif contains(s,"lastSat")
-        dt = DateTime(replace(s, "lastSat", "1", 1), "yyyy uuu d H:MM:SS")
+        dt = DateTime(replace(s, "lastSat" => "1", count=1), "yyyy uuu d H:MM:SS")
         dt = tonext(lastSat, dt; same=true)
     elseif contains(s,"Sun>=1")
-        dt = DateTime(replace(s,"Sun>=", "", 1),"yyyy uuu d H:MM:SS")
+        dt = DateTime(replace(s,"Sun>=" => "", count=1),"yyyy uuu d H:MM:SS")
         dt = tonext(d -> dayofweek(d) == Sun, dt; same=true)
     else
         format = join(split("yyyy uuu dd HH:MM:SS", " ")[1:num_periods], ' ')
@@ -137,7 +137,7 @@ end
 function abbr_string(format::AbstractString, save::TimeOffset, letter::AbstractString="")
     # Note: using @sprintf would make sense but unfortunately it doesn't accept a
     # format as a variable.
-    abbr = replace(format,"%s",letter,1)
+    abbr = replace(format, "%s" => letter, count=1)
 
     # If the abbreviation contains a slash then the first string is the abbreviation
     # for standard time and the second is the abbreviation for daylight saving time.
@@ -156,8 +156,8 @@ function abbr_string(format::AbstractString, save::TimeOffset, letter::AbstractS
 end
 
 function ruleparse(from, to, rule_type, month, on, at, save, letter)
-    from_int = Nullable{Int}(from == "min" ? nothing : parse(Int, from))
-    to_int = Nullable{Int}(to == "only" ? from_int : to == "max" ? nothing : parse(Int, to))
+    from_int = convert(Nullable{Int}, from == "min" ? nothing : parse(Int, from))
+    to_int = convert(Nullable{Int}, to == "only" ? from_int : to == "max" ? nothing : parse(Int, to))
     month_int = MONTHS[month]
 
     # Now we need to get the right anonymous function
@@ -221,7 +221,7 @@ function zoneparse(gmtoff, rules, format, until="")
 
     # Parse the date the line rule applies up to
     until_tuple = until == "" ? (nothing, 'w') : parsedate(until)
-    until_dt, until_flag = Nullable{DateTime}(until_tuple[1]), until_tuple[2]
+    until_dt, until_flag = convert(Nullable{DateTime}, until_tuple[1]), until_tuple[2]
 
     if rules == "-" || ismatch(r"\d",rules)
         save = TimeOffset(rules)
@@ -505,9 +505,9 @@ function tzparse(tz_source_file::AbstractString)
             # which means the last found kind/name should persist.
             persist = ismatch(r"^\s", line)
 
-            line = strip(replace(chomp(line), r"#.*$", ""))
+            line = strip(replace(chomp(line), r"#.*$" => ""))
             length(line) > 0 || continue
-            line = replace(line, r"\s+", " ")
+            line = replace(line, r"\s+" => " ")
 
             if !persist
                 kind, name, line = split(line, ' '; limit=3)

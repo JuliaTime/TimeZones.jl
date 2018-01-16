@@ -29,8 +29,8 @@ end
 end
 
 @testset "parse components" begin
-    test = ("2017-11-14 11:03:53 +0100", dateformat"yyyy-mm-dd HH:MM:SS zzzzz")
-    expected = [
+    local test = ("2017-11-14 11:03:53 +0100", dateformat"yyyy-mm-dd HH:MM:SS zzzzz")
+    local expected = [
         Dates.Year(2017),
         Dates.Month(11),
         Dates.Day(14),
