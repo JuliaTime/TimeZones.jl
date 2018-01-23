@@ -192,8 +192,8 @@ function ruleparse(from, to, rule_type, month, on, at, save, letter)
     letter = letter == "-" ? "" : letter
 
     # Report unexpected save values that could cause issues during resolve.
-    save_hm < MIN_SAVE && @warn "Discovered save $save_hm less than the expected min $MIN_SAVE"
-    save_hm > MAX_SAVE && @warn "Discovered save $save_hm larger than the expected max $MAX_SAVE"
+    save_hm < MIN_SAVE && @warn "Discovered save \"$save\" less than the expected min $MIN_SAVE"
+    save_hm > MAX_SAVE && @warn "Discovered save \"$save\" larger than the expected max $MAX_SAVE"
 
     # Now we've finally parsed everything we need
     return Rule(

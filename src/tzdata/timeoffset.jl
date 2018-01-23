@@ -70,7 +70,7 @@ const MAX_GMT_OFFSET = TimeOffset("15:13:42")   # America/Metlakatla
 
 # min/max save across all zones/rules and all time.
 # Note: A warning is given when we find an Olson rule that exceeds these values.
-const MIN_SAVE = TimeOffset("00:00")
+const MIN_SAVE = TimeOffset("-01:00") # Eire (rule in 2018a)
 const MAX_SAVE = TimeOffset("02:00")  # France, Germany, Port, Spain
 
 const MIN_OFFSET = MIN_GMT_OFFSET + MIN_SAVE
