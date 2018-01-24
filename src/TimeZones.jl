@@ -2,14 +2,11 @@ __precompile__()
 
 module TimeZones
 
-using Compat.Dates
-import Compat.Dates: TimeZone, AbstractTime
+import Compat: Sys, uninitialized, @info, @warn
 
-import Compat: Sys
-using Compat.Printf
-using Compat.Unicode
+using Compat.Dates, Compat.Printf, Compat.Unicode
+import Compat.Dates: TimeZone, AbstractTime
 using Nullables
-import Compat: uninitialized
 
 export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
     DateTime, TimeError, AmbiguousTimeError, NonExistentTimeError, UnhandledTimeError,
@@ -121,7 +118,7 @@ function build(version::AbstractString="latest", regions=REGIONS; force::Bool=fa
         TimeZones.WindowsTimeZoneIDs.build(force=force)
     end
 
-    info("Successfully built TimeZones")
+    @info "Successfully built TimeZones"
 end
 
 include("utils.jl")

@@ -7,7 +7,7 @@
 @test tz"Africa/Nairobi" === TimeZone("Africa/Nairobi")
 
 if lowercase(get(ENV, "CI", "false")) == "true"
-    info("Testing build process")
+    @info "Testing build process"
 
     # Clean out deps directories for a clean re-build
     rm(TimeZones.COMPILED_DIR, recursive=true)

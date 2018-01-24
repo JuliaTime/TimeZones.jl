@@ -192,8 +192,8 @@ function ruleparse(from, to, rule_type, month, on, at, save, letter)
     letter = letter == "-" ? "" : letter
 
     # Report unexpected save values that could cause issues during resolve.
-    save_hm < MIN_SAVE && warn("Discovered save $save_hm less than the expected min $MIN_SAVE")
-    save_hm > MAX_SAVE && warn("Discovered save $save_hm larger than the expected max $MAX_SAVE")
+    save_hm < MIN_SAVE && @warn "Discovered save $save_hm less than the expected min $MIN_SAVE"
+    save_hm > MAX_SAVE && @warn "Discovered save $save_hm larger than the expected max $MAX_SAVE"
 
     # Now we've finally parsed everything we need
     return Rule(
@@ -213,8 +213,8 @@ function zoneparse(gmtoff, rules, format, until="")
     offset = TimeOffset(gmtoff)
 
     # Report unexpected offsets that could cause issues during resolve.
-    offset < MIN_GMT_OFFSET && warn("Discovered offset $offset less than the expected min $MIN_GMT_OFFSET")
-    offset > MAX_GMT_OFFSET && warn("Discovered offset $offset larger than the expected max $MAX_GMT_OFFSET")
+    offset < MIN_GMT_OFFSET && @warn "Discovered offset $offset less than the expected min $MIN_GMT_OFFSET"
+    offset > MAX_GMT_OFFSET && @warn "Discovered offset $offset larger than the expected max $MAX_GMT_OFFSET"
 
     # "zzz" represents a NULL entry
     format = format == "zzz" ? "" : format
@@ -523,7 +523,7 @@ function tzparse(tz_source_file::AbstractString)
                 dest = line
                 links[dest] = name
             else
-                warn("Unhandled line found with type: $kind")
+                @warn "Unhandled line found with type: $kind"
             end
         end
     end

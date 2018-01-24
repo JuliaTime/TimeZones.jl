@@ -1,6 +1,7 @@
 module TZData
 
 using Compat
+using Compat: @info, @warn
 using Compat.Printf
 using Nullables
 
