@@ -49,7 +49,7 @@ function __init__()
         Year, Month, Day, Hour, Minute, Second, Millisecond, TimeZone,
     )
 
-    global const ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
+    global ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
 end
 
 """
