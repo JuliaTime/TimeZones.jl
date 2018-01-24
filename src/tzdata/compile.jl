@@ -1,4 +1,4 @@
-using Compat.Dates
+using Compat.Dates, Compat.Serialization
 import Compat.Dates: parse_components
 
 import ...TimeZones: TZ_SOURCE_DIR, COMPILED_DIR, TIME_ZONES
