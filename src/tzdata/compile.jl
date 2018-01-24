@@ -148,7 +148,7 @@ function abbr_string(format::AbstractString, save::TimeOffset, letter::AbstractS
 
     # Some time zones (e.g. "Europe/Ulyanovsk") do not have abbreviations for the various
     # rules and instead hardcode the offset as the name.
-    if ismatch(r"[+-]\d{2}", abbr)
+    if contains(abbr, r"[+-]\d{2}")
         abbr = ""
     end
 
@@ -162,22 +162,22 @@ function ruleparse(from, to, rule_type, month, on, at, save, letter)
 
     # Now we need to get the right anonymous function
     # for determining the right day for transitioning
-    if ismatch(r"last\w\w\w", on)
+    if contains(on, r"last\w\w\w")
         # We pre-built these functions above
         # They follow the format: "lastSun", "lastMon".
         on_func = eval(Symbol(on))
-    elseif ismatch(r"\w\w\w[<>]=\d\d?", on)
+    elseif contains(on, r"\w\w\w[<>]=\d\d?")
         # The first day of the week that occurs before or after a given day of month.
         # i.e. Sun>=8 refers to the Sunday after the 8th of the month
         # or in other words, the 2nd Sunday.
         dow::Int = DAYS[match(r"\w\w\w", on).match]
         dom::Int = parse(Int, match(r"\d\d?", on).match)
-        if ismatch(r"<=", on)
+        if contains(on, "<=")
             on_func = (dt -> day(dt) <= dom && dayofweek(dt) == dow)
         else
             on_func = (dt -> day(dt) >= dom && dayofweek(dt) == dow)
         end
-    elseif ismatch(r"\d\d?", on)
+    elseif contains(on, r"\d\d?")
         # Matches just a plain old day of the month
         dom = parse(Int, on)
         on_func = dt -> day(dt) == dom
@@ -223,7 +223,7 @@ function zoneparse(gmtoff, rules, format, until="")
     until_tuple = until == "" ? (nothing, 'w') : parsedate(until)
     until_dt, until_flag = convert(Nullable{DateTime}, until_tuple[1]), until_tuple[2]
 
-    if rules == "-" || ismatch(r"\d",rules)
+    if rules == "-" || contains(rules, r"\d")
         save = TimeOffset(rules)
         rules = ""
     else
@@ -503,7 +503,7 @@ function tzparse(tz_source_file::AbstractString)
         for line in eachline(fp)
             # Lines that start with whitespace can be considered a "continuation line"
             # which means the last found kind/name should persist.
-            persist = ismatch(r"^\s", line)
+            persist = contains(line, r"^\s")
 
             line = strip(replace(chomp(line), r"#.*$" => ""))
             length(line) > 0 || continue

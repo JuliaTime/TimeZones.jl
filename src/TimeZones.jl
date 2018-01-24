@@ -64,7 +64,7 @@ time zone string formats can be found in `FixedTimeZone(::AbstractString)`.
 """
 function TimeZone(str::AbstractString)
     return get!(TIME_ZONES, str) do
-        if ismatch(FIXED_TIME_ZONE_REGEX, str)
+        if contains(str, FIXED_TIME_ZONE_REGEX)
             return FixedTimeZone(str)
         end
 
@@ -100,7 +100,7 @@ Tests whether a string is a valid name for constructing a `TimeZone`.
 function istimezone(str::AbstractString)
     return (
         haskey(TIME_ZONES, str) ||
-        ismatch(FIXED_TIME_ZONE_REGEX, str) ||
+        contains(str, FIXED_TIME_ZONE_REGEX) ||
         isfile(joinpath(COMPILED_DIR, split(str, "/")...))
     )
 end

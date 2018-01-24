@@ -26,6 +26,6 @@ mktempdir() do temp_dir
     # downloading the latest data.
     @test isfile(LATEST_FILE)
     version, retrieved = read_latest(LATEST_FILE)
-    @test ismatch(r"\A(?:\d{2}){1,2}[a-z]?\z", version)
+    @test contains(version, r"\A(?:\d{2}){1,2}[a-z]?\z")
     @test isa(retrieved, DateTime)
 end
