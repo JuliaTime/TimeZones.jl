@@ -1,3 +1,4 @@
+import Compat: findall
 import TimeZones: Transition, TZFILE_MAX
 
 
@@ -15,7 +16,7 @@ function overlap(a::Array{Transition}, b::Array{Transition})
     end_dt = min(last(a).utc_datetime, last(b).utc_datetime)
 
     within = t -> start_dt <= t.utc_datetime <= end_dt
-    return a[find(within, a)], b[find(within, b)]
+    return a[findall(within, a)], b[findall(within, b)]
 end
 
 function issimilar(x::Transition, y::Transition)

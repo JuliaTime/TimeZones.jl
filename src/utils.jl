@@ -48,7 +48,7 @@ function optional(ex::Expr)
         if i in dynamic
             name, value = arg.args
             new_sig[i] = name
-            default[findin(dynamic,i)] = value
+            default[dynamic .== i] = value
         else
             new_sig[i] = arg
         end
