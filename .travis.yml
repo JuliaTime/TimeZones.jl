@@ -14,7 +14,7 @@ script:
   # Avoid setting JULIA_TZ_VERSION if the deps/build.jl file has been modified
   - git fetch origin +:refs/remotes/origin/HEAD; if ! git diff --quiet origin/HEAD HEAD -- deps/build.jl; then unset JULIA_TZ_VERSION; fi
   - julia -e 'Pkg.clone(pwd()); Pkg.build("TimeZones")'
-  - OPTIONS=$(julia -e 'using Mocking; print(DISABLE_PRECOMPILE_STR)')
+  - OPTIONS=$(julia -e 'using Mocking; print(DISABLE_COMPILED_MODULES_STR)')
   - julia $OPTIONS -e 'Pkg.test("TimeZones"; coverage=true)'
 after_success:
   - julia -e 'cd(Pkg.dir("TimeZones")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())';
