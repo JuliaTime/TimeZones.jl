@@ -1,7 +1,10 @@
 import Compat.Dates
+using Mocking
 
 utc = FixedTimeZone("UTC")
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
+apia = resolve("Pacific/Apia", tzdata["australasia"]...)
+midway = resolve("Pacific/Midway", tzdata["australasia"]...)
 
 # Converting a ZonedDateTime into a DateTime
 dt = DateTime(2015, 1, 1, 0)
@@ -21,6 +24,24 @@ dt = now(Dates.UTC)::DateTime
 zdt = now(warsaw)
 @test zdt.timezone == warsaw
 @test Dates.datetime2unix(TimeZones.utc(zdt)) ≈ Dates.datetime2unix(dt)
+
+# today function
+@test abs(today() - today(warsaw)) <= Dates.Day(1)
+@test today(apia) - today(midway) == Dates.Day(1)
+
+# todayat function
+zdt = now(warsaw)
+now_time = Time(TimeZones.localtime(zdt))
+@test todayat(now_time, warsaw) == zdt
+
+if !compiled_modules_enabled
+    patch = @patch today(tz::TimeZone) = Date(1916, 10, 1)
+    apply(patch) do
+        @test_throws AmbiguousTimeError todayat(Time(0), warsaw)
+        @test todayat(Time(0), warsaw, 1) == ZonedDateTime(1916, 10, 1, 0, warsaw, 1)
+        @test todayat(Time(0), warsaw, 2) == ZonedDateTime(1916, 10, 1, 0, warsaw, 2)
+    end
+end
 
 
 # Changing time zones
