@@ -8,6 +8,13 @@ using Compat.Dates, Compat.Printf, Compat.Unicode
 import Compat.Dates: TimeZone, AbstractTime
 using Nullables
 
+# https://github.com/JuliaLang/Compat.jl/pull/473
+if VERSION < v"0.7.0-DEV.3476"
+    using Base.Serializer
+else
+    using Serialization
+end
+
 export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
     DateTime, TimeError, AmbiguousTimeError, NonExistentTimeError, UnhandledTimeError,
     # discovery.jl
