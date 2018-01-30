@@ -1,9 +1,10 @@
 using Mocking
+using Compat: @info, @warn
 
 compiled_modules_enabled = Mocking.compiled_modules_enabled()
 if compiled_modules_enabled
     flag = Mocking.COMPILED_MODULES_FLAG
-    warn("`julia` not started with `--$flag=no`. Disabling tests that require Mocking")
+    @warn "`julia` not started with `--$flag=no`. Disabling tests that require Mocking"
 else
     Mocking.enable()
 end

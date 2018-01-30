@@ -2,14 +2,18 @@ __precompile__()
 
 module TimeZones
 
-using Compat.Dates
-import Compat.Dates: TimeZone, AbstractTime
+import Compat: Sys, uninitialized, @info, @warn
 
-import Compat: Sys
-using Compat.Printf
-using Compat.Unicode
+using Compat.Dates, Compat.Printf, Compat.Unicode
+import Compat.Dates: TimeZone, AbstractTime
 using Nullables
-import Compat: uninitialized
+
+# https://github.com/JuliaLang/Compat.jl/pull/473
+if VERSION < v"0.7.0-DEV.3476"
+    using Base.Serializer
+else
+    using Serialization
+end
 
 export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
     DateTime, TimeError, AmbiguousTimeError, NonExistentTimeError, UnhandledTimeError,
@@ -49,7 +53,7 @@ function __init__()
         Year, Month, Day, Hour, Minute, Second, Millisecond, TimeZone,
     )
 
-    global const ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
+    global ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
 end
 
 """
@@ -64,7 +68,7 @@ time zone string formats can be found in `FixedTimeZone(::AbstractString)`.
 """
 function TimeZone(str::AbstractString)
     return get!(TIME_ZONES, str) do
-        if ismatch(FIXED_TIME_ZONE_REGEX, str)
+        if contains(str, FIXED_TIME_ZONE_REGEX)
             return FixedTimeZone(str)
         end
 
@@ -100,7 +104,7 @@ Tests whether a string is a valid name for constructing a `TimeZone`.
 function istimezone(str::AbstractString)
     return (
         haskey(TIME_ZONES, str) ||
-        ismatch(FIXED_TIME_ZONE_REGEX, str) ||
+        contains(str, FIXED_TIME_ZONE_REGEX) ||
         isfile(joinpath(COMPILED_DIR, split(str, "/")...))
     )
 end
@@ -121,7 +125,7 @@ function build(version::AbstractString="latest", regions=REGIONS; force::Bool=fa
         TimeZones.WindowsTimeZoneIDs.build(force=force)
     end
 
-    info("Successfully built TimeZones")
+    @info "Successfully built TimeZones"
 end
 
 include("utils.jl")

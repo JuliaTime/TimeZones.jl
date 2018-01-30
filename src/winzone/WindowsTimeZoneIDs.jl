@@ -1,5 +1,7 @@
 module WindowsTimeZoneIDs
 
+using Compat: @info
+
 import ...TimeZones: DEPS_DIR
 using LightXML
 
@@ -50,12 +52,12 @@ function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
         if isfile(fallback_xml_file) && !force
             cp(fallback_xml_file, xml_file)
         else
-            info("Downloading latest Windows to POSIX timezone ID XML")
+            @info "Downloading latest Windows to POSIX timezone ID XML"
             download(WINDOWS_ZONE_URL, xml_file)
         end
     end
 
-    info("Compiling Windows time zone name translation")
+    @info "Compiling Windows time zone name translation"
     translation = compile(xml_file)
 
     # Copy contents into translation constant

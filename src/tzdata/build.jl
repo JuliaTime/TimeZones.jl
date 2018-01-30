@@ -25,7 +25,7 @@ function build(
         version = get(latest_version(), "latest")
 
         if version != "latest"
-            info("Latest tzdata is $version")
+            @info "Latest tzdata is $version"
         end
     end
 
@@ -33,25 +33,25 @@ function build(
 
     # Avoid downloading a tzdata archive if we already have a local copy
     if version == "latest" || !isfile(archive)
-        info("Downloading $version tzdata")
+        @info "Downloading $version tzdata"
         archive = tzdata_download(version, archive_dir)
 
         if version == "latest"
             m = match(TZDATA_VERSION_REGEX, basename(archive))
             if m !== nothing
                 version = m.match
-                info("Latest tzdata is $version")
+                @info "Latest tzdata is $version"
             end
         end
     end
 
     if !isempty(tz_source_dir)
-        info("Extracting tzdata archive")
+        @info "Extracting tzdata archive"
         extract(archive, tz_source_dir, regions, verbose=verbose)
     end
 
     if !isempty(compiled_dir)
-        info("Converting tz source files into TimeZone data")
+        @info "Converting tz source files into TimeZone data"
         compile(tz_source_dir, compiled_dir)
     end
 
