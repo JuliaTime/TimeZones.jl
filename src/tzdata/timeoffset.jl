@@ -1,6 +1,4 @@
-import Base: convert, promote_rule, string, print, show
-import Dates: Period, TimePeriod, Week, Day, Hour, Minute, Second, Millisecond, value, toms,
-    hour, minute, second
+using Dates: TimePeriod, Week, Day, Hour, Minute, Second, Millisecond, value
 
 # Convenience type for working with HH:MM:SS.
 struct TimeOffset <: TimePeriod
@@ -35,12 +33,12 @@ function TimeOffset(s::AbstractString)
 end
 
 # TimePeriod methods
-value(t::TimeOffset) = t.seconds
-toms(t::TimeOffset) = value(t) * 1000
+Dates.value(t::TimeOffset) = t.seconds
+Dates.toms(t::TimeOffset) = value(t) * 1000
 
-hour(t::TimeOffset) = div(value(t), 3600)
-minute(t::TimeOffset) = rem(div(value(t), 60), 60)
-second(t::TimeOffset) = rem(value(t), 60)
+Dates.hour(t::TimeOffset) = div(value(t), 3600)
+Dates.minute(t::TimeOffset) = rem(div(value(t), 60), 60)
+Dates.second(t::TimeOffset) = rem(value(t), 60)
 
 function hourminutesecond(t::TimeOffset)
     h, r = divrem(value(t), 3600)
@@ -48,19 +46,19 @@ function hourminutesecond(t::TimeOffset)
     return h, m, s
 end
 
-convert(::Type{Second}, t::TimeOffset) = Second(value(t))
-convert(::Type{Millisecond}, t::TimeOffset) = Millisecond(value(t) * 1000)
-promote_rule(::Type{<:Union{Week,Day,Hour,Minute,Second}}, ::Type{TimeOffset}) = Second
-promote_rule(::Type{Millisecond}, ::Type{TimeOffset}) = Millisecond
+Base.convert(::Type{Second}, t::TimeOffset) = Second(value(t))
+Base.convert(::Type{Millisecond}, t::TimeOffset) = Millisecond(value(t) * 1000)
+Base.promote_rule(::Type{<:Union{Week,Day,Hour,Minute,Second}}, ::Type{TimeOffset}) = Second
+Base.promote_rule(::Type{Millisecond}, ::Type{TimeOffset}) = Millisecond
 
 # https://en.wikipedia.org/wiki/ISO_8601#Times
-function string(t::TimeOffset)
+function Base.string(t::TimeOffset)
     neg = value(t) < 0 ? "-" : ""
     h, m, s = map(abs, hourminutesecond(t))
     @sprintf("%s%02d:%02d:%02d", neg, h, m, s)
 end
-print(io::IO, t::TimeOffset) = print(io, string(t))
-show(io::IO, t::TimeOffset) = print(io, t)
+Base.print(io::IO, t::TimeOffset) = print(io, string(t))
+Base.show(io::IO, t::TimeOffset) = print(io, t)
 
 
 # min/max offsets across all zones and all time.

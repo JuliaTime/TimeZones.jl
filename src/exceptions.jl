@@ -1,5 +1,3 @@
-import Base: showerror
-
 abstract type TimeError <: Exception end
 
 """
@@ -13,7 +11,7 @@ struct AmbiguousTimeError <: TimeError
     timezone::TimeZone
 end
 
-function showerror(io::IO, e::AmbiguousTimeError)
+function Base.showerror(io::IO, e::AmbiguousTimeError)
     print(io, "AmbiguousTimeError: ")
     print(io, "Local DateTime $(e.local_dt) is ambiguous within $(string(e.timezone))")
 end
@@ -30,7 +28,7 @@ struct NonExistentTimeError <: TimeError
     timezone::TimeZone
 end
 
-function showerror(io::IO, e::NonExistentTimeError)
+function Base.showerror(io::IO, e::NonExistentTimeError)
     print(io, "NonExistentTimeError: ")
     print(io, "Local DateTime $(e.local_dt) does not exist within $(string(e.timezone))")
 end
@@ -44,7 +42,7 @@ struct UnhandledTimeError <: TimeError
     tz::VariableTimeZone
 end
 
-function showerror(io::IO, e::UnhandledTimeError)
+function Base.showerror(io::IO, e::UnhandledTimeError)
     print(io, "UnhandledTimeError: ")
     print(io, "TimeZone $(string(e.tz)) does not handle dates on or after $(get(e.tz.cutoff)) UTC")
 end

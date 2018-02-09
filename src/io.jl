@@ -1,23 +1,22 @@
-import Base: print, show, showcompact
 using Dates: value, DateFormat
 
-print(io::IO, tz::TimeZone) = print(io, tz.name)
-function print(io::IO, tz::FixedTimeZone)
+Base.print(io::IO, tz::TimeZone) = print(io, tz.name)
+function Base.print(io::IO, tz::FixedTimeZone)
     name = string(tz.name)
     isempty(name) ? print(io, "UTC", tz.offset) : print(io, name)
 end
-print(io::IO, zdt::ZonedDateTime) = print(io, localtime(zdt), zdt.zone.offset)
+Base.print(io::IO, zdt::ZonedDateTime) = print(io, localtime(zdt), zdt.zone.offset)
 
-showcompact(io::IO, tz::TimeZone) = print(io, string(tz))
+Base.showcompact(io::IO, tz::TimeZone) = print(io, string(tz))
 
-function show(io::IO, t::Transition)
+function Base.show(io::IO, t::Transition)
     name_str = string(t.zone.name)
     print(io, t.utc_datetime, " ")
     show(io, t.zone.offset)
     !isempty(name_str) && print(io, " (", name_str, ")")
 end
 
-function show(io::IO, tz::FixedTimeZone)
+function Base.show(io::IO, tz::FixedTimeZone)
     offset_str = "UTC" * offset_string(tz.offset, true)  # Use ISO 8601 for comparision
     name_str = string(tz.name)
     if isempty(name_str)
@@ -29,7 +28,7 @@ function show(io::IO, tz::FixedTimeZone)
     end
 end
 
-function show(io::IO,tz::VariableTimeZone)
+function Base.show(io::IO,tz::VariableTimeZone)
     trans = tz.transitions
 
     # Retrieve the "modern" time zone transitions. We'll treat the latest transitions as
@@ -54,4 +53,4 @@ function show(io::IO,tz::VariableTimeZone)
     )
 end
 
-show(io::IO,dt::ZonedDateTime) = print(io, string(dt))
+Base.show(io::IO,dt::ZonedDateTime) = print(io, string(dt))

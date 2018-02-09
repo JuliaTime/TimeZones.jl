@@ -1,4 +1,4 @@
-import Base: +, -, .+, .-, broadcast
+import Base: +, -
 
 # ZonedDateTime arithmetic
 (+)(x::ZonedDateTime) = x
@@ -17,7 +17,7 @@ function (-)(zdt::ZonedDateTime, p::TimePeriod)
     return ZonedDateTime(zdt.utc_datetime - p, timezone(zdt); from_utc=true)
 end
 
-function broadcast(::typeof(+), r::StepRange{ZonedDateTime}, p::DatePeriod)
+function Base.broadcast(::typeof(+), r::StepRange{ZonedDateTime}, p::DatePeriod)
     start, step, stop = first(r), Base.step(r), last(r)
 
     # Since the localtime + period can result in an invalid local datetime when working with
@@ -41,4 +41,6 @@ function broadcast(::typeof(+), r::StepRange{ZonedDateTime}, p::DatePeriod)
     return StepRange(start, step, stop)
 end
 
-broadcast(::typeof(-), r::StepRange{ZonedDateTime}, p::DatePeriod) = broadcast(+, r, -p)
+function Base.broadcast(::typeof(-), r::StepRange{ZonedDateTime}, p::DatePeriod)
+    broadcast(+, r, -p)
+end

@@ -1,5 +1,4 @@
 using Dates: DateFormat, DatePart, min_width, max_width
-import Dates: tryparsenext, format, default_format
 
 # Handle Nullable deprecation on Julia 0.7
 if VERSION < v"0.7.0-DEV.3017"
@@ -70,19 +69,19 @@ function tryparsenext_tz(str, i, len, min_width::Int=1, max_width::Int=0)
     end
 end
 
-function tryparsenext(d::DatePart{'z'}, str, i, len)
+function Dates.tryparsenext(d::DatePart{'z'}, str, i, len)
     tryparsenext_fixedtz(str, i, len, min_width(d), max_width(d))
 end
 
-function tryparsenext(d::DatePart{'Z'}, str, i, len)
+function Dates.tryparsenext(d::DatePart{'Z'}, str, i, len)
     tryparsenext_tz(str, i, len, min_width(d), max_width(d))
 end
 
-function format(io::IO, d::DatePart{'z'}, zdt, locale)
+function Dates.format(io::IO, d::DatePart{'z'}, zdt, locale)
     write(io, string(zdt.zone.offset))
 end
 
-function format(io::IO, d::DatePart{'Z'}, zdt, locale)
+function Dates.format(io::IO, d::DatePart{'Z'}, zdt, locale)
     write(io, string(zdt.zone))  # In most cases will be an abbreviation.
 end
 
@@ -92,7 +91,7 @@ function ZonedDateTime(str::AbstractString, df::DateFormat=ISOZonedDateTimeForma
     parse(ZonedDateTime, str, df)
 end
 function ZonedDateTime(str::AbstractString, format::AbstractString; locale::AbstractString="english")
-    ZonedDateTime(str, DateFormat(format,locale))
+    ZonedDateTime(str, DateFormat(format, locale))
 end
 
-default_format(::Type{ZonedDateTime}) = ISOZonedDateTimeFormat
+Dates.default_format(::Type{ZonedDateTime}) = ISOZonedDateTimeFormat

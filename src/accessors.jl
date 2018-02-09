@@ -1,4 +1,4 @@
-import Dates: Hour, Minute, Second, Millisecond, days, hour, minute, second, millisecond
+using Dates: Hour, Minute, Second, Millisecond, days, hour, minute, second, millisecond
 
 """
     localtime(::ZonedDateTime) -> DateTime
@@ -23,12 +23,12 @@ Returns the `TimeZone` used by the `ZonedDateTime`.
 """
 timezone(zdt::ZonedDateTime) = zdt.timezone
 
-days(zdt::ZonedDateTime) = days(localtime(zdt))
+Dates.days(zdt::ZonedDateTime) = days(localtime(zdt))
 
 for period in (:Hour, :Minute, :Second, :Millisecond)
     accessor = Symbol(lowercase(string(period)))
     @eval begin
-        $accessor(zdt::ZonedDateTime) = $accessor(localtime(zdt))
-        $period(zdt::ZonedDateTime) = $period($accessor(zdt))
+        Dates.$accessor(zdt::ZonedDateTime) = $accessor(localtime(zdt))
+        Dates.$period(zdt::ZonedDateTime) = $period($accessor(zdt))
     end
 end

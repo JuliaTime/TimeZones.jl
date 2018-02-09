@@ -1,4 +1,5 @@
-import Base: @deprecate, @deprecate_binding, colon
+using Base: @deprecate, @deprecate_binding
+import Base: colon
 
 # BEGIN TimeZones 0.6 deprecations
 
