@@ -1,5 +1,5 @@
-import Compat.Dates: DateFormat, DatePart, tryparsenext, format, min_width, max_width,
-    default_format
+using Dates: DateFormat, DatePart, min_width, max_width
+import Dates: tryparsenext, format, default_format
 
 # Handle Nullable deprecation on Julia 0.7
 if VERSION < v"0.7.0-DEV.3017"

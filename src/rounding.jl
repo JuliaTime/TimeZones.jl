@@ -1,4 +1,4 @@
-import Compat.Dates: Period, DatePeriod, TimePeriod
+using Dates: Period, DatePeriod, TimePeriod
 
 function Base.floor(zdt::ZonedDateTime, p::DatePeriod)
     return ZonedDateTime(floor(localtime(zdt), p), timezone(zdt))

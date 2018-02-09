@@ -1,6 +1,5 @@
 # Determine the local system's time zone
 # Based upon Python's tzlocal https://pypi.python.org/pypi/tzlocal
-import Compat: @static, Sys, read
 using Mocking
 
 if Sys.iswindows()

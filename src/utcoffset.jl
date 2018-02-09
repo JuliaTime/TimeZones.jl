@@ -1,5 +1,6 @@
 import Base: +, -, isequal, isless, print, show
-import Compat.Dates: AbstractTime, Second, value
+using Dates: AbstractTime, Second
+import Dates: value
 
 # Note: The IANA time zone database rounds offset precision to the nearest second
 # See "America/New_York" notes in tzdata file "northamerica" for an example.

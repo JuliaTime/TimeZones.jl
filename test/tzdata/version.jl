@@ -1,7 +1,7 @@
-import TimeZones: ARCHIVE_DIR
-import TimeZones.TZData: TZDATA_VERSION_REGEX, TZDATA_NEWS_REGEX
-import TimeZones.TZData: read_news, extract, tzdata_version_dir, tzdata_version_archive
-import TimeZones.TZData: active_version, active_archive
+using TimeZones: ARCHIVE_DIR
+using TimeZones.TZData: TZDATA_VERSION_REGEX, TZDATA_NEWS_REGEX
+using TimeZones.TZData: read_news, extract, tzdata_version_dir, tzdata_version_archive
+using TimeZones.TZData: active_version, active_archive
 
 for year = ("12", "1234"), letter = ("", "z")
     version = year * letter

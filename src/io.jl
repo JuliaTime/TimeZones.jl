@@ -1,5 +1,5 @@
 import Base: print, show, showcompact
-import Compat.Dates: value, DateFormat
+using Dates: value, DateFormat
 
 print(io::IO, tz::TimeZone) = print(io, tz.name)
 function print(io::IO, tz::FixedTimeZone)

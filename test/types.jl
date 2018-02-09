@@ -1,6 +1,5 @@
-import TimeZones: Transition
-import Compat.Dates: Hour, Second, UTM
-
+using TimeZones: Transition
+using Dates: Hour, Second, UTM
 
 # Constructor FixedTimeZone from a string.
 @test FixedTimeZone("0123") == FixedTimeZone("UTC+01:23", 4980)

@@ -2,10 +2,11 @@ __precompile__()
 
 module TimeZones
 
-import Compat: Sys, uninitialized, @info, @warn
+import Compat: Dates, Sys
+using Compat: @info, @warn, @static, read, uninitialized, unsafe_string, xor
 
 using Compat.Dates, Compat.Printf, Compat.Serialization, Compat.Unicode
-import Compat.Dates: TimeZone, AbstractTime
+import Dates: TimeZone, AbstractTime
 using Nullables
 
 export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDateTime,

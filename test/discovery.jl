@@ -1,4 +1,4 @@
-import TimeZones: timezone_names
+using TimeZones: timezone_names
 
 names = timezone_names()
 @test length(names) >= 436

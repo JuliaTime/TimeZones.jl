@@ -1,5 +1,4 @@
 import Base: +, -, .+, .-, broadcast
-import Compat: @static
 
 # ZonedDateTime arithmetic
 (+)(x::ZonedDateTime) = x

@@ -1,7 +1,7 @@
 module TZData
 
-using Compat
-using Compat: @info, @warn
+import Compat: Dates, Serialization, Sys
+using Compat: @info, @warn, isassigned, read
 using Compat.Printf
 using Nullables
 

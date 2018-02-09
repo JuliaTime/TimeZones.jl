@@ -14,8 +14,9 @@ using Test
 using TimeZones
 import TimeZones: PKG_DIR, ARCHIVE_DIR
 import TimeZones.TZData: ZoneDict, RuleDict, tzparse, resolve, build
-import Compat: Sys
+import Compat: Dates, Sys
 using Compat.Unicode
+using Compat: findall, read
 using Nullables
 
 const TZDATA_VERSION = "2016j"

@@ -1,5 +1,4 @@
-import Compat.Dates: Hour, Minute, Second, Millisecond,
-    days, hour, minute, second, millisecond
+import Dates: Hour, Minute, Second, Millisecond, days, hour, minute, second, millisecond
 
 """
     localtime(::ZonedDateTime) -> DateTime

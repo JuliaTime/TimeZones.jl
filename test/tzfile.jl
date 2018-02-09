@@ -1,5 +1,4 @@
-import Compat: findall
-import TimeZones: Transition, TZFILE_MAX
+using TimeZones: Transition, TZFILE_MAX
 
 
 abbrs = b"LMT\0WSST\0SDT\0WSDT\0"  # Pacific/Apia

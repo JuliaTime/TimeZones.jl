@@ -1,5 +1,4 @@
-import Compat.Dates
-import Compat.Dates: Second
+using Dates: Second
 
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 fixed = FixedTimeZone("Fixed", -7200, 3600)

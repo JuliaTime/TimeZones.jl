@@ -1,4 +1,4 @@
-import TimeZones: UTCOffset, value, isdst
+using TimeZones: UTCOffset, value, isdst
 
 @test value(UTCOffset(0, 0)) == 0
 @test value(UTCOffset(3600, 0)) == 3600

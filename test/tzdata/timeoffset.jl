@@ -1,4 +1,4 @@
-import TimeZones.TZData: TimeOffset, value, hour, minute, second, hourminutesecond
+using TimeZones.TZData: TimeOffset, value, hour, minute, second, hourminutesecond
 
 # Time seconds constructor
 t = TimeOffset(5025)

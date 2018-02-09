@@ -1,9 +1,6 @@
-
-# import Compat.Dates: UTInstant, DateTime, TimeZone, Millisecond
-using Compat.Dates
-import Compat.Dates: value, argerror, validargs
+using Dates
+import Dates: value, argerror, validargs
 import Base: promote_rule, ==, hash, isequal, isless, typemin, typemax
-import Compat: xor
 
 const FIXED_TIME_ZONE_REGEX = r"""
 ^(?|

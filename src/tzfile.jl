@@ -2,8 +2,6 @@
 # - http://man7.org/linux/man-pages/man5/tzfile.5.html
 # - ftp://ftp.iana.org/tz/code/tzfile.5.txt
 
-import Compat: read, unsafe_string
-
 const TZFILE_MAX = unix2datetime(typemax(Int32))
 
 struct TransitionTimeInfo

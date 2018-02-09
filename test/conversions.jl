@@ -1,4 +1,4 @@
-import Compat.Dates
+using Compat.Dates
 using Mocking
 
 utc = FixedTimeZone("UTC")

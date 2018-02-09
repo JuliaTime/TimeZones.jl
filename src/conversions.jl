@@ -1,5 +1,4 @@
-import Compat.Dates: unix2datetime, datetime2unix, julian2datetime, datetime2julian,
-    now, today
+import Dates: unix2datetime, datetime2unix, julian2datetime, datetime2julian, now, today
 using Mocking
 
 # UTC is an abstract type defined in Dates, for some reason

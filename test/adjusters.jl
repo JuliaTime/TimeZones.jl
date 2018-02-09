@@ -1,4 +1,4 @@
-using Compat.Dates
+using Dates: Year, Month, Day, Hour, Minute, Second, Millisecond
 
 # Basic truncation
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)

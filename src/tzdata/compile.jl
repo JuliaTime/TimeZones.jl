@@ -1,9 +1,9 @@
-using Compat.Dates, Compat.Serialization
-import Compat.Dates: parse_components
+using Dates: parse_components
+using Serialization: serialize
 
-import ...TimeZones: TZ_SOURCE_DIR, COMPILED_DIR, TIME_ZONES
-import ...TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
-import ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET,
+using ...TimeZones: TZ_SOURCE_DIR, COMPILED_DIR, TIME_ZONES
+using ...TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
+using ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET,
     MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET
 
 # Zone type maps to an Olson Timezone database entity

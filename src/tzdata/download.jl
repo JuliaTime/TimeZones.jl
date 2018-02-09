@@ -1,6 +1,5 @@
-import TimeZones: DEPS_DIR
-import Compat: isassigned
-using Compat.Dates
+using Dates
+using TimeZones: DEPS_DIR
 
 const LATEST_FILE = joinpath(DEPS_DIR, "latest")
 const LATEST_FORMAT = Dates.DateFormat("yyyy-mm-ddTHH:MM:SS")
