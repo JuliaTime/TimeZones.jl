@@ -288,7 +288,11 @@ function hash(zdt::ZonedDateTime, h::UInt)
 end
 
 function isequal(a::ZonedDateTime, b::ZonedDateTime)
-    isequal(a.utc_datetime, b.utc_datetime) && isequal(a.timezone, b.timezone)
+    return (
+        isequal(a.utc_datetime, b.utc_datetime) &&
+        isequal(a.timezone, b.timezone) &&
+        isequal(a.zone, b.zone)
+    )
 end
 
 function ==(a::VariableTimeZone, b::VariableTimeZone)

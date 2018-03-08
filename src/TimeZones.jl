@@ -12,6 +12,7 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
     DateTime, TimeError, AmbiguousTimeError, NonExistentTimeError, UnhandledTimeError,
     # discovery.jl
     timezone_names, all_timezones, timezones_from_abbr, timezone_abbrs,
+    next_transition_instant, show_next_transition,
     # accessors.jl
     hour, minute, second, millisecond,
     # adjusters.jl
