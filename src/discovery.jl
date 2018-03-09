@@ -149,6 +149,7 @@ julia> instant - Millisecond(0)  # Instant after the change
 julia> ZonedDateTime(2018, 3, 25, 1, tz"Europe/London")  # Cannot normally construct the `instant`
 ERROR: NonExistentTimeError: Local DateTime 2018-03-25T01:00:00 does not exist within Europe/London
 ...
+```
 """
 next_transition_instant
 
@@ -181,14 +182,17 @@ due to daylight-savings time). Information displayed includes:
 
 ```julia
 julia> show_next_transition(ZonedDateTime(2018, 8, 1, tz"Europe/London"))
-2018-10-28 02:00 → 01:00 (Backward)
-Before: 2018-10-28T01:59:59.999+01:00 (BST)
-After:  2018-10-28T01:00:00.000+00:00 (GMT)
+Transition Date:   2018-10-28
+Local Time Change: 02:00 → 01:00 (Backward)
+Transition From:   2018-10-28T01:59:59.999+01:00 (BST)
+Transition To:     2018-10-28T01:00:00.000+00:00 (GMT)
 
 julia> show_next_transition(ZonedDateTime(2011, 12, 1, tz"Pacific/Apia"))
-2011-12-30 00:00 → 00:00 (Forward)
-Before: 2011-12-29T23:59:59.999-10:00 (UTC-10:00)
-After:  2011-12-31T00:00:00.000+14:00 (UTC+14:00)
+Transition Date:   2011-12-30
+Local Time Change: 00:00 → 00:00 (Forward)
+Transition From:   2011-12-29T23:59:59.999-10:00 (UTC-10:00)
+Transition To:     2011-12-31T00:00:00.000+14:00 (UTC+14:00)
+```
 """
 show_next_transition
 
