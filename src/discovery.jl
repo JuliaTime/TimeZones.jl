@@ -201,14 +201,18 @@ function show_next_transition(io::IO, zdt::ZonedDateTime)
     a, b = instant - Millisecond(1), instant + Millisecond(0)
     direction = value(b.zone.offset) - value(a.zone.offset) < 0 ? "Backward" : "Forward"
 
-    zdt_format(zdt) = string(
-        Dates.format(zdt, dateformat"yyyy-mm-ddTHH:MM:SS.sss"),  # Note: zzz won't work here
-        zdt.zone.offset,
-        " ($(zdt.zone))",
-    )
-    time_format(zdt) = Dates.format(
-        zdt, second(zdt) == 0 ? dateformat"HH:MM" : dateformat"HH:MM:SS"
-    )
+    function zdt_format(zdt)
+        name_suffix = string(zdt.zone.name)
+        !isempty(name_suffix) && (name_suffix = string(" (", name_suffix, ")"))
+        string(
+            Dates.format(zdt, dateformat"yyyy-mm-ddTHH:MM:SS.sss"),
+            zdt.zone.offset,  # Note: "zzz" will not work in the format above as is
+            name_suffix,
+        )
+    end
+    function time_format(zdt)
+        Dates.format(zdt, second(zdt) == 0 ? dateformat"HH:MM" : dateformat"HH:MM:SS")
+    end
 
     println(io, "Transition Date:   ", Dates.format(instant, dateformat"yyyy-mm-dd"))
     println(io, "Local Time Change: ", time_format(instant), " → ", time_format(b), " (", direction, ")")
