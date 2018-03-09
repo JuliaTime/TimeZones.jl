@@ -26,6 +26,7 @@ value(offset::UTCOffset) = value(offset.std + offset.dst)
 
 (+)(dt::DateTime, offset::UTCOffset) = dt + (offset.std + offset.dst)
 (-)(dt::DateTime, offset::UTCOffset) = dt - (offset.std + offset.dst)
+(-)(a::UTCOffset, b::UTCOffset) = UTCOffset(a.std - b.std, a.dst - b.dst)
 
 # Determines if the given `UTCOffset` is an offset for daylight saving time.
 isdst(offset::UTCOffset) = offset.dst != Second(0)

@@ -31,6 +31,7 @@ abbrs = timezone_abbrs()
 
 wpg = resolve("America/Winnipeg", tzdata["northamerica"]...)
 apia = resolve("Pacific/Apia", tzdata["australasia"]...)
+paris = resolve("Europe/Paris", tzdata["europe"]...)
 
 @testset "next_transition_instant" begin
     @testset "non-existent" begin
@@ -75,6 +76,7 @@ end
             """
             Transition Date:   2018-03-11
             Local Time Change: 02:00 → 03:00 (Forward)
+            Offset Change:     UTC-6/+0 → UTC-6/+1
             Transition From:   2018-03-11T01:59:59.999-06:00 (CST)
             Transition To:     2018-03-11T03:00:00.000-05:00 (CDT)
             """
@@ -85,6 +87,7 @@ end
             """
             Transition Date:   2018-11-04
             Local Time Change: 02:00 → 01:00 (Backward)
+            Offset Change:     UTC-6/+1 → UTC-6/+0
             Transition From:   2018-11-04T01:59:59.999-05:00 (CDT)
             Transition To:     2018-11-04T01:00:00.000-06:00 (CST)
             """
@@ -95,8 +98,20 @@ end
             """
             Transition Date:   2011-12-30
             Local Time Change: 00:00 → 00:00 (Forward)
+            Offset Change:     UTC-11/+1 → UTC+13/+1
             Transition From:   2011-12-29T23:59:59.999-10:00 (SDT)
             Transition To:     2011-12-31T00:00:00.000+14:00 (WSDT)
+            """
+    end
+
+    @testset "dst offset change" begin
+        @test sprint(show_next_transition, ZonedDateTime(1945, 4, 1, paris)) ==
+            """
+            Transition Date:   1945-04-02
+            Local Time Change: 02:00 → 03:00 (Forward)
+            Offset Change:     UTC+0/+1 → UTC+0/+2
+            Transition From:   1945-04-02T01:59:59.999+01:00 (WEST)
+            Transition To:     1945-04-02T03:00:00.000+02:00 (WEMT)
             """
     end
 
