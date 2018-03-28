@@ -107,252 +107,258 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     rule_endless,
 ]
 
+@testset "resolve" begin
+    @testset "Europe/Warsaw" begin
+        tz = resolve("Europe/Warsaw", tzdata["europe"]...)
 
-### resolve ###
+        # Europe/Warsaw time zone has a combination of factors that requires computing
+        # the abbreviation to be done in a specific way.
+        @test tz.transitions[1].zone.name == :LMT
+        @test tz.transitions[2].zone.name == :WMT
+        @test tz.transitions[3].zone.name == :CET   # Standard time
+        @test tz.transitions[4].zone.name == :CEST  # Daylight saving time
+        @test issorted(tz.transitions)
 
-warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
+        zone = Dict{AbstractString,FixedTimeZone}()
+        zone["LMT"] = FixedTimeZone("LMT", 5040, 0)
+        zone["WMT"] = FixedTimeZone("WMT", 5040, 0)
+        zone["CET"] = FixedTimeZone("CET", 3600, 0)
+        zone["CEST"] = FixedTimeZone("CEST", 3600, 3600)
+        zone["EET"] = FixedTimeZone("EET", 7200, 0)
+        zone["EEST"] = FixedTimeZone("EEST", 7200, 3600)
 
-# Europe/Warsaw time zone has a combination of factors that requires computing
-# the abbreviation to be done in a specific way.
-@test warsaw.transitions[1].zone.name == :LMT
-@test warsaw.transitions[2].zone.name == :WMT
-@test warsaw.transitions[3].zone.name == :CET   # Standard time
-@test warsaw.transitions[4].zone.name == :CEST  # Daylight saving time
-@test issorted(warsaw.transitions)
+        @test tz.transitions[1] == Transition(typemin(DateTime), zone["LMT"])  # Ideally -Inf
+        @test tz.transitions[2] == Transition(DateTime(1879,12,31,22,36), zone["WMT"])
+        @test tz.transitions[3] == Transition(DateTime(1915,8,4,22,36), zone["CET"])
+        @test tz.transitions[4] == Transition(DateTime(1916,4,30,22,0), zone["CEST"])
+        @test tz.transitions[5] == Transition(DateTime(1916,9,30,23,0), zone["CET"])
+        @test tz.transitions[6] == Transition(DateTime(1917,4,16,1,0), zone["CEST"])
+        @test tz.transitions[7] == Transition(DateTime(1917,9,17,1,0), zone["CET"])
+        @test tz.transitions[8] == Transition(DateTime(1918,4,15,1,0), zone["CEST"])
+        @test tz.transitions[9] == Transition(DateTime(1918,9,16,1,0), zone["EET"]) #
+        @test tz.transitions[10] == Transition(DateTime(1919,4,15,0,0), zone["EEST"])
+        @test tz.transitions[11] == Transition(DateTime(1919,9,16,0,0), zone["EET"])
+        @test tz.transitions[12] == Transition(DateTime(1922,5,31,22,0), zone["CET"]) #
+        @test tz.transitions[13] == Transition(DateTime(1940,6,23,1,0), zone["CEST"])
 
-zone = Dict{AbstractString,FixedTimeZone}()
-zone["LMT"] = FixedTimeZone("LMT", 5040, 0)
-zone["WMT"] = FixedTimeZone("WMT", 5040, 0)
-zone["CET"] = FixedTimeZone("CET", 3600, 0)
-zone["CEST"] = FixedTimeZone("CEST", 3600, 3600)
-zone["EET"] = FixedTimeZone("EET", 7200, 0)
-zone["EEST"] = FixedTimeZone("EEST", 7200, 3600)
+        @test tz.transitions[14] == Transition(DateTime(1942,11,2,1,0), zone["CET"])
+        @test tz.transitions[15] == Transition(DateTime(1943,3,29,1,0), zone["CEST"])
+        @test tz.transitions[16] == Transition(DateTime(1943,10,4,1,0), zone["CET"])
+        @test tz.transitions[17] == Transition(DateTime(1944,4,3,1,0), zone["CEST"])
+        @test tz.transitions[18] == Transition(DateTime(1944,10,4,0,0), zone["CET"])
+    end
 
-@test warsaw.transitions[1] == Transition(typemin(DateTime), zone["LMT"])  # Ideally -Inf
-@test warsaw.transitions[2] == Transition(DateTime(1879,12,31,22,36), zone["WMT"])
-@test warsaw.transitions[3] == Transition(DateTime(1915,8,4,22,36), zone["CET"])
-@test warsaw.transitions[4] == Transition(DateTime(1916,4,30,22,0), zone["CEST"])
-@test warsaw.transitions[5] == Transition(DateTime(1916,9,30,23,0), zone["CET"])
-@test warsaw.transitions[6] == Transition(DateTime(1917,4,16,1,0), zone["CEST"])
-@test warsaw.transitions[7] == Transition(DateTime(1917,9,17,1,0), zone["CET"])
-@test warsaw.transitions[8] == Transition(DateTime(1918,4,15,1,0), zone["CEST"])
-@test warsaw.transitions[9] == Transition(DateTime(1918,9,16,1,0), zone["EET"]) #
-@test warsaw.transitions[10] == Transition(DateTime(1919,4,15,0,0), zone["EEST"])
-@test warsaw.transitions[11] == Transition(DateTime(1919,9,16,0,0), zone["EET"])
-@test warsaw.transitions[12] == Transition(DateTime(1922,5,31,22,0), zone["CET"]) #
-@test warsaw.transitions[13] == Transition(DateTime(1940,6,23,1,0), zone["CEST"])
+    # Zone Pacific/Honolulu contains the following properties which make it good for testing:
+    # - Zone's contain save in rules field
+    # - Zone abbreviation redefined: HST
+    # - Is not cutoff
+    @testset "Pacific/Honolulu" begin
+        tz = resolve("Pacific/Honolulu", tzdata["northamerica"]...)
 
-@test warsaw.transitions[14] == Transition(DateTime(1942,11,2,1,0), zone["CET"])
-@test warsaw.transitions[15] == Transition(DateTime(1943,3,29,1,0), zone["CEST"])
-@test warsaw.transitions[16] == Transition(DateTime(1943,10,4,1,0), zone["CET"])
-@test warsaw.transitions[17] == Transition(DateTime(1944,4,3,1,0), zone["CEST"])
-@test warsaw.transitions[18] == Transition(DateTime(1944,10,4,0,0), zone["CET"])
+        zone = Dict{AbstractString,FixedTimeZone}()
+        zone["LMT"] = FixedTimeZone("LMT", -37886, 0)
+        zone["HST"] = FixedTimeZone("HST", -37800, 0)
+        zone["HDT"] = FixedTimeZone("HDT", -37800, 3600)
+        zone["HST_NEW"] = FixedTimeZone("HST", -36000, 0)
 
+        @test tz.transitions[1] == Transition(typemin(DateTime), zone["LMT"])
+        @test tz.transitions[2] == Transition(DateTime(1896,1,13,22,31,26), zone["HST"])
+        @test tz.transitions[3] == Transition(DateTime(1933,4,30,12,30), zone["HDT"])
+        @test tz.transitions[4] == Transition(DateTime(1933,5,21,21,30), zone["HST"])
+        @test tz.transitions[5] == Transition(DateTime(1942,2,9,12,30), zone["HDT"])
+        @test tz.transitions[6] == Transition(DateTime(1945,9,30,11,30), zone["HST"])
+        @test tz.transitions[7] == Transition(DateTime(1947,6,8,12,30), zone["HST_NEW"])
 
-# Zone Pacific/Honolulu contains the following properties which make it good for testing:
-# - Zone's contain save in rules field
-# - Zone abbreviation redefined: HST
-# - Is not cutoff
+        @test length(tz.transitions) == 7
+        @test isnull(tz.cutoff)
+    end
 
-honolulu = resolve("Pacific/Honolulu", tzdata["northamerica"]...)
+    # Zone Pacific/Apia contains the following properties which make it good for testing:
+    # - Offset switch from -11:00 to 13:00
+    # - Rules interaction with a large negative offset
+    # - Rules interaction with a large positive offset
+    # - Includes a DateTime Julia could consider invalid: "2011 Dec 29 24:00"
+    # - Changed zone format while in a non-standard transition
+    # - Zone abbreviation redefined: LMT, WSST
+    @testset "Pacific/Apia" begin
+        tz = resolve("Pacific/Apia", tzdata["australasia"]...)
 
-zone = Dict{AbstractString,FixedTimeZone}()
-zone["LMT"] = FixedTimeZone("LMT", -37886, 0)
-zone["HST"] = FixedTimeZone("HST", -37800, 0)
-zone["HDT"] = FixedTimeZone("HDT", -37800, 3600)
-zone["HST_NEW"] = FixedTimeZone("HST", -36000, 0)
+        zone = Dict{AbstractString,FixedTimeZone}()
+        zone["LMT_OLD"] = FixedTimeZone("LMT", 45184, 0)
+        zone["LMT"] = FixedTimeZone("LMT", -41216, 0)
+        zone["WSST_OLD"] = FixedTimeZone("WSST", -41400, 0)
+        zone["SST"] = FixedTimeZone("SST", -39600, 0)
+        zone["SDT"] = FixedTimeZone("SDT", -39600, 3600)
+        zone["WSST"] = FixedTimeZone("WSST", 46800, 0)
+        zone["WSDT"] = FixedTimeZone("WSDT", 46800, 3600)
 
-@test honolulu.transitions[1] == Transition(typemin(DateTime), zone["LMT"])
-@test honolulu.transitions[2] == Transition(DateTime(1896,1,13,22,31,26), zone["HST"])
-@test honolulu.transitions[3] == Transition(DateTime(1933,4,30,12,30), zone["HDT"])
-@test honolulu.transitions[4] == Transition(DateTime(1933,5,21,21,30), zone["HST"])
-@test honolulu.transitions[5] == Transition(DateTime(1942,2,9,12,30), zone["HDT"])
-@test honolulu.transitions[6] == Transition(DateTime(1945,9,30,11,30), zone["HST"])
-@test honolulu.transitions[7] == Transition(DateTime(1947,6,8,12,30), zone["HST_NEW"])
-
-@test length(honolulu.transitions) == 7
-@test isnull(honolulu.cutoff)
-
-
-# Zone Pacific/Apia contains the following properties which make it good for testing:
-# - Offset switch from -11:00 to 13:00
-# - Rules interaction with a large negative offset
-# - Rules interaction with a large positive offset
-# - Includes a DateTime Julia could consider invalid: "2011 Dec 29 24:00"
-# - Changed zone format while in a non-standard transition
-# - Zone abbreviation redefined: LMT, WSST
-
-apia = resolve("Pacific/Apia", tzdata["australasia"]...)
-
-zone = Dict{AbstractString,FixedTimeZone}()
-zone["LMT_OLD"] = FixedTimeZone("LMT", 45184, 0)
-zone["LMT"] = FixedTimeZone("LMT", -41216, 0)
-zone["WSST_OLD"] = FixedTimeZone("WSST", -41400, 0)
-zone["SST"] = FixedTimeZone("SST", -39600, 0)
-zone["SDT"] = FixedTimeZone("SDT", -39600, 3600)
-zone["WSST"] = FixedTimeZone("WSST", 46800, 0)
-zone["WSDT"] = FixedTimeZone("WSDT", 46800, 3600)
-
-@test apia.transitions[1] == Transition(typemin(DateTime), zone["LMT_OLD"])
-@test apia.transitions[2] == Transition(DateTime(1879,7,4,11,26,56), zone["LMT"])
-@test apia.transitions[3] == Transition(DateTime(1911,1,1,11,26,56), zone["WSST_OLD"])
-@test apia.transitions[4] == Transition(DateTime(1950,1,1,11,30), zone["SST"])
-@test apia.transitions[5] == Transition(DateTime(2010,9,26,11), zone["SDT"])
-@test apia.transitions[6] == Transition(DateTime(2011,4,2,14), zone["SST"])
-@test apia.transitions[7] == Transition(DateTime(2011,9,24,14), zone["SDT"])
-@test apia.transitions[8] == Transition(DateTime(2011,12,30,10), zone["WSDT"])
-@test apia.transitions[9] == Transition(DateTime(2012,3,31,14), zone["WSST"])
-@test apia.transitions[10] == Transition(DateTime(2012,9,29,14), zone["WSDT"])
-
-
-# Zone Europe/Madrid contains the following properties which make it good for testing:
-# - Observed midsummer time
-# - End of midsummer time also switches both the UTC offset and the saving time
-# - In 1979-01-01 switches from "Spain" to "EU" rules which could create a redundant entry
-madrid = resolve("Europe/Madrid", tzdata["europe"]...)
-
-zone = Dict{AbstractString,FixedTimeZone}()
-zone["WET"] = FixedTimeZone("WET", 0, 0)
-zone["WEST"] = FixedTimeZone("WEST", 0, 3600)
-zone["WEMT"] = FixedTimeZone("WEMT", 0, 7200)
-zone["CET"] = FixedTimeZone("CET", 3600, 0)
-zone["CEST"] = FixedTimeZone("CEST", 3600, 3600)
-
-@test madrid.transitions[23] == Transition(DateTime(1939,4,15,23), zone["WEST"])
-@test madrid.transitions[24] == Transition(DateTime(1939,10,7,23), zone["WET"])
-@test madrid.transitions[25] == Transition(DateTime(1940,3,16,23), zone["WEST"])
-@test madrid.transitions[26] == Transition(DateTime(1942,5,2,22), zone["WEMT"])
-
-@test madrid.transitions[33] == Transition(DateTime(1945,9,29,23), zone["WEST"])
-@test madrid.transitions[34] == Transition(DateTime(1946,4,13,22), zone["WEMT"])
-@test madrid.transitions[35] == Transition(DateTime(1946,9,29,22), zone["CET"])
-@test madrid.transitions[36] == Transition(DateTime(1949,4,30,22), zone["CEST"])
-
-# Redundant transition would be around 1979-01-01T00:00:00 as CET
-@test madrid.transitions[47] == Transition(DateTime(1978,9,30,23), zone["CET"])
-@test madrid.transitions[48] == Transition(DateTime(1979,4,1,1), zone["CEST"])
+        @test tz.transitions[1] == Transition(typemin(DateTime), zone["LMT_OLD"])
+        @test tz.transitions[2] == Transition(DateTime(1879,7,4,11,26,56), zone["LMT"])
+        @test tz.transitions[3] == Transition(DateTime(1911,1,1,11,26,56), zone["WSST_OLD"])
+        @test tz.transitions[4] == Transition(DateTime(1950,1,1,11,30), zone["SST"])
+        @test tz.transitions[5] == Transition(DateTime(2010,9,26,11), zone["SDT"])
+        @test tz.transitions[6] == Transition(DateTime(2011,4,2,14), zone["SST"])
+        @test tz.transitions[7] == Transition(DateTime(2011,9,24,14), zone["SDT"])
+        @test tz.transitions[8] == Transition(DateTime(2011,12,30,10), zone["WSDT"])
+        @test tz.transitions[9] == Transition(DateTime(2012,3,31,14), zone["WSST"])
+        @test tz.transitions[10] == Transition(DateTime(2012,9,29,14), zone["WSDT"])
+    end
 
 
-# Zone America/Anchorage contains the following properties which make it good for testing:
-# - Uses a format containing a slash which indicates the abbreviations for STD/DST
-#   Alternatives include: Europe/London, Europe/Dublin, and Europe/Moscow.
-# - Observed war/peace time
-anchorage = resolve("America/Anchorage", tzdata["northamerica"]...)
+    # Zone Europe/Madrid contains the following properties which make it good for testing:
+    # - Observed midsummer time
+    # - End of midsummer time also switches both the UTC offset and the saving time
+    # - In 1979-01-01 switches from "Spain" to "EU" rules which could create a redundant entry
+    @testset "Europe/Madrid" begin
+        tz = resolve("Europe/Madrid", tzdata["europe"]...)
 
-zone = Dict{AbstractString,FixedTimeZone}()
-zone["CAT"] = FixedTimeZone("CAT", -36000, 0)
-zone["CAWT"] = FixedTimeZone("CAWT", -36000, 3600)
-zone["CAPT"] = FixedTimeZone("CAPT", -36000, 3600)
-zone["AHST"] = FixedTimeZone("AHST", -36000, 0)
-zone["AHDT"] = FixedTimeZone("AHDT", -36000, 3600)
+        zone = Dict{AbstractString,FixedTimeZone}()
+        zone["WET"] = FixedTimeZone("WET", 0, 0)
+        zone["WEST"] = FixedTimeZone("WEST", 0, 3600)
+        zone["WEMT"] = FixedTimeZone("WEMT", 0, 7200)
+        zone["CET"] = FixedTimeZone("CET", 3600, 0)
+        zone["CEST"] = FixedTimeZone("CEST", 3600, 3600)
 
-@test anchorage.transitions[3] == Transition(DateTime(1900,8,20,21,59,36), zone["CAT"])
-@test anchorage.transitions[4] == Transition(DateTime(1942,2,9,12), zone["CAWT"])
-@test anchorage.transitions[5] == Transition(DateTime(1945,8,14,23), zone["CAPT"])
-@test anchorage.transitions[6] == Transition(DateTime(1945,9,30,11), zone["CAT"])
-@test anchorage.transitions[7] == Transition(DateTime(1967,4,1,10), zone["AHST"])
-@test anchorage.transitions[8] == Transition(DateTime(1969,4,27,12), zone["AHDT"])
+        @test tz.transitions[23] == Transition(DateTime(1939,4,15,23), zone["WEST"])
+        @test tz.transitions[24] == Transition(DateTime(1939,10,7,23), zone["WET"])
+        @test tz.transitions[25] == Transition(DateTime(1940,3,16,23), zone["WEST"])
+        @test tz.transitions[26] == Transition(DateTime(1942,5,2,22), zone["WEMT"])
 
+        @test tz.transitions[33] == Transition(DateTime(1945,9,29,23), zone["WEST"])
+        @test tz.transitions[34] == Transition(DateTime(1946,4,13,22), zone["WEMT"])
+        @test tz.transitions[35] == Transition(DateTime(1946,9,29,22), zone["CET"])
+        @test tz.transitions[36] == Transition(DateTime(1949,4,30,22), zone["CEST"])
 
-# Zone Europe/Ulyanovsk contains the following properties which make it good for testing:
-# - With the exception of LMT all Zone and Rule abbreviations are UTC offsets which should
-#   be treated as NULL.
-ulyanovsk = resolve("Europe/Ulyanovsk", tzdata["europe"]...)
-@test all(t -> string(t.zone.name) == "", ulyanovsk.transitions[2:end])
+        # Redundant transition would be around 1979-01-01T00:00:00 as CET
+        @test tz.transitions[47] == Transition(DateTime(1978,9,30,23), zone["CET"])
+        @test tz.transitions[48] == Transition(DateTime(1979,4,1,1), zone["CEST"])
+    end
 
+    # Zone America/Anchorage contains the following properties which make it good for testing:
+    # - Uses a format containing a slash which indicates the abbreviations for STD/DST
+    #   Alternatives include: Europe/London, Europe/Dublin, and Europe/Moscow.
+    # - Observed war/peace time
+    @testset "America/Anchorage" begin
+        tz = resolve("America/Anchorage", tzdata["northamerica"]...)
 
-# Fake Zone Pacific/Cutoff contains the following properties which make it good for testing:
-# - Having a single transition on the first year allows us to test the special case where we
-#   need to include a cutoff while only having a single transition
-# - Having no rules ensures that cutoff is calculated correctly with only zones
+        zone = Dict{AbstractString,FixedTimeZone}()
+        zone["CAT"] = FixedTimeZone("CAT", -36000, 0)
+        zone["CAWT"] = FixedTimeZone("CAWT", -36000, 3600)
+        zone["CAPT"] = FixedTimeZone("CAPT", -36000, 3600)
+        zone["AHST"] = FixedTimeZone("AHST", -36000, 0)
+        zone["AHDT"] = FixedTimeZone("AHDT", -36000, 3600)
 
-# Manually generate zones and rules as if we had read them from a file.
-zones = ZoneDict()
-rules = RuleDict()
+        @test tz.transitions[3] == Transition(DateTime(1900,8,20,21,59,36), zone["CAT"])
+        @test tz.transitions[4] == Transition(DateTime(1942,2,9,12), zone["CAWT"])
+        @test tz.transitions[5] == Transition(DateTime(1945,8,14,23), zone["CAPT"])
+        @test tz.transitions[6] == Transition(DateTime(1945,9,30,11), zone["CAT"])
+        @test tz.transitions[7] == Transition(DateTime(1967,4,1,10), zone["AHST"])
+        @test tz.transitions[8] == Transition(DateTime(1969,4,27,12), zone["AHDT"])
+    end
 
-zones["Pacific/Cutoff"] = [
-    zoneparse("-10:00", "-", "CUT-1", "1933 Apr 1 2:00s"),
-    zoneparse("-11:00", "-", "CUT-2", ""),
-]
+    # Zone Europe/Ulyanovsk contains the following properties which make it good for testing:
+    # - With the exception of LMT all Zone and Rule abbreviations are UTC offsets which should
+    #   be treated as NULL.
+    @testset "Europe/Ulyanovsk" begin
+        ulyanovsk = resolve("Europe/Ulyanovsk", tzdata["europe"]...)
+        @test all(t -> string(t.zone.name) == "", ulyanovsk.transitions[2:end])
+    end
 
-cutoff_tz = resolve("Pacific/Cutoff", zones, rules)
+    # Fake Zone Pacific/Cutoff contains the following properties which make it good for testing:
+    # - Having a single transition on the first year allows us to test the special case where we
+    #   need to include a cutoff while only having a single transition
+    # - Having no rules ensures that cutoff is calculated correctly with only zones
+    @testset "Pacific/Cutoff (Fake)" begin
+        # Manually generate zones and rules as if we had read them from a file.
+        zones = ZoneDict()
+        rules = RuleDict()
 
-zone = Dict{AbstractString,FixedTimeZone}()
-zone["CUT-1"] = FixedTimeZone("CUT-1", -36000)
-zone["CUT-2"] = FixedTimeZone("CUT-2", -39600)
+        zones["Pacific/Cutoff"] = [
+            zoneparse("-10:00", "-", "CUT-1", "1933 Apr 1 2:00s"),
+            zoneparse("-11:00", "-", "CUT-2", ""),
+        ]
 
-@test cutoff_tz.transitions[1] == Transition(typemin(DateTime), zone["CUT-1"])
-@test cutoff_tz.transitions[2] == Transition(DateTime(1933,4,1,12), zone["CUT-2"])
-@test isnull(cutoff_tz.cutoff)
+        tz = resolve("Pacific/Cutoff", zones, rules)
 
-cutoff_tz = resolve("Pacific/Cutoff", zones, rules, max_year=1900)
+        zone = Dict{AbstractString,FixedTimeZone}()
+        zone["CUT-1"] = FixedTimeZone("CUT-1", -36000)
+        zone["CUT-2"] = FixedTimeZone("CUT-2", -39600)
 
-# Normally resolve TimeZones with a single transition are returned as a FixedTimeZone except
-# when a cutoff is included.
-@test isa(cutoff_tz, VariableTimeZone)
-@test length(cutoff_tz.transitions) == 1
-@test get(cutoff_tz.cutoff) == DateTime(1933,4,1,12)
+        @test tz.transitions[1] == Transition(typemin(DateTime), zone["CUT-1"])
+        @test tz.transitions[2] == Transition(DateTime(1933,4,1,12), zone["CUT-2"])
+        @test isnull(tz.cutoff)
 
+        tz = resolve("Pacific/Cutoff", zones, rules, max_year=1900)
 
-# Behaviour of mixing "RULES" as a String and as a Time. In reality this behaviour has never
-# been observed.
+        # Normally resolve TimeZones with a single transition are returned as a FixedTimeZone except
+        # when a cutoff is included.
+        @test isa(tz, VariableTimeZone)
+        @test length(tz.transitions) == 1
+        @test get(tz.cutoff) == DateTime(1933,4,1,12)
+    end
 
-# Manually generate zones and rules as if we had read them from a file.
-zones = ZoneDict()
-rules = RuleDict()
+    # Behaviour of mixing "RULES" as a String and as a Time. In reality this behaviour has never
+    # been observed.
+    @testset "Pacific/Test (Fake)" begin
+        # Manually generate zones and rules as if we had read them from a file.
+        zones = ZoneDict()
+        rules = RuleDict()
 
-zones["Pacific/Test"] = [
-    zoneparse("-10:00", "-", "TST-1", "1933 Apr 1 2:00s"),
-    zoneparse("-10:00", "1:00", "TDT-2", "1933 Sep 1 2:00s"),
-    zoneparse("-10:00", "Testing", "T%sT-3", "1934 Sep 1 3:00s"),
-    zoneparse("-10:00", "1:00", "TDT-4", "1935 Sep 1 3:00s"),
-    zoneparse("-10:00", "Testing", "T%sT-5", ""),
-]
-rules["Testing"] = [
-    ruleparse("1934", "1935", "-", "Apr", "1", "3:00s", "1", "D"),
-    ruleparse("1934", "1935", "-", "Sep", "1", "3:00s", "0", "S"),
-]
+        zones["Pacific/Test"] = [
+            zoneparse("-10:00", "-", "TST-1", "1933 Apr 1 2:00s"),
+            zoneparse("-10:00", "1:00", "TDT-2", "1933 Sep 1 2:00s"),
+            zoneparse("-10:00", "Testing", "T%sT-3", "1934 Sep 1 3:00s"),
+            zoneparse("-10:00", "1:00", "TDT-4", "1935 Sep 1 3:00s"),
+            zoneparse("-10:00", "Testing", "T%sT-5", ""),
+        ]
+        rules["Testing"] = [
+            ruleparse("1934", "1935", "-", "Apr", "1", "3:00s", "1", "D"),
+            ruleparse("1934", "1935", "-", "Sep", "1", "3:00s", "0", "S"),
+        ]
 
-test = resolve("Pacific/Test", zones, rules)
+        tz = resolve("Pacific/Test", zones, rules)
 
-zone = Dict{AbstractString,FixedTimeZone}()
-zone["TST-1"] = FixedTimeZone("TST-1", -36000, 0)
-zone["TDT-2"] = FixedTimeZone("TDT-2", -36000, 3600)
-zone["TST-3"] = FixedTimeZone("TST-3", -36000, 0)
-zone["TDT-3"] = FixedTimeZone("TDT-3", -36000, 3600)
-zone["TDT-4"] = FixedTimeZone("TDT-4", -36000, 3600)
-zone["TST-5"] = FixedTimeZone("TST-5", -36000, 0)
-zone["TDT-5"] = FixedTimeZone("TDT-5", -36000, 3600)
+        zone = Dict{AbstractString,FixedTimeZone}()
+        zone["TST-1"] = FixedTimeZone("TST-1", -36000, 0)
+        zone["TDT-2"] = FixedTimeZone("TDT-2", -36000, 3600)
+        zone["TST-3"] = FixedTimeZone("TST-3", -36000, 0)
+        zone["TDT-3"] = FixedTimeZone("TDT-3", -36000, 3600)
+        zone["TDT-4"] = FixedTimeZone("TDT-4", -36000, 3600)
+        zone["TST-5"] = FixedTimeZone("TST-5", -36000, 0)
+        zone["TDT-5"] = FixedTimeZone("TDT-5", -36000, 3600)
 
-@test test.transitions[1] == Transition(typemin(DateTime), zone["TST-1"])
-@test test.transitions[2] == Transition(DateTime(1933,4,1,12), zone["TDT-2"]) # -09:00
-@test test.transitions[3] == Transition(DateTime(1933,9,1,12), zone["TST-3"])
-@test test.transitions[4] == Transition(DateTime(1934,4,1,13), zone["TDT-3"])
-@test test.transitions[5] == Transition(DateTime(1934,9,1,13), zone["TDT-4"])
-@test test.transitions[6] == Transition(DateTime(1935,9,1,13), zone["TST-5"])
+        @test tz.transitions[1] == Transition(typemin(DateTime), zone["TST-1"])
+        @test tz.transitions[2] == Transition(DateTime(1933,4,1,12), zone["TDT-2"]) # -09:00
+        @test tz.transitions[3] == Transition(DateTime(1933,9,1,12), zone["TST-3"])
+        @test tz.transitions[4] == Transition(DateTime(1934,4,1,13), zone["TDT-3"])
+        @test tz.transitions[5] == Transition(DateTime(1934,9,1,13), zone["TDT-4"])
+        @test tz.transitions[6] == Transition(DateTime(1935,9,1,13), zone["TST-5"])
 
-# Note: Due to how the the zones/rules were written a redundant transition could be created
-# such that `test.transitions[6] == test.transitions[7]`. The TimeZone code can safely
-# handle redundant transitions but ideally they should be eliminated.
-@test length(test.transitions) == 6
+        # Note: Due to how the the zones/rules were written a redundant transition could be created
+        # such that `test.transitions[6] == test.transitions[7]`. The TimeZone code can safely
+        # handle redundant transitions but ideally they should be eliminated.
+        @test length(tz.transitions) == 6
+    end
 
+    # Make sure that we can deal with Links. Take note that the current implementation converts
+    # links into zones which makes it hard to explicitly test for a link. We expect that the
+    # following link exists:
+    #
+    # Link  Europe/Oslo  Arctic/Longyearbyen
+    @testset "Link" begin
+        # Make sure that that the link time zone was parsed.
+        zone_names = keys(tzdata["europe"][1])
+        @test "Arctic/Longyearbyen" in zone_names
 
-# Make sure that we can deal with Links. Take note that the current implementation converts
-# links into zones which makes it hard to explicitly test for a link. We expect that the
-# following link exists:
-#
-# Link  Europe/Oslo  Arctic/Longyearbyen
+        oslo = resolve("Europe/Oslo", tzdata["europe"]...)
+        longyearbyen = resolve("Arctic/Longyearbyen", tzdata["europe"]...)
 
-# Make sure that that the link time zone was parsed.
-zone_names = keys(tzdata["europe"][1])
-@test "Arctic/Longyearbyen" in zone_names
+        @test oslo.transitions == longyearbyen.transitions
+    end
 
-oslo = resolve("Europe/Oslo", tzdata["europe"]...)
-longyearbyen = resolve("Arctic/Longyearbyen", tzdata["europe"]...)
-
-@test oslo.transitions == longyearbyen.transitions
-
-
-# Zones that don't include multiple lines and no rules should be treated as a FixedTimeZone.
-mst = resolve("MST", tzdata["northamerica"]...)
-@test isa(mst, FixedTimeZone)
+    # Zones that don't include multiple lines and no rules should be treated as a FixedTimeZone.
+    @testset "FixedTimeZone" begin
+        tz = resolve("MST", tzdata["northamerica"]...)
+        @test isa(tz, FixedTimeZone)
+    end
+end
