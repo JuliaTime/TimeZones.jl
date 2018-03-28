@@ -2,8 +2,8 @@
 import Compat
 
 function ignore_output(body::Function; stdout::Bool=true, stderr::Bool=true)
-    out_old = STDOUT
-    err_old = STDERR
+    out_old = Compat.stdout
+    err_old = Compat.stderr
 
     if stdout
         (out_rd, out_wr) = redirect_stdout()

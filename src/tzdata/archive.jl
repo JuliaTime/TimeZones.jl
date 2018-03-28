@@ -1,4 +1,4 @@
-import Compat: @static, Sys
+import Compat: @static, Sys, devnull
 
 if Sys.iswindows()
     const exe7z = joinpath(JULIA_HOME, "7z.exe")
@@ -19,7 +19,7 @@ function extract(archive, directory, files=AbstractString[]; verbose::Bool=false
     end
 
     if !verbose
-        cmd = pipeline(cmd, stdout=DevNull, stderr=DevNull)
+        cmd = pipeline(cmd, stdout=devnull, stderr=devnull)
     end
 
     run(cmd)
@@ -50,7 +50,7 @@ function readarchive(archive)
         content = false
 
         cmd = pipeline(`$exe7z x $archive -y -so`, `$exe7z l -si -y -ttar`)
-        output = readchomp(pipeline(cmd, stderr=DevNull))
+        output = readchomp(pipeline(cmd, stderr=devnull))
         for line in split(output, "\r\n")
             # Extract the file name from the last column in the 7-zip output table.
             # Note: We can just write `line[54:end]` on Julia 0.5 and up (JuliaLang/julia#15624)
@@ -70,7 +70,7 @@ function readarchive(archive)
 
         return files
     else
-        output = readchomp(pipeline(`tar tf $archive`, stderr=DevNull))
+        output = readchomp(pipeline(`tar tf $archive`, stderr=devnull))
         return split(output, '\n')
     end
 end
