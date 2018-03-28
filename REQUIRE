@@ -1,5 +1,5 @@
 julia 0.6
-Compat 0.55
+Compat 0.57
 Mocking 0.4.1
 Nullables 0.0.3
 @windows LightXML 0.2

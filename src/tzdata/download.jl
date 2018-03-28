@@ -1,5 +1,5 @@
 import TimeZones: DEPS_DIR
-import Compat: isassigned
+using Compat: isassigned, mv
 using Compat.Dates
 
 const LATEST_FILE = joinpath(DEPS_DIR, "latest")
@@ -101,7 +101,7 @@ function tzdata_download(version::AbstractString="latest", dir::AbstractString=t
         version = tzdata_version_archive(archive)
 
         archive_versioned = joinpath(dir, "tzdata$version.tar.gz")
-        mv(archive, archive_versioned, remove_destination=true)
+        mv(archive, archive_versioned, force=true)
         archive = archive_versioned
 
         set_latest(version, now_utc)
