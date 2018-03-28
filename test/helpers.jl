@@ -1,4 +1,5 @@
 # Utility functions for testing
+import Compat
 
 function ignore_output(body::Function; stdout::Bool=true, stderr::Bool=true)
     out_old = STDOUT
