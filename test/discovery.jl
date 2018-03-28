@@ -119,7 +119,7 @@ end
         if !compiled_modules_enabled
             patch = @patch now(tz::TimeZone) = ZonedDateTime(2000, 1, 1, tz)
             apply(patch) do
-                @test contains(sprint(show_next_transition, wpg), "2000-04-02")
+                @test occursin("2000-04-02", sprint(show_next_transition, wpg))
             end
         end
     end

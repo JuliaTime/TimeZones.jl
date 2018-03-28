@@ -59,7 +59,7 @@ end
 # Active/built tzdata version
 version = active_version()
 @test version != "latest"  # Could happen if the logic to resolve the version fails
-@test contains(version, TZDATA_VERSION_REGEX)
+@test match(TZDATA_VERSION_REGEX, version) !== nothing
 
 archive = active_archive()
 @test isfile(archive)
