@@ -62,7 +62,7 @@ paris = resolve("Europe/Paris", tzdata["europe"]...)
 
     @testset "upcoming" begin
         if !compiled_modules_enabled
-            patch = @patch now(tz::TimeZone) = ZonedDateTime(2000, 1, 1, tz)
+            local patch = @patch now(tz::TimeZone) = ZonedDateTime(2000, 1, 1, tz)
             apply(patch) do
                 @test next_transition_instant(wpg) == ZonedDateTime(2000, 4, 2, 3, wpg)
             end
@@ -117,7 +117,7 @@ end
 
     @testset "upcoming" begin
         if !compiled_modules_enabled
-            patch = @patch now(tz::TimeZone) = ZonedDateTime(2000, 1, 1, tz)
+            local patch = @patch now(tz::TimeZone) = ZonedDateTime(2000, 1, 1, tz)
             apply(patch) do
                 @test occursin("2000-04-02", sprint(show_next_transition, wpg))
             end

@@ -1,6 +1,6 @@
 # Determine the local system's time zone
 # Based upon Python's tzlocal https://pypi.python.org/pypi/tzlocal
-import Compat: @static, Sys, read
+import Compat: @static, Sys, findnext, isequal, pushfirst!, read
 using Mocking
 
 if Sys.iswindows()
@@ -50,7 +50,7 @@ function localzone()
 
                 # The system time zone directory used depends on the (g)libc version
                 tzdirs = ["/usr/lib/zoneinfo", "/usr/share/zoneinfo"]
-                haskey(ENV, "TZDIR") && unshift!(tzdirs, ENV["TZDIR"])
+                haskey(ENV, "TZDIR") && pushfirst!(tzdirs, ENV["TZDIR"])
 
                 for dir in tzdirs
                     filepath = joinpath(dir, name)
@@ -105,12 +105,12 @@ function localzone()
         link = "/etc/localtime"
         if @mock islink(link)
             filepath = @mock readlink(link)
-            start = search(filepath, '/')
+            pos = findnext(isequal('/'), filepath, 1)
 
-            while start != 0
-                name = filepath[(start + 1):end]
+            while pos !== nothing
+                name = SubString(filepath, pos + 1)
                 name in validnames && return TimeZone(name)
-                start = search(filepath, '/', start + 1)
+                pos = findnext(isequal('/'), filepath, pos + 1)
             end
         end
 
@@ -135,10 +135,10 @@ function localzone()
                 name = replace(posix_name, r"Etc/GMT0?" => "UTC")
 
                 # Note: Etc/GMT[+-] are reversed compared to UTC[+-]
-                if occursin("+", name)
-                    name = replace(name, "+" => "-")
+                if occursin('+', name)
+                    name = replace(name, '+' => '-')
                 else
-                    name = replace(name, "-" => "+")
+                    name = replace(name, '-' => '+')
                 end
 
                 return FixedTimeZone(name)
