@@ -135,10 +135,10 @@ function localzone()
                 name = replace(posix_name, r"Etc/GMT0?" => "UTC")
 
                 # Note: Etc/GMT[+-] are reversed compared to UTC[+-]
-                if occursin("+", name)
-                    name = replace(name, "+" => "-")
+                if occursin('+', name)
+                    name = replace(name, '+' => '-')
                 else
-                    name = replace(name, "-" => "+")
+                    name = replace(name, '-' => '+')
                 end
 
                 return FixedTimeZone(name)
