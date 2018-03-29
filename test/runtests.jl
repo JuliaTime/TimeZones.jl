@@ -1,5 +1,5 @@
 using Mocking
-using Compat: @info, @warn
+using Compat: occursin, @info, @warn
 
 compiled_modules_enabled = Mocking.compiled_modules_enabled()
 if compiled_modules_enabled

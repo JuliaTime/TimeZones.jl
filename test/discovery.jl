@@ -35,7 +35,7 @@ paris = resolve("Europe/Paris", tzdata["europe"]...)
 
 @testset "next_transition_instant" begin
     @testset "non-existent" begin
-        zone = FixedTimeZone("CST", -6 * 3600)
+        local zone = FixedTimeZone("CST", -6 * 3600)
 
         instant = next_transition_instant(ZonedDateTime(2018, 1, 1, wpg))
         expected_instant = ZonedDateTime(DateTime(2018, 3, 11, 8), wpg, zone)
@@ -48,7 +48,7 @@ paris = resolve("Europe/Paris", tzdata["europe"]...)
     end
 
     @testset "ambiguous" begin
-        zone = FixedTimeZone("CDT", -6 * 3600, 3600)
+        local zone = FixedTimeZone("CDT", -6 * 3600, 3600)
 
         instant = next_transition_instant(ZonedDateTime(2018, 6, 1, wpg))
         expected_instant = ZonedDateTime(DateTime(2018, 11, 4, 7), wpg, zone)
@@ -119,7 +119,7 @@ end
         if !compiled_modules_enabled
             patch = @patch now(tz::TimeZone) = ZonedDateTime(2000, 1, 1, tz)
             apply(patch) do
-                @test contains(sprint(show_next_transition, wpg), "2000-04-02")
+                @test occursin("2000-04-02", sprint(show_next_transition, wpg))
             end
         end
     end

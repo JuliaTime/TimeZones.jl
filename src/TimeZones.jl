@@ -2,7 +2,7 @@ __precompile__()
 
 module TimeZones
 
-import Compat: Sys, uninitialized, @info, @warn
+import Compat: Sys, occursin, undef, @info, @warn
 
 using Compat.Dates, Compat.Printf, Compat.Serialization, Compat.Unicode
 import Compat.Dates: TimeZone, AbstractTime
@@ -62,7 +62,7 @@ time zone string formats can be found in `FixedTimeZone(::AbstractString)`.
 """
 function TimeZone(str::AbstractString)
     return get!(TIME_ZONES, str) do
-        if contains(str, FIXED_TIME_ZONE_REGEX)
+        if occursin(FIXED_TIME_ZONE_REGEX, str)
             return FixedTimeZone(str)
         end
 
@@ -98,7 +98,7 @@ Tests whether a string is a valid name for constructing a `TimeZone`.
 function istimezone(str::AbstractString)
     return (
         haskey(TIME_ZONES, str) ||
-        contains(str, FIXED_TIME_ZONE_REGEX) ||
+        occursin(FIXED_TIME_ZONE_REGEX, str) ||
         isfile(joinpath(COMPILED_DIR, split(str, "/")...))
     )
 end

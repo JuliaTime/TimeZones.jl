@@ -15,7 +15,7 @@ Returns a `TimeZone` object that is equivalent to the system's current time zone
 function localzone()
     @static if Sys.isapple()
         name = @mock read(`systemsetup -gettimezone`, String)  # Appears to only work as root
-        if contains(name, "Time Zone: ")
+        if startswith(name, "Time Zone: ")
             name = strip(replace(name, "Time Zone: " => ""))
         else
             # link will be something like /usr/share/zoneinfo/Europe/Warsaw
@@ -135,7 +135,7 @@ function localzone()
                 name = replace(posix_name, r"Etc/GMT0?" => "UTC")
 
                 # Note: Etc/GMT[+-] are reversed compared to UTC[+-]
-                if contains(name, "+")
+                if occursin("+", name)
                     name = replace(name, "+" => "-")
                 else
                     name = replace(name, "-" => "+")

@@ -89,14 +89,14 @@ function parsedate(s::AbstractString)
     s = replace(s, r"\s+" => " ")
     num_periods = length(split(s, " "))
     s, flag = num_periods > 3 && isflag(s[end]) ? (s[1:end-1], s[end]) : (s, DEFAULT_FLAG)
-    if contains(s,"lastSun")
+    if occursin("lastSun", s)
         dt = DateTime(replace(s, "lastSun" => "1", count=1), "yyyy uuu d H:MM:SS")
         dt = tonext(lastSun, dt; same=true)
-    elseif contains(s,"lastSat")
+    elseif occursin("lastSat", s)
         dt = DateTime(replace(s, "lastSat" => "1", count=1), "yyyy uuu d H:MM:SS")
         dt = tonext(lastSat, dt; same=true)
-    elseif contains(s,"Sun>=1")
-        dt = DateTime(replace(s,"Sun>=" => "", count=1),"yyyy uuu d H:MM:SS")
+    elseif occursin("Sun>=1", s)
+        dt = DateTime(replace(s, "Sun>=" => "", count=1), "yyyy uuu d H:MM:SS")
         dt = tonext(d -> dayofweek(d) == Sun, dt; same=true)
     else
         format = join(split("yyyy uuu dd HH:MM:SS", " ")[1:num_periods], ' ')
@@ -148,7 +148,7 @@ function abbr_string(format::AbstractString, save::TimeOffset, letter::AbstractS
 
     # Some time zones (e.g. "Europe/Ulyanovsk") do not have abbreviations for the various
     # rules and instead hardcode the offset as the name.
-    if contains(abbr, r"[+-]\d{2}")
+    if occursin(r"[+-]\d{2}", abbr)
         abbr = ""
     end
 
@@ -162,22 +162,22 @@ function ruleparse(from, to, rule_type, month, on, at, save, letter)
 
     # Now we need to get the right anonymous function
     # for determining the right day for transitioning
-    if contains(on, r"last\w\w\w")
+    if occursin(r"last\w\w\w", on)
         # We pre-built these functions above
         # They follow the format: "lastSun", "lastMon".
         on_func = eval(Symbol(on))
-    elseif contains(on, r"\w\w\w[<>]=\d\d?")
+    elseif occursin(r"\w\w\w[<>]=\d\d?", on)
         # The first day of the week that occurs before or after a given day of month.
         # i.e. Sun>=8 refers to the Sunday after the 8th of the month
         # or in other words, the 2nd Sunday.
         dow::Int = DAYS[match(r"\w\w\w", on).match]
         dom::Int = parse(Int, match(r"\d\d?", on).match)
-        if contains(on, "<=")
+        if occursin(on, "<=")
             on_func = (dt -> day(dt) <= dom && dayofweek(dt) == dow)
         else
             on_func = (dt -> day(dt) >= dom && dayofweek(dt) == dow)
         end
-    elseif contains(on, r"\d\d?")
+    elseif occursin(r"\d\d?", on)
         # Matches just a plain old day of the month
         dom = parse(Int, on)
         on_func = dt -> day(dt) == dom
@@ -223,7 +223,7 @@ function zoneparse(gmtoff, rules, format, until="")
     until_tuple = until == "" ? (nothing, 'w') : parsedate(until)
     until_dt, until_flag = convert(Nullable{DateTime}, until_tuple[1]), until_tuple[2]
 
-    if rules == "-" || contains(rules, r"\d")
+    if rules == "-" || occursin(r"\d", rules)
         save = TimeOffset(rules)
         rules = ""
     else
@@ -503,7 +503,7 @@ function tzparse(tz_source_file::AbstractString)
         for line in eachline(fp)
             # Lines that start with whitespace can be considered a "continuation line"
             # which means the last found kind/name should persist.
-            persist = contains(line, r"^\s")
+            persist = occursin(r"^\s", line)
 
             line = strip(replace(chomp(line), r"#.*$" => ""))
             length(line) > 0 || continue

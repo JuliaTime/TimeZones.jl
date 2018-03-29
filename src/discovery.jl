@@ -1,4 +1,5 @@
 using Mocking
+using Compat: stdout
 
 """
     timezone_names() -> Array{AbstractString}
@@ -177,8 +178,8 @@ next_transition_instant(tz::TimeZone=localzone()) = next_transition_instant(@moc
 
 
 """
-    show_next_transition(io::IO=STDOUT, zdt::ZonedDateTime)
-    show_next_transition(io::IO=STDOUT, tz::TimeZone=localzone())
+    show_next_transition(io::IO=stdout, zdt::ZonedDateTime)
+    show_next_transition(io::IO=stdout, tz::TimeZone=localzone())
 
 Display useful information about the next time zone transition (typically
 due to daylight-savings time). Information displayed includes:
@@ -239,4 +240,4 @@ function show_next_transition(io::IO, tz::TimeZone=localzone())
     show_next_transition(io, @mock now(tz))
 end
 
-show_next_transition(x...) = show_next_transition(STDOUT, x...)
+show_next_transition(x...) = show_next_transition(stdout, x...)

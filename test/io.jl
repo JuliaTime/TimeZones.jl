@@ -19,13 +19,16 @@ dt = DateTime(1942,12,25,1,23,45)
 @test string(honolulu) == "Pacific/Honolulu"
 @test string(ulyanovsk) == "Europe/Ulyanovsk"
 
-@test sprint(showcompact, null) == "UTC+03:00"
-@test sprint(showcompact, fixed) == "UTC+01:00"
-@test sprint(showcompact, est) == "EST"
-@test sprint(showcompact, warsaw) == "Europe/Warsaw"
-@test sprint(showcompact, apia) == "Pacific/Apia"
-@test sprint(showcompact, honolulu) == "Pacific/Honolulu"
-@test sprint(showcompact, ulyanovsk) == "Europe/Ulyanovsk"
+# Alternatively in Julia 0.7.0-DEV.4517 we could use
+# `sprint(show, ..., context=:compact => true)`
+show_compact = (io, args...) -> show(IOContext(io, :compact => true), args...)
+@test sprint(show_compact, null) == "UTC+03:00"
+@test sprint(show_compact, fixed) == "UTC+01:00"
+@test sprint(show_compact, est) == "EST"
+@test sprint(show_compact, warsaw) == "Europe/Warsaw"
+@test sprint(show_compact, apia) == "Pacific/Apia"
+@test sprint(show_compact, honolulu) == "Pacific/Honolulu"
+@test sprint(show_compact, ulyanovsk) == "Europe/Ulyanovsk"
 
 @test sprint(show, null) == "UTC+03:00"
 @test sprint(show, fixed) == "UTC+01:00"
