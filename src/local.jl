@@ -1,6 +1,6 @@
 # Determine the local system's time zone
 # Based upon Python's tzlocal https://pypi.python.org/pypi/tzlocal
-import Compat: @static, Sys, pushfirst!, read
+import Compat: @static, Sys, findnext, isequal, pushfirst!, read
 using Mocking
 
 if Sys.iswindows()
@@ -105,12 +105,12 @@ function localzone()
         link = "/etc/localtime"
         if @mock islink(link)
             filepath = @mock readlink(link)
-            start = search(filepath, '/')
+            pos = findnext(isequal('/'), filepath, 1)
 
-            while start != 0
-                name = filepath[(start + 1):end]
+            while pos !== nothing
+                name = SubString(filepath, pos + 1)
                 name in validnames && return TimeZone(name)
-                start = search(filepath, '/', start + 1)
+                pos = findnext(isequal('/'), filepath, pos + 1)
             end
         end
 
