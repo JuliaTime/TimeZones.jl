@@ -1,4 +1,10 @@
-import Base: @deprecate, @deprecate_binding, colon, (:)
+import Base: @deprecate, @deprecate_binding
+
+if VERSION < v"0.7.0-DEV.4003"
+    import Base: colon
+else
+    import Base: (:)
+end
 
 # BEGIN TimeZones 0.6 deprecations
 
