@@ -1,6 +1,6 @@
 # Determine the local system's time zone
 # Based upon Python's tzlocal https://pypi.python.org/pypi/tzlocal
-import Compat: @static, Sys, read
+import Compat: @static, Sys, pushfirst!, read
 using Mocking
 
 if Sys.iswindows()
@@ -50,7 +50,7 @@ function localzone()
 
                 # The system time zone directory used depends on the (g)libc version
                 tzdirs = ["/usr/lib/zoneinfo", "/usr/share/zoneinfo"]
-                haskey(ENV, "TZDIR") && unshift!(tzdirs, ENV["TZDIR"])
+                haskey(ENV, "TZDIR") && pushfirst!(tzdirs, ENV["TZDIR"])
 
                 for dir in tzdirs
                     filepath = joinpath(dir, name)
