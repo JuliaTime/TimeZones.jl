@@ -6,21 +6,27 @@ import Base: promote_rule, ==, hash, isequal, isless, typemin, typemax
 import Compat: xor
 
 const FIXED_TIME_ZONE_REGEX = r"""
-^(?|
-    UTC([+-]\d{1,2})?
+    ^(?|
+        UTC
+        (?:
+            (?<sign>[+-])
+            (?<hour>\d{1,2})
+        )?
     |
-    ([+-]\d{2})
+        (?<sign>[+-])
+        (?<hour>\d{2})
     |
-    (?:UTC(?=[+-]))?
-    ([+-]?\d{2})
-    (?|
-        (\d{2})
+        (?:UTC(?=[+-]))?
+        (?<sign>[+-])?
+        (?<hour>\d{2})
+        (?|
+            (?(hour)\:(?<minute>\d{2}))
+            (?(minute)\:(?<second>\d{2}))?
         |
-        \:(\d{2})
-        (?:\:(\d{2}))?
-    )
-)$
-"""x
+            (?(hour)(?<minute>\d{2}))
+        )
+    )$
+    """x
 
 # Using type Symbol instead of AbstractString for name since it
 # gets us ==, and hash for free.
@@ -71,25 +77,23 @@ UTC+15:45:21
 """
 function FixedTimeZone(s::AbstractString)
     m = match(FIXED_TIME_ZONE_REGEX, s)
-    m == nothing && throw(ArgumentError("Unrecognized time zone: $s"))
+    m === nothing && throw(ArgumentError("Unrecognized time zone: $s"))
 
-    values = map(n -> n == nothing ? 0 : Base.parse(Int, n), m.captures)
+    coefficient = m[:sign] == "-" ? -1 : 1
+    sig = coefficient < 0 ? '-' : '+'
+    hour = m[:hour] === nothing ? 0 : parse(Int, m[:hour])
+    minute = m[:minute] === nothing ? 0 : parse(Int, m[:minute])
+    second = m[:second] === nothing ? 0 : parse(Int, m[:second])
 
-    if values == [0, 0, 0]
+    if hour == 0 && minute == 0 && second == 0
         name = "UTC"
-    elseif values[3] == 0
-        name = @sprintf("UTC%+03d:%02d", values[1:2]...)
+    elseif second == 0
+        name = @sprintf("UTC%c%02d:%02d", sig, hour, minute)
     else
-        name = @sprintf("UTC%+03d:%02d:%02d", values...)
+        name = @sprintf("UTC%c%02d:%02d:%02d", sig, hour, minute, second)
     end
 
-    if values[1] < 0
-        for i in 2:length(values)
-            values[i] = -values[i]
-        end
-    end
-
-    offset = values[1] * 3600 + values[2] * 60 + values[3]
+    offset = coefficient * (hour * 3600 + minute * 60 + second)
     return FixedTimeZone(name, offset)
 end
 

@@ -10,6 +10,8 @@ import TimeZones: UTCOffset, value, isdst
 @test string(UTCOffset(0, 3600)) == "+01:00"
 @test string(UTCOffset(-7200, 3600)) == "-01:00"
 @test string(UTCOffset(-3661)) == "-01:01:01"
+@test string(UTCOffset( 1800)) == "+00:30"
+@test string(UTCOffset(-1800)) == "-00:30"
 
 @test !isdst(UTCOffset(0))
 @test !isdst(UTCOffset(0, 0))
