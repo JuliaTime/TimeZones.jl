@@ -33,7 +33,11 @@ function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
     end
 
     if tz_end <= min_pos
-        return nullable(String, nothing), i
+        return @static if VERSION < v"0.7.0-DEV.4797"
+            nullable(String, nothing), i
+        else
+            nothing
+        end
     else
         tz = SubString(str, tz_start, tz_end)
         return nullable(String, tz), i
@@ -55,7 +59,11 @@ function tryparsenext_tz(str, i, len, min_width::Int=1, max_width::Int=0)
     end
 
     if tz_end == 0
-        return nullable(String, nothing), i
+        return @static if VERSION < v"0.7.0-DEV.4797"
+            nullable(String, nothing), i
+        else
+            nothing
+        end
     else
         name = SubString(str, tz_start, tz_end)
 
@@ -65,7 +73,11 @@ function tryparsenext_tz(str, i, len, min_width::Int=1, max_width::Int=0)
         if occursin("/", name) || name in ("UTC", "GMT")
             return nullable(String, name), i
         else
-            return nullable(String, nothing), i
+            return @static if VERSION < v"0.7.0-DEV.4797"
+                nullable(String, nothing), i
+            else
+                nothing
+            end
         end
     end
 end
