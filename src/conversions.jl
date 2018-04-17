@@ -98,7 +98,7 @@ function zdt2julian(::Type{T}, zdt::ZonedDateTime) where T<:Integer
     floor(T, datetime2julian(utc(zdt)))
 end
 
-function zdt2julian(::Type{T}, zdt::ZonedDateTime) where T<:Number
+function zdt2julian(::Type{T}, zdt::ZonedDateTime) where T<:Real
     convert(T, datetime2julian(utc(zdt)))
 end
 
@@ -114,10 +114,10 @@ function zdt2unix(::Type{T}, zdt::ZonedDateTime) where T<:Integer
     floor(T, datetime2unix(utc(zdt)))
 end
 
-function zdt2unix(::Type{T}, zdt::ZonedDateTime) where T<:Number
+function zdt2unix(::Type{T}, zdt::ZonedDateTime) where T<:Real
     convert(T, datetime2unix(utc(zdt)))
 end
 
-function unix2zdt(seconds::Integer)
+function unix2zdt(seconds::Real)
     ZonedDateTime(unix2datetime(seconds), utc_tz, from_utc=true)
 end
