@@ -1,6 +1,8 @@
 
 # import Compat.Dates: UTInstant, DateTime, TimeZone, Millisecond
+using Compat
 using Compat.Dates
+using Compat: AbstractDateTime
 import Compat.Dates: value, argerror, validargs
 import Base: promote_rule, ==, hash, isequal, isless, typemin, typemax
 import Compat: xor
@@ -134,7 +136,7 @@ end
 # A `DateTime` that includes `TimeZone` information.
 # """
 
-struct ZonedDateTime <: TimeType
+struct ZonedDateTime <: AbstractDateTime
     utc_datetime::DateTime
     timezone::TimeZone
     zone::FixedTimeZone  # The current zone for the utc_datetime.
