@@ -25,8 +25,8 @@ function compile(xml_file::AbstractString)
 
     # TODO: Eliminate the Etc/* POSIX names here? See Windows section of `localzone`
 
-    # Dictionary to store the windows to timezone conversions
-    translation = Dict{AbstractString,AbstractString}()
+    # Dictionary to store the windows to time zone conversions
+    translation = Dict{String,String}()
     for map_zone in map_zones
         # Territory "001" is the global default
         if attribute(map_zone, "territory") == "001"
@@ -35,6 +35,8 @@ function compile(xml_file::AbstractString)
             translation[win_name] = posix_name
         end
     end
+
+    free(xdoc)
 
     return translation
 end
