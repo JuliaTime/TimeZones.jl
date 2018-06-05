@@ -8,13 +8,18 @@ else
     nullable(T::Type, x) = x  # Ignore nullable container type T
 end
 
+# https://github.com/JuliaLang/julia/pull/25261
+if VERSION < v"0.7.0-DEV.5126"
+    iterate(str::String, i::Int) = next(str, i)
+end
+
 function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
     tz_start, tz_end = i, 0
     min_pos = min_width <= 0 ? i : i + min_width - 1
     max_pos = max_width <= 0 ? len : min(chr2ind(str, ind2chr(str,i) + max_width - 1), len)
     state = 1
     @inbounds while i <= max_pos
-        c, ii = next(str, i)
+        c, ii = iterate(str, i)::Tuple{Char, Int}
         if state == 1 && (c == '-' || c == '+')
             state = 2
             tz_end = i
@@ -49,7 +54,7 @@ function tryparsenext_tz(str, i, len, min_width::Int=1, max_width::Int=0)
     min_pos = min_width <= 0 ? i : i + min_width - 1
     max_pos = max_width <= 0 ? len : min(chr2ind(str, ind2chr(str,i) + max_width - 1), len)
     @inbounds while i <= max_pos
-        c, ii = next(str, i)
+        c, ii = iterate(str, i)::Tuple{Char, Int}
         if c == '/' || c == '_' || isalpha(c)
             tz_end = i
         else
