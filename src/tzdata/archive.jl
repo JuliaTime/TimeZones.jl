@@ -1,7 +1,7 @@
 import Compat: @static, Sys, devnull
 
 if Sys.iswindows()
-    const exe7z = joinpath(JULIA_HOME, "7z.exe")
+    const exe7z = joinpath(Sys.BINDIR, "7z.exe")
 end
 
 """
