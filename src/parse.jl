@@ -1,5 +1,6 @@
 import Compat.Dates: DateFormat, DatePart, tryparsenext, format, min_width, max_width,
     default_format
+using Compat: isletter
 
 # Handle Nullable deprecation on Julia 0.7
 if VERSION < v"0.7.0-DEV.3017"
@@ -55,7 +56,7 @@ function tryparsenext_tz(str, i, len, min_width::Int=1, max_width::Int=0)
     max_pos = max_width <= 0 ? len : min(chr2ind(str, ind2chr(str,i) + max_width - 1), len)
     @inbounds while i <= max_pos
         c, ii = iterate(str, i)::Tuple{Char, Int}
-        if c == '/' || c == '_' || isalpha(c)
+        if c == '/' || c == '_' || isletter(c)
             tz_end = i
         else
             break
