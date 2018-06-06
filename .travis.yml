@@ -3,7 +3,8 @@ os:
   - osx
   - linux
 julia:
-  - "0.6"
+  - 0.6
+  - 0.7
   - nightly
 notifications:
   email: false
@@ -13,9 +14,7 @@ script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
   # Avoid setting JULIA_TZ_VERSION if the deps/build.jl file has been modified
   - git fetch origin +:refs/remotes/origin/HEAD; if ! git diff --quiet origin/HEAD HEAD -- deps/build.jl; then unset JULIA_TZ_VERSION; fi
-  - julia -e 'Pkg.clone(pwd()); Pkg.build("TimeZones")'
-  - OPTIONS=$(julia -e 'using Mocking; print(DISABLE_COMPILED_MODULES_STR)')
-  - julia $OPTIONS -e 'Pkg.test("TimeZones"; coverage=true)'
+  - julia -e 'Pkg.clone(pwd()); Pkg.build("TimeZones"); Pkg.test("TimeZones"; coverage=true)'
 after_success:
   - julia -e 'cd(Pkg.dir("TimeZones")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())';
   - julia -e 'cd(Pkg.dir("TimeZones")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'

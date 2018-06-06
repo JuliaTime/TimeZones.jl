@@ -3,7 +3,7 @@ module WindowsTimeZoneIDs
 using Compat: @info
 
 import ...TimeZones: DEPS_DIR
-using LightXML
+using EzXML
 
 # A mapping of Windows timezone names to Olson timezone names.
 # Details on the contents of this file can be found at:
@@ -17,26 +17,20 @@ isdir(WINDOWS_XML_DIR) || mkdir(WINDOWS_XML_DIR)
 
 function compile(xml_file::AbstractString)
     # Get the timezone conversions from the file
-    xdoc = parse_file(xml_file)
-    xroot = root(xdoc)
-    windows_zones = find_element(xroot, "windowsZones")
-    map_timezones = find_element(windows_zones, "mapTimezones")
-    map_zones = get_elements_by_tagname(map_timezones, "mapZone")
+    doc = readxml(xml_file)
+
+    # Territory "001" is the global default
+    map_zones = find(doc, "//mapZone[@territory='001']")
 
     # TODO: Eliminate the Etc/* POSIX names here? See Windows section of `localzone`
 
     # Dictionary to store the windows to time zone conversions
     translation = Dict{String,String}()
     for map_zone in map_zones
-        # Territory "001" is the global default
-        if attribute(map_zone, "territory") == "001"
-            win_name = attribute(map_zone, "other")
-            posix_name = attribute(map_zone, "type")
-            translation[win_name] = posix_name
-        end
+        win_name = map_zone["other"]
+        posix_name = map_zone["type"]
+        translation[win_name] = posix_name
     end
-
-    free(xdoc)
 
     return translation
 end
