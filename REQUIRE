@@ -2,4 +2,4 @@ julia 0.6
 Compat 0.66
 Mocking 0.4.1
 Nullables 0.0.3
-@windows LightXML 0.2
+@windows EzXML 0.6
