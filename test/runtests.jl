@@ -1,21 +1,13 @@
 using Mocking
-using Compat: occursin, @info, @warn
+Mocking.enable(force=true)
+const compiled_modules_enabled = false
 
-compiled_modules_enabled = Mocking.compiled_modules_enabled()
-if compiled_modules_enabled
-    flag = Mocking.COMPILED_MODULES_FLAG
-    @warn "`julia` not started with `--$flag=no`. Disabling tests that require Mocking"
-else
-    Mocking.enable()
-end
-
-VERSION < v"0.7-" && import Compat: Test
-using Test
+import Compat: Sys, occursin, @info, @warn
+using Compat.Unicode
+using Compat.Test
 using TimeZones
 import TimeZones: PKG_DIR, ARCHIVE_DIR
 import TimeZones.TZData: ZoneDict, RuleDict, tzparse, resolve, build
-import Compat: Sys
-using Compat.Unicode
 using Nullables
 
 const TZDATA_VERSION = "2016j"
