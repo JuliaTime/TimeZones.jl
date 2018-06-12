@@ -11,7 +11,7 @@ end
 
 # https://github.com/JuliaLang/julia/pull/25261
 if VERSION < v"0.7.0-DEV.5126"
-    iterate(str::String, i::Int) = next(str, i)
+    iterate(str::AbstractString, i::Int) = next(str, i)
 end
 
 function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
