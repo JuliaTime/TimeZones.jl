@@ -17,7 +17,7 @@ import Compat.Dates: parse_components, default_format
     @test_throws ArgumentError parse(ZonedDateTime, "2016-04-11 08:00 EST", dateformat"yyyy-mm-dd HH:MM zzz")
     # test AbstractString
     @test isequal(
-        parse(ZonedDateTime, Base.Test.GenericString("2018-01-01 00:00 UTC"), dateformat"yyyy-mm-dd HH:MM ZZZ"),
+        parse(ZonedDateTime, Test.GenericString("2018-01-01 00:00 UTC"), dateformat"yyyy-mm-dd HH:MM ZZZ"),
         ZonedDateTime(2018, 1, 1, 0, tz"UTC"),
     )
 
