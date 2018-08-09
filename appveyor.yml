@@ -7,13 +7,6 @@ environment:
   - julia_version: 1.0
   - julia_version: latest
 
-matrix:
-  allow_failures:
-    # Failing due to https://github.com/bicycle1885/EzXML.jl/issues/66
-    - julia_version: 0.7
-    - julia_version: 1.0
-    - julia_version: latest
-
 platform:
   - x86 # 32-bit
   - x64 # 64-bit
