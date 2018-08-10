@@ -1,6 +1,6 @@
 module WindowsTimeZoneIDs
 
-using Compat: @info
+using Compat: @info, findall
 
 import ...TimeZones: DEPS_DIR
 using EzXML
@@ -20,7 +20,7 @@ function compile(xml_file::AbstractString)
     doc = readxml(xml_file)
 
     # Territory "001" is the global default
-    map_zones = find(doc, "//mapZone[@territory='001']")
+    map_zones = findall(doc, "//mapZone[@territory='001']")
 
     # TODO: Eliminate the Etc/* POSIX names here? See Windows section of `localzone`
 
