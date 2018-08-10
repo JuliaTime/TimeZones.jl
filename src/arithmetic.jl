@@ -1,4 +1,4 @@
-import Base: +, -, .+, .-
+import Base: +, -
 import Compat: @static
 
 if VERSION < v"0.7.0-DEV.4955"
