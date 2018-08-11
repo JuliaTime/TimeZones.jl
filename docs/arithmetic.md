@@ -1,6 +1,6 @@
-## ZonedDateTime-Period Arithmetic
+## Localized-Period Arithmetic
 
-`ZonedDateTime` uses calendrical arithmetic in a [similar manner to `DateTime`](https://docs.julialang.org/en/stable/manual/dates/#TimeType-Period-Arithmetic-1) but with some key differences. Lets look at these differences by adding a day to March 30th 2014 in Europe/Warsaw.
+`Localized` uses calendrical arithmetic in a [similar manner to `DateTime`](https://docs.julialang.org/en/stable/manual/dates/#TimeType-Period-Arithmetic-1) but with some key differences. Lets look at these differences by adding a day to March 30th 2014 in Europe/Warsaw.
 
 ```julia
 julia> using Base.Dates
@@ -8,14 +8,14 @@ julia> using Base.Dates
 julia> warsaw = tz"Europe/Warsaw"
 Europe/Warsaw (UTC+1/UTC+2)
 
-julia> spring = ZonedDateTime(2014, 3, 30, warsaw)
+julia> spring = Localized(2014, 3, 30, warsaw)
 2014-03-30T00:00:00+01:00
 
 julia> spring + Day(1)
 2014-03-31T00:00:00+02:00
 ```
 
-Adding a day to the `ZonedDateTime` changed the date from the 30th to the 31st as expected. Looking closely however you'll notice that the time zone offset changed from +01:00 to +02:00. The reason for this change is because the time zone "Europe/Warsaw" switched from standard time (+01:00) to daylight saving time (+02:00) on the 30th. The change in the offset caused the local DateTime 2014-03-31T02:00:00 to be skipped effectively making the 30th a day which only contained 23 hours. Alternatively if we added hours we can see the difference:
+Adding a day to the `Localized` changed the date from the 30th to the 31st as expected. Looking closely however you'll notice that the time zone offset changed from +01:00 to +02:00. The reason for this change is because the time zone "Europe/Warsaw" switched from standard time (+01:00) to daylight saving time (+02:00) on the 30th. The change in the offset caused the local DateTime 2014-03-31T02:00:00 to be skipped effectively making the 30th a day which only contained 23 hours. Alternatively if we added hours we can see the difference:
 
 ```julia
 julia> spring + Hour(24)
@@ -48,17 +48,17 @@ julia> spring + Day(1) + Hour(24)
 If using a version of Julia 0.5 or below you may want to force precedence when mixing `DatePeriod`s and `TimePeriod`s since the expression `Day(1) + Hour(24)` would be automatically canonicalized to `Day(2)`:
 
 ```julia
-julia> ZonedDateTime(2014, 10, 25, warsaw) + Day(1) + Hour(24)  # On Julia 0.5 or below
+julia> Localized(2014, 10, 25, warsaw) + Day(1) + Hour(24)  # On Julia 0.5 or below
 2014-10-27T00:00:00+01:00
 
-julia> ZonedDateTime(2014, 10, 25, warsaw) + Day(2)
+julia> Localized(2014, 10, 25, warsaw) + Day(2)
 2014-10-27T00:00:00+01:00
 ```
 
 In Julia 0.6 period canonicalization no longer happens automatically:
 
 ```
-julia> ZonedDateTime(2014, 10, 25, warsaw) + Day(1) + Hour(24)  # Julia 0.6 and above
+julia> Localized(2014, 10, 25, warsaw) + Day(1) + Hour(24)  # Julia 0.6 and above
 2014-10-26T23:00:00+01:00
 ```
 
@@ -70,10 +70,10 @@ Julia allows for the use of powerful [adjuster functions](https://docs.julialang
 julia> warsaw = tz"Europe/Warsaw"
 Europe/Warsaw (UTC+1/UTC+2)
 
-julia> start = ZonedDateTime(2014, warsaw)
+julia> start = Localized(2014, warsaw)
 2014-01-01T00:00:00+01:00
 
-julia> stop = ZonedDateTime(2015, warsaw)
+julia> stop = Localized(2015, warsaw)
 2015-01-01T00:00:00+01:00
 
 julia> Dates.recur(start:Dates.Hour(1):stop) do d
@@ -81,7 +81,7 @@ julia> Dates.recur(start:Dates.Hour(1):stop) do d
            Dates.hour(d) == 9 &&
            Dates.dayofweekofmonth(d) == 5
        end
-5-element Array{TimeZones.ZonedDateTime,1}:
+5-element Array{TimeZones.Localized,1}:
  2014-01-29T09:00:00+01:00
  2014-04-30T09:00:00+02:00
  2014-07-30T09:00:00+02:00
@@ -91,17 +91,17 @@ julia> Dates.recur(start:Dates.Hour(1):stop) do d
 
 Note the transition from standard time to daylight saving time (and back again).
 
-It is possible to define a range `start:step:stop` such that `start` and `stop` have different time zones. In this case the resulting `ZonedDateTime`s will all share a time zone with `start` but the range will stop at the instant that corresponds to `stop` in `start`'s time zone. For example:
+It is possible to define a range `start:step:stop` such that `start` and `stop` have different time zones. In this case the resulting `Localized`s will all share a time zone with `start` but the range will stop at the instant that corresponds to `stop` in `start`'s time zone. For example:
 
 ```julia
-julia> start = ZonedDateTime(2016, 1, 1, 12, tz"UTC")
+julia> start = Localized(2016, 1, 1, 12, tz"UTC")
 2016-01-01T12:00:00+00:00
 
-julia> stop = ZonedDateTime(2016, 1, 1, 18, tz"Europe/Warsaw")
+julia> stop = Localized(2016, 1, 1, 18, tz"Europe/Warsaw")
 2016-01-01T18:00:00+01:00
 
 julia> collect(start:Dates.Hour(1):stop)
-6-element Array{TimeZones.ZonedDateTime,1}:
+6-element Array{TimeZones.Localized,1}:
  2016-01-01T12:00:00+00:00
  2016-01-01T13:00:00+00:00
  2016-01-01T14:00:00+00:00

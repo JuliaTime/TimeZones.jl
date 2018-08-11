@@ -8,24 +8,24 @@ else
     import Base.Broadcast: broadcasted
 end
 
-# ZonedDateTime arithmetic
-(+)(x::ZonedDateTime) = x
-(-)(x::ZonedDateTime, y::ZonedDateTime) = x.utc_datetime - y.utc_datetime
+# Localized arithmetic
+(+)(x::Localized) = x
+(-)(x::Localized, y::Localized) = x.utc_datetime - y.utc_datetime
 
-function (+)(zdt::ZonedDateTime, p::DatePeriod)
-    return ZonedDateTime(localtime(zdt) + p, timezone(zdt))
+function (+)(zdt::Localized, p::DatePeriod)
+    return Localized(localtime(zdt) + p, timezone(zdt))
 end
-function (+)(zdt::ZonedDateTime, p::TimePeriod)
-    return ZonedDateTime(zdt.utc_datetime + p, timezone(zdt); from_utc=true)
+function (+)(zdt::Localized, p::TimePeriod)
+    return Localized(zdt.utc_datetime + p, timezone(zdt); from_utc=true)
 end
-function (-)(zdt::ZonedDateTime, p::DatePeriod)
-    return ZonedDateTime(localtime(zdt) - p, timezone(zdt))
+function (-)(zdt::Localized, p::DatePeriod)
+    return Localized(localtime(zdt) - p, timezone(zdt))
 end
-function (-)(zdt::ZonedDateTime, p::TimePeriod)
-    return ZonedDateTime(zdt.utc_datetime - p, timezone(zdt); from_utc=true)
+function (-)(zdt::Localized, p::TimePeriod)
+    return Localized(zdt.utc_datetime - p, timezone(zdt); from_utc=true)
 end
 
-function broadcasted(::typeof(+), r::StepRange{ZonedDateTime}, p::DatePeriod)
+function broadcasted(::typeof(+), r::StepRange{<:Localized}, p::DatePeriod)
     start, step, stop = first(r), Base.step(r), last(r)
 
     # Since the localtime + period can result in an invalid local datetime when working with
@@ -49,4 +49,4 @@ function broadcasted(::typeof(+), r::StepRange{ZonedDateTime}, p::DatePeriod)
     return StepRange(start, step, stop)
 end
 
-broadcasted(::typeof(-), r::StepRange{ZonedDateTime}, p::DatePeriod) = broadcast(+, r, -p)
+broadcasted(::typeof(-), r::StepRange{Localized}, p::DatePeriod) = broadcast(+, r, -p)

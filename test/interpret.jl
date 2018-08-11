@@ -6,28 +6,28 @@ non_existent_pos = DateTime(2011,9,24,3)
 ambiguous_neg = DateTime(2012,4,1,3)
 non_existent_neg = DateTime(2012,9,30,3)
 
-@test_throws AmbiguousTimeError ZonedDateTime(ambiguous_pos, apia)
-@test_throws NonExistentTimeError ZonedDateTime(non_existent_pos, apia)
-@test_throws AmbiguousTimeError ZonedDateTime(ambiguous_neg, apia)
-@test_throws NonExistentTimeError ZonedDateTime(non_existent_neg, apia)
+@test_throws AmbiguousTimeError Localized(ambiguous_pos, apia)
+@test_throws NonExistentTimeError Localized(non_existent_pos, apia)
+@test_throws AmbiguousTimeError Localized(ambiguous_neg, apia)
+@test_throws NonExistentTimeError Localized(non_existent_neg, apia)
 
-@test TimeZones.shift_gap(ambiguous_pos, apia) == ZonedDateTime[]
+@test TimeZones.shift_gap(ambiguous_pos, apia) == Localized[]
 @test TimeZones.shift_gap(non_existent_pos, apia) == [
-    ZonedDateTime(2011, 9, 24, 2, 59, 59, 999, apia),
-    ZonedDateTime(2011, 9, 24, 4, apia),
+    Localized(2011, 9, 24, 2, 59, 59, 999, apia),
+    Localized(2011, 9, 24, 4, apia),
 ]
-@test TimeZones.shift_gap(ambiguous_neg, apia) == ZonedDateTime[]
+@test TimeZones.shift_gap(ambiguous_neg, apia) == Localized[]
 @test TimeZones.shift_gap(non_existent_neg, apia) == [
-    ZonedDateTime(2012, 9, 30, 2, 59, 59, 999, apia),
-    ZonedDateTime(2012, 9, 30, 4, apia),
+    Localized(2012, 9, 30, 2, 59, 59, 999, apia),
+    Localized(2012, 9, 30, 4, apia),
 ]
 
 # Valid local datetimes close to the non-existent hour should have no boundaries as are
 # already valid.
-@test TimeZones.shift_gap(non_existent_pos - Second(1), apia) == ZonedDateTime[]
-@test TimeZones.shift_gap(non_existent_pos + Hour(1), apia) == ZonedDateTime[]
-@test TimeZones.shift_gap(non_existent_neg - Second(1), apia) == ZonedDateTime[]
-@test TimeZones.shift_gap(non_existent_neg + Hour(1), apia) == ZonedDateTime[]
+@test TimeZones.shift_gap(non_existent_pos - Second(1), apia) == Localized[]
+@test TimeZones.shift_gap(non_existent_pos + Hour(1), apia) == Localized[]
+@test TimeZones.shift_gap(non_existent_neg - Second(1), apia) == Localized[]
+@test TimeZones.shift_gap(non_existent_neg + Hour(1), apia) == Localized[]
 
 
 # Create custom VariableTimeZones to test corner cases
@@ -58,12 +58,12 @@ non_existent_2 = DateTime(1935,4,1,3)
 for tz in (long, hidden)
     local tz
     boundaries = [
-        ZonedDateTime(1935, 4, 1, 1, 59, 59, 999, tz),
-        ZonedDateTime(1935, 4, 1, 4, tz),
+        Localized(1935, 4, 1, 1, 59, 59, 999, tz),
+        Localized(1935, 4, 1, 4, tz),
     ]
 
-    @test_throws NonExistentTimeError ZonedDateTime(non_existent_1, tz)
-    @test_throws NonExistentTimeError ZonedDateTime(non_existent_2, tz)
+    @test_throws NonExistentTimeError Localized(non_existent_1, tz)
+    @test_throws NonExistentTimeError Localized(non_existent_2, tz)
 
     @test TimeZones.shift_gap(non_existent_1, tz) == boundaries
     @test TimeZones.shift_gap(non_existent_2, tz) == boundaries
@@ -76,21 +76,21 @@ ambiguous = ambiguous_pos
 non_existent = non_existent_pos
 
 # first_valid/last_valid with a step
-@test TimeZones.first_valid(valid, apia, Hour(1)) == ZonedDateTime(valid, apia)
-@test TimeZones.last_valid(valid, apia, Hour(1)) == ZonedDateTime(valid, apia)
+@test TimeZones.first_valid(valid, apia, Hour(1)) == Localized(valid, apia)
+@test TimeZones.last_valid(valid, apia, Hour(1)) == Localized(valid, apia)
 
-@test TimeZones.first_valid(non_existent, apia, Hour(1)) == ZonedDateTime(2011,9,24,4,apia)
-@test TimeZones.last_valid(non_existent, apia, Hour(1)) == ZonedDateTime(2011,9,24,2,apia)
+@test TimeZones.first_valid(non_existent, apia, Hour(1)) == Localized(2011,9,24,4,apia)
+@test TimeZones.last_valid(non_existent, apia, Hour(1)) == Localized(2011,9,24,2,apia)
 
-@test TimeZones.first_valid(ambiguous, apia, Hour(1)) == ZonedDateTime(ambiguous,apia,1)
-@test TimeZones.last_valid(ambiguous, apia, Hour(1)) == ZonedDateTime(ambiguous,apia,2)
+@test TimeZones.first_valid(ambiguous, apia, Hour(1)) == Localized(ambiguous,apia,1)
+@test TimeZones.last_valid(ambiguous, apia, Hour(1)) == Localized(ambiguous,apia,2)
 
 # first_valid/last_valid with no step
-@test TimeZones.first_valid(valid, apia) == ZonedDateTime(valid, apia)
-@test TimeZones.last_valid(valid, apia) == ZonedDateTime(valid, apia)
+@test TimeZones.first_valid(valid, apia) == Localized(valid, apia)
+@test TimeZones.last_valid(valid, apia) == Localized(valid, apia)
 
-@test TimeZones.first_valid(non_existent, apia) == ZonedDateTime(2011,9,24,4,apia)
-@test TimeZones.last_valid(non_existent, apia) == ZonedDateTime(2011,9,24,2,59,59,999,apia)
+@test TimeZones.first_valid(non_existent, apia) == Localized(2011,9,24,4,apia)
+@test TimeZones.last_valid(non_existent, apia) == Localized(2011,9,24,2,59,59,999,apia)
 
-@test TimeZones.first_valid(ambiguous, apia) == ZonedDateTime(ambiguous,apia,1)
-@test TimeZones.last_valid(ambiguous, apia) == ZonedDateTime(ambiguous,apia,2)
+@test TimeZones.first_valid(ambiguous, apia) == Localized(ambiguous,apia,1)
+@test TimeZones.last_valid(ambiguous, apia) == Localized(ambiguous,apia,2)

@@ -1,11 +1,11 @@
-## Rounding a ZonedDateTime
+## Rounding a Localized
 
-Rounding operations (`floor`, `ceil`, and `round`) on `ZonedDateTime`s are performed in a
+Rounding operations (`floor`, `ceil`, and `round`) on `Localized`s are performed in a
 [similar manner to `DateTime`](https://docs.julialang.org/en/stable/manual/dates/#Rounding-1)
 and should generally behave as expected. When `VariableTimeZone` transitions are involved,
 however, unexpected behaviour may be encountered.
 
-Instead of performing rounding operations on a UTC representation of the `ZonedDateTime`,
+Instead of performing rounding operations on a UTC representation of the `Localized`,
 which would in some cases be computationally less expensive, rounding is done in the local
 time zone. This ensures that rounding behaves as expected and is maximally meaningful.
 
@@ -18,8 +18,8 @@ wouldn't be on the hour in the local time zone.
 
 When the target resolution is a `TimePeriod` the likelihood of encountering an ambiguous or
 non-existent time (due to daylight saving time transitions) is increased. To resolve this
-issue, rounding a `ZonedDateTime` with a `VariableTimeZone` to a `TimePeriod` uses the
-`DateTime` value in the appropriate `FixedTimeZone`, then reconverts it to a `ZonedDateTime`
+issue, rounding a `Localized` with a `VariableTimeZone` to a `TimePeriod` uses the
+`DateTime` value in the appropriate `FixedTimeZone`, then reconverts it to a `Localized`
 in the appropriate `VariableTimeZone` afterward. (See [Examples](#examples) below.)
 
 ### Rounding to a DatePeriod
@@ -27,7 +27,7 @@ in the appropriate `VariableTimeZone` afterward. (See [Examples](#examples) belo
 When the target resolution is a `DatePeriod` rounding is done in the local time zone in a
 straightforward fashion.
 
-Rounding is not an entirely "safe" operation for `ZonedDateTime`s, as in some cases
+Rounding is not an entirely "safe" operation for `Localized`s, as in some cases
 historical transitions for some time zones (`Asia/Colombo`, for example) occur at midnight.
 In such cases rounding to a `DatePeriod` may still result in an `AmbiguousTimeError` or a
 `NonExistentTimeError`s. (But such occurrences should be relatively rare.)
@@ -40,7 +40,7 @@ The `America/Winnipeg` time zone transitioned from Central Standard Time (UTC-6:
 Central Daylight Time (UTC-5:00) on 2016-03-13, moving directly from 01:59:59 to 03:00:00.
 
 ```julia
-julia> zdt = ZonedDateTime(2016, 3, 13, 1, 45, tz"America/Winnipeg")
+julia> zdt = Localized(2016, 3, 13, 1, 45, tz"America/Winnipeg")
 2016-03-13T01:45:00-06:00
 
 julia> floor(zdt, Dates.Day)
@@ -66,7 +66,7 @@ The `Asia/Colombo` time zone revised the definition of Lanka Time from UTC+6:30 
 on 1996-10-26, moving from 00:29:59 back to 00:00:00.
 
 ```julia
-julia> zdt = ZonedDateTime(1996, 10, 25, 23, 45, tz"Asia/Colombo")
+julia> zdt = Localized(1996, 10, 25, 23, 45, tz"Asia/Colombo")
 1996-10-25T23:45:00+06:30
 
 julia> round(zdt, Dates.Hour)

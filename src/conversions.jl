@@ -6,20 +6,20 @@ using Mocking
 const utc_tz = FixedTimeZone("UTC")
 
 """
-    DateTime(::ZonedDateTime) -> DateTime
+    DateTime(::Localized) -> DateTime
 
 Returns an equivalent `DateTime` without any `TimeZone` information.
 """
-DateTime(zdt::ZonedDateTime) = localtime(zdt)
+DateTime(zdt::Localized) = localtime(zdt)
 
 """
-    now(::TimeZone) -> ZonedDateTime
+    now(::TimeZone) -> Localized
 
-Returns a `ZonedDateTime` corresponding to the user's system time in the specified `TimeZone`.
+Returns a `Localized` corresponding to the user's system time in the specified `TimeZone`.
 """
 function now(tz::TimeZone)
     utc = unix2datetime(time())
-    ZonedDateTime(utc, tz, from_utc=true)
+    Localized(utc, tz, from_utc=true)
 end
 
 """
@@ -43,9 +43,9 @@ julia> today(tz"Pacific/Midway"), today(tz"Pacific/Apia")
 today(tz::TimeZone) = Date(localtime(now(tz)))
 
 """
-    todayat(tod::Time, tz::TimeZone, [amb]) -> ZonedDateTime
+    todayat(tod::Time, tz::TimeZone, [amb]) -> Localized
 
-Creates a `ZonedDateTime` for today at the specified time of day. If the result is ambiguous
+Creates a `Localized` for today at the specified time of day. If the result is ambiguous
 in the given `TimeZone` then `amb` can be supplied to resolve ambiguity.
 
 # Examples
@@ -59,20 +59,20 @@ julia> todayat(Time(10, 30), tz"Europe/Warsaw")
 ```
 """
 function todayat(tod::Time, tz::VariableTimeZone, amb::Union{Integer,Bool})
-    ZonedDateTime((@mock today(tz)) + tod, tz, amb)
+    Localized((@mock today(tz)) + tod, tz, amb)
 end
 
-todayat(tod::Time, tz::TimeZone) = ZonedDateTime((@mock today(tz)) + tod, tz)
+todayat(tod::Time, tz::TimeZone) = Localized((@mock today(tz)) + tod, tz)
 
 
 """
-    astimezone(zdt::ZonedDateTime, tz::TimeZone) -> ZonedDateTime
+    astimezone(zdt::Localized, tz::TimeZone) -> Localized
 
-Converts a `ZonedDateTime` from its current `TimeZone` into the specified `TimeZone`.
+Converts a `Localized` from its current `TimeZone` into the specified `TimeZone`.
 """
 function astimezone end
 
-function astimezone(zdt::ZonedDateTime, tz::VariableTimeZone)
+function astimezone(zdt::Localized, tz::VariableTimeZone)
     i = searchsortedlast(
         tz.transitions, zdt.utc_datetime,
         by=v -> typeof(v) == Transition ? v.utc_datetime : v,
@@ -83,41 +83,41 @@ function astimezone(zdt::ZonedDateTime, tz::VariableTimeZone)
     end
 
     zone = tz.transitions[i].zone
-    return ZonedDateTime(zdt.utc_datetime, tz, zone)
+    return Localized(zdt.utc_datetime, tz, zone)
 end
 
-function astimezone(zdt::ZonedDateTime, tz::FixedTimeZone)
-    return ZonedDateTime(zdt.utc_datetime, tz, tz)
+function astimezone(zdt::Localized, tz::FixedTimeZone)
+    return Localized(zdt.utc_datetime, tz, tz)
 end
 
-function zdt2julian(zdt::ZonedDateTime)
+function zdt2julian(zdt::Localized)
     datetime2julian(utc(zdt))
 end
 
-function zdt2julian(::Type{T}, zdt::ZonedDateTime) where T<:Integer
+function zdt2julian(::Type{T}, zdt::Localized) where T<:Integer
     floor(T, datetime2julian(utc(zdt)))
 end
 
-function zdt2julian(::Type{T}, zdt::ZonedDateTime) where T<:Real
+function zdt2julian(::Type{T}, zdt::Localized) where T<:Real
     convert(T, datetime2julian(utc(zdt)))
 end
 
 function julian2zdt(jd::Real)
-    ZonedDateTime(julian2datetime(jd), utc_tz, from_utc=true)
+    Localized(julian2datetime(jd), utc_tz, from_utc=true)
 end
 
-function zdt2unix(zdt::ZonedDateTime)
+function zdt2unix(zdt::Localized)
     datetime2unix(utc(zdt))
 end
 
-function zdt2unix(::Type{T}, zdt::ZonedDateTime) where T<:Integer
+function zdt2unix(::Type{T}, zdt::Localized) where T<:Integer
     floor(T, datetime2unix(utc(zdt)))
 end
 
-function zdt2unix(::Type{T}, zdt::ZonedDateTime) where T<:Real
+function zdt2unix(::Type{T}, zdt::Localized) where T<:Real
     convert(T, datetime2unix(utc(zdt)))
 end
 
 function unix2zdt(seconds::Real)
-    ZonedDateTime(unix2datetime(seconds), utc_tz, from_utc=true)
+    Localized(unix2datetime(seconds), utc_tz, from_utc=true)
 end

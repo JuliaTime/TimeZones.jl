@@ -13,7 +13,7 @@ extract(active_archive(), TimeZones.TZ_SOURCE_DIR, "etcetera")
 compile()
 ```
 
-## Far-future ZonedDateTime with VariableTimeZone
+## Far-future Localized with VariableTimeZone
 
 Due to the internal representation of a `VariableTimeZone` it is infeasible to determine a time zones transitions to infinity. Since [2038-01-19T03:14:07](https://en.wikipedia.org/wiki/Year_2038_problem) is the last `DateTime` that can be represented by an `Int32` (`Dates.unix2datetime(typemax(Int32))`) it was decided that 2037 would be the last year in which all transition dates are computed. If additional transitions are known to exist after the last transition then a cutoff date is specified.
 
@@ -27,18 +27,18 @@ julia> last(warsaw.transitions)
 julia> warsaw.cutoff  # DateTime up until the last transition is effective
 Nullable{DateTime}(2038-03-28T01:00:00)
 
-julia> ZonedDateTime(DateTime(2039), warsaw)
+julia> Localized(DateTime(2039), warsaw)
 ERROR: TimeZone Europe/Warsaw does not handle dates on or after 2038-03-28T01:00:00 UTC
 ```
 
-It is important to note that since we are taking about future time zone transitions and the rules dictating these transitions are subject to change and may not be accurate. If you still want to work with future `ZonedDateTime` past the default cutoff you can re-compile the `TimeZone` objects and specify the `max_year` keyword:
+It is important to note that since we are taking about future time zone transitions and the rules dictating these transitions are subject to change and may not be accurate. If you still want to work with future `Localized` past the default cutoff you can re-compile the `TimeZone` objects and specify the `max_year` keyword:
 
 ```julia
 julia> using TimeZones
 
 julia> TimeZones.TZData.compile(max_year=2200)
 
-julia> ZonedDateTime(DateTime(2100), tz"Europe/Warsaw")
+julia> Localized(DateTime(2100), tz"Europe/Warsaw")
 2100-01-01T00:00:00+01:00
 ```
 
@@ -47,13 +47,13 @@ Warning: since the `tz` string macro loads the `TimeZone` at compile time the ti
 ```julia
 julia> begin
            TimeZones.TZData.compile(max_year=2210)
-           ZonedDateTime(DateTime(2205), tz"Europe/Warsaw")
+           Localized(DateTime(2205), tz"Europe/Warsaw")
        end
 ERROR: UnhandledTimeError: TimeZone Europe/Warsaw does not handle dates on or after 2038-03-28T01:00:00 UTC
 
 julia> begin
            TimeZones.TZData.compile(max_year=2220)
-           ZonedDateTime(DateTime(2215), TimeZone("Europe/Warsaw"))
+           Localized(DateTime(2215), TimeZone("Europe/Warsaw"))
        end
 2215-01-01T00:00:00+01:00
 ```

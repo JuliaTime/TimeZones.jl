@@ -2,34 +2,34 @@ import Compat.Dates: Hour, Minute, Second, Millisecond,
     days, hour, minute, second, millisecond
 
 """
-    localtime(::ZonedDateTime) -> DateTime
+    localtime(::Localized) -> DateTime
 
-Creates a local or civil `DateTime` from the given `ZonedDateTime`. For example the
+Creates a local or civil `DateTime` from the given `Localized`. For example the
 `2014-05-30T08:11:24-04:00` would return `2014-05-30T08:11:24`.
 """
-localtime(zdt::ZonedDateTime) = zdt.utc_datetime + zdt.zone.offset
+localtime(zdt::Localized) = zdt.utc_datetime + zdt.zone.offset
 
 """
-    utc(::ZonedDateTime) -> DateTime
+    utc(::Localized) -> DateTime
 
-Creates a utc `DateTime` from the given `ZonedDateTime`. For example the
+Creates a utc `DateTime` from the given `Localized`. For example the
 `2014-05-30T08:11:24-04:00` would return `2014-05-30T12:11:24`.
 """
-utc(zdt::ZonedDateTime) = zdt.utc_datetime
+utc(zdt::Localized) = zdt.utc_datetime
 
 """
-    timezone(::ZonedDateTime) -> TimeZone
+    timezone(::Localized) -> TimeZone
 
-Returns the `TimeZone` used by the `ZonedDateTime`.
+Returns the `TimeZone` used by the `Localized`.
 """
-timezone(zdt::ZonedDateTime) = zdt.timezone
+timezone(zdt::Localized) = zdt.timezone
 
-days(zdt::ZonedDateTime) = days(localtime(zdt))
+days(zdt::Localized) = days(localtime(zdt))
 
 for period in (:Hour, :Minute, :Second, :Millisecond)
     accessor = Symbol(lowercase(string(period)))
     @eval begin
-        $accessor(zdt::ZonedDateTime) = $accessor(localtime(zdt))
-        $period(zdt::ZonedDateTime) = $period($accessor(zdt))
+        $accessor(zdt::Localized) = $accessor(localtime(zdt))
+        $period(zdt::Localized) = $period($accessor(zdt))
     end
 end

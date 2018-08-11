@@ -6,12 +6,12 @@ warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 apia = resolve("Pacific/Apia", tzdata["australasia"]...)
 midway = resolve("Pacific/Midway", tzdata["australasia"]...)
 
-# Converting a ZonedDateTime into a DateTime
+# Converting a Localized into a DateTime
 dt = DateTime(2015, 1, 1, 0)
-zdt = ZonedDateTime(dt, warsaw)
+zdt = Localized(dt, warsaw)
 @test DateTime(zdt) == dt
 
-# Converting from ZonedDateTime to DateTime isn't possible as it is always inexact.
+# Converting from Localized to DateTime isn't possible as it is always inexact.
 @test_throws MethodError convert(DateTime, zdt)
 
 # Vectorized accessors
@@ -41,8 +41,8 @@ zdt = now(warsaw)
             local patch = @patch today(tz::TimeZone) = Date(1916, 10, 1)
             apply(patch) do
                 @test_throws AmbiguousTimeError todayat(Time(0), warsaw)
-                @test todayat(Time(0), warsaw, 1) == ZonedDateTime(1916, 10, 1, 0, warsaw, 1)
-                @test todayat(Time(0), warsaw, 2) == ZonedDateTime(1916, 10, 1, 0, warsaw, 2)
+                @test todayat(Time(0), warsaw, 1) == Localized(1916, 10, 1, 0, warsaw, 1)
+                @test todayat(Time(0), warsaw, 2) == Localized(1916, 10, 1, 0, warsaw, 2)
             end
         end
     end
@@ -50,54 +50,54 @@ end
 
 # Changing time zones
 dt = DateTime(2015, 1, 1, 0)
-zdt_utc = ZonedDateTime(dt, utc; from_utc=true)
-zdt_warsaw = ZonedDateTime(dt, warsaw; from_utc=true)
+zdt_utc = Localized(dt, utc; from_utc=true)
+zdt_warsaw = Localized(dt, warsaw; from_utc=true)
 
-# Identical since ZonedDateTime is immutable
+# Identical since Localized is immutable
 @test astimezone(zdt_utc, warsaw) === zdt_warsaw
 @test astimezone(zdt_warsaw, utc) === zdt_utc
 
-# ZonedDateTime to Unix timestamp (and vice versa)
-@test TimeZones.zdt2unix(ZonedDateTime(1970, utc)) == 0
-@test TimeZones.unix2zdt(0) == ZonedDateTime(1970, utc)
+# Localized to Unix timestamp (and vice versa)
+@test TimeZones.zdt2unix(Localized(1970, utc)) == 0
+@test TimeZones.unix2zdt(0) == Localized(1970, utc)
 
 for dt in (DateTime(2013, 2, 13), DateTime(2016, 8, 11))
     local dt
-    local zdt = ZonedDateTime(dt, warsaw)
+    local zdt = Localized(dt, warsaw)
     offset = TimeZones.value(zdt.zone.offset)   # Total offset in seconds
     @test TimeZones.zdt2unix(zdt) == datetime2unix(dt) - offset
 end
 
-@test isa(TimeZones.zdt2unix(ZonedDateTime(1970, utc)), Float64)
-@test isa(TimeZones.zdt2unix(Float32, ZonedDateTime(1970, utc)), Float32)
-@test isa(TimeZones.zdt2unix(Int64, ZonedDateTime(1970, utc)), Int64)
-@test isa(TimeZones.zdt2unix(Int32, ZonedDateTime(1970, utc)), Int32)
+@test isa(TimeZones.zdt2unix(Localized(1970, utc)), Float64)
+@test isa(TimeZones.zdt2unix(Float32, Localized(1970, utc)), Float32)
+@test isa(TimeZones.zdt2unix(Int64, Localized(1970, utc)), Int64)
+@test isa(TimeZones.zdt2unix(Int32, Localized(1970, utc)), Int32)
 
-@test TimeZones.zdt2unix(ZonedDateTime(1970, 1, 1, 0, 0, 0, 750, utc)) == 0.75
-@test TimeZones.zdt2unix(Float32, ZonedDateTime(1970, 1, 1, 0, 0, 0, 750, utc)) == 0.75
-@test TimeZones.zdt2unix(Int64, ZonedDateTime(1970, 1, 1, 0, 0, 0, 750, utc)) == 0
-@test TimeZones.zdt2unix(Int32, ZonedDateTime(1970, 1, 1, 0, 0, 0, 750, utc)) == 0
+@test TimeZones.zdt2unix(Localized(1970, 1, 1, 0, 0, 0, 750, utc)) == 0.75
+@test TimeZones.zdt2unix(Float32, Localized(1970, 1, 1, 0, 0, 0, 750, utc)) == 0.75
+@test TimeZones.zdt2unix(Int64, Localized(1970, 1, 1, 0, 0, 0, 750, utc)) == 0
+@test TimeZones.zdt2unix(Int32, Localized(1970, 1, 1, 0, 0, 0, 750, utc)) == 0
 
 # round-trip
-zdt = ZonedDateTime(2010, 1, 2, 3, 4, 5, 999, utc)
+zdt = Localized(2010, 1, 2, 3, 4, 5, 999, utc)
 round_trip = TimeZones.unix2zdt(TimeZones.zdt2unix(zdt))
 @test round_trip == zdt
 
 # millisecond loss
-zdt = ZonedDateTime(2010, 1, 2, 3, 4, 5, 999, utc)
+zdt = Localized(2010, 1, 2, 3, 4, 5, 999, utc)
 round_trip = TimeZones.unix2zdt(TimeZones.zdt2unix(Int64, zdt))
 @test round_trip != zdt
 @test round_trip == floor(zdt, Dates.Second(1))
 
 # timezone loss
-zdt = ZonedDateTime(2010, 1, 2, 3, 4, 5, warsaw)
+zdt = Localized(2010, 1, 2, 3, 4, 5, warsaw)
 round_trip = TimeZones.unix2zdt(TimeZones.zdt2unix(Int64, zdt))
 @test round_trip == zdt
 @test !isequal(round_trip, zdt)
 
 # Julian dates
 jd = 2457241.855
-jd_zdt = ZonedDateTime(Dates.julian2datetime(jd), warsaw, from_utc=true)
+jd_zdt = Localized(Dates.julian2datetime(jd), warsaw, from_utc=true)
 @test TimeZones.zdt2julian(jd_zdt) == jd
 @test TimeZones.zdt2julian(Int, jd_zdt) === floor(Int, jd)
 @test TimeZones.zdt2julian(Float64, jd_zdt) === jd

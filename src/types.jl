@@ -131,38 +131,34 @@ end
 
 
 # """
-#     ZonedDateTime
+#     Localized
 
 # A `DateTime` that includes `TimeZone` information.
 # """
 
-struct ZonedDateTime <: AbstractDateTime
-    utc_datetime::DateTime
+struct Localized{T<:Compat.AbstractDateTime} <: AbstractDateTime
+    utc_datetime::T
     timezone::TimeZone
     zone::FixedTimeZone  # The current zone for the utc_datetime.
+end
 
-    function ZonedDateTime(utc_datetime::DateTime, timezone::TimeZone, zone::FixedTimeZone)
-        return new(utc_datetime, timezone, zone)
+function Localized(utc_datetime::T, timezone::VariableTimeZone, zone::FixedTimeZone) where T<:Compat.AbstractDateTime
+    if utc_datetime >= get(timezone.cutoff, typemax(DateTime))
+        throw(UnhandledTimeError(timezone))
     end
 
-    function ZonedDateTime(utc_datetime::DateTime, timezone::VariableTimeZone, zone::FixedTimeZone)
-        if utc_datetime >= get(timezone.cutoff, typemax(DateTime))
-            throw(UnhandledTimeError(timezone))
-        end
-
-        return new(utc_datetime, timezone, zone)
-    end
+    return Localized{T}(utc_datetime, timezone, zone)
 end
 
 """
-    ZonedDateTime(dt::DateTime, tz::TimeZone; from_utc=false) -> ZonedDateTime
+    Localized(dt::DateTime, tz::TimeZone; from_utc=false) -> Localized
 
-Construct a `ZonedDateTime` by applying a `TimeZone` to a `DateTime`. When the `from_utc`
+Construct a `Localized` by applying a `TimeZone` to a `DateTime`. When the `from_utc`
 keyword is true the given `DateTime` is assumed to be in UTC instead of in local time and is
 converted to the specified `TimeZone`.  Note that when `from_utc` is true the given
 `DateTime` will always exists and is never ambiguous.
 """
-function ZonedDateTime(dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
+function Localized(dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
     possible = interpret(dt, tz, from_utc ? UTC : Local)
 
     num = length(possible)
@@ -175,19 +171,19 @@ function ZonedDateTime(dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
     end
 end
 
-function ZonedDateTime(dt::DateTime, tz::FixedTimeZone; from_utc::Bool=false)
+function Localized(dt::DateTime, tz::FixedTimeZone; from_utc::Bool=false)
     utc_dt = from_utc ? dt : dt - tz.offset
-    return ZonedDateTime(utc_dt, tz, tz)
+    return Localized{DateTime}(utc_dt, tz, tz)
 end
 
 """
-    ZonedDateTime(dt::DateTime, tz::VariableTimeZone, occurrence::Integer) -> ZonedDateTime
+    Localized(dt::DateTime, tz::VariableTimeZone, occurrence::Integer) -> Localized
 
-Construct a `ZonedDateTime` by applying a `TimeZone` to a `DateTime`. If the `DateTime` is
+Construct a `Localized` by applying a `TimeZone` to a `DateTime`. If the `DateTime` is
 ambiguous within the given time zone you can set `occurrence` to a positive integer to
 resolve the ambiguity.
 """
-function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, occurrence::Integer)
+function Localized(dt::DateTime, tz::VariableTimeZone, occurrence::Integer)
     possible = interpret(dt, tz, Local)
 
     num = length(possible)
@@ -203,12 +199,12 @@ function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, occurrence::Integer)
 end
 
 """
-    ZonedDateTime(dt::DateTime, tz::VariableTimeZone, is_dst::Bool) -> ZonedDateTime
+    Localized(dt::DateTime, tz::VariableTimeZone, is_dst::Bool) -> Localized
 
-Construct a `ZonedDateTime` by applying a `TimeZone` to a `DateTime`. If the `DateTime` is
+Construct a `Localized` by applying a `TimeZone` to a `DateTime`. If the `DateTime` is
 ambiguous within the given time zone you can set `is_dst` to resolve the ambiguity.
 """
-function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
+function Localized(dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
     possible = interpret(dt, tz, Local)
 
     num = length(possible)
@@ -231,29 +227,29 @@ end
 
 # Convenience constructors
 @doc """
-    ZonedDateTime(y, [m, d, h, mi, s, ms], tz, [amb]) -> DateTime
+    Localized(y, [m, d, h, mi, s, ms], tz, [amb]) -> DateTime
 
-Construct a `ZonedDateTime` type by parts. Arguments `y, m, ..., ms` must be convertible to
+Construct a `Localized` type by parts. Arguments `y, m, ..., ms` must be convertible to
 `Int64` and `tz` must be a `TimeZone`. If the given `DateTime` is ambiguous in the given
 `TimeZone` then `amb` can be supplied to resolve ambiguity.
-""" ZonedDateTime
+""" Localized
 
-@optional function ZonedDateTime(y::Integer, m::Integer=1, d::Integer=1, h::Integer=0, mi::Integer=0, s::Integer=0, ms::Integer=0, tz::VariableTimeZone, amb::Union{Integer,Bool})
-    ZonedDateTime(DateTime(y,m,d,h,mi,s,ms), tz, amb)
+@optional function Localized(y::Integer, m::Integer=1, d::Integer=1, h::Integer=0, mi::Integer=0, s::Integer=0, ms::Integer=0, tz::VariableTimeZone, amb::Union{Integer,Bool})
+    Localized(DateTime(y,m,d,h,mi,s,ms), tz, amb)
 end
 
-@optional function ZonedDateTime(y::Integer, m::Integer=1, d::Integer=1, h::Integer=0, mi::Integer=0, s::Integer=0, ms::Integer=0, tz::TimeZone)
-    ZonedDateTime(DateTime(y,m,d,h,mi,s,ms), tz)
+@optional function Localized(y::Integer, m::Integer=1, d::Integer=1, h::Integer=0, mi::Integer=0, s::Integer=0, ms::Integer=0, tz::TimeZone)
+    Localized(DateTime(y,m,d,h,mi,s,ms), tz)
 end
 
 # Parsing constructor. Note we typically don't support passing in time zone information as a
 # string since we cannot do not know if we need to support resolving ambiguity.
-function ZonedDateTime(y::Int64, m::Int64, d::Int64, h::Int64, mi::Int64, s::Int64, ms::Int64, tz::AbstractString)
-    ZonedDateTime(DateTime(y,m,d,h,mi,s,ms), TimeZone(tz))
+function Localized(y::Int64, m::Int64, d::Int64, h::Int64, mi::Int64, s::Int64, ms::Int64, tz::AbstractString)
+    Localized(DateTime(y,m,d,h,mi,s,ms), TimeZone(tz))
 end
 
 
-function ZonedDateTime(parts::Union{Period,TimeZone}...)
+function Localized(parts::Union{Period,TimeZone}...)
     periods = Period[]
     timezone = Nullable{TimeZone}()
     for part in parts
@@ -267,7 +263,7 @@ function ZonedDateTime(parts::Union{Period,TimeZone}...)
     end
 
     isnull(timezone) && throw(ArgumentError("Missing time zone"))
-    return ZonedDateTime(DateTime(periods...), get(timezone))
+    return Localized(DateTime(periods...), get(timezone))
 end
 
 # Promotion
@@ -276,24 +272,24 @@ end
 # undefined promote_rule on TimeType types.
 # Otherwise, typejoin(T,S) is called (returning TimeType) so no conversion happens, and
 # isless(promote(x,y)...) is called again, causing a stack overflow.
-function promote_rule(::Type{T}, ::Type{S}) where {T<:TimeType, S<:ZonedDateTime}
+function promote_rule(::Type{T}, ::Type{S}) where {T<:TimeType, S<:Localized}
     error("no promotion exists for ", T, " and ", S)
 end
 
 # Equality
-==(a::ZonedDateTime, b::ZonedDateTime) = a.utc_datetime == b.utc_datetime
-isless(a::ZonedDateTime, b::ZonedDateTime) = isless(a.utc_datetime, b.utc_datetime)
+==(a::Localized, b::Localized) = a.utc_datetime == b.utc_datetime
+isless(a::Localized, b::Localized) = isless(a.utc_datetime, b.utc_datetime)
 
-# Note: `hash` and `isequal` assume that the "zone" of a ZonedDateTime is not being set
+# Note: `hash` and `isequal` assume that the "zone" of a Localized is not being set
 # incorrectly.
 
-function hash(zdt::ZonedDateTime, h::UInt)
+function hash(zdt::Localized, h::UInt)
     h = hash(zdt.utc_datetime, h)
     h = hash(zdt.timezone, h)
     return h
 end
 
-function isequal(a::ZonedDateTime, b::ZonedDateTime)
+function isequal(a::Localized, b::Localized)
     return (
         isequal(a.utc_datetime, b.utc_datetime) &&
         isequal(a.timezone, b.timezone) &&
@@ -312,10 +308,10 @@ function hash(tz::VariableTimeZone, h::UInt)
     return h
 end
 
-typemin(::Type{ZonedDateTime}) = ZonedDateTime(typemin(DateTime), utc_tz; from_utc=true)
-typemax(::Type{ZonedDateTime}) = ZonedDateTime(typemax(DateTime), utc_tz; from_utc=true)
+typemin(::Type{Localized}) = Localized(typemin(DateTime), utc_tz; from_utc=true)
+typemax(::Type{Localized}) = Localized(typemax(DateTime), utc_tz; from_utc=true)
 
-function validargs(::Type{ZonedDateTime}, y::Int64, m::Int64, d::Int64, h::Int64, mi::Int64, s::Int64, ms::Int64, tz::AbstractString)
+function validargs(::Type{Localized}, y::Int64, m::Int64, d::Int64, h::Int64, mi::Int64, s::Int64, ms::Int64, tz::AbstractString)
     err = validargs(DateTime, y, m, d, h, mi, s, ms)
     isnull(err) || return err
     istimezone(tz) || return argerror("TimeZone: \"$str\" is not a recognized time zone")

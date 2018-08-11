@@ -46,7 +46,7 @@ if lowercase(get(ENV, "CI", "false")) == "true"
 
     @test last(warsaw.transitions).utc_datetime == DateTime(2037, 10, 25, 1)
     @test get(warsaw.cutoff) == DateTime(2038, 3, 28, 1)
-    @test_throws TimeZones.UnhandledTimeError ZonedDateTime(DateTime(2039), warsaw)
+    @test_throws TimeZones.UnhandledTimeError Localized(DateTime(2039), warsaw)
 
     TimeZones.TZData.compile(max_year=2200)
     new_warsaw = TimeZone("Europe/Warsaw")
@@ -54,9 +54,9 @@ if lowercase(get(ENV, "CI", "false")) == "true"
     @test warsaw !== new_warsaw
     @test last(new_warsaw.transitions).utc_datetime == DateTime(2200, 10, 26, 1)
     @test get(new_warsaw.cutoff) == DateTime(2201, 3, 29, 1)
-    ZonedDateTime(2100, new_warsaw)  # Test this doesn't throw an exception
+    Localized(2100, new_warsaw)  # Test this doesn't throw an exception
 
-    @test_throws TimeZones.UnhandledTimeError ZonedDateTime(2100, warsaw)
+    @test_throws TimeZones.UnhandledTimeError Localized(2100, warsaw)
 
 
     # Using the tz string macro which runs at parse time means that the resulting TimeZone

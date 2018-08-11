@@ -43,8 +43,8 @@ show_compact = (io, args...) -> show(IOContext(io, :compact => true), args...)
 @test sprint(show, FixedTimeZone("GMT", 0)) == "GMT"
 @test sprint(show, FixedTimeZone("FOO", 0)) == "FOO (UTC+0)"
 
-# ZonedDateTime as a string
-zdt = ZonedDateTime(dt, warsaw)
+# Localized as a string
+zdt = Localized(dt, warsaw)
 @test string(zdt) == "1942-12-25T01:23:45+01:00"
 @test sprint(show, zdt) == "1942-12-25T01:23:45+01:00"
 
@@ -68,40 +68,40 @@ df = Dates.DateFormat("Z")
 @test parse_components("UTC", df) == Any[FixedTimeZone("UTC")]
 @test parse_components("Europe/Warsaw", df) == Any[warsaw]
 
-# ZonedDateTime parsing.
+# Localized parsing.
 # Note: uses compiled time zone information. If these tests are failing try to rebuild
 # the TimeZones package.
-@test ZonedDateTime("1942-12-25T01:23:45.000+01:00") == ZonedDateTime(dt, fixed)
-@test ZonedDateTime("1942-12-25T01:23:45+0100", "yyyy-mm-ddTHH:MM:SSzzz") == ZonedDateTime(dt, fixed)
-@test ZonedDateTime("1942-12-25T01:23:45 Europe/Warsaw", "yyyy-mm-ddTHH:MM:SS ZZZ") == ZonedDateTime(dt, warsaw)
-@test ZonedDateTime("1942-12-25T01:23:45 America/New_York", "yyyy-mm-ddTHH:MM:SS ZZZ") == ZonedDateTime(dt, new_york)
+@test Localized("1942-12-25T01:23:45.000+01:00") == Localized(dt, fixed)
+@test Localized("1942-12-25T01:23:45+0100", "yyyy-mm-ddTHH:MM:SSzzz") == Localized(dt, fixed)
+@test Localized("1942-12-25T01:23:45 Europe/Warsaw", "yyyy-mm-ddTHH:MM:SS ZZZ") == Localized(dt, warsaw)
+@test Localized("1942-12-25T01:23:45 America/New_York", "yyyy-mm-ddTHH:MM:SS ZZZ") == Localized(dt, new_york)
 
 x = "1942-12-25T01:23:45.123+01:00"
-@test string(ZonedDateTime(x)) == x
+@test string(Localized(x)) == x
 
 # Note: CET here represents the FixedTimeZone used in Europe/Warsaw and not the
 # VariableTimeZone CET.
-@test_throws ArgumentError ZonedDateTime("1942-12-25T01:23:45 CET", "yyyy-mm-ddTHH:MM:SS ZZZ")
+@test_throws ArgumentError Localized("1942-12-25T01:23:45 CET", "yyyy-mm-ddTHH:MM:SS ZZZ")
 
-# Creating a ZonedDateTime requires a TimeZone to be present.
-@test_throws ArgumentError ZonedDateTime("1942-12-25T01:23:45", "yyyy-mm-ddTHH:MM:SSzzz")
+# Creating a Localized requires a TimeZone to be present.
+@test_throws ArgumentError Localized("1942-12-25T01:23:45", "yyyy-mm-ddTHH:MM:SSzzz")
 
 
-# ZonedDateTime formatting
+# Localized formatting
 f = "yyyy/m/d H:M:S ZZZ"
-@test Dates.format(ZonedDateTime(dt, fixed), f) == "1942/12/25 1:23:45 UTC+01:00"
-@test Dates.format(ZonedDateTime(dt, warsaw), f) == "1942/12/25 1:23:45 CET"
-@test Dates.format(ZonedDateTime(dt, ulyanovsk), f) == "1942/12/25 1:23:45 UTC+04:00"
+@test Dates.format(Localized(dt, fixed), f) == "1942/12/25 1:23:45 UTC+01:00"
+@test Dates.format(Localized(dt, warsaw), f) == "1942/12/25 1:23:45 CET"
+@test Dates.format(Localized(dt, ulyanovsk), f) == "1942/12/25 1:23:45 UTC+04:00"
 
 f = "yyyy/m/d H:M:S zzz"
-@test Dates.format(ZonedDateTime(dt, fixed), f) == "1942/12/25 1:23:45 +01:00"
-@test Dates.format(ZonedDateTime(dt, warsaw), f) == "1942/12/25 1:23:45 +01:00"
-@test Dates.format(ZonedDateTime(dt, ulyanovsk), f) == "1942/12/25 1:23:45 +04:00"
+@test Dates.format(Localized(dt, fixed), f) == "1942/12/25 1:23:45 +01:00"
+@test Dates.format(Localized(dt, warsaw), f) == "1942/12/25 1:23:45 +01:00"
+@test Dates.format(Localized(dt, ulyanovsk), f) == "1942/12/25 1:23:45 +04:00"
 
 
 # The "Z" slot displays the time zone abbreviation for VariableTimeZones. It is fine to use
 # the abbreviation for display purposes but not fine for parsing. This means that we
 # currently cannot parse all strings produced by format.
 df = Dates.DateFormat("yyyy-mm-ddTHH:MM:SS ZZZ")
-zdt = ZonedDateTime(dt, warsaw)
-@test_throws ArgumentError parse(ZonedDateTime, Dates.format(zdt, df), df)
+zdt = Localized(dt, warsaw)
+@test_throws ArgumentError parse(Localized, Dates.format(zdt, df), df)
