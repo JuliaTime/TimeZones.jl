@@ -44,17 +44,17 @@ implicit_day_hour = Localized(spring, warsaw) + Day(1) + Hour(24)
 @test implicit_hour_day == Localized(2015, 3, 31, 0, warsaw)
 @test implicit_day_hour == Localized(2015, 3, 31, 0, warsaw)
 
-# CompoundPeriod canonicalization interacting with period arithmetic. Since `spring_zdt` is
+# CompoundPeriod canonicalization interacting with period arithmetic. Since `spring_loc` is
 # a 23 hour day this means adding `Day(1)` and `Hour(23)` are equivalent.
-spring_zdt = Localized(spring, warsaw)
-@test spring_zdt + Day(1) + Minute(1) == spring_zdt + Hour(23) + Minute(1)
+spring_loc = Localized(spring, warsaw)
+@test spring_loc + Day(1) + Minute(1) == spring_loc + Hour(23) + Minute(1)
 
 # When canonicalization happens automatically `Hour(24) + Minute(1)` is converted into
 # `Day(1) + Minute(1)`. Fixed in `JuliaLang/julia#19268`
 if VERSION >= v"0.6.0-dev.1874"
-    @test spring_zdt + Hour(23) + Minute(1) < spring_zdt + Hour(24) + Minute(1)
+    @test spring_loc + Hour(23) + Minute(1) < spring_loc + Hour(24) + Minute(1)
 else
-    @test spring_zdt + Hour(23) + Minute(1) == spring_zdt + Hour(24) + Minute(1)
+    @test spring_loc + Hour(23) + Minute(1) == spring_loc + Hour(24) + Minute(1)
 end
 
 # Arithmetic with a StepRange should always work even when the start/stop lands on

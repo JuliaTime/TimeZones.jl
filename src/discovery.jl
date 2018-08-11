@@ -129,7 +129,7 @@ end
 
 
 """
-    next_transition_instant(zdt::Localized) -> Localized
+    next_transition_instant(ldt::Localized) -> Localized
     next_transition_instant(tz::TimeZone=localzone()) -> Localized
 
 Determine the next instant at which a time zone transition occurs (typically
@@ -154,12 +154,12 @@ ERROR: NonExistentTimeError: Local DateTime 2018-03-25T01:00:00 does not exist w
 """
 next_transition_instant
 
-function next_transition_instant(zdt::Localized)
-    tz = zdt.timezone
+function next_transition_instant(ldt::Localized)
+    tz = ldt.timezone
 
     # Determine the index of the transition which occurs after the UTC datetime specified
     index = searchsortedfirst(
-        tz.transitions, TimeZones.utc(zdt),
+        tz.transitions, TimeZones.utc(ldt),
         by=el -> isa(el, TimeZones.Transition) ? el.utc_datetime : el,
     )
 
@@ -178,7 +178,7 @@ next_transition_instant(tz::TimeZone=localzone()) = next_transition_instant(@moc
 
 
 """
-    show_next_transition(io::IO=stdout, zdt::Localized)
+    show_next_transition(io::IO=stdout, ldt::Localized)
     show_next_transition(io::IO=stdout, tz::TimeZone=localzone())
 
 Display useful information about the next time zone transition (typically
@@ -210,29 +210,29 @@ Transition To:     2011-12-31T00:00:00.000+14:00
 """
 show_next_transition
 
-function show_next_transition(io::IO, zdt::Localized)
-    instant = next_transition_instant(zdt)
+function show_next_transition(io::IO, ldt::Localized)
+    instant = next_transition_instant(ldt)
     from, to = instant - Millisecond(1), instant + Millisecond(0)
     direction = value(to.zone.offset - from.zone.offset) < 0 ? "Backward" : "Forward"
 
-    function zdt_format(zdt)
-        name_suffix = string(zdt.zone.name)
+    function loc_format(ldt)
+        name_suffix = string(ldt.zone.name)
         !isempty(name_suffix) && (name_suffix = string(" (", name_suffix, ")"))
         string(
-            Dates.format(zdt, dateformat"yyyy-mm-ddTHH:MM:SS.sss"),
-            zdt.zone.offset,  # Note: "zzz" will not work in the format above as is
+            Dates.format(ldt, dateformat"yyyy-mm-ddTHH:MM:SS.sss"),
+            ldt.zone.offset,  # Note: "zzz" will not work in the format above as is
             name_suffix,
         )
     end
-    function time_format(zdt)
-        Dates.format(zdt, second(zdt) == 0 ? dateformat"HH:MM" : dateformat"HH:MM:SS")
+    function time_format(ldt)
+        Dates.format(ldt, second(ldt) == 0 ? dateformat"HH:MM" : dateformat"HH:MM:SS")
     end
 
     println(io, "Transition Date:   ", Dates.format(instant, dateformat"yyyy-mm-dd"))
     println(io, "Local Time Change: ", time_format(instant), " → ", time_format(to), " (", direction, ")")
     println(io, "Offset Change:     ", repr(from.zone.offset), " → ", repr(to.zone.offset))
-    println(io, "Transition From:   ", zdt_format(from))
-    println(io, "Transition To:     ", zdt_format(to))
+    println(io, "Transition From:   ", loc_format(from))
+    println(io, "Transition To:     ", loc_format(to))
 
 end
 

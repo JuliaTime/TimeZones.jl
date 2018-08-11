@@ -12,17 +12,17 @@ end
 (+)(x::Localized) = x
 (-)(x::Localized, y::Localized) = x.utc_datetime - y.utc_datetime
 
-function (+)(zdt::Localized, p::DatePeriod)
-    return Localized(localtime(zdt) + p, timezone(zdt))
+function (+)(ldt::Localized, p::DatePeriod)
+    return Localized(localtime(ldt) + p, timezone(ldt))
 end
-function (+)(zdt::Localized, p::TimePeriod)
-    return Localized(zdt.utc_datetime + p, timezone(zdt); from_utc=true)
+function (+)(ldt::Localized, p::TimePeriod)
+    return Localized(ldt.utc_datetime + p, timezone(ldt); from_utc=true)
 end
-function (-)(zdt::Localized, p::DatePeriod)
-    return Localized(localtime(zdt) - p, timezone(zdt))
+function (-)(ldt::Localized, p::DatePeriod)
+    return Localized(localtime(ldt) - p, timezone(ldt))
 end
-function (-)(zdt::Localized, p::TimePeriod)
-    return Localized(zdt.utc_datetime - p, timezone(zdt); from_utc=true)
+function (-)(ldt::Localized, p::TimePeriod)
+    return Localized(ldt.utc_datetime - p, timezone(ldt); from_utc=true)
 end
 
 function broadcasted(::typeof(+), r::StepRange{<:Localized}, p::DatePeriod)

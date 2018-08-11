@@ -96,12 +96,12 @@ function tryparsenext(d::DatePart{'Z'}, str, i, len)
     tryparsenext_tz(str, i, len, min_width(d), max_width(d))
 end
 
-function format(io::IO, d::DatePart{'z'}, zdt, locale)
-    write(io, string(zdt.zone.offset))
+function format(io::IO, d::DatePart{'z'}, ldt, locale)
+    write(io, string(ldt.zone.offset))
 end
 
-function format(io::IO, d::DatePart{'Z'}, zdt, locale)
-    write(io, string(zdt.zone))  # In most cases will be an abbreviation.
+function format(io::IO, d::DatePart{'Z'}, ldt, locale)
+    write(io, string(ldt.zone))  # In most cases will be an abbreviation.
 end
 
 # Note: ISOZonedDateTimeFormat is defined in the module __init__ which means that this

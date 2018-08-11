@@ -342,13 +342,13 @@ Localized(DateTime(1970, 1, 1), cutoff_tz)  # pre cutoff
 @test_throws UnhandledTimeError Localized(DateTime(1989, 5, 7), cutoff_tz)
 @test_throws UnhandledTimeError Localized(DateTime(1988, 5, 5), cutoff_tz) + Hour(24)
 
-zdt = Localized(DateTime(2038, 3, 28), warsaw, from_utc=true)
-@test_throws UnhandledTimeError zdt + Hour(1)
+ldt = Localized(DateTime(2038, 3, 28), warsaw, from_utc=true)
+@test_throws UnhandledTimeError ldt + Hour(1)
 
 # TimeZones that no longer have any transitions after the max_year shouldn't have a cutoff
 # eg. Asia/Hong_Kong, Pacific/Honolulu, Australia/Perth
 perth = resolve("Australia/Perth", tzdata["australasia"]...)
-zdt = Localized(DateTime(2200, 1, 1), perth, from_utc=true)
+ldt = Localized(DateTime(2200, 1, 1), perth, from_utc=true)
 
 
 # Convenience constructors for making a DateTime on-the-fly

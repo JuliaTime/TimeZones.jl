@@ -2,15 +2,15 @@ using Compat.Dates
 
 # Basic truncation
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
-zdt = Localized(DateTime(2014,10,15,23,59,58,57), warsaw)
+ldt = Localized(DateTime(2014,10,15,23,59,58,57), warsaw)
 
-@test trunc(zdt, Year) == Localized(DateTime(2014), warsaw)
-@test trunc(zdt, Month) == Localized(DateTime(2014,10), warsaw)
-@test trunc(zdt, Day) == Localized(DateTime(2014,10,15), warsaw)
-@test trunc(zdt, Hour) == Localized(DateTime(2014,10,15,23), warsaw)
-@test trunc(zdt, Minute) == Localized(DateTime(2014,10,15,23,59), warsaw)
-@test trunc(zdt, Second) == Localized(DateTime(2014,10,15,23,59,58), warsaw)
-@test trunc(zdt, Millisecond) == zdt
+@test trunc(ldt, Year) == Localized(DateTime(2014), warsaw)
+@test trunc(ldt, Month) == Localized(DateTime(2014,10), warsaw)
+@test trunc(ldt, Day) == Localized(DateTime(2014,10,15), warsaw)
+@test trunc(ldt, Hour) == Localized(DateTime(2014,10,15,23), warsaw)
+@test trunc(ldt, Minute) == Localized(DateTime(2014,10,15,23,59), warsaw)
+@test trunc(ldt, Second) == Localized(DateTime(2014,10,15,23,59,58), warsaw)
+@test trunc(ldt, Millisecond) == ldt
 
 # Ambiguous hour truncation
 dt = DateTime(2014,10,26,2)
@@ -20,20 +20,20 @@ dt = DateTime(2014,10,26,2)
 
 # Sub-hourly offsets (Issue #33)
 st_johns = resolve("America/St_Johns", tzdata["northamerica"]...)   # UTC-3:30 or UTC-2:30
-zdt = Localized(DateTime(2016,8,18,17,57,56,513), st_johns)
-@test trunc(zdt, Hour) == Localized(DateTime(2016,8,18,17), st_johns)
+ldt = Localized(DateTime(2016,8,18,17,57,56,513), st_johns)
+@test trunc(ldt, Hour) == Localized(DateTime(2016,8,18,17), st_johns)
 
 # Adjuster functions
-zdt = Localized(DateTime(2013,9,9), warsaw) # Monday
+ldt = Localized(DateTime(2013,9,9), warsaw) # Monday
 
-@test TimeZones.firstdayofweek(zdt) == Localized(DateTime(2013,9,9), warsaw)
-@test TimeZones.lastdayofweek(zdt) == Localized(DateTime(2013,9,15), warsaw)
-@test TimeZones.firstdayofmonth(zdt) == Localized(DateTime(2013,9,1), warsaw)
-@test TimeZones.lastdayofmonth(zdt) == Localized(DateTime(2013,9,30), warsaw)
-@test TimeZones.firstdayofyear(zdt) == Localized(DateTime(2013,1,1), warsaw)
-@test TimeZones.lastdayofyear(zdt) == Localized(DateTime(2013,12,31), warsaw)
-@test TimeZones.firstdayofquarter(zdt) == Localized(DateTime(2013,7,1), warsaw)
-@test TimeZones.lastdayofquarter(zdt) == Localized(DateTime(2013,9,30), warsaw)
+@test TimeZones.firstdayofweek(ldt) == Localized(DateTime(2013,9,9), warsaw)
+@test TimeZones.lastdayofweek(ldt) == Localized(DateTime(2013,9,15), warsaw)
+@test TimeZones.firstdayofmonth(ldt) == Localized(DateTime(2013,9,1), warsaw)
+@test TimeZones.lastdayofmonth(ldt) == Localized(DateTime(2013,9,30), warsaw)
+@test TimeZones.firstdayofyear(ldt) == Localized(DateTime(2013,1,1), warsaw)
+@test TimeZones.lastdayofyear(ldt) == Localized(DateTime(2013,12,31), warsaw)
+@test TimeZones.firstdayofquarter(ldt) == Localized(DateTime(2013,7,1), warsaw)
+@test TimeZones.lastdayofquarter(ldt) == Localized(DateTime(2013,9,30), warsaw)
 
 
 # TODO: Should be in Dates.

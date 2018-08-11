@@ -3,10 +3,10 @@
 Switching an existing `Localized` from one `TimeZone` to another can be done with the function `astimezone`:
 
 ```julia
-julia> zdt = Localized(2014, 1, 1, tz"UTC")
+julia> ldt = Localized(2014, 1, 1, tz"UTC")
 2014-01-01T00:00:00+00:00
 
-julia> astimezone(zdt, tz"Asia/Tokyo")
+julia> astimezone(ldt, tz"Asia/Tokyo")
 2014-01-01T09:00:00+09:00
 ```
 
@@ -57,12 +57,12 @@ It is recommended that you prefer the use of the `z` character code over `Z` tim
 Formatting uses the `Dates.format` function with a `Localized` and a format string:
 
 ```julia
-julia> zdt = Localized(2015,8,6,22,25,tz"Europe/Warsaw")
+julia> ldt = Localized(2015,8,6,22,25,tz"Europe/Warsaw")
 2015-08-06T22:25:00+02:00
 
-julia> Dates.format(zdt, "yyyymmddzzzz")
+julia> Dates.format(ldt, "yyyymmddzzzz")
 "20150806+02:00"
 
-julia> Dates.format(zdt, "yyyy-mm-dd HH:MM ZZZ")
+julia> Dates.format(ldt, "yyyy-mm-dd HH:MM ZZZ")
 "2015-08-06 22:25 CEST"
 ```

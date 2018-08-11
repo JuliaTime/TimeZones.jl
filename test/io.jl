@@ -44,9 +44,9 @@ show_compact = (io, args...) -> show(IOContext(io, :compact => true), args...)
 @test sprint(show, FixedTimeZone("FOO", 0)) == "FOO (UTC+0)"
 
 # Localized as a string
-zdt = Localized(dt, warsaw)
-@test string(zdt) == "1942-12-25T01:23:45+01:00"
-@test sprint(show, zdt) == "1942-12-25T01:23:45+01:00"
+ldt = Localized(dt, warsaw)
+@test string(ldt) == "1942-12-25T01:23:45+01:00"
+@test sprint(show, ldt) == "1942-12-25T01:23:45+01:00"
 
 
 # TimeZone parsing
@@ -103,5 +103,5 @@ f = "yyyy/m/d H:M:S zzz"
 # the abbreviation for display purposes but not fine for parsing. This means that we
 # currently cannot parse all strings produced by format.
 df = Dates.DateFormat("yyyy-mm-ddTHH:MM:SS ZZZ")
-zdt = Localized(dt, warsaw)
-@test_throws ArgumentError parse(Localized, Dates.format(zdt, df), df)
+ldt = Localized(dt, warsaw)
+@test_throws ArgumentError parse(Localized, Dates.format(ldt, df), df)

@@ -20,5 +20,9 @@ else
 end
 
 @deprecate_binding ZonedDateTime Localized
+@deprecate julian2zdt julian2localized
+@deprecate zdt2julia localized2julian
+@deprecate unix2zdt unix2localized
+@deprecate zdt2unix localized2unix
 
 # END TimeZones 0.6 deprecations

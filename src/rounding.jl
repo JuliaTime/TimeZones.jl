@@ -1,33 +1,33 @@
 import Compat.Dates: Period, DatePeriod, TimePeriod
 
-function Base.floor(zdt::Localized, p::DatePeriod)
-    return Localized(floor(localtime(zdt), p), timezone(zdt))
+function Base.floor(ldt::Localized, p::DatePeriod)
+    return Localized(floor(localtime(ldt), p), timezone(ldt))
 end
 
-function Base.floor(zdt::Localized, p::TimePeriod)
+function Base.floor(ldt::Localized, p::TimePeriod)
     # Rounding is done using the current fixed offset to avoid transitional ambiguities.
-    dt = floor(localtime(zdt), p)
-    utc_dt = dt - zdt.zone.offset
-    return Localized(utc_dt, timezone(zdt); from_utc=true)
+    dt = floor(localtime(ldt), p)
+    utc_dt = dt - ldt.zone.offset
+    return Localized(utc_dt, timezone(ldt); from_utc=true)
 end
 
-function Base.ceil(zdt::Localized, p::DatePeriod)
-    return Localized(ceil(localtime(zdt), p), timezone(zdt))
+function Base.ceil(ldt::Localized, p::DatePeriod)
+    return Localized(ceil(localtime(ldt), p), timezone(ldt))
 end
 
-#function Dates.floorceil(zdt::Localized, p::Dates.DatePeriod)
-    #return floor(zdt, p), ceil(zdt, p)
+#function Dates.floorceil(ldt::Localized, p::Dates.DatePeriod)
+    #return floor(ldt, p), ceil(ldt, p)
 #end
 
 """
-    floor(zdt::Localized, p::Period) -> Localized
-    floor(zdt::Localized, p::Type{Period}) -> Localized
+    floor(ldt::Localized, p::Period) -> Localized
+    floor(ldt::Localized, p::Type{Period}) -> Localized
 
-Returns the nearest `Localized` less than or equal to `zdt` at resolution `p`. The
-result will be in the same time zone as `zdt`.
+Returns the nearest `Localized` less than or equal to `ldt` at resolution `p`. The
+result will be in the same time zone as `ldt`.
 
-For convenience, `p` may be a type instead of a value: `floor(zdt, Dates.Hour)` is a
-shortcut for `floor(zdt, Dates.Hour(1))`.
+For convenience, `p` may be a type instead of a value: `floor(ldt, Dates.Hour)` is a
+shortcut for `floor(ldt, Dates.Hour(1))`.
 
 `VariableTimeZone` transitions are handled as for `round`.
 
@@ -37,27 +37,27 @@ The `America/Winnipeg` time zone transitioned from Central Standard Time (UTC-6:
 Central Daylight Time (UTC-5:00) on 2016-03-13, moving directly from 01:59:59 to 03:00:00.
 
 ```julia
-julia> zdt = Localized(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg"))
+julia> ldt = Localized(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg"))
 2016-03-13T01:45:00-06:00
 
-julia> floor(zdt, Dates.Day)
+julia> floor(ldt, Dates.Day)
 2016-03-13T00:00:00-06:00
 
-julia> floor(zdt, Dates.Hour)
+julia> floor(ldt, Dates.Hour)
 2016-03-13T01:00:00-06:00
 ```
 """
 Base.floor(::TimeZones.Localized, ::Union{Period, Type{Period}})
 
 """
-    ceil(zdt::Localized, p::Period) -> Localized
-    ceil(zdt::Localized, p::Type{Period}) -> Localized
+    ceil(ldt::Localized, p::Period) -> Localized
+    ceil(ldt::Localized, p::Type{Period}) -> Localized
 
-Returns the nearest `Localized` greater than or equal to `zdt` at resolution `p`.
-The result will be in the same time zone as `zdt`.
+Returns the nearest `Localized` greater than or equal to `ldt` at resolution `p`.
+The result will be in the same time zone as `ldt`.
 
-For convenience, `p` may be a type instead of a value: `ceil(zdt, Dates.Hour)` is a
-shortcut for `ceil(zdt, Dates.Hour(1))`.
+For convenience, `p` may be a type instead of a value: `ceil(ldt, Dates.Hour)` is a
+shortcut for `ceil(ldt, Dates.Hour(1))`.
 
 `VariableTimeZone` transitions are handled as for `round`.
 
@@ -67,28 +67,28 @@ The `America/Winnipeg` time zone transitioned from Central Standard Time (UTC-6:
 Central Daylight Time (UTC-5:00) on 2016-03-13, moving directly from 01:59:59 to 03:00:00.
 
 ```julia
-julia> zdt = Localized(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg"))
+julia> ldt = Localized(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg"))
 2016-03-13T01:45:00-06:00
 
-julia> ceil(zdt, Dates.Day)
+julia> ceil(ldt, Dates.Day)
 2016-03-14T00:00:00-05:00
 
-julia> ceil(zdt, Dates.Hour)
+julia> ceil(ldt, Dates.Hour)
 2016-03-13T03:00:00-05:00
 ```
 """
 Base.ceil(::TimeZones.Localized, ::Union{Period, Type{Period}})
 
 """
-    round(zdt::Localized, p::Period, [r::RoundingMode]) -> Localized
-    round(zdt::Localized, p::Type{Period}, [r::RoundingMode]) -> Localized
+    round(ldt::Localized, p::Period, [r::RoundingMode]) -> Localized
+    round(ldt::Localized, p::Type{Period}, [r::RoundingMode]) -> Localized
 
-Returns the `Localized` nearest to `zdt` at resolution `p`. The result will be in the
-same time zone as `zdt`. By default (`RoundNearestTiesUp`), ties (e.g., rounding 9:30 to the
+Returns the `Localized` nearest to `ldt` at resolution `p`. The result will be in the
+same time zone as `ldt`. By default (`RoundNearestTiesUp`), ties (e.g., rounding 9:30 to the
 nearest hour) will be rounded up.
 
-For convenience, `p` may be a type instead of a value: `round(zdt, Dates.Hour)` is a
-shortcut for `round(zdt, Dates.Hour(1))`.
+For convenience, `p` may be a type instead of a value: `round(ldt, Dates.Hour)` is a
+shortcut for `round(ldt, Dates.Hour(1))`.
 
 Valid rounding modes for `round(::TimeType, ::Period, ::RoundingMode)` are
 `RoundNearestTiesUp` (default), `RoundDown` (`floor`), and `RoundUp` (`ceil`).
@@ -124,13 +124,13 @@ The `America/Winnipeg` time zone transitioned from Central Standard Time (UTC-6:
 Central Daylight Time (UTC-5:00) on 2016-03-13, moving directly from 01:59:59 to 03:00:00.
 
 ```julia
-julia> zdt = Localized(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg"))
+julia> ldt = Localized(2016, 3, 13, 1, 45, TimeZone("America/Winnipeg"))
 2016-03-13T01:45:00-06:00
 
-julia> round(zdt, Dates.Hour)
+julia> round(ldt, Dates.Hour)
 2016-03-13T03:00:00-05:00
 
-julia> round(zdt, Dates.Day)
+julia> round(ldt, Dates.Day)
 2016-03-13T00:00:00-06:00
 ```
 
@@ -138,13 +138,13 @@ The `Asia/Colombo` time zone revised the definition of Lanka Time from UTC+6:30 
 on 1996-10-26, moving from 00:29:59 back to 00:00:00.
 
 ```julia
-julia> zdt = Localized(1996, 10, 25, 23, 45, TimeZone("Asia/Colombo"))
+julia> ldt = Localized(1996, 10, 25, 23, 45, TimeZone("Asia/Colombo"))
 1996-10-25T23:45:00+06:30
 
-julia> round(zdt, Dates.Hour)
+julia> round(ldt, Dates.Hour)
 1996-10-26T00:00:00+06:30
 
-julia> round(zdt, Dates.Day)
+julia> round(ldt, Dates.Day)
 ERROR: Local DateTime 1996-10-26T00:00:00 is ambiguous
 ```
 """     # Defined in base/dates/rounding.jl

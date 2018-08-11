@@ -213,7 +213,7 @@ function Localized(dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
     elseif num == 0
         throw(NonExistentTimeError(dt, tz))
     elseif num == 2
-        mask = [isdst(zdt.zone.offset) for zdt in possible]
+        mask = [isdst(ldt.zone.offset) for ldt in possible]
 
         # Mask is expected to be unambiguous.
         !xor(mask...) && throw(AmbiguousTimeError(dt, tz))
@@ -283,9 +283,9 @@ isless(a::Localized, b::Localized) = isless(a.utc_datetime, b.utc_datetime)
 # Note: `hash` and `isequal` assume that the "zone" of a Localized is not being set
 # incorrectly.
 
-function hash(zdt::Localized, h::UInt)
-    h = hash(zdt.utc_datetime, h)
-    h = hash(zdt.timezone, h)
+function hash(ldt::Localized, h::UInt)
+    h = hash(ldt.utc_datetime, h)
+    h = hash(ldt.timezone, h)
     return h
 end
 
