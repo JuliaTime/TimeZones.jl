@@ -37,9 +37,9 @@ paris = resolve("Europe/Paris", tzdata["europe"]...)
     @testset "non-existent" begin
         local zone = FixedTimeZone("CST", -6 * 3600)
 
-        instant = next_transition_instant(ZonedDateTime(2018, 1, 1, wpg))
-        expected_instant = ZonedDateTime(DateTime(2018, 3, 11, 8), wpg, zone)
-        expected_valid = ZonedDateTime(2018, 3, 11, 3, wpg)
+        instant = next_transition_instant(Localized(2018, 1, 1, wpg))
+        expected_instant = Localized{DateTime, true}(DateTime(2018, 3, 11, 8), wpg, zone)
+        expected_valid = Localized(2018, 3, 11, 3, wpg)
 
         @test isequal(instant, expected_instant)
         @test instant == expected_valid
@@ -50,9 +50,9 @@ paris = resolve("Europe/Paris", tzdata["europe"]...)
     @testset "ambiguous" begin
         local zone = FixedTimeZone("CDT", -6 * 3600, 3600)
 
-        instant = next_transition_instant(ZonedDateTime(2018, 6, 1, wpg))
-        expected_instant = ZonedDateTime(DateTime(2018, 11, 4, 7), wpg, zone)
-        expected_valid = ZonedDateTime(2018, 11, 4, 1, wpg, 2)
+        instant = next_transition_instant(Localized(2018, 6, 1, wpg))
+        expected_instant = Localized{DateTime, true}(DateTime(2018, 11, 4, 7), wpg, zone)
+        expected_valid = Localized(2018, 11, 4, 1, wpg, 2)
 
         @test isequal(instant, expected_instant)
         @test instant == expected_valid
@@ -62,9 +62,9 @@ paris = resolve("Europe/Paris", tzdata["europe"]...)
 
     @testset "upcoming" begin
         if !compiled_modules_enabled
-            local patch = @patch now(tz::TimeZone) = ZonedDateTime(2000, 1, 1, tz)
+            local patch = @patch now(tz::TimeZone) = Localized(2000, 1, 1, tz)
             apply(patch) do
-                @test next_transition_instant(wpg) == ZonedDateTime(2000, 4, 2, 3, wpg)
+                @test next_transition_instant(wpg) == Localized(2000, 4, 2, 3, wpg)
             end
         end
     end
@@ -72,7 +72,7 @@ end
 
 @testset "show_next_transition" begin
     @testset "non-existent" begin
-        @test sprint(show_next_transition, ZonedDateTime(2018, 1, 1, wpg)) ==
+        @test sprint(show_next_transition, Localized(2018, 1, 1, wpg)) ==
             """
             Transition Date:   2018-03-11
             Local Time Change: 02:00 → 03:00 (Forward)
@@ -83,7 +83,7 @@ end
     end
 
     @testset "ambiguous" begin
-         @test sprint(show_next_transition, ZonedDateTime(2018, 6, 1, wpg)) ==
+         @test sprint(show_next_transition, Localized(2018, 6, 1, wpg)) ==
             """
             Transition Date:   2018-11-04
             Local Time Change: 02:00 → 01:00 (Backward)
@@ -94,7 +94,7 @@ end
     end
 
     @testset "standard offset change" begin
-        @test sprint(show_next_transition, ZonedDateTime(2011, 12, 1, apia)) ==
+        @test sprint(show_next_transition, Localized(2011, 12, 1, apia)) ==
             """
             Transition Date:   2011-12-30
             Local Time Change: 00:00 → 00:00 (Forward)
@@ -105,7 +105,7 @@ end
     end
 
     @testset "dst offset change" begin
-        @test sprint(show_next_transition, ZonedDateTime(1945, 4, 1, paris)) ==
+        @test sprint(show_next_transition, Localized(1945, 4, 1, paris)) ==
             """
             Transition Date:   1945-04-02
             Local Time Change: 02:00 → 03:00 (Forward)
@@ -117,7 +117,7 @@ end
 
     @testset "upcoming" begin
         if !compiled_modules_enabled
-            local patch = @patch now(tz::TimeZone) = ZonedDateTime(2000, 1, 1, tz)
+            local patch = @patch now(tz::TimeZone) = Localized(2000, 1, 1, tz)
             apply(patch) do
                 @test occursin("2000-04-02", sprint(show_next_transition, wpg))
             end

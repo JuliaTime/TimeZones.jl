@@ -46,20 +46,20 @@ Base.isequal(a::Array{Expr}, b::Array{Expr}) = map(strip, a) == map(strip, b)
 const I = Integer
 @test isequal(
     optional(
-        :(function ZonedDateTime(y::I, m::I=1, d::I=1, h::I=0, mi::I=0, s::I=0, ms::I=0, tz::TimeZone)
-            ZonedDateTime(DateTime(y,m,d,h,mi,s,ms), tz)
+        :(function Localized(y::I, m::I=1, d::I=1, h::I=0, mi::I=0, s::I=0, ms::I=0, tz::TimeZone)
+            Localized(DateTime(y,m,d,h,mi,s,ms), tz)
         end)
     ),
     [
-        :(function ZonedDateTime(y::I,m::I,d::I,h::I,mi::I,s::I,ms::I,tz::TimeZone)
-            ZonedDateTime(DateTime(y,m,d,h,mi,s,ms), tz)
+        :(function Localized(y::I,m::I,d::I,h::I,mi::I,s::I,ms::I,tz::TimeZone)
+            Localized(DateTime(y,m,d,h,mi,s,ms), tz)
         end),
-        :(ZonedDateTime(y::I,m::I,d::I,h::I,mi::I,s::I,tz::TimeZone) = ZonedDateTime(y,m,d,h,mi,s,0,tz)),
-        :(ZonedDateTime(y::I,m::I,d::I,h::I,mi::I,tz::TimeZone) = ZonedDateTime(y,m,d,h,mi,0,0,tz)),
-        :(ZonedDateTime(y::I,m::I,d::I,h::I,tz::TimeZone) = ZonedDateTime(y,m,d,h,0,0,0,tz)),
-        :(ZonedDateTime(y::I,m::I,d::I,tz::TimeZone) = ZonedDateTime(y,m,d,0,0,0,0,tz)),
-        :(ZonedDateTime(y::I,m::I,tz::TimeZone) = ZonedDateTime(y,m,1,0,0,0,0,tz)),
-        :(ZonedDateTime(y::I,tz::TimeZone) = ZonedDateTime(y,1,1,0,0,0,0,tz)),
+        :(Localized(y::I,m::I,d::I,h::I,mi::I,s::I,tz::TimeZone) = Localized(y,m,d,h,mi,s,0,tz)),
+        :(Localized(y::I,m::I,d::I,h::I,mi::I,tz::TimeZone) = Localized(y,m,d,h,mi,0,0,tz)),
+        :(Localized(y::I,m::I,d::I,h::I,tz::TimeZone) = Localized(y,m,d,h,0,0,0,tz)),
+        :(Localized(y::I,m::I,d::I,tz::TimeZone) = Localized(y,m,d,0,0,0,0,tz)),
+        :(Localized(y::I,m::I,tz::TimeZone) = Localized(y,m,1,0,0,0,0,tz)),
+        :(Localized(y::I,tz::TimeZone) = Localized(y,1,1,0,0,0,0,tz)),
     ],
 )
 

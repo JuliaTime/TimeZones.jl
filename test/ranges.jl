@@ -11,10 +11,10 @@ fixed = FixedTimeZone("Fixed", -5 * 3600)
 d = DateTime(2013, 2, 13)
 raw_range = collect(d:Hour(1):d + Day(1))
 
-utc_range = ZonedDateTime(d, utc):Hour(1):ZonedDateTime(d, utc) + Day(1)
-dst_range = ZonedDateTime(d, dst):Hour(1):ZonedDateTime(d, dst) + Day(1)
-no_dst_range = ZonedDateTime(d, no_dst):Hour(1):ZonedDateTime(d, no_dst) + Day(1)
-fixed_range = ZonedDateTime(d, fixed):Hour(1):ZonedDateTime(d, fixed) + Day(1)
+utc_range = Localized(d, utc):Hour(1):Localized(d, utc) + Day(1)
+dst_range = Localized(d, dst):Hour(1):Localized(d, dst) + Day(1)
+no_dst_range = Localized(d, no_dst):Hour(1):Localized(d, no_dst) + Day(1)
+fixed_range = Localized(d, fixed):Hour(1):Localized(d, fixed) + Day(1)
 
 # Each range should have 25 elements.
 @test length(utc_range) == 25
@@ -33,10 +33,10 @@ fixed_range = ZonedDateTime(d, fixed):Hour(1):ZonedDateTime(d, fixed) + Day(1)
 d = DateTime(2013, 3, 10)
 raw_range = collect(d:Hour(1):d + Day(1))
 
-utc_range = ZonedDateTime(d, utc):Hour(1):ZonedDateTime(d, utc) + Day(1)
-dst_range = ZonedDateTime(d, dst):Hour(1):ZonedDateTime(d, dst) + Day(1)
-no_dst_range = ZonedDateTime(d, no_dst):Hour(1):ZonedDateTime(d, no_dst) + Day(1)
-fixed_range = ZonedDateTime(d, fixed):Hour(1):ZonedDateTime(d, fixed) + Day(1)
+utc_range = Localized(d, utc):Hour(1):Localized(d, utc) + Day(1)
+dst_range = Localized(d, dst):Hour(1):Localized(d, dst) + Day(1)
+no_dst_range = Localized(d, no_dst):Hour(1):Localized(d, no_dst) + Day(1)
+fixed_range = Localized(d, fixed):Hour(1):Localized(d, fixed) + Day(1)
 
 # The range that observes DST should have only 24 elements because 02:00 is skipped.
 @test length(utc_range) == 25
@@ -58,10 +58,10 @@ fixed_range = ZonedDateTime(d, fixed):Hour(1):ZonedDateTime(d, fixed) + Day(1)
 d = DateTime(2013, 11, 3)
 raw_range = collect(d:Hour(1):d + Day(1))
 
-utc_range = ZonedDateTime(d, utc):Hour(1):ZonedDateTime(d, utc) + Day(1)
-dst_range = ZonedDateTime(d, dst):Hour(1):ZonedDateTime(d, dst) + Day(1)
-no_dst_range = ZonedDateTime(d, no_dst):Hour(1):ZonedDateTime(d, no_dst) + Day(1)
-fixed_range = ZonedDateTime(d, fixed):Hour(1):ZonedDateTime(d, fixed) + Day(1)
+utc_range = Localized(d, utc):Hour(1):Localized(d, utc) + Day(1)
+dst_range = Localized(d, dst):Hour(1):Localized(d, dst) + Day(1)
+no_dst_range = Localized(d, no_dst):Hour(1):Localized(d, no_dst) + Day(1)
+fixed_range = Localized(d, fixed):Hour(1):Localized(d, fixed) + Day(1)
 
 # The range that observes DST should have 26 elements because of the two instances of 01:00.
 @test length(utc_range) == 25
@@ -79,27 +79,27 @@ fixed_range = ZonedDateTime(d, fixed):Hour(1):ZonedDateTime(d, fixed) + Day(1)
 @test TimeZones.utc.(fixed_range) == raw_range .+ Hour(5)
 
 # filter behaviour with a non-existent hour
-range = ZonedDateTime(2015, 3, 8, dst):Dates.Hour(1):ZonedDateTime(2015, 3, 10, dst)
+range = Localized(2015, 3, 8, dst):Dates.Hour(1):Localized(2015, 3, 10, dst)
 @test filter(dt -> Dates.hour(dt) == 2, range) == [
-    # ZonedDateTime(2015, 3, 8, 2, dst)  # Non-existent hour
-    ZonedDateTime(2015, 3, 9, 2, dst)
+    # Localized(2015, 3, 8, 2, dst)  # Non-existent hour
+    Localized(2015, 3, 9, 2, dst)
 ]
 
 # filter behaviour with ambiguous hour
-range = ZonedDateTime(2015, 11, 1, dst):Dates.Hour(1):ZonedDateTime(2015, 11, 3, dst)
+range = Localized(2015, 11, 1, dst):Dates.Hour(1):Localized(2015, 11, 3, dst)
 @test filter(dt -> Dates.hour(dt) == 1, range) == [
-    ZonedDateTime(2015, 11, 1, 1, dst, 1)
-    ZonedDateTime(2015, 11, 1, 1, dst, 2)
-    ZonedDateTime(2015, 11, 2, 1, dst)
+    Localized(2015, 11, 1, 1, dst, 1)
+    Localized(2015, 11, 1, 1, dst, 2)
+    Localized(2015, 11, 2, 1, dst)
 ]
 
-# default step for a ZonedDateTime range
+# default step for a Localized range
 if VERSION < v"0.7.0-DEV.2778"
-    range = ZonedDateTime(2017, 10, 1, 9, utc):ZonedDateTime(2017, 12, 8, 23, utc)
+    range = Localized(2017, 10, 1, 9, utc):Localized(2017, 12, 8, 23, utc)
     @test step(range) == Dates.Day(1)
 elseif VERSION < v"0.7-DEV+"  # Currently failing on Julia 0.7-DEV. Disabling for now.
     @test_warn(
-        "colon(start::T, stop::T) where T <: ZonedDateTime is deprecated, use start:Day(1):stop instead.",
-        ZonedDateTime(2017, 10, 1, 9, utc):ZonedDateTime(2017, 12, 8, 23, utc)
+        "colon(start::T, stop::T) where T <: Localized is deprecated, use start:Day(1):stop instead.",
+        Localized(2017, 10, 1, 9, utc):Localized(2017, 12, 8, 23, utc)
     )
 end

@@ -5,20 +5,20 @@ import Compat.Dates: firstdayofweek, lastdayofweek, firstdayofmonth, lastdayofmo
 
 # Truncation
 # TODO: Just utilize floor code for truncation?
-function trunc(zdt::ZonedDateTime, ::Type{P}) where P<:DatePeriod
-    ZonedDateTime(trunc(localtime(zdt), P), timezone(zdt))
+function trunc(ldt::Localized, ::Type{P}) where P<:DatePeriod
+    Localized(trunc(localtime(ldt), P), timezone(ldt))
 end
-function trunc(zdt::ZonedDateTime, ::Type{P}) where P<:TimePeriod
-    local_dt = trunc(localtime(zdt), P)
-    utc_dt = local_dt - zdt.zone.offset
-    ZonedDateTime(utc_dt, timezone(zdt); from_utc=true)
+function trunc(ldt::Localized, ::Type{P}) where P<:TimePeriod
+    local_dt = trunc(localtime(ldt), P)
+    utc_dt = local_dt - ldt.zone.offset
+    Localized(utc_dt, timezone(ldt); from_utc=true)
 end
-trunc(zdt::ZonedDateTime, ::Type{Millisecond}) = zdt
+trunc(ldt::Localized, ::Type{Millisecond}) = ldt
 
 # Adjusters
 for prefix in ("firstdayof", "lastdayof"), suffix in ("week", "month", "year", "quarter")
     func = Symbol(prefix * suffix)
     @eval begin
-        $func(dt::ZonedDateTime) = ZonedDateTime($func(localtime(dt)), dt.timezone)
+        $func(dt::Localized) = Localized($func(localtime(dt)), dt.timezone)
     end
 end
