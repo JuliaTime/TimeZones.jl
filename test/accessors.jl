@@ -41,3 +41,15 @@ arr = fill(ldt, n)
 @test Dates.yearmonth.(arr) == fill((2014, 6), n)
 @test Dates.monthday.(arr) == fill((6, 12), n)
 @test Dates.yearmonthday.(arr) == fill((2014, 6, 12), n)
+
+ambiguous = Localized(DateTime(2015, 10, 25, 2), warsaw; strict=false)   # Ambiguous hour in Warsaw
+nonexistent = Localized(DateTime(2014, 3, 30, 2), warsaw; strict=false)  # Non-existent hour in Warsaw
+
+@test TimeZones.isstrict(ldt)
+@test !TimeZones.isstrict(TimeZones.relax(ldt))
+@test TimeZones.isambiguous(ambiguous)
+@test TimeZones.isnonexistent(nonexistent)
+@test !isvalid(ambiguous)
+@test !isvalid(nonexistent)
+@test isvalid(ldt)
+@test isvalid(TimeZones.relax(ldt))

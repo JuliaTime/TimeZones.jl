@@ -95,6 +95,15 @@ round_trip = TimeZones.unix2localized(TimeZones.localized2unix(Int64, ldt))
 @test round_trip == ldt
 @test !isequal(round_trip, ldt)
 
+# restrict vs relax
+relaxed_ldt = TimeZones.relax(ldt)
+ambiguous = Localized(DateTime(2015, 10, 25, 2), warsaw; strict=false)   # Ambiguous hour in Warsaw
+nonexistent = Localized(DateTime(2014, 3, 30, 2), warsaw; strict=false)  # Non-existent hour in Warsaw
+
+@test !TimeZones.isstrict(relaxed_ldt)
+@test_throws AmbiguousTimeError TimeZones.restrict(ambiguous)
+@test_throws NonExistentTimeError TimeZones.restrict(nonexistent)
+
 # Julian dates
 jd = 2457241.855
 jd_loc = Localized(Dates.julian2datetime(jd), warsaw, from_utc=true)

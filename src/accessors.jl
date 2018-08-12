@@ -24,6 +24,35 @@ Returns the `TimeZone` used by the `Localized`.
 """
 timezone(ldt::Localized) = ldt.timezone
 
+"""
+    isstrict(ldt::Localized) -> Bool
+
+Returns whether the localized datetime is strict
+(e.g., cannot represent non-existent or ambiguous hours).
+"""
+isstrict(ldt::Localized) = ldt.strict
+
+"""
+    isvalid(ldt::Localized) -> Bool
+
+Returns wether the localized datetime is valid (e.g., exists and is not amibiguous)
+"""
+Base.isvalid(ldt::Localized) = !isa(ldt.zone, InvalidTimeZone)
+
+"""
+    isambiguous(ldt::Localized) -> Bool
+
+Returns whether the localized datetime is ambiguous.
+"""
+isambiguous(ldt::Localized) = isa(ldt.zone, Ambiguous)
+
+"""
+    isnonexistent(ldt::Localized) -> Bool
+
+Returns whether the localized datetime is non-existent.
+"""
+isnonexistent(ldt::Localized) = isa(ldt.zone, NonExistent)
+
 days(ldt::Localized) = days(localtime(ldt))
 
 for period in (:Hour, :Minute, :Second, :Millisecond)

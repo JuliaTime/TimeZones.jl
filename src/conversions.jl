@@ -90,6 +90,21 @@ function astimezone(ldt::Localized, tz::FixedTimeZone)
     return Localized(ldt.utc_datetime, tz, tz)
 end
 
+"""
+    restrict(ldt::Localized) -> Localized
+
+Return a restricted representation of the localized datetime or throws an error if that
+isn't possible.
+"""
+restrict(ldt::Localized) = Localized(ldt.utc_datetime, ldt.timezone, ldt.zone, true)
+
+"""
+    relax(ldt::Localized) -> Localized
+
+Return a relaxed representation of the localized datetime.
+"""
+relax(ldt::Localized) = Localized(ldt.utc_datetime, ldt.timezone, ldt.zone, false)
+
 function localized2julian(ldt::Localized)
     datetime2julian(utc(ldt))
 end
