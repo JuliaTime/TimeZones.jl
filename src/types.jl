@@ -142,48 +142,40 @@ struct Ambiguous <: InvalidTimeZone end
 # A `DateTime` that includes `TimeZone` information.
 # """
 
-struct Localized{T<:Compat.AbstractDateTime} <: AbstractDateTime
+struct Localized{T<:Compat.AbstractDateTime, S} <: AbstractDateTime
     utc_datetime::T
     timezone::TimeZone
     zone::Union{FixedTimeZone, InvalidTimeZone}  # The current zone for the utc_datetime.
-    strict::Bool                                 # time must be representable
-
-    function Localized{T}(utc_datetime::T, timezone::TimeZone, zone::FixedTimeZone, strict::Bool) where T
-        new{T}(utc_datetime, timezone, zone, strict)
-    end
-
-    # We have internal constructors that ensure that we handle invalid times correctly.
-    function Localized{T}(utc_datetime::T, timezone::TimeZone, zone::NonExistent, strict::Bool) where T
-        strict && throw(NonExistentTimeError(utc_datetime, timezone))
-        new{T}(utc_datetime, timezone, zone, strict)
-    end
-
-    function Localized{T}(utc_datetime::T, timezone::TimeZone, zone::Ambiguous, strict::Bool) where T
-        strict && throw(AmbiguousTimeError(utc_datetime, timezone))
-        new{T}(utc_datetime, timezone, zone, strict)
-    end
 end
 
 function Localized(
-    utc_datetime::T,
-    timezone::TimeZone,
-    zone::Union{FixedTimeZone, InvalidTimeZone},
-    strict::Bool=true
+    utc_datetime::T, timezone::TimeZone, zone::FixedTimeZone, strict::Bool=true
 ) where T<:Compat.AbstractDateTime
-    Localized{T}(utc_datetime, timezone, zone, strict)
+    Localized{T, strict}(utc_datetime, timezone, zone)
 end
 
 function Localized(
-    utc_datetime::T,
-    timezone::VariableTimeZone,
-    zone::FixedTimeZone,
-    strict::Bool=true
+    utc_datetime::T, timezone::TimeZone, zone::NonExistent, strict::Bool=true
+) where T<:Compat.AbstractDateTime
+    strict && throw(NonExistentTimeError(utc_datetime, timezone))
+    Localized{T, strict}(utc_datetime, timezone, zone)
+end
+
+function Localized(
+    utc_datetime::T, timezone::TimeZone, zone::Ambiguous, strict::Bool=true
+) where T<:Compat.AbstractDateTime
+    strict && throw(AmbiguousTimeError(utc_datetime, timezone))
+    Localized{T, strict}(utc_datetime, timezone, zone)
+end
+
+function Localized(
+    utc_datetime::T, timezone::VariableTimeZone, zone::FixedTimeZone, strict::Bool=true
 ) where T<:Compat.AbstractDateTime
     if utc_datetime >= get(timezone.cutoff, typemax(DateTime))
         throw(UnhandledTimeError(timezone))
     end
 
-    return Localized{T}(utc_datetime, timezone, zone, strict)
+    return Localized{T, strict}(utc_datetime, timezone, zone)
 end
 
 """
@@ -312,6 +304,11 @@ end
 # isless(promote(x,y)...) is called again, causing a stack overflow.
 function promote_rule(::Type{T}, ::Type{S}) where {T<:TimeType, S<:Localized}
     error("no promotion exists for ", T, " and ", S)
+end
+
+# Promote strict localized times to relaxed times
+function promote_rule(::Type{Localized{T, false}}, ::Type{Localized{T, true}}) where T
+    Localized{T, false}
 end
 
 # Equality

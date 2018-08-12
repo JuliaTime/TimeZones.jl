@@ -94,7 +94,7 @@ Aside: the function name refers to a period of invalid local time (gap) caused b
 saving time or offset changes (shift).
 """
 function shift_gap(local_dt::DateTime, tz::VariableTimeZone, strict::Bool=true)
-    boundaries = Localized{DateTime}[]
+    boundaries = Localized{DateTime, strict}[]
     t = tz.transitions
     n = length(t)
     delta = eps(local_dt)

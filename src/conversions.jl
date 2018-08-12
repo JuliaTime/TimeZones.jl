@@ -136,3 +136,6 @@ end
 function unix2localized(seconds::Real)
     Localized(unix2datetime(seconds), utc_tz, from_utc=true)
 end
+
+Base.convert(::Type{Localized{T, false}}, x::Localized{T, true}) where T = relax(x)
+Base.convert(::Type{Localized{T, true}}, x::Localized{T, false}) where T = restrict(x)

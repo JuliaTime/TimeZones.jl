@@ -30,7 +30,8 @@ timezone(ldt::Localized) = ldt.timezone
 Returns whether the localized datetime is strict
 (e.g., cannot represent non-existent or ambiguous hours).
 """
-isstrict(ldt::Localized) = ldt.strict
+isstrict(ldt::Localized{T, true}) where T = true
+isstrict(ldt::Localized{T, false}) where T = false
 
 """
     isvalid(ldt::Localized) -> Bool

@@ -38,7 +38,7 @@ paris = resolve("Europe/Paris", tzdata["europe"]...)
         local zone = FixedTimeZone("CST", -6 * 3600)
 
         instant = next_transition_instant(Localized(2018, 1, 1, wpg))
-        expected_instant = Localized{DateTime}(DateTime(2018, 3, 11, 8), wpg, zone, true)
+        expected_instant = Localized{DateTime, true}(DateTime(2018, 3, 11, 8), wpg, zone)
         expected_valid = Localized(2018, 3, 11, 3, wpg)
 
         @test isequal(instant, expected_instant)
@@ -51,7 +51,7 @@ paris = resolve("Europe/Paris", tzdata["europe"]...)
         local zone = FixedTimeZone("CDT", -6 * 3600, 3600)
 
         instant = next_transition_instant(Localized(2018, 6, 1, wpg))
-        expected_instant = Localized{DateTime}(DateTime(2018, 11, 4, 7), wpg, zone, true)
+        expected_instant = Localized{DateTime, true}(DateTime(2018, 11, 4, 7), wpg, zone)
         expected_valid = Localized(2018, 11, 4, 1, wpg, 2)
 
         @test isequal(instant, expected_instant)
