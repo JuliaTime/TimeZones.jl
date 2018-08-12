@@ -129,51 +129,87 @@ function VariableTimeZone(name::AbstractString, transitions::Vector{Transition})
     return VariableTimeZone(Symbol(name), transitions, Nullable{DateTime}())
 end
 
+# Define invalid TimeZone types
+abstract type InvalidTimeZone <: TimeZone end
+
+struct NonExistent <: InvalidTimeZone end
+
+struct Ambiguous <: InvalidTimeZone end
 
 # """
 #     Localized
-
+#
 # A `DateTime` that includes `TimeZone` information.
 # """
 
 struct Localized{T<:Compat.AbstractDateTime} <: AbstractDateTime
     utc_datetime::T
     timezone::TimeZone
-    zone::FixedTimeZone  # The current zone for the utc_datetime.
+    zone::Union{FixedTimeZone, InvalidTimeZone}  # The current zone for the utc_datetime.
+    strict::Bool                                 # time must be representable
+
+    function Localized{T}(utc_datetime::T, timezone::TimeZone, zone::FixedTimeZone, strict::Bool) where T
+        new{T}(utc_datetime, timezone, zone, strict)
+    end
+
+    # We have internal constructors that ensure that we handle invalid times correctly.
+    function Localized{T}(utc_datetime::T, timezone::TimeZone, zone::NonExistent, strict::Bool) where T
+        strict && throw(NonExistentTimeError(utc_datetime, timezone))
+        new{T}(utc_datetime, timezone, zone, strict)
+    end
+
+    function Localized{T}(utc_datetime::T, timezone::TimeZone, zone::Ambiguous, strict::Bool) where T
+        strict && throw(AmbiguousTimeError(utc_datetime, timezone))
+        new{T}(utc_datetime, timezone, zone, strict)
+    end
 end
 
-function Localized(utc_datetime::T, timezone::VariableTimeZone, zone::FixedTimeZone) where T<:Compat.AbstractDateTime
+function Localized(
+    utc_datetime::T,
+    timezone::TimeZone,
+    zone::Union{FixedTimeZone, InvalidTimeZone},
+    strict::Bool=true
+) where T<:Compat.AbstractDateTime
+    Localized{T}(utc_datetime, timezone, zone, strict)
+end
+
+function Localized(
+    utc_datetime::T,
+    timezone::VariableTimeZone,
+    zone::FixedTimeZone,
+    strict::Bool=true
+) where T<:Compat.AbstractDateTime
     if utc_datetime >= get(timezone.cutoff, typemax(DateTime))
         throw(UnhandledTimeError(timezone))
     end
 
-    return Localized{T}(utc_datetime, timezone, zone)
+    return Localized{T}(utc_datetime, timezone, zone, strict)
 end
 
 """
-    Localized(dt::DateTime, tz::TimeZone; from_utc=false) -> Localized
+    Localized(dt::DateTime, tz::TimeZone; from_utc=false, strict=true) -> Localized
 
 Construct a `Localized` by applying a `TimeZone` to a `DateTime`. When the `from_utc`
 keyword is true the given `DateTime` is assumed to be in UTC instead of in local time and is
 converted to the specified `TimeZone`.  Note that when `from_utc` is true the given
 `DateTime` will always exists and is never ambiguous.
 """
-function Localized(dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
+function Localized(dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false, strict::Bool=true)
     possible = interpret(dt, tz, from_utc ? UTC : Local)
 
     num = length(possible)
     if num == 1
         return first(possible)
     elseif num == 0
-        throw(NonExistentTimeError(dt, tz))
+        return Localized(dt, tz, NonExistent(), strict)
     else
-        throw(AmbiguousTimeError(dt, tz))
+        return Localized(dt, tz, Ambiguous(), strict)
     end
 end
 
-function Localized(dt::DateTime, tz::FixedTimeZone; from_utc::Bool=false)
+function Localized(dt::DateTime, tz::FixedTimeZone; from_utc::Bool=false, strict::Bool=true)
     utc_dt = from_utc ? dt : dt - tz.offset
-    return Localized{DateTime}(utc_dt, tz, tz)
+    return Localized(utc_dt, tz, tz, strict)
 end
 
 """
@@ -183,18 +219,18 @@ Construct a `Localized` by applying a `TimeZone` to a `DateTime`. If the `DateTi
 ambiguous within the given time zone you can set `occurrence` to a positive integer to
 resolve the ambiguity.
 """
-function Localized(dt::DateTime, tz::VariableTimeZone, occurrence::Integer)
-    possible = interpret(dt, tz, Local)
+function Localized(dt::DateTime, tz::VariableTimeZone, occurrence::Integer; strict::Bool=true)
+    possible = interpret(dt, tz, Local, strict)
 
     num = length(possible)
     if num == 1
         return first(possible)
     elseif num == 0
-        throw(NonExistentTimeError(dt, tz))
+        return Localized(dt, tz, NonExistent(), strict)
     elseif occurrence > 0
         return possible[occurrence]
     else
-        throw(AmbiguousTimeError(dt, tz))
+        return Localized(dt, tz, Ambiguous(), strict)
     end
 end
 
@@ -204,24 +240,26 @@ end
 Construct a `Localized` by applying a `TimeZone` to a `DateTime`. If the `DateTime` is
 ambiguous within the given time zone you can set `is_dst` to resolve the ambiguity.
 """
-function Localized(dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
-    possible = interpret(dt, tz, Local)
+function Localized(dt::DateTime, tz::VariableTimeZone, is_dst::Bool, strict::Bool=true)
+    possible = interpret(dt, tz, Local, strict)
 
     num = length(possible)
     if num == 1
         return first(possible)
     elseif num == 0
-        throw(NonExistentTimeError(dt, tz))
+        return Localized(dt, tz, NonExistent(), strict)
     elseif num == 2
         mask = [isdst(ldt.zone.offset) for ldt in possible]
 
         # Mask is expected to be unambiguous.
-        !xor(mask...) && throw(AmbiguousTimeError(dt, tz))
+        if !xor(mask...)
+            return Localized(dt, tz, Ambiguous(), strict)
+        end
 
         occurrence = findfirst(d -> d == is_dst, mask)
         return possible[occurrence]
     else
-        throw(AmbiguousTimeError(dt, tz))
+        return Localized(dt, tz, Ambiguous(), strict)
     end
 end
 
