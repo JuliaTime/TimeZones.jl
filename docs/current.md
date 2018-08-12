@@ -1,6 +1,6 @@
 ## Current Time / System Time Zone
 
-Julia provides the `now()` method to retrieve your current system's time as a `DateTime`. The TimeZones.jl package provides an additional `now(::TimeZone)` method providing the current time as a `ZonedDateTime`:
+Julia provides the `now()` method to retrieve your current system's time as a `DateTime`. The TimeZones.jl package provides an additional `now(::TimeZone)` method providing the current time as a `Localized`:
 
 ```julia
 now(tz"Europe/Warsaw")
@@ -27,22 +27,22 @@ julia> today(tz"Pacific/Midway"), today(tz"Pacific/Apia")
 (2018-01-29, 2018-01-30)
 ```
 
-You should be careful not to use `today()` when working with `ZonedDateTime`s as you may end up using the wrong day. For example:
+You should be careful not to use `today()` when working with `Localized`s as you may end up using the wrong day. For example:
 
 ```julia
 julia> midway, apia = tz"Pacific/Midway", tz"Pacific/Apia"
 (Pacific/Midway (UTC-11), Pacific/Apia (UTC+13/UTC+14))
 
-julia> ZonedDateTime(today() + Time(11), midway)
+julia> Localized(today() + Time(11), midway)
 2018-01-29T11:00:00-11:00
 
-julia> ZonedDateTime(today() + Time(11), apia)  # Should be 2018-01-30
+julia> Localized(today() + Time(11), apia)  # Should be 2018-01-30
 2018-01-29T11:00:00+14:00
 
-julia> ZonedDateTime(today(midway) + Time(11), midway)
+julia> Localized(today(midway) + Time(11), midway)
 2018-01-29T11:00:00-11:00
 
-julia> ZonedDateTime(today(apia) + Time(11), apia)
+julia> Localized(today(apia) + Time(11), apia)
 2018-01-30T11:00:00+14:00
 ```
 

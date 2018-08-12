@@ -8,7 +8,7 @@ using Compat.Dates, Compat.Printf, Compat.Serialization, Compat.Unicode
 import Compat.Dates: TimeZone, AbstractTime
 using Nullables
 
-export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
+export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, Localized,
     DateTime, TimeError, AmbiguousTimeError, NonExistentTimeError, UnhandledTimeError,
     # discovery.jl
     timezone_names, all_timezones, timezones_from_abbr, timezone_abbrs,
@@ -43,7 +43,7 @@ function __init__()
     Dates.CONVERSION_SPECIFIERS['z'] = TimeZone
     Dates.CONVERSION_SPECIFIERS['Z'] = TimeZone
     Dates.CONVERSION_DEFAULTS[TimeZone] = ""
-    Dates.CONVERSION_TRANSLATIONS[ZonedDateTime] = (
+    Dates.CONVERSION_TRANSLATIONS[Localized] = (
         Year, Month, Day, Hour, Minute, Second, Millisecond, TimeZone,
     )
 

@@ -6,7 +6,7 @@ function print(io::IO, tz::FixedTimeZone)
     name = string(tz.name)
     isempty(name) ? print(io, "UTC", tz.offset) : print(io, name)
 end
-print(io::IO, zdt::ZonedDateTime) = print(io, localtime(zdt), zdt.zone.offset)
+print(io::IO, ldt::Localized) = print(io, localtime(ldt), ldt.zone.offset)
 
 function show(io::IO, t::Transition)
     name_str = string(t.zone.name)
@@ -60,4 +60,4 @@ function show(io::IO, tz::VariableTimeZone)
     end
 end
 
-show(io::IO,dt::ZonedDateTime) = print(io, string(dt))
+show(io::IO,dt::Localized) = print(io, string(dt))

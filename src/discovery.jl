@@ -129,16 +129,16 @@ end
 
 
 """
-    next_transition_instant(zdt::ZonedDateTime) -> ZonedDateTime
-    next_transition_instant(tz::TimeZone=localzone()) -> ZonedDateTime
+    next_transition_instant(ldt::Localized) -> Localized
+    next_transition_instant(tz::TimeZone=localzone()) -> Localized
 
 Determine the next instant at which a time zone transition occurs (typically
 due to daylight-savings time).
 
-Note that the provided `ZonedDateTime` isn't normally constructable:
+Note that the provided `Localized` isn't normally constructable:
 
 ```julia
-julia> instant = next_transition_instant(ZonedDateTime(2018, 3, 1, tz"Europe/London"))
+julia> instant = next_transition_instant(Localized(2018, 3, 1, tz"Europe/London"))
 2018-03-25T01:00:00+00:00
 
 julia> instant - Millisecond(1)  # Instant prior to the change
@@ -147,38 +147,38 @@ julia> instant - Millisecond(1)  # Instant prior to the change
 julia> instant - Millisecond(0)  # Instant after the change
 2018-03-25T02:00:00+01:00
 
-julia> ZonedDateTime(2018, 3, 25, 1, tz"Europe/London")  # Cannot normally construct the `instant`
+julia> Localized(2018, 3, 25, 1, tz"Europe/London")  # Cannot normally construct the `instant`
 ERROR: NonExistentTimeError: Local DateTime 2018-03-25T01:00:00 does not exist within Europe/London
 ...
 ```
 """
 next_transition_instant
 
-function next_transition_instant(zdt::ZonedDateTime)
-    tz = zdt.timezone
+function next_transition_instant(ldt::Localized)
+    tz = ldt.timezone
 
     # Determine the index of the transition which occurs after the UTC datetime specified
     index = searchsortedfirst(
-        tz.transitions, TimeZones.utc(zdt),
+        tz.transitions, TimeZones.utc(ldt),
         by=el -> isa(el, TimeZones.Transition) ? el.utc_datetime : el,
     )
 
     # Use the UTC datetime of the transition and the offset information prior to the
-    # transition to create a `ZonedDateTime` which cannot be constructed with the high-level
+    # transition to create a `Localized` which cannot be constructed with the high-level
     # constructors. The instant constructed is equivalent to the first instant after the
     # transition but visually appears to be before the transition. For example in a
     # transition where the clock changes from 01:59 → 03:00 we would return 02:00 where
     # the UTC datetime of 02:00 == 03:00.
     utc_datetime = tz.transitions[index].utc_datetime
     prev_zone = tz.transitions[index - 1].zone
-    ZonedDateTime(utc_datetime, tz, prev_zone)
+    Localized(utc_datetime, tz, prev_zone)
 end
 
 next_transition_instant(tz::TimeZone=localzone()) = next_transition_instant(@mock now(tz))
 
 
 """
-    show_next_transition(io::IO=stdout, zdt::ZonedDateTime)
+    show_next_transition(io::IO=stdout, ldt::Localized)
     show_next_transition(io::IO=stdout, tz::TimeZone=localzone())
 
 Display useful information about the next time zone transition (typically
@@ -193,14 +193,14 @@ due to daylight-savings time). Information displayed includes:
 * Transition To: the instant after the transition occurs
 
 ```julia
-julia> show_next_transition(ZonedDateTime(2018, 8, 1, tz"Europe/London"))
+julia> show_next_transition(Localized(2018, 8, 1, tz"Europe/London"))
 Transition Date:   2018-10-28
 Local Time Change: 02:00 → 01:00 (Backward)
 Offset Change:     UTC+0/+1 → UTC+0/+0
 Transition From:   2018-10-28T01:59:59.999+01:00 (BST)
 Transition To:     2018-10-28T01:00:00.000+00:00 (GMT)
 
-julia> show_next_transition(ZonedDateTime(2011, 12, 1, tz"Pacific/Apia"))
+julia> show_next_transition(Localized(2011, 12, 1, tz"Pacific/Apia"))
 Transition Date:   2011-12-30
 Local Time Change: 00:00 → 00:00 (Forward)
 Offset Change:     UTC-11/+1 → UTC+13/+1
@@ -210,29 +210,29 @@ Transition To:     2011-12-31T00:00:00.000+14:00
 """
 show_next_transition
 
-function show_next_transition(io::IO, zdt::ZonedDateTime)
-    instant = next_transition_instant(zdt)
+function show_next_transition(io::IO, ldt::Localized)
+    instant = next_transition_instant(ldt)
     from, to = instant - Millisecond(1), instant + Millisecond(0)
     direction = value(to.zone.offset - from.zone.offset) < 0 ? "Backward" : "Forward"
 
-    function zdt_format(zdt)
-        name_suffix = string(zdt.zone.name)
+    function loc_format(ldt)
+        name_suffix = string(ldt.zone.name)
         !isempty(name_suffix) && (name_suffix = string(" (", name_suffix, ")"))
         string(
-            Dates.format(zdt, dateformat"yyyy-mm-ddTHH:MM:SS.sss"),
-            zdt.zone.offset,  # Note: "zzz" will not work in the format above as is
+            Dates.format(ldt, dateformat"yyyy-mm-ddTHH:MM:SS.sss"),
+            ldt.zone.offset,  # Note: "zzz" will not work in the format above as is
             name_suffix,
         )
     end
-    function time_format(zdt)
-        Dates.format(zdt, second(zdt) == 0 ? dateformat"HH:MM" : dateformat"HH:MM:SS")
+    function time_format(ldt)
+        Dates.format(ldt, second(ldt) == 0 ? dateformat"HH:MM" : dateformat"HH:MM:SS")
     end
 
     println(io, "Transition Date:   ", Dates.format(instant, dateformat"yyyy-mm-dd"))
     println(io, "Local Time Change: ", time_format(instant), " → ", time_format(to), " (", direction, ")")
     println(io, "Offset Change:     ", repr(from.zone.offset), " → ", repr(to.zone.offset))
-    println(io, "Transition From:   ", zdt_format(from))
-    println(io, "Transition To:     ", zdt_format(to))
+    println(io, "Transition From:   ", loc_format(from))
+    println(io, "Transition To:     ", loc_format(to))
 
 end
 
