@@ -43,7 +43,7 @@ paris = resolve("Europe/Paris", tzdata["europe"]...)
 
         @test isequal(instant, expected_instant)
         @test instant == expected_valid
-        @test !isequal(instant, expected_valid)
+        @test isequal(instant, expected_valid)
         @test isequal(instant + Millisecond(0), expected_valid)
     end
 
@@ -56,7 +56,7 @@ paris = resolve("Europe/Paris", tzdata["europe"]...)
 
         @test isequal(instant, expected_instant)
         @test instant == expected_valid
-        @test !isequal(instant, expected_valid)
+        @test isequal(instant, expected_valid)
         @test isequal(instant + Millisecond(0), expected_valid)
     end
 

@@ -277,8 +277,8 @@ early_utc = ZonedDateTime(DateTime(UTM(typemin(Int64))), utc)
 @test spring_apia.zone == FixedTimeZone("SST", -39600, 0)
 @test spring_utc == spring_apia
 @test spring_utc !== spring_apia
-@test !isequal(spring_utc, spring_apia)
-@test hash(spring_utc) != hash(spring_apia)
+@test isequal(spring_utc, spring_apia)
+@test hash(spring_utc) == hash(spring_apia)
 @test astimezone(spring_utc, apia) === spring_apia  # Since ZonedDateTime is immutable
 @test astimezone(spring_apia, utc) === spring_utc
 @test isequal(astimezone(spring_utc, apia), spring_apia)
@@ -293,8 +293,8 @@ fall_apia = ZonedDateTime(DateTime(2010, 10, 1, 2), apia)
 @test fall_utc !== fall_apia
 @test !(fall_utc < fall_apia)
 @test !(fall_utc > fall_apia)
-@test !isequal(fall_utc, fall_apia)
-@test hash(fall_utc) != hash(fall_apia)
+@test isequal(fall_utc, fall_apia)
+@test hash(fall_utc) == hash(fall_apia)
 @test astimezone(fall_utc, apia) === fall_apia  # Since ZonedDateTime is immutable
 @test astimezone(fall_apia, utc) === fall_utc
 @test isequal(astimezone(fall_utc, apia), fall_apia)
@@ -310,6 +310,7 @@ y = deepcopy(x)
 @test !(x > y)
 @test isequal(x, y)
 @test hash(x) == hash(y)
+@test hash(x) != hash(y.utc_datetime)
 
 
 # A FixedTimeZone is effective for all of time where as a VariableTimeZone has as start.
