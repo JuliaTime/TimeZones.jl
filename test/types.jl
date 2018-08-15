@@ -310,6 +310,8 @@ y = deepcopy(x)
 @test !(x > y)
 @test isequal(x, y)
 @test hash(x) == hash(y)
+
+# Check that the ZonedDateTime and plain DateTimes don't hash to the same value.
 @test hash(x) != hash(y.utc_datetime)
 
 

@@ -41,10 +41,10 @@ paris = resolve("Europe/Paris", tzdata["europe"]...)
         expected_instant = ZonedDateTime(DateTime(2018, 3, 11, 8), wpg, zone)
         expected_valid = ZonedDateTime(2018, 3, 11, 3, wpg)
 
-        @test isequal(instant, expected_instant)
+        @test instant === expected_instant
         @test instant == expected_valid
-        @test isequal(instant, expected_valid)
-        @test isequal(instant + Millisecond(0), expected_valid)
+        @test instant !== expected_valid
+        @test instant + Millisecond(0) === expected_valid
     end
 
     @testset "ambiguous" begin
@@ -54,10 +54,10 @@ paris = resolve("Europe/Paris", tzdata["europe"]...)
         expected_instant = ZonedDateTime(DateTime(2018, 11, 4, 7), wpg, zone)
         expected_valid = ZonedDateTime(2018, 11, 4, 1, wpg, 2)
 
-        @test isequal(instant, expected_instant)
+        @test instant === expected_instant
         @test instant == expected_valid
-        @test isequal(instant, expected_valid)
-        @test isequal(instant + Millisecond(0), expected_valid)
+        @test instant !== expected_valid
+        @test instant + Millisecond(0) === expected_valid
     end
 
     @testset "upcoming" begin
