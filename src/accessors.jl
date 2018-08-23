@@ -1,3 +1,4 @@
+import Base: eps
 import Compat.Dates: Hour, Minute, Second, Millisecond,
     days, hour, minute, second, millisecond
 
@@ -33,3 +34,5 @@ for period in (:Hour, :Minute, :Second, :Millisecond)
         $period(zdt::ZonedDateTime) = $period($accessor(zdt))
     end
 end
+
+eps(::ZonedDateTime) = Millisecond(1)

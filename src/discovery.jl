@@ -212,7 +212,8 @@ show_next_transition
 
 function show_next_transition(io::IO, zdt::ZonedDateTime)
     instant = next_transition_instant(zdt)
-    from, to = instant - Millisecond(1), instant + Millisecond(0)
+    epsilon = eps(instant)
+    from, to = instant - epsilon, instant + zero(epsilon)
     direction = value(to.zone.offset - from.zone.offset) < 0 ? "Backward" : "Forward"
 
     function zdt_format(zdt)

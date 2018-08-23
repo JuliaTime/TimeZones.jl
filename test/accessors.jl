@@ -1,5 +1,5 @@
 import Compat.Dates
-import Compat.Dates: Second
+import Compat.Dates: Second, Millisecond
 
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 fixed = FixedTimeZone("Fixed", -7200, 3600)
@@ -14,6 +14,8 @@ zdt = ZonedDateTime(DateTime(2014,6,12,23,59,58,57), fixed)
 @test TimeZones.minute(zdt) == 59
 @test TimeZones.second(zdt) == 58
 @test TimeZones.millisecond(zdt) == 57
+
+@test eps(zdt) == Millisecond(1)
 
 # Make sure that Dates accessors work with ZonedDateTime.
 @test Dates.year(zdt) == 2014
