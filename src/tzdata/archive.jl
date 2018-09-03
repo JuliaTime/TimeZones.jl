@@ -1,8 +1,4 @@
-import Compat: @static, Sys, devnull
-
-if Sys.iswindows()
-    const exe7z = joinpath(Sys.BINDIR, "7z.exe")
-end
+import Compat: @static, devnull
 
 """
     extract(archive, directory, [files]; [verbose=false]) -> Void
