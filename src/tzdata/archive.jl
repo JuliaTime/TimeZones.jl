@@ -1,7 +1,9 @@
 import Compat: @static, Sys, devnull
 
-if Sys.iswindows()
-    const exe7z = joinpath(Sys.BINDIR, "7z.exe")
+function __init__()
+    if Sys.iswindows()
+        const exe7z = joinpath(Sys.BINDIR, "7z.exe")
+    end
 end
 
 """
