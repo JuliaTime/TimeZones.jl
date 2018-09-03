@@ -2,6 +2,7 @@ module TZData
 
 using Compat
 using Compat: occursin, @info, @warn
+import Compat: Sys
 using Compat.Printf
 using Nullables
 
@@ -10,6 +11,12 @@ using Nullables
 # (africa, australasia, ...)
 
 export build
+
+function __init__()
+    if Sys.iswindows()
+        global exe7z = joinpath(Sys.BINDIR, "7z.exe")
+    end
+end
 
 include("timeoffset.jl")
 include("archive.jl")

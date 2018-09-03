@@ -1,10 +1,4 @@
-import Compat: @static, Sys, devnull
-
-function __init__()
-    if Sys.iswindows()
-        const exe7z = joinpath(Sys.BINDIR, "7z.exe")
-    end
-end
+import Compat: @static, devnull
 
 """
     extract(archive, directory, [files]; [verbose=false]) -> Void
