@@ -20,7 +20,12 @@ function compile(xml_file::AbstractString)
     doc = readxml(xml_file)
 
     # Territory "001" is the global default
-    map_zones = findall(doc, "//mapZone[@territory='001']")
+    # Note: `findall` deprecation added in EzXML v0.8 which only works on Julia 0.7 and above
+    if VERSION < v"0.7"
+        map_zones = findall(doc, "//mapZone[@territory='001']")
+    else
+        map_zones = findall("//mapZone[@territory='001']", doc)
+    end
 
     # TODO: Eliminate the Etc/* POSIX names here? See Windows section of `localzone`
 
