@@ -33,9 +33,6 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
 
 const PKG_DIR = normpath(joinpath(dirname(@__FILE__), ".."))
 const DEPS_DIR = joinpath(PKG_DIR, "deps")
-const ARCHIVE_DIR = joinpath(DEPS_DIR, "tzarchive")
-const TZ_SOURCE_DIR = joinpath(DEPS_DIR, "tzsource")
-const COMPILED_DIR = joinpath(DEPS_DIR, "compiled")
 const TIME_ZONES = Dict{AbstractString,TimeZone}()
 
 function __init__()
@@ -142,6 +139,6 @@ include("rounding.jl")
 include("parse.jl")
 include("deprecated.jl")
 
-import TimeZones.TZData: REGIONS, LEGACY_REGIONS
+using TimeZones.TZData: ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, REGIONS, LEGACY_REGIONS
 
 end # module

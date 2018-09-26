@@ -1,7 +1,7 @@
 using Compat.Dates, Compat.Serialization
 import Compat.Dates: parse_components
 
-import ...TimeZones: TZ_SOURCE_DIR, COMPILED_DIR, TIME_ZONES
+import ...TimeZones: TIME_ZONES
 import ...TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
 import ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET,
     MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET

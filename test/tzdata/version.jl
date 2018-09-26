@@ -1,5 +1,4 @@
-import TimeZones: ARCHIVE_DIR
-import TimeZones.TZData: TZDATA_VERSION_REGEX, TZDATA_NEWS_REGEX
+import TimeZones.TZData: ARCHIVE_DIR, TZDATA_VERSION_REGEX, TZDATA_NEWS_REGEX
 import TimeZones.TZData: read_news, extract, tzdata_version_dir, tzdata_version_archive
 import TimeZones.TZData: active_version, active_archive
 
