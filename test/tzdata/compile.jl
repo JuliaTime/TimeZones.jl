@@ -46,8 +46,9 @@ import Compat.Dates: Hour, Minute, Second, DateTime, Date
 # Invalid zone
 @test_throws ArgumentError parsedate("1945 Aug 2 12:34i")
 
-# Actual until date found in Zone "Pacific/Apia"
-@test parsedate("2011 Dec 29 24:00") == (DateTime(2011,12,30), 'w')
+# Actual dates found tzdata files
+@test parsedate("2011 Dec 29 24:00") == (DateTime(2011,12,30), 'w')  # Pacific/Apia (2014f)
+@test parsedate("1945 Sep 30 24:00") == (DateTime(1945,10,1), 'w')  # Asia/Macau (2018f)
 
 
 ### order_rules ###

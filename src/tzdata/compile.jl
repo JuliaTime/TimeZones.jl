@@ -102,13 +102,15 @@ function parsedate(s::AbstractString)
         format = join(split("yyyy uuu dd HH:MM:SS", " ")[1:num_periods], ' ')
         periods = parse_components(s, DateFormat(format))
 
-        # Roll over 24:00 to the next day which occurs in "Pacific/Apia".
-        # Not a general purpose solution. For example won't work at the end of the month.
+        # Roll over 24:00 to the next day which occurs in "Pacific/Apia" and "Asia/Macau".
+        # Note: shift is applied after we create the DateTime to ensure that roll over works
+        # correctly at the end of the month or year.
+        shift = Day(0)
         if length(periods) > 3 && periods[4] == Hour(24)
             periods[4] = Hour(0)
-            periods[3] += Day(1)
+            shift += Day(1)
         end
-        dt = DateTime(periods...)
+        dt = DateTime(periods...) + shift
     end
 
     # TODO: I feel like there are issues here.
