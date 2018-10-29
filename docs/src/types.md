@@ -14,7 +14,7 @@ julia> tz"Europe/Warsaw"
 Europe/Warsaw (UTC+1/UTC+2)
 ```
 
-To see all of the [currently available](faq#why-are-the-etc-time-zones-unsupported) time zone names:
+To see all of the [currently available](@ref etc_tzs) time zone names:
 
 ```julia
 timezone_names()
@@ -101,7 +101,7 @@ julia> ZonedDateTime(2039, warsaw)
 ERROR: TimeZone Europe/Warsaw does not handle dates on or after 2038-03-28T01:00:00 UTC
 ```
 
-It is possible to have [timezones that work beyond 2038](faq#far-future-zoneddatetime-with-variabletimezone) but it since these dates are in the future it is possible the timezone rules may change and will not be accurate.
+It is possible to have [timezones that work beyond 2038](@ref future_tzs) but it since these dates are in the future it is possible the timezone rules may change and will not be accurate.
 
 
 ## FixedTimeZone

@@ -1,7 +1,7 @@
 Frequently Asked Questions
 ==========================
 
-## Why are the "Etc/&ast;" time zones unsupported?
+## [Why are the "Etc/&ast;" time zones unsupported?](@id etc_tzs)
 
 According to [IANA](ftp://ftp.iana.org/tz/data/etcetera) the "Etc/&ast;" time zones are only included in the tz database for "historical reasons". Furthermore the time zones offsets provided the Etc/GMT±HH can be misleading. For example the Etc/GMT+4 time zone is 4 hours **behind** UTC rather than 4 hours **ahead** as most people expect. Since TimeZones.jl already provides an easy way of constructing fixed offset time zones using `FixedTimeZone` it was decided to leave these time zones out.
 
@@ -13,7 +13,7 @@ extract(active_archive(), TimeZones.TZ_SOURCE_DIR, "etcetera")
 compile()
 ```
 
-## Far-future ZonedDateTime with VariableTimeZone
+## [Far-future ZonedDateTime with VariableTimeZone](@id future_tzs)
 
 Due to the internal representation of a `VariableTimeZone` it is infeasible to determine a time zones transitions to infinity. Since [2038-01-19T03:14:07](https://en.wikipedia.org/wiki/Year_2038_problem) is the last `DateTime` that can be represented by an `Int32` (`Dates.unix2datetime(typemax(Int32))`) it was decided that 2037 would be the last year in which all transition dates are computed. If additional transitions are known to exist after the last transition then a cutoff date is specified.
 
