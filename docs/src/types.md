@@ -2,14 +2,12 @@
 
 ```@meta
 DocTestSetup = quote
-    using TimeZones
-    using Compat.Dates
+    using TimeZones, Dates
 end
 ```
 
 ```@setup tz
-using TimeZones
-using Compat.Dates
+using TimeZones, Dates
 ```
 
 ## TimeZone

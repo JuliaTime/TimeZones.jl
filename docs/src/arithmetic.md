@@ -5,7 +5,7 @@
 `ZonedDateTime` uses calendrical arithmetic in a [similar manner to `DateTime`](https://docs.julialang.org/en/stable/stdlib/Dates/#TimeType-Period-Arithmetic-1) but with some key differences. Lets look at these differences by adding a day to March 30th 2014 in Europe/Warsaw.
 
 ```jldoctest spring
-julia> using TimeZones, Compat.Dates
+julia> using TimeZones, Dates
 
 julia> warsaw = tz"Europe/Warsaw"
 Europe/Warsaw (UTC+1/UTC+2)

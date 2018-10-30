@@ -2,7 +2,7 @@
 
 ```@setup tz
 using TimeZones
-using Compat.Dates
+using Dates
 ```
 
 ## `now` / System Time Zone

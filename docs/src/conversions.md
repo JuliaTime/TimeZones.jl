@@ -2,8 +2,7 @@
 
 ```@meta
 DocTestSetup = quote
-    using Compat.Dates
-    using TimeZones
+    using TimeZones, Dates
 end
 ```
 
