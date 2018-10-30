@@ -1,4 +1,6 @@
-## Current Time / System Time Zone
+# Current Time
+
+## `now` / System Time Zone
 
 Julia provides the `now()` method to retrieve your current system's time as a `DateTime`. The TimeZones.jl package provides an additional `now(::TimeZone)` method providing the current time as a `ZonedDateTime`:
 
@@ -12,7 +14,7 @@ To get the `TimeZone` currently specified on you system you can use `localzone()
 now(localzone())
 ```
 
-## Today
+## `today`
 
 Similar to `now` the TimeZones package also provides a `today(::TimeZone)` method which allows you to determine the current date as a `Date` in the specified `TimeZone`.
 

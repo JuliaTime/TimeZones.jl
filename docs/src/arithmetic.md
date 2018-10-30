@@ -1,3 +1,5 @@
+# Arithmetic
+
 ## ZonedDateTime-Period Arithmetic
 
 `ZonedDateTime` uses calendrical arithmetic in a [similar manner to `DateTime`](https://docs.julialang.org/en/stable/manual/dates/#TimeType-Period-Arithmetic-1) but with some key differences. Lets look at these differences by adding a day to March 30th 2014 in Europe/Warsaw.

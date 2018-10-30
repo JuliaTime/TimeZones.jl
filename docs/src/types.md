@@ -1,3 +1,5 @@
+# Time Zone Types
+
 ## TimeZone
 
 A `TimeZone` is an abstract type that represents information regarding a specific time zone. Typically you will create an instance of a `TimeZone` by passing in a zone name to the convenience constructor `TimeZone`:

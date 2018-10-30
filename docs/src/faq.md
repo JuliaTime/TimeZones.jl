@@ -1,5 +1,4 @@
-Frequently Asked Questions
-==========================
+# Frequently Asked Questions
 
 ## [Why are the "Etc/&ast;" time zones unsupported?](@id etc_tzs)
 

@@ -1,9 +1,8 @@
-Time Zones
-==========
+# Time Zones
 
 [TimeZones.jl](https://github.com/JuliaTime/TimeZones.jl) provides access to the [IANA time zone database](http://www.iana.org/time-zones) (also referred to as the tz database) to the programming language [Julia](http://julialang.org/). This library can handle any time zone in the tz database but some have excluded by default due to them being deemed as historical (such as "Etc/*").
 
-# Installation
+## Installation
 
 The TimeZones package extends the Dates module provided by Julia version 0.4. In order to use this package you will need to have Julia 0.4 or higher installed on your system. Details on downloading and installing Julia can be found on the [language homepage](http://julialang.org/).
 
