@@ -9,6 +9,8 @@ The TimeZones package extends the Dates module provided by Julia version 0.4. In
 Once Julia is installed you can simply install TimeZones using the package manager. First open a Julia interactive session and run:
 
 ```julia
+julia> using Pkg  # on Julia 0.7+
+
 julia> Pkg.add("TimeZones")
 ```
 
