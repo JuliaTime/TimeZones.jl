@@ -47,23 +47,6 @@ julia> spring + Day(1) + Hour(24)
 2014-04-01T00:00:00+02:00
 ```
 
-If using a version of Julia 0.5 or below you may want to force precedence when mixing `DatePeriod`s and `TimePeriod`s since the expression `Day(1) + Hour(24)` would be automatically canonicalized to `Day(2)`:
-
-```julia
-julia> ZonedDateTime(2014, 10, 25, warsaw) + Day(1) + Hour(24)  # On Julia 0.5 or below
-2014-10-27T00:00:00+01:00
-
-julia> ZonedDateTime(2014, 10, 25, warsaw) + Day(2)
-2014-10-27T00:00:00+01:00
-```
-
-In Julia 0.6 period canonicalization no longer happens automatically:
-
-```
-julia> ZonedDateTime(2014, 10, 25, warsaw) + Day(1) + Hour(24)  # Julia 0.6 and above
-2014-10-26T23:00:00+01:00
-```
-
 ## Ranges
 
 Julia allows for the use of powerful [adjuster functions](https://docs.julialang.org/en/stable/manual/dates/#Adjuster-Functions-1) to perform certain cendrical and temporal calculations. The `recur()` function, for example, can take a `StepRange` of `TimeType`s and apply a function to produce a vector of dates that fit certain inclusion criteria (for example, "every fifth Wednesday of the month in 2014 at 09:00"):
