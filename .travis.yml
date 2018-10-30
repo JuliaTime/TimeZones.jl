@@ -33,3 +33,12 @@ after_success:
       Pkg.add("Coverage"); using Coverage
       Codecov.submit(process_folder())
       Coveralls.submit(Coveralls.process_folder())'
+jobs:
+  include:
+    - stage: "Documentation"
+      julia: 1.0
+      os: linux
+      script:
+        - julia --project=docs/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd())); Pkg.build("TimeZones")'
+        - julia --project=docs/ docs/make.jl
+      after_success: skip
