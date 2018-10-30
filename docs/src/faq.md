@@ -2,7 +2,7 @@
 
 ```@meta
 DocTestSetup = quote
-	using TimeZones
+    using TimeZones
 end
 ```
 
