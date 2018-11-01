@@ -36,7 +36,7 @@ You should be careful not to use `today()` when working with `ZonedDateTime`s as
 ```@repl tz
 midway, apia = tz"Pacific/Midway", tz"Pacific/Apia"
 ZonedDateTime(today() + Time(11), midway)
-ZonedDateTime(today() + Time(11), apia)  # Should be 2018-01-30
+ZonedDateTime(today() + Time(11), apia)  # Wrong date; with the current rules apia should be one day ahead of midway
 ZonedDateTime(today(midway) + Time(11), midway)
 ZonedDateTime(today(apia) + Time(11), apia)
 ```
