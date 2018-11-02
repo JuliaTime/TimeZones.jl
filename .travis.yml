@@ -44,21 +44,15 @@ jobs:
     - &doctest
       stage: "Documentation (Test)"
       os: linux
-      julia: 0.7
+      julia: 1.0
       script:
         - julia --project=docs/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd())); Pkg.build("TimeZones")'
         - julia --project=docs/ docs/make.jl
       after_success: skip
     - <<: *doctest
-      julia: 1.0
-    - <<: *doctest
       julia: nightly
     - <<: *doctest
       os: osx
-      julia: 0.7
-    - <<: *doctest
-      os: osx
-      julia: 1.0
     - <<: *doctest
       os: osx
       julia: nightly
