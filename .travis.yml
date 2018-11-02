@@ -1,3 +1,9 @@
+stages:
+  - test
+  - Documentation (Test)
+  - name: Documentation (Deploy)
+    if: branch = master OR tag =~ ^v
+
 language: julia
 os:
   - osx
@@ -35,10 +41,31 @@ after_success:
       Coveralls.submit(Coveralls.process_folder())'
 jobs:
   include:
-    - stage: "Documentation"
-      julia: 1.0
+    - &doctest
+      stage: "Documentation (Test)"
       os: linux
+      julia: 0.7
       script:
         - julia --project=docs/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd())); Pkg.build("TimeZones")'
         - julia --project=docs/ docs/make.jl
+      after_success: skip
+    - <<: *doctest
+      julia: 1.0
+    - <<: *doctest
+      julia: nightly
+    - <<: *doctest
+      os: osx
+      julia: 0.7
+    - <<: *doctest
+      os: osx
+      julia: 1.0
+    - <<: *doctest
+      os: osx
+      julia: nightly
+    - stage: "Documentation (Deploy)"
+      os: linux
+      julia: 1.0
+      script:
+        - julia --project=docs/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd())); Pkg.build("TimeZones")'
+        - julia --project=docs/ docs/deploy.jl
       after_success: skip
