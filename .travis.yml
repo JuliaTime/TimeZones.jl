@@ -2,7 +2,7 @@ stages:
   - test
   - Documentation (Test)
   - name: Documentation (Deploy)
-    if: branch = master OR tag =~ ^v
+    if: (branch = master AND type != pull_request) OR tag =~ ^v
 
 language: julia
 os:
