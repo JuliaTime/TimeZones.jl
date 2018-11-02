@@ -14,4 +14,5 @@ makedocs(
     html_prettyurls=false,  # makes local builds work
     linkcheck=true,
     linkcheck_ignore=[r"^ftp://.*"],
+    strict=true,
 )
