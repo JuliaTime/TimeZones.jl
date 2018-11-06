@@ -1,3 +1,9 @@
+stages:
+  - test
+  - Documentation (Test)
+  - name: Documentation (Deploy)
+    if: (branch = master AND type != pull_request) OR tag =~ ^v
+
 language: julia
 os:
   - osx
@@ -33,3 +39,27 @@ after_success:
       Pkg.add("Coverage"); using Coverage
       Codecov.submit(process_folder())
       Coveralls.submit(Coveralls.process_folder())'
+jobs:
+  include:
+    - &doctest
+      stage: "Documentation (Test)"
+      os: linux
+      julia: 1.0
+      script:
+        - julia --project=docs/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd())); Pkg.build("TimeZones")'
+        - julia --project=docs/ docs/make.jl
+      after_success: skip
+    - <<: *doctest
+      julia: nightly
+    - <<: *doctest
+      os: osx
+    - <<: *doctest
+      os: osx
+      julia: nightly
+    - stage: "Documentation (Deploy)"
+      os: linux
+      julia: 1.0
+      script:
+        - julia --project=docs/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd())); Pkg.build("TimeZones")'
+        - julia --project=docs/ docs/deploy.jl
+      after_success: skip
