@@ -180,6 +180,10 @@ function ZonedDateTime(dt::DateTime, tz::FixedTimeZone; from_utc::Bool=false)
     return ZonedDateTime(utc_dt, tz, tz)
 end
 
+function ZonedDateTime(dt::DateTime, tz::UTC; from_utc::Bool=false)
+    return ZonedDateTime(dt, FixedTimeZone(tz); from_utc=from_utc)
+end
+
 """
     ZonedDateTime(dt::DateTime, tz::VariableTimeZone, occurrence::Integer) -> ZonedDateTime
 

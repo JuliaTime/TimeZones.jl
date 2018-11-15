@@ -5,6 +5,8 @@ using Mocking
 # UTC is an abstract type defined in Dates, for some reason
 const utc_tz = FixedTimeZone("UTC")
 
+FixedTimeZone(::UTC) = utc_tz
+
 """
     DateTime(::ZonedDateTime) -> DateTime
 

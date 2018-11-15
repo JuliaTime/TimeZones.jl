@@ -6,6 +6,11 @@ warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
 apia = resolve("Pacific/Apia", tzdata["australasia"]...)
 midway = resolve("Pacific/Midway", tzdata["australasia"]...)
 
+# Converting from the stdlib UTC
+@test FixedTimeZone(UTC()) == utc
+dt = DateTime(2015, 1, 1, 0)
+@test ZonedDateTime(dt, FixedTimeZone(UTC())) == ZonedDateTime(dt, utc)
+
 # Converting a ZonedDateTime into a DateTime
 dt = DateTime(2015, 1, 1, 0)
 zdt = ZonedDateTime(dt, warsaw)
