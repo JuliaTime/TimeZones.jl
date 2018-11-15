@@ -6,7 +6,7 @@ import Compat: Sys, read
 # For mocking make sure we are actually changing the time zone
 name = string(localzone()) == "Europe/Warsaw" ? "Pacific/Apia" : "Europe/Warsaw"
 
-tzfile_path = joinpath(TZFILE_DIR, split(name, '/')...)
+tzfile_path = joinpath(TZFILE_DIR(), split(name, '/')...)
 @assert isfile(tzfile_path) "Tests require a local tzfile present"
 win_name = name == "Europe/Warsaw" ? "Central European Standard Time" : "Samoa Standard Time"
 timezone = TimeZone(name)

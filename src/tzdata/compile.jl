@@ -540,7 +540,7 @@ function tzparse(tz_source_file::AbstractString)
     return zones, rules
 end
 
-function load(tz_source_dir::AbstractString=TZ_SOURCE_DIR; max_year::Integer=MAX_YEAR)
+function load(tz_source_dir::AbstractString=TZ_SOURCE_DIR(); max_year::Integer=MAX_YEAR)
     timezones = Dict{AbstractString,TimeZone}()
     for filename in readdir(tz_source_dir)
         zones, rules = tzparse(joinpath(tz_source_dir, filename))
@@ -549,7 +549,7 @@ function load(tz_source_dir::AbstractString=TZ_SOURCE_DIR; max_year::Integer=MAX
     return timezones
 end
 
-function compile(tz_source_dir::AbstractString=TZ_SOURCE_DIR, dest_dir::AbstractString=COMPILED_DIR; max_year::Integer=MAX_YEAR)
+function compile(tz_source_dir::AbstractString=TZ_SOURCE_DIR(), dest_dir::AbstractString=COMPILED_DIR(); max_year::Integer=MAX_YEAR)
     timezones = load(tz_source_dir; max_year=max_year)
 
     isdir(dest_dir) || error("Destination directory doesn't exist")

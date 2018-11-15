@@ -31,11 +31,11 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
     # TZData
     build
 
-const PKG_DIR = normpath(joinpath(dirname(@__FILE__), ".."))
-const DEPS_DIR = joinpath(PKG_DIR, "deps")
-const ARCHIVE_DIR = joinpath(DEPS_DIR, "tzarchive")
-const TZ_SOURCE_DIR = joinpath(DEPS_DIR, "tzsource")
-const COMPILED_DIR = joinpath(DEPS_DIR, "compiled")
+PKG_DIR() = Pkg.dir("TimeZones")
+DEPS_DIR() = joinpath(PKG_DIR(), "deps")
+ARCHIVE_DIR() = joinpath(DEPS_DIR(), "tzarchive")
+TZ_SOURCE_DIR() = joinpath(DEPS_DIR(), "tzsource")
+COMPILED_DIR() = joinpath(DEPS_DIR(), "compiled")
 const TIME_ZONES = Dict{AbstractString,TimeZone}()
 
 function __init__()
@@ -66,7 +66,7 @@ function TimeZone(str::AbstractString)
             return FixedTimeZone(str)
         end
 
-        tz_path = joinpath(COMPILED_DIR, split(str, "/")...)
+        tz_path = joinpath(COMPILED_DIR(), split(str, "/")...)
         isfile(tz_path) || throw(ArgumentError("Unknown time zone \"$str\""))
 
         open(tz_path, "r") do fp
@@ -99,7 +99,7 @@ function istimezone(str::AbstractString)
     return (
         haskey(TIME_ZONES, str) ||
         occursin(FIXED_TIME_ZONE_REGEX, str) ||
-        isfile(joinpath(COMPILED_DIR, split(str, "/")...))
+        isfile(joinpath(COMPILED_DIR(), split(str, "/")...))
     )
 end
 

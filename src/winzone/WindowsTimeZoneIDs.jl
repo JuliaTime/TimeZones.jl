@@ -10,10 +10,10 @@ using EzXML
 # http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping
 const WINDOWS_ZONE_URL = "http://unicode.org/repos/cldr/trunk/common/supplemental/windowsZones.xml"
 
-const WINDOWS_XML_DIR = joinpath(DEPS_DIR, "local")
-const WINDOWS_XML_FILE = joinpath(WINDOWS_XML_DIR, "windowsZones.xml")
+WINDOWS_XML_DIR() = joinpath(DEPS_DIR(), "local")
+WINDOWS_XML_FILE() = joinpath(WINDOWS_XML_DIR(), "windowsZones.xml")
 
-isdir(WINDOWS_XML_DIR) || mkdir(WINDOWS_XML_DIR)
+isdir(WINDOWS_XML_DIR()) || mkdir(WINDOWS_XML_DIR())
 
 function compile(xml_file::AbstractString)
     # Get the timezone conversions from the file
@@ -40,14 +40,14 @@ function compile(xml_file::AbstractString)
     return translation
 end
 
-const WINDOWS_TRANSLATION = if isfile(WINDOWS_XML_FILE)
-    compile(WINDOWS_XML_FILE)
+const WINDOWS_TRANSLATION = if isfile(WINDOWS_XML_FILE())
+    compile(WINDOWS_XML_FILE())
 else
     Dict{AbstractString, AbstractString}()
 end
 
-function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
-    fallback_xml_file = joinpath(WINDOWS_XML_DIR, "windowsZones2017a.xml")
+function build(xml_file::AbstractString=WINDOWS_XML_FILE(); force::Bool=false)
+    fallback_xml_file = joinpath(WINDOWS_XML_DIR(), "windowsZones2017a.xml")
 
     if !isfile(xml_file)
         if isfile(fallback_xml_file) && !force

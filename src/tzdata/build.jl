@@ -59,17 +59,17 @@ function build(
 end
 
 function build(version::AbstractString="latest", regions=REGIONS)
-    isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
-    isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)
-    isdir(COMPILED_DIR) || mkdir(COMPILED_DIR)
+    isdir(ARCHIVE_DIR()) || mkdir(ARCHIVE_DIR())
+    isdir(TZ_SOURCE_DIR()) || mkdir(TZ_SOURCE_DIR())
+    isdir(COMPILED_DIR()) || mkdir(COMPILED_DIR())
 
     # Empty the compile directory in case to handle different versions not overriding all
     # files.
-    for file in readdir(COMPILED_DIR)
-        rm(joinpath(COMPILED_DIR, file), recursive=true)
+    for file in readdir(COMPILED_DIR())
+        rm(joinpath(COMPILED_DIR(), file), recursive=true)
     end
 
-    version = build(version, regions, ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, verbose=true)
+    version = build(version, regions, ARCHIVE_DIR(), TZ_SOURCE_DIR(), COMPILED_DIR(), verbose=true)
     write(ACTIVE_VERSION_FILE, version)
 
     return version

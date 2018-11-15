@@ -25,7 +25,7 @@ const TZDATA_NEWS_REGEX = r"""
     \b
 """x
 
-const ACTIVE_VERSION_FILE = joinpath(DEPS_DIR, "active_version")
+ACTIVE_VERSION_FILE() = joinpath(DEPS_DIR(), "active_version")
 
 """
     read_news(news, [limit]) -> Vector{AbstractString}
@@ -93,15 +93,15 @@ function tzdata_version_archive(archive::AbstractString)
 end
 
 function active_version()
-    if !isfile(ACTIVE_VERSION_FILE)
+    if !isfile(ACTIVE_VERSION_FILE())
         error("No active tzdata version. Try re-building TimeZones")
     end
-    read(ACTIVE_VERSION_FILE, String)
+    read(ACTIVE_VERSION_FILE(), String)
 end
 
 function active_archive()
     version = active_version()
-    archive = joinpath(ARCHIVE_DIR, "tzdata$version.tar.gz")
+    archive = joinpath(ARCHIVE_DIR(), "tzdata$version.tar.gz")
     !isfile(archive) && error("Missing $version tzdata archive")
     return archive
 end

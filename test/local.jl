@@ -62,7 +62,7 @@ if Sys.islinux()
     end
 
     # Absolute filespec
-    warsaw_path = joinpath(TZFILE_DIR, "Europe", "Warsaw")
+    warsaw_path = joinpath(TZFILE_DIR(), "Europe", "Warsaw")
     warsaw_from_file = open(warsaw_path) do f
         TimeZones.read_tzfile(f, "local")
     end
@@ -78,10 +78,10 @@ if Sys.islinux()
 
     # Set TZDIR and use time zone unrecognized by TimeZone
     @test_throws ArgumentError TimeZone("Etc/UTC")
-    utc = open(joinpath(TZFILE_DIR, "Etc", "UTC")) do f
+    utc = open(joinpath(TZFILE_DIR(), "Etc", "UTC")) do f
         TimeZones.read_tzfile(f, "Etc/UTC")
     end
-    withenv("TZ" => ":Etc/UTC", "TZDIR" => TZFILE_DIR) do
+    withenv("TZ" => ":Etc/UTC", "TZDIR" => TZFILE_DIR()) do
         @test localzone() == utc
     end
 

@@ -29,20 +29,20 @@ end
 
 # Ensure that read_tzfile returns a FixedTimeZone with the right data
 utc = FixedTimeZone("UTC", 0)
-open(joinpath(TZFILE_DIR, "Etc", "UTC")) do f
+open(joinpath(TZFILE_DIR(), "Etc", "UTC")) do f
     tz = TimeZones.read_tzfile(f, "UTC")
     @test tz == utc
 end
 
 # Fixed time zone using version 2 data.
 utc_plus_6 = FixedTimeZone("UTC+6", 6 * 3600)
-open(joinpath(TZFILE_DIR, "Etc", "GMT-6")) do f
+open(joinpath(TZFILE_DIR(), "Etc", "GMT-6")) do f
     tz = TimeZones.read_tzfile(f, "UTC+6")
     @test tz == utc_plus_6
 end
 
 warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
-open(joinpath(TZFILE_DIR, "Europe", "Warsaw")) do f
+open(joinpath(TZFILE_DIR(), "Europe", "Warsaw")) do f
     tz = TimeZones.read_tzfile(f, "Europe/Warsaw")
     @test string(tz) == "Europe/Warsaw"
     @test first(tz.transitions).utc_datetime == DateTime(1915,8,4,22,36)
@@ -52,7 +52,7 @@ open(joinpath(TZFILE_DIR, "Europe", "Warsaw")) do f
 end
 
 # Read version 1 compatible data
-open(joinpath(TZFILE_DIR, "Europe", "Warsaw (Version 2)")) do f
+open(joinpath(TZFILE_DIR(), "Europe", "Warsaw (Version 2)")) do f
     version, tz = TimeZones.read_tzfile_internal(f, "Europe/Warsaw")
     @test version == '2'
     @test string(tz) == "Europe/Warsaw"
@@ -65,7 +65,7 @@ open(joinpath(TZFILE_DIR, "Europe", "Warsaw (Version 2)")) do f
 end
 
 # Read version 2 data
-open(joinpath(TZFILE_DIR, "Europe", "Warsaw (Version 2)")) do f
+open(joinpath(TZFILE_DIR(), "Europe", "Warsaw (Version 2)")) do f
     tz = TimeZones.read_tzfile(f, "Europe/Warsaw")
     @test string(tz) == "Europe/Warsaw"
     @test first(tz.transitions).utc_datetime == typemin(DateTime)
@@ -76,7 +76,7 @@ end
 
 
 godthab = resolve("America/Godthab", tzdata["europe"]...)
-open(joinpath(TZFILE_DIR, "America", "Godthab")) do f
+open(joinpath(TZFILE_DIR(), "America", "Godthab")) do f
     tz = TimeZones.read_tzfile(f, "America/Godthab")
     @test string(tz) == "America/Godthab"
     @test first(tz.transitions).utc_datetime == DateTime(1916,7,28,3,26,56)
@@ -86,7 +86,7 @@ open(joinpath(TZFILE_DIR, "America", "Godthab")) do f
 end
 
 # Read version 1 compatible data
-open(joinpath(TZFILE_DIR, "America", "Godthab (Version 3)")) do f
+open(joinpath(TZFILE_DIR(), "America", "Godthab (Version 3)")) do f
     version, tz = TimeZones.read_tzfile_internal(f, "America/Godthab")
     @test version == '3'
     @test string(tz) == "America/Godthab"
@@ -97,7 +97,7 @@ open(joinpath(TZFILE_DIR, "America", "Godthab (Version 3)")) do f
 end
 
 # Read version 3 data
-open(joinpath(TZFILE_DIR, "America", "Godthab (Version 3)")) do f
+open(joinpath(TZFILE_DIR(), "America", "Godthab (Version 3)")) do f
     tz = TimeZones.read_tzfile(f, "America/Godthab")
     @test string(tz) == "America/Godthab"
     @test first(tz.transitions).utc_datetime == typemin(DateTime)
@@ -111,7 +111,7 @@ end
 # DST calculation. The entire day of 2011/12/30 was skipped when they changed from a
 # -11:00 GMT offset to 13:00 GMT offset
 apia = resolve("Pacific/Apia", tzdata["australasia"]...)
-open(joinpath(TZFILE_DIR, "Pacific", "Apia")) do f
+open(joinpath(TZFILE_DIR(), "Pacific", "Apia")) do f
     tz = TimeZones.read_tzfile(f, "Pacific/Apia")
     @test string(tz) == "Pacific/Apia"
     @test first(tz.transitions).utc_datetime == DateTime(1911,1,1,11,26,56)
@@ -125,7 +125,7 @@ end
 # midsomer back in 1940's there were 2 different dst one after another, we get a
 # different utc and dst than Olson.
 paris = resolve("Europe/Paris", tzdata["europe"]...)
-open(joinpath(TZFILE_DIR, "Europe", "Paris")) do f
+open(joinpath(TZFILE_DIR(), "Europe", "Paris")) do f
     tz = TimeZones.read_tzfile(f, "Europe/Paris")
     @test string(tz) == "Europe/Paris"
     @test first(tz.transitions).utc_datetime == DateTime(1911,3,10,23,51,39)
@@ -143,7 +143,7 @@ open(joinpath(TZFILE_DIR, "Europe", "Paris")) do f
 end
 
 madrid = resolve("Europe/Madrid", tzdata["europe"]...)
-open(joinpath(TZFILE_DIR, "Europe", "Madrid")) do f
+open(joinpath(TZFILE_DIR(), "Europe", "Madrid")) do f
     tz = TimeZones.read_tzfile(f, "Europe/Madrid")
     @test string(tz) == "Europe/Madrid"
     @test first(tz.transitions).utc_datetime == DateTime(1917,5,5,23)
@@ -163,7 +163,7 @@ end
 
 # "Australia/Perth" test processing a tzfile that should not contain a cutoff
 perth = resolve("Australia/Perth", tzdata["australasia"]...)
-open(joinpath(TZFILE_DIR, "Australia", "Perth")) do f
+open(joinpath(TZFILE_DIR(), "Australia", "Perth")) do f
     tz = TimeZones.read_tzfile(f, "Australia/Perth")
     @test string(tz) == "Australia/Perth"
     @test first(tz.transitions).utc_datetime == DateTime(1916,12,31,16,1)
