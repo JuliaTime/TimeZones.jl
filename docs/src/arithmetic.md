@@ -2,7 +2,7 @@
 
 ## ZonedDateTime-Period Arithmetic
 
-`ZonedDateTime` uses calendrical arithmetic in a [similar manner to `DateTime`](https://docs.julialang.org/en/stable/stdlib/Dates/#TimeType-Period-Arithmetic-1) but with some key differences. Lets look at these differences by adding a day to March 30th 2014 in Europe/Warsaw.
+`ZonedDateTime` uses calendrical arithmetic in a [similar manner to `DateTime`](https://docs.julialang.org/en/v1/stdlib/Dates/#TimeType-Period-Arithmetic-1) but with some key differences. Lets look at these differences by adding a day to March 30th 2014 in Europe/Warsaw.
 
 ```jldoctest spring
 julia> using TimeZones, Dates
@@ -49,7 +49,7 @@ julia> spring + Day(1) + Hour(24)
 
 ## Ranges
 
-[Query](https://docs.julialang.org/en/stable/stdlib/Dates/#Query-Functions-1) and [adjuster functions](https://docs.julialang.org/en/stable/stdlib/Dates/#Adjuster-Functions-1) can be used as with `Date` and `DateTime`.
+[Query](https://docs.julialang.org/en/v1/stdlib/Dates/#Query-Functions-1) and [adjuster functions](https://docs.julialang.org/en/v1/stdlib/Dates/#Adjuster-Functions-1) can be used as with `Date` and `DateTime`.
 We can use `filter` to apply a predicate to a `StepRange` of `TimeType`s to produce a vector of dates that fit certain inclusion criteria (for example, "every fifth Wednesday of the month in 2014 at 09:00"):
 
 ```jldoctest spring
