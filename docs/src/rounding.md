@@ -7,7 +7,7 @@ end
 ```
 
 Rounding operations (`floor`, `ceil`, and `round`) on `ZonedDateTime`s are performed in a
-[similar manner to `DateTime`](https://docs.julialang.org/en/stable/stdlib/Dates/#Rounding-1)
+[similar manner to `DateTime`](https://docs.julialang.org/en/v1/stdlib/Dates/#Rounding-1)
 and should generally behave as expected. When `VariableTimeZone` transitions are involved,
 however, unexpected behaviour may be encountered.
 
