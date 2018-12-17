@@ -11,7 +11,9 @@ function TimeOffset(hour::Integer, minute::Integer, second::Integer)
     TimeOffset(hour * 3600 + minute * 60 + second)
 end
 
-function TimeOffset(s::AbstractString)
+TimeOffset(str::AbstractString) = parse(TimeOffset, str)
+
+function Base.parse(::Type{TimeOffset}, s::AbstractString)
     # "-" represents 0:00 for some DST rules
     s == "-" && return ZERO
     parsed = map(n -> parse(Int, n), split(s, ':'))

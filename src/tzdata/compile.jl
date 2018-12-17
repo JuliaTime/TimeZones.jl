@@ -214,69 +214,63 @@ function abbr_string(format::AbstractString, save::TimeOffset, letter::AbstractS
     return abbr
 end
 
-function ruleparse(from, to, rule_type, month, on, at, save, letter)
-    from_int = from == "min" ? nothing : parse(Int, from)
-    to_int = to == "max" ? nothing : (to == "only" ? from_int : parse(Int, to))
-    month_int = MONTHS[month]
+function Base.parse(::Type{Rule}, str::AbstractString)
+    from_str, to_str, type_str, month_str, on_str, at_str, save_str, letter_str = begin
+        split(str, r"\s+")
+    end
+
+    from = from_str != "min" ? parse(Int, from_str) : nothing
+    to = to_str == "only" ? from : (to_str != "max" ? parse(Int, to_str) : nothing)
+    type_str == "-" || throw(ArgumentError("Unhandled rule type: \"$type_str\""))
+    month = MONTHS[month_str]
 
     # Now we need to get the right anonymous function
     # for determining the right day for transitioning
-    on_func = tryparse_dayofmonth(on)
-    on_func === nothing && error("Can't parse day of month for DST change: \"$on\"")
+    on = tryparse_dayofmonth(on_str)
+    on === nothing && error("Can't parse day of month for DST change: \"$on_str\"")
 
     # Now we get the time of the transition
-    c = at[end]
-    at_hm = TimeOffset(isflag(c) ? at[1:end-1] : at)
+    c = at_str[end]
+    at = parse(TimeOffset, isflag(c) ? at_str[1:end-1] : at_str)
     at_flag = isflag(c) ? c : DEFAULT_FLAG
-    save_hm = TimeOffset(save)
-    letter = letter == "-" ? "" : letter
+    save = parse(TimeOffset, save_str)
+    letter = letter_str != "-" ? letter_str : ""
 
     # Report unexpected save values that could cause issues during resolve.
-    save_hm < MIN_SAVE && @warn "Discovered save \"$save\" less than the expected min $MIN_SAVE"
-    save_hm > MAX_SAVE && @warn "Discovered save \"$save\" larger than the expected max $MAX_SAVE"
+    save < MIN_SAVE && @warn "Discovered save \"$save_str\" less than the expected min $MIN_SAVE"
+    save > MAX_SAVE && @warn "Discovered save \"$save_str\" larger than the expected max $MAX_SAVE"
 
     # Now we've finally parsed everything we need
-    return Rule(
-        from_int,
-        to_int,
-        month_int,
-        on_func,
-        at_hm,
-        at_flag,
-        save_hm,
-        letter,
-    )
+    return Rule(from, to, month, on, at, at_flag, save, letter)
 end
 
-function zoneparse(gmtoff, rules, format, until="")
+function Base.parse(::Type{Zone}, str::AbstractString)
+    parts = split(str, r"\s+"; limit=4)
+    gmtoff_str, rules_str, format_str = parts[1:3]
+    until_str = length(parts) > 3 ? parts[4] : ""
+
     # Get our offset and abbreviation string for this period
-    offset = TimeOffset(gmtoff)
+    gmt_offset = parse(TimeOffset, gmtoff_str)
 
     # Report unexpected offsets that could cause issues during resolve.
-    offset < MIN_GMT_OFFSET && @warn "Discovered offset $offset less than the expected min $MIN_GMT_OFFSET"
-    offset > MAX_GMT_OFFSET && @warn "Discovered offset $offset larger than the expected max $MAX_GMT_OFFSET"
+    gmt_offset < MIN_GMT_OFFSET && @warn "Discovered offset $gmt_offset less than the expected min $MIN_GMT_OFFSET"
+    gmt_offset > MAX_GMT_OFFSET && @warn "Discovered offset $gmt_offset larger than the expected max $MAX_GMT_OFFSET"
 
     # "zzz" represents a NULL entry
-    format = format == "zzz" ? "" : format
+    abbr_format = format_str != "zzz" ? format_str : ""
 
     # Parse the date the line rule applies up to
-    until_dt, until_flag = until == "" ? (nothing, 'w') : parse_date(until)
+    until, until_flag = !isempty(until_str) ? parse_date(until_str) : (nothing, 'w')
 
-    if rules == "-" || occursin(r"\d", rules)
-        save = TimeOffset(rules)
-        rules = ""
+    if rules_str == "-" || any(isnumeric, rules_str)
+        rule_name = nothing
+        save_offset = TimeOffset(rules_str)
     else
-        save = ZERO
+        rule_name = rules_str
+        save_offset = ZERO
     end
 
-    return Zone(
-        offset,
-        save,
-        rules,
-        format,
-        until_dt,
-        until_flag,
-    )
+    return Zone(gmt_offset, save_offset, rule_name !== nothing ? rule_name : "", abbr_format, until, until_flag)
 end
 
 """
@@ -546,17 +540,16 @@ function tzparse(tz_source_file::AbstractString)
 
             line = strip(replace(chomp(line), r"#.*$" => ""))
             length(line) > 0 || continue
-            line = replace(line, r"\s+" => " ")
 
             if !persist
-                kind, name, line = split(line, ' '; limit=3)
+                kind, name, line = split(line, r"\s+"; limit=3)
             end
 
             if kind == "Rule"
-                rule = ruleparse(split(line, ' ')...)
+                rule = parse(Rule, line)
                 rules[name] = push!(get(rules, name, Rule[]), rule)
             elseif kind == "Zone"
-                zone = zoneparse(split(line, ' '; limit=4)...)
+                zone = parse(Zone, line)
                 zones[name] = push!(get(zones, name, Zone[]), zone)
             elseif kind == "Link"
                 dest = line
