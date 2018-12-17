@@ -69,15 +69,18 @@ const DAYS = Dict(
     "Mon" => 1, "Tue" => 2, "Wed" => 3, "Thu" => 4, "Fri" => 5, "Sat" => 6, "Sun" => 7,
 )
 
-# Create adjuster functions such as "lastSun".
+const LAST_DAY_OF_WEEK = Dict{String, Function}()
+
+# Create adjuster functions such as `last_sunday`.
 for (abbr, dayofweek) in DAYS
-    sym = Symbol("last" * abbr)
-    @eval (
-        function $sym(dt)
+    str = "last" * abbr
+    f = Symbol("last_" * lowercase(dayname(dayofweek)))
+    LAST_DAY_OF_WEEK[str] = @eval begin
+        function $f(dt)
             return dayofweek(dt) == $dayofweek &&
             dayofweekofmonth(dt) == daysofweekinmonth(dt)
         end
-    )
+    end
 end
 
 isflag(flag::Char) = flag in ('w', 'u', 's')
@@ -91,10 +94,10 @@ function parsedate(s::AbstractString)
     s, flag = num_periods > 3 && isflag(s[end]) ? (s[1:end-1], s[end]) : (s, DEFAULT_FLAG)
     if occursin("lastSun", s)
         dt = DateTime(replace(s, "lastSun" => "1", count=1), "yyyy uuu d H:MM:SS")
-        dt = tonext(lastSun, dt; same=true)
+        dt = tonext(last_sunday, dt; same=true)
     elseif occursin("lastSat", s)
         dt = DateTime(replace(s, "lastSat" => "1", count=1), "yyyy uuu d H:MM:SS")
-        dt = tonext(lastSat, dt; same=true)
+        dt = tonext(last_saturday, dt; same=true)
     elseif occursin("Sun>=1", s)
         dt = DateTime(replace(s, "Sun>=" => "", count=1), "yyyy uuu d H:MM:SS")
         dt = tonext(d -> dayofweek(d) == Sun, dt; same=true)
@@ -167,7 +170,7 @@ function ruleparse(from, to, rule_type, month, on, at, save, letter)
     if occursin(r"last\w\w\w", on)
         # We pre-built these functions above
         # They follow the format: "lastSun", "lastMon".
-        on_func = eval(Symbol(on))
+        on_func = LAST_DAY_OF_WEEK[on]
     elseif occursin(r"\w\w\w[<>]=\d\d?", on)
         # The first day of the week that occurs before or after a given day of month.
         # i.e. Sun>=8 refers to the Sunday after the 8th of the month
