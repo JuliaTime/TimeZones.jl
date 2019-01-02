@@ -1,5 +1,5 @@
 using TimeZones: Transition
-using TimeZones.TZData: ZoneDict, RuleDict, Zone, Rule, resolve, parse_date, order_rules
+using TimeZones.TZData: TZSource, Zone, Rule, compile, parse_date, order_rules
 using Dates: Hour, Minute, Second, DateTime, Date
 
 ### parse_date ###
@@ -112,9 +112,9 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     rule_endless,
 ]
 
-@testset "resolve" begin
+@testset "compile" begin
     @testset "Europe/Warsaw" begin
-        tz = resolve("Europe/Warsaw", tzdata["europe"][1:2]...)
+        tz = compile("Europe/Warsaw", tzdata["europe"])
 
         # Europe/Warsaw time zone has a combination of factors that requires computing
         # the abbreviation to be done in a specific way.
@@ -158,7 +158,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     # - Zone abbreviation redefined: HST
     # - Is not cutoff
     @testset "Pacific/Honolulu" begin
-        tz = resolve("Pacific/Honolulu", tzdata["northamerica"][1:2]...)
+        tz = compile("Pacific/Honolulu", tzdata["northamerica"])
 
         zone = Dict{AbstractString,FixedTimeZone}()
         zone["LMT"] = FixedTimeZone("LMT", -37886, 0)
@@ -186,7 +186,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     # - Changed zone format while in a non-standard transition
     # - Zone abbreviation redefined: LMT, WSST
     @testset "Pacific/Apia" begin
-        tz = resolve("Pacific/Apia", tzdata["australasia"][1:2]...)
+        tz = compile("Pacific/Apia", tzdata["australasia"])
 
         zone = Dict{AbstractString,FixedTimeZone}()
         zone["LMT_OLD"] = FixedTimeZone("LMT", 45184, 0)
@@ -215,7 +215,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     # - End of midsummer time also switches both the UTC offset and the saving time
     # - In 1979-01-01 switches from "Spain" to "EU" rules which could create a redundant entry
     @testset "Europe/Madrid" begin
-        tz = resolve("Europe/Madrid", tzdata["europe"][1:2]...)
+        tz = compile("Europe/Madrid", tzdata["europe"])
 
         zone = Dict{AbstractString,FixedTimeZone}()
         zone["WET"] = FixedTimeZone("WET", 0, 0)
@@ -244,7 +244,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     #   Alternatives include: Europe/London, Europe/Dublin, and Europe/Moscow.
     # - Observed war/peace time
     @testset "America/Anchorage" begin
-        tz = resolve("America/Anchorage", tzdata["northamerica"][1:2]...)
+        tz = compile("America/Anchorage", tzdata["northamerica"])
 
         zone = Dict{AbstractString,FixedTimeZone}()
         zone["CAT"] = FixedTimeZone("CAT", -36000, 0)
@@ -265,7 +265,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     # - With the exception of LMT all Zone and Rule abbreviations are UTC offsets which should
     #   be treated as NULL.
     @testset "Europe/Ulyanovsk" begin
-        ulyanovsk = resolve("Europe/Ulyanovsk", tzdata["europe"][1:2]...)
+        ulyanovsk = compile("Europe/Ulyanovsk", tzdata["europe"])
         @test all(t -> string(t.zone.name) == "", ulyanovsk.transitions[2:end])
     end
 
@@ -275,15 +275,17 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     # - Having no rules ensures that cutoff is calculated correctly with only zones
     @testset "Pacific/Cutoff (Fake)" begin
         # Manually generate zones and rules as if we had read them from a file.
-        zones = ZoneDict()
-        rules = RuleDict()
+        zones = Dict{String,Vector{Zone}}()
+        rules = Dict{String,Vector{Rule}}()
+        links = Dict{String,String}()
 
         zones["Pacific/Cutoff"] = [
             parse(Zone, "-10:00    -   CUT-1   1933 Apr 1 2:00s"),
             parse(Zone, "-11:00    -   CUT-2"),
         ]
+        tz_source = TZSource(zones, rules, links)
 
-        tz = resolve("Pacific/Cutoff", zones, rules)
+        tz = compile("Pacific/Cutoff", tz_source)
 
         zone = Dict{AbstractString,FixedTimeZone}()
         zone["CUT-1"] = FixedTimeZone("CUT-1", -36000)
@@ -293,10 +295,10 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
         @test tz.transitions[2] == Transition(DateTime(1933,4,1,12), zone["CUT-2"])
         @test tz.cutoff === nothing
 
-        tz = resolve("Pacific/Cutoff", zones, rules, max_year=1900)
+        tz = compile("Pacific/Cutoff", tz_source, max_year=1900)
 
-        # Normally resolve TimeZones with a single transition are returned as a FixedTimeZone except
-        # when a cutoff is included.
+        # Normally compiled TimeZones with a single transition are returned as a
+        # FixedTimeZone except when a cutoff is included.
         @test isa(tz, VariableTimeZone)
         @test length(tz.transitions) == 1
         @test tz.cutoff == DateTime(1933,4,1,12)
@@ -306,8 +308,9 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     # been observed.
     @testset "Pacific/Test (Fake)" begin
         # Manually generate zones and rules as if we had read them from a file.
-        zones = ZoneDict()
-        rules = RuleDict()
+        zones = Dict{String,Vector{Zone}}()
+        rules = Dict{String,Vector{Rule}}()
+        links = Dict{String,String}()
 
         zones["Pacific/Test"] = [
             parse(Zone, "-10:00      -         TST-1    1933 Apr 1 2:00s"),
@@ -320,8 +323,9 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
             parse(Rule, "1934  1935  -         Apr 1    3:00s   1   D"),
             parse(Rule, "1934  1935  -         Sep 1    3:00s   0   S"),
         ]
+        tz_source = TZSource(zones, rules, links)
 
-        tz = resolve("Pacific/Test", zones, rules)
+        tz = compile("Pacific/Test", tz_source)
 
         zone = Dict{AbstractString,FixedTimeZone}()
         zone["TST-1"] = FixedTimeZone("TST-1", -36000, 0)
@@ -352,18 +356,12 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     # Link  Europe/Oslo  Arctic/Longyearbyen
     @testset "Link" begin
         # Make sure that that the link time zone was parsed.
-        zone_names = keys(tzdata["europe"][1])
-        @test !("Arctic/Longyearbyen" in zone_names)
+        @test !("Arctic/Longyearbyen" in keys(tzdata["europe"].zones))
+        @test "Arctic/Longyearbyen" in keys(tzdata["europe"].links)
+        @test tzdata["europe"].links["Arctic/Longyearbyen"] == "Europe/Oslo"
 
-        tzlinks = tzdata["europe"][3]
-        aliases = keys(tzlinks)
-        @test "Arctic/Longyearbyen" in aliases
-        @test tzlinks["Arctic/Longyearbyen"] == "Europe/Oslo"
-
-        # Note: Loading all of the time zones to perform these checks isn't performant
-        time_zones = TimeZones.TZData.load(TZ_SOURCE_DIR)
-        oslo = time_zones["Europe/Oslo"]
-        longyearbyen = time_zones["Arctic/Longyearbyen"]
+        oslo = compile("Europe/Oslo", tzdata["europe"])
+        longyearbyen = compile("Arctic/Longyearbyen", tzdata["europe"])
 
         @test longyearbyen != oslo
         @test longyearbyen.name != oslo.name
@@ -372,7 +370,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
 
     # Zones that don't include multiple lines and no rules should be treated as a FixedTimeZone.
     @testset "FixedTimeZone" begin
-        tz = resolve("MST", tzdata["northamerica"][1:2]...)
+        tz = compile("MST", tzdata["northamerica"])
         @test isa(tz, FixedTimeZone)
     end
 end

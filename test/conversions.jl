@@ -2,9 +2,9 @@ import Dates
 using Mocking
 
 utc = FixedTimeZone("UTC")
-warsaw = resolve("Europe/Warsaw", tzdata["europe"][1:2]...)
-apia = resolve("Pacific/Apia", tzdata["australasia"][1:2]...)
-midway = resolve("Pacific/Pago_Pago", tzdata["australasia"][1:2]...)
+warsaw = compile("Europe/Warsaw", tzdata["europe"])
+apia = compile("Pacific/Apia", tzdata["australasia"])
+midway = compile("Pacific/Midway", tzdata["australasia"])
 
 # Converting a ZonedDateTime into a DateTime
 dt = DateTime(2015, 1, 1, 0)

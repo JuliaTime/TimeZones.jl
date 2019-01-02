@@ -3,7 +3,7 @@ using Serialization
 using Dates: parse_components
 
 using ...TimeZones: TIME_ZONES
-using ...TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition, rename
+using ...TimeZones: TimeZones, TimeZone, FixedTimeZone, VariableTimeZone, Transition, rename
 using ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET, MIN_SAVE, MAX_SAVE,
     ABS_DIFF_OFFSET
 
@@ -47,10 +47,33 @@ struct Rule
     end
 end
 
-const ZoneDict = Dict{AbstractString, Vector{Zone}}
-const RuleDict = Dict{AbstractString, Vector{Rule}}
-const LinkDict = Dict{AbstractString, AbstractString}
-const OrderedRuleDict = Dict{AbstractString, Tuple{Vector{Date}, Vector{Rule}}}
+struct TZSource
+    zones::Dict{String,Vector{Zone}}
+    rules::Dict{String,Vector{Rule}}
+    links::Dict{String,String}
+end
+
+function TZSource()
+    TZSource(
+        Dict{String,Vector{Zone}}(),
+        Dict{String,Vector{Rule}}(),
+        Dict{String,String}(),
+    )
+end
+
+TZSource(file::AbstractString) = load!(TZSource(), file)
+
+function TZSource(files)
+    tz_source = TZSource()
+
+    for file in files
+        load!(tz_source, file)
+    end
+
+    return tz_source
+end
+
+const OrderedRuleDict = Dict{String, Tuple{Vector{Date}, Vector{Rule}}}
 
 # Min and max years that we create DST transition DateTimes for (inclusive)
 const MIN_YEAR = year(typemin(DateTime))  # Essentially the begining of time
@@ -354,9 +377,13 @@ end
 Resolves a named zone into TimeZone. Updates ordered with any new rules that
 were required to be ordered.
 """
-function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDict,
-    ordered::OrderedRuleDict; max_year::Integer=MAX_YEAR, debug=false)
-
+function compile!(
+    zone_name::AbstractString,
+    tz_source::TZSource,
+    ordered::OrderedRuleDict;
+    max_year::Integer=MAX_YEAR,
+    debug=false,
+)
     transitions = Transition[]
     cutoff = nothing
 
@@ -367,11 +394,14 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     letter = ""
     start_rule = nothing
 
+    zone_set = tz_source.zones
+    rule_set = tz_source.rules
+
     # zones = Set{FixedTimeZone}()
 
     # Zone needs to be in ascending order to ensure that start_utc is being applied
     # to the correct transition.
-    for zone in sort(zoneset[zone_name])
+    for zone in sort(zone_set[zone_name])
 
         # Break at the beginning of the loop instead of the end so that we know an
         # future zone exists beyond max_year and we can set cutoff.
@@ -404,7 +434,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
             # Only order the rule if it hasn't already been processed. We'll go one year
             # further than the max_year to ensure we get an accurate cutoff DateTime.
             if !haskey(ordered, rule_name)
-                ordered[rule_name] = order_rules(ruleset[rule_name]; max_year=max_year + 1)
+                ordered[rule_name] = order_rules(rule_set[rule_name]; max_year=max_year + 1)
             end
 
             dates, rules = ordered[rule_name]
@@ -509,76 +539,77 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     end
 end
 
-function resolve(zoneset::ZoneDict, ruleset::RuleDict; max_year::Integer=MAX_YEAR, debug=false)
-    ordered = OrderedRuleDict()
-    time_zones = Dict{AbstractString,TimeZone}()
 
-    for zone_name in keys(zoneset)
-        tz = resolve!(zone_name, zoneset, ruleset, ordered; max_year=max_year, debug=debug)
-        time_zones[zone_name] = tz
-    end
+function load!(tz_source::TZSource, io::IO)
+    zones = tz_source.zones
+    rules = tz_source.rules
+    links = tz_source.links
 
-    return time_zones
-end
-
-function resolve(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDict; max_year::Integer=MAX_YEAR, debug=false)
-    ordered = OrderedRuleDict()
-    return resolve!(zone_name, zoneset, ruleset, ordered; max_year=max_year, debug=debug)
-end
-
-function tzparse(tz_source_file::AbstractString)
-    zones = ZoneDict()
-    rules = RuleDict()
-    links = LinkDict()
+    local kind
+    local name
 
     # For the intial pass we'll collect the zone and rule lines.
-    open(tz_source_file) do fp
-        kind = name = ""
-        for line in eachline(fp)
-            # Lines that start with whitespace can be considered a "continuation line"
-            # which means the last found kind/name should persist.
-            persist = occursin(r"^\s", line)
+    for line in eachline(io)
+        # Lines that start with whitespace can be considered a "continuation line" which
+        # means the last found kind/name should persist.
+        persist = occursin(r"^\s", line)
 
-            line = strip(replace(chomp(line), r"#.*$" => ""))
-            length(line) > 0 || continue
+        line = strip(replace(line, r"#.*$" => ""))
+        length(line) > 0 || continue
 
-            if !persist
-                kind, name, line = split(line, r"\s+"; limit=3)
-            end
+        if !persist
+            kind, name, line = split(line, r"\s+"; limit=3)
+        end
 
-            if kind == "Rule"
-                rule = parse(Rule, line)
-                rules[name] = push!(get(rules, name, Rule[]), rule)
-            elseif kind == "Zone"
-                zone = parse(Zone, line)
-                zones[name] = push!(get(zones, name, Zone[]), zone)
-            elseif kind == "Link"
-                target = name
-                link_name = line
-                links[link_name] = target
-            else
-                @warn "Unhandled line found with type: $kind"
-            end
+        if kind == "Rule"
+            rule = parse(Rule, line)
+            rules[name] = push!(get(rules, name, Rule[]), rule)
+        elseif kind == "Zone"
+            zone = parse(Zone, line)
+            zones[name] = push!(get(zones, name, Zone[]), zone)
+        elseif kind == "Link"
+            target = name
+            link_name = line
+            links[link_name] = target
+        else
+            @warn "Unhandled line found with type: $kind"
         end
     end
 
-    return zones, rules, links
+    return tz_source
 end
 
-function load(tz_source_dir::AbstractString=TZ_SOURCE_DIR; max_year::Integer=MAX_YEAR)
-    all_links = LinkDict()
-    time_zones = Dict{AbstractString,TimeZone}()
-    for filename in readdir(tz_source_dir)
-        zones, rules, links = tzparse(joinpath(tz_source_dir, filename))
-        merge!(time_zones, resolve(zones, rules; max_year=max_year))
-        merge!(all_links, links)
+function load!(tz_source::TZSource, file::AbstractString)
+    open(file, "r") do io
+        load!(tz_source, io)
+    end
+end
+
+function compile(name::AbstractString, tz_source::TZSource; kwargs...)
+    ordered = OrderedRuleDict()
+    if haskey(tz_source.links, name)
+        tz = compile!(tz_source.links[name], tz_source, ordered; kwargs...)
+        rename(tz, name)
+    else
+        compile!(name, tz_source, ordered; kwargs...)
+    end
+end
+
+function compile(tz_source::TZSource; kwargs...)
+    time_zones = Vector{TimeZone}()
+    ordered = OrderedRuleDict()
+    lookup = Dict{String, TimeZone}()
+    for zone_name in keys(tz_source.zones)
+        tz = compile!(zone_name, tz_source, ordered; kwargs...)
+        push!(time_zones, tz)
+        lookup[zone_name] = tz
     end
 
     # Convert links into time zones.
-    for (link_name, target) in all_links
-        if !haskey(time_zones, link_name) && haskey(time_zones, target)
-            time_zones[link_name] = rename(time_zones[target], link_name)
-        elseif !haskey(time_zones, target)
+    for (link_name, target) in tz_source.links
+        if !haskey(lookup, link_name) && haskey(lookup, target)
+            push!(time_zones, rename(lookup[target], link_name))
+        elseif !haskey(lookup, target)
             error("Unable to resolve link \"$link_name\" referencing \"$target\"")
         end
     end
@@ -586,19 +617,23 @@ function load(tz_source_dir::AbstractString=TZ_SOURCE_DIR; max_year::Integer=MAX
     return time_zones
 end
 
+
+
 function compile(tz_source_dir::AbstractString=TZ_SOURCE_DIR, dest_dir::AbstractString=COMPILED_DIR; max_year::Integer=MAX_YEAR)
-    time_zones = load(tz_source_dir; max_year=max_year)
+    tz_source_paths = joinpath.(tz_source_dir, readdir(tz_source_dir))
+    time_zones = compile(TZSource(tz_source_paths); max_year=max_year)
 
     isdir(dest_dir) || error("Destination directory doesn't exist")
     empty!(TIME_ZONES)
 
-    for (name, tz) in time_zones
-        parts = split(name, "/")
-        tz_dir, tz_file = joinpath(dest_dir, parts[1:end-1]...), parts[end]
+    for tz in time_zones
+        parts = split(TimeZones.name(tz), '/')
+        tz_path = joinpath(dest_dir, parts...)
+        tz_dir = dirname(tz_path)
 
         isdir(tz_dir) || mkpath(tz_dir)
 
-        open(joinpath(tz_dir, tz_file), "w") do fp
+        open(tz_path, "w") do fp
             serialize(fp, tz)
         end
     end

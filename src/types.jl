@@ -89,6 +89,7 @@ function FixedTimeZone(s::AbstractString)
     return FixedTimeZone(name, offset)
 end
 
+name(tz::FixedTimeZone) = tz.name
 rename(tz::FixedTimeZone, name::AbstractString) = FixedTimeZone(name, tz.offset)
 
 
@@ -113,6 +114,8 @@ struct VariableTimeZone <: TimeZone
         new(name, transitions, cutoff)
     end
 end
+
+name(tz::VariableTimeZone) = tz.name
 
 function rename(tz::VariableTimeZone, name::AbstractString)
     VariableTimeZone(name, tz.transitions, tz.cutoff)

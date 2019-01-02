@@ -1,6 +1,6 @@
 using Dates: Day, Hour
 
-warsaw = resolve("Europe/Warsaw", tzdata["europe"][1:2]...)
+warsaw = compile("Europe/Warsaw", tzdata["europe"])
 
 normal = DateTime(2015, 1, 1, 0)   # a 24 hour day in warsaw
 spring = DateTime(2015, 3, 29, 0)  # a 23 hour day in warsaw
