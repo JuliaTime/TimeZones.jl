@@ -29,9 +29,9 @@ abbrs = timezone_abbrs()
 @test issorted(abbrs)
 
 
-wpg = resolve("America/Winnipeg", tzdata["northamerica"]...)
-apia = resolve("Pacific/Apia", tzdata["australasia"]...)
-paris = resolve("Europe/Paris", tzdata["europe"]...)
+wpg = resolve("America/Winnipeg", tzdata["northamerica"][1:2]...)
+apia = resolve("Pacific/Apia", tzdata["australasia"][1:2]...)
+paris = resolve("Europe/Paris", tzdata["europe"][1:2]...)
 
 @testset "next_transition_instant" begin
     @testset "non-existent" begin

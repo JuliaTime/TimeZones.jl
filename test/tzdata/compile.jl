@@ -114,7 +114,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
 
 @testset "resolve" begin
     @testset "Europe/Warsaw" begin
-        tz = resolve("Europe/Warsaw", tzdata["europe"]...)
+        tz = resolve("Europe/Warsaw", tzdata["europe"][1:2]...)
 
         # Europe/Warsaw time zone has a combination of factors that requires computing
         # the abbreviation to be done in a specific way.
@@ -158,7 +158,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     # - Zone abbreviation redefined: HST
     # - Is not cutoff
     @testset "Pacific/Honolulu" begin
-        tz = resolve("Pacific/Honolulu", tzdata["northamerica"]...)
+        tz = resolve("Pacific/Honolulu", tzdata["northamerica"][1:2]...)
 
         zone = Dict{AbstractString,FixedTimeZone}()
         zone["LMT"] = FixedTimeZone("LMT", -37886, 0)
@@ -186,7 +186,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     # - Changed zone format while in a non-standard transition
     # - Zone abbreviation redefined: LMT, WSST
     @testset "Pacific/Apia" begin
-        tz = resolve("Pacific/Apia", tzdata["australasia"]...)
+        tz = resolve("Pacific/Apia", tzdata["australasia"][1:2]...)
 
         zone = Dict{AbstractString,FixedTimeZone}()
         zone["LMT_OLD"] = FixedTimeZone("LMT", 45184, 0)
@@ -215,7 +215,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     # - End of midsummer time also switches both the UTC offset and the saving time
     # - In 1979-01-01 switches from "Spain" to "EU" rules which could create a redundant entry
     @testset "Europe/Madrid" begin
-        tz = resolve("Europe/Madrid", tzdata["europe"]...)
+        tz = resolve("Europe/Madrid", tzdata["europe"][1:2]...)
 
         zone = Dict{AbstractString,FixedTimeZone}()
         zone["WET"] = FixedTimeZone("WET", 0, 0)
@@ -244,7 +244,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     #   Alternatives include: Europe/London, Europe/Dublin, and Europe/Moscow.
     # - Observed war/peace time
     @testset "America/Anchorage" begin
-        tz = resolve("America/Anchorage", tzdata["northamerica"]...)
+        tz = resolve("America/Anchorage", tzdata["northamerica"][1:2]...)
 
         zone = Dict{AbstractString,FixedTimeZone}()
         zone["CAT"] = FixedTimeZone("CAT", -36000, 0)
@@ -265,7 +265,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     # - With the exception of LMT all Zone and Rule abbreviations are UTC offsets which should
     #   be treated as NULL.
     @testset "Europe/Ulyanovsk" begin
-        ulyanovsk = resolve("Europe/Ulyanovsk", tzdata["europe"]...)
+        ulyanovsk = resolve("Europe/Ulyanovsk", tzdata["europe"][1:2]...)
         @test all(t -> string(t.zone.name) == "", ulyanovsk.transitions[2:end])
     end
 
@@ -353,17 +353,26 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     @testset "Link" begin
         # Make sure that that the link time zone was parsed.
         zone_names = keys(tzdata["europe"][1])
-        @test "Arctic/Longyearbyen" in zone_names
+        @test !("Arctic/Longyearbyen" in zone_names)
 
-        oslo = resolve("Europe/Oslo", tzdata["europe"]...)
-        longyearbyen = resolve("Arctic/Longyearbyen", tzdata["europe"]...)
+        tzlinks = tzdata["europe"][3]
+        aliases = keys(tzlinks)
+        @test "Arctic/Longyearbyen" in aliases
+        @test tzlinks["Arctic/Longyearbyen"] == "Europe/Oslo"
 
-        @test oslo.transitions == longyearbyen.transitions
+        # Note: Loading all of the time zones to perform these checks isn't performant
+        time_zones = TimeZones.TZData.load(TZ_SOURCE_DIR)
+        oslo = time_zones["Europe/Oslo"]
+        longyearbyen = time_zones["Arctic/Longyearbyen"]
+
+        @test longyearbyen != oslo
+        @test longyearbyen.name != oslo.name
+        @test longyearbyen.transitions == oslo.transitions
     end
 
     # Zones that don't include multiple lines and no rules should be treated as a FixedTimeZone.
     @testset "FixedTimeZone" begin
-        tz = resolve("MST", tzdata["northamerica"]...)
+        tz = resolve("MST", tzdata["northamerica"][1:2]...)
         @test isa(tz, FixedTimeZone)
     end
 end

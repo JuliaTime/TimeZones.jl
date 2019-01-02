@@ -3,7 +3,7 @@ using Serialization
 using Dates: parse_components
 
 using ...TimeZones: TIME_ZONES
-using ...TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
+using ...TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition, rename
 using ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET, MIN_SAVE, MAX_SAVE,
     ABS_DIFF_OFFSET
 
@@ -49,6 +49,7 @@ end
 
 const ZoneDict = Dict{AbstractString, Vector{Zone}}
 const RuleDict = Dict{AbstractString, Vector{Rule}}
+const LinkDict = Dict{AbstractString, AbstractString}
 const OrderedRuleDict = Dict{AbstractString, Tuple{Vector{Date}, Vector{Rule}}}
 
 # Min and max years that we create DST transition DateTimes for (inclusive)
@@ -528,7 +529,7 @@ end
 function tzparse(tz_source_file::AbstractString)
     zones = ZoneDict()
     rules = RuleDict()
-    links = Dict{AbstractString,AbstractString}()
+    links = LinkDict()
 
     # For the intial pass we'll collect the zone and rule lines.
     open(tz_source_file) do fp
@@ -552,30 +553,36 @@ function tzparse(tz_source_file::AbstractString)
                 zone = parse(Zone, line)
                 zones[name] = push!(get(zones, name, Zone[]), zone)
             elseif kind == "Link"
-                dest = line
-                links[dest] = name
+                target = name
+                link_name = line
+                links[link_name] = target
             else
                 @warn "Unhandled line found with type: $kind"
             end
         end
     end
 
-    # Turn links into zones.
-    # Note: it would be more computationally efficient to pass the links around
-    # and only resolve a zone once.
-    for (dest, source) in links
-        zones[dest] = zones[source]
-    end
-
-    return zones, rules
+    return zones, rules, links
 end
 
 function load(tz_source_dir::AbstractString=TZ_SOURCE_DIR; max_year::Integer=MAX_YEAR)
+    all_links = LinkDict()
     time_zones = Dict{AbstractString,TimeZone}()
     for filename in readdir(tz_source_dir)
-        zones, rules = tzparse(joinpath(tz_source_dir, filename))
+        zones, rules, links = tzparse(joinpath(tz_source_dir, filename))
         merge!(time_zones, resolve(zones, rules; max_year=max_year))
+        merge!(all_links, links)
     end
+
+    # Convert links into time zones.
+    for (link_name, target) in all_links
+        if !haskey(time_zones, link_name) && haskey(time_zones, target)
+            time_zones[link_name] = rename(time_zones[target], link_name)
+        elseif !haskey(time_zones, target)
+            error("Unable to resolve link \"$link_name\" referencing \"$target\"")
+        end
+    end
+
     return time_zones
 end
 

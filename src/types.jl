@@ -89,6 +89,9 @@ function FixedTimeZone(s::AbstractString)
     return FixedTimeZone(name, offset)
 end
 
+rename(tz::FixedTimeZone, name::AbstractString) = FixedTimeZone(name, tz.offset)
+
+
 struct Transition
     utc_datetime::DateTime  # Instant where new zone applies
     zone::FixedTimeZone
@@ -109,6 +112,10 @@ struct VariableTimeZone <: TimeZone
     function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::Union{DateTime,Nothing}=nothing)
         new(name, transitions, cutoff)
     end
+end
+
+function rename(tz::VariableTimeZone, name::AbstractString)
+    VariableTimeZone(name, tz.transitions, tz.cutoff)
 end
 
 

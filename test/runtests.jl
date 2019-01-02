@@ -7,7 +7,7 @@ using TimeZones
 using Unicode
 
 using TimeZones: PKG_DIR
-using TimeZones.TZData: ARCHIVE_DIR, ZoneDict, RuleDict, tzparse, resolve, build
+using TimeZones.TZData: ARCHIVE_DIR, ZoneDict, RuleDict, LinkDict, tzparse, resolve, build
 
 const TZDATA_VERSION = "2016j"
 const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(PKG_DIR, "test", "tzsource"))
@@ -27,7 +27,7 @@ build(TZDATA_VERSION, TEST_REGIONS, ARCHIVE_DIR, TZ_SOURCE_DIR)
 #
 # Note: resolving only the time zones we want is much faster than running compile which
 # recompiles all the time zones.
-tzdata = Dict{AbstractString,Tuple{ZoneDict,RuleDict}}()
+tzdata = Dict{AbstractString,Tuple{ZoneDict,RuleDict,LinkDict}}()
 for name in TEST_REGIONS
     tzdata[name] = tzparse(joinpath(TZ_SOURCE_DIR, name))
 end

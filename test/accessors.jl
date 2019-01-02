@@ -1,7 +1,7 @@
 import Dates
 using Dates: Second, Millisecond
 
-warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
+warsaw = resolve("Europe/Warsaw", tzdata["europe"][1:2]...)
 fixed = FixedTimeZone("Fixed", -7200, 3600)
 
 # ZonedDateTime accessors

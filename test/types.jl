@@ -56,7 +56,7 @@ tz = VariableTimeZone(
     "UnhandledTimeError: TimeZone Imaginary/Zone does not handle dates on or after 1980-01-01T00:00:00 UTC"
 
 
-warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
+warsaw = resolve("Europe/Warsaw", tzdata["europe"][1:2]...)
 
 # Standard time behaviour
 local_dt = DateTime(1916, 2, 1, 0)
@@ -163,7 +163,7 @@ utc_dts = (DateTime(1922, 5, 31, 21), DateTime(1922, 5, 31, 22))
 
 
 # Check behaviour when save is larger than an hour.
-paris = resolve("Europe/Paris", tzdata["europe"]...)
+paris = resolve("Europe/Paris", tzdata["europe"][1:2]...)
 
 @test ZonedDateTime(DateTime(1945,4,2,1), paris).zone == FixedTimeZone("WEST", 0, 3600)
 @test_throws NonExistentTimeError ZonedDateTime(DateTime(1945,4,2,2), paris)
@@ -227,7 +227,7 @@ t = VariableTimeZone("Testing", [
 
 
 # Significant offset change: -11:00 -> 13:00.
-apia = resolve("Pacific/Apia", tzdata["australasia"]...)
+apia = resolve("Pacific/Apia", tzdata["australasia"][1:2]...)
 
 # Skips an entire day.
 @test ZonedDateTime(DateTime(2011,12,29,23),apia).utc_datetime == DateTime(2011,12,30,9)
@@ -325,7 +325,7 @@ y = deepcopy(x)
 
 
 # Equality for VariableTimeZones
-another_warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
+another_warsaw = resolve("Europe/Warsaw", tzdata["europe"][1:2]...)
 
 @test warsaw == warsaw
 @test warsaw === warsaw
@@ -350,7 +350,7 @@ zdt = ZonedDateTime(DateTime(2038, 3, 28), warsaw, from_utc=true)
 
 # TimeZones that no longer have any transitions after the max_year shouldn't have a cutoff
 # eg. Asia/Hong_Kong, Pacific/Honolulu, Australia/Perth
-perth = resolve("Australia/Perth", tzdata["australasia"]...)
+perth = resolve("Australia/Perth", tzdata["australasia"][1:2]...)
 zdt = ZonedDateTime(DateTime(2200, 1, 1), perth, from_utc=true)
 
 

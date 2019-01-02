@@ -1,5 +1,5 @@
 # Contains both positive and negative UTC offsets and observes daylight saving time.
-apia = resolve("Pacific/Apia", tzdata["australasia"]...)
+apia = resolve("Pacific/Apia", tzdata["australasia"][1:2]...)
 
 ambiguous_pos = DateTime(2011,4,2,3)
 non_existent_pos = DateTime(2011,9,24,3)
