@@ -51,11 +51,7 @@ spring_zdt = ZonedDateTime(spring, warsaw)
 
 # When canonicalization happens automatically `Hour(24) + Minute(1)` is converted into
 # `Day(1) + Minute(1)`. Fixed in `JuliaLang/julia#19268`
-if VERSION >= v"0.6.0-dev.1874"
-    @test spring_zdt + Hour(23) + Minute(1) < spring_zdt + Hour(24) + Minute(1)
-else
-    @test spring_zdt + Hour(23) + Minute(1) == spring_zdt + Hour(24) + Minute(1)
-end
+@test spring_zdt + Hour(23) + Minute(1) < spring_zdt + Hour(24) + Minute(1)
 
 # Arithmetic with a StepRange should always work even when the start/stop lands on
 # ambiguous or non-existent DateTimes.
