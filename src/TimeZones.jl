@@ -27,9 +27,7 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
     # local.jl
     localzone,
     # ranges.jl
-    guess,
-    # TZData
-    build
+    guess
 
 const PKG_DIR = normpath(joinpath(dirname(@__FILE__), ".."))
 const DEPS_DIR = joinpath(PKG_DIR, "deps")

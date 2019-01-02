@@ -15,7 +15,7 @@ const ARCHIVE_DIR = joinpath(DEPS_DIR, "tzarchive")
 const TZ_SOURCE_DIR = joinpath(DEPS_DIR, "tzsource")
 const COMPILED_DIR = joinpath(DEPS_DIR, "compiled")
 
-export ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, REGIONS, LEGACY_REGIONS, build
+export ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, REGIONS, LEGACY_REGIONS
 
 function __init__()
     if Sys.iswindows()
