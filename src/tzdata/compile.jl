@@ -519,14 +519,14 @@ end
 
 function resolve(zoneset::ZoneDict, ruleset::RuleDict; max_year::Integer=MAX_YEAR, debug=false)
     ordered = OrderedRuleDict()
-    timezones = Dict{AbstractString,TimeZone}()
+    time_zones = Dict{AbstractString,TimeZone}()
 
     for zone_name in keys(zoneset)
         tz = resolve!(zone_name, zoneset, ruleset, ordered; max_year=max_year, debug=debug)
-        timezones[zone_name] = tz
+        time_zones[zone_name] = tz
     end
 
-    return timezones
+    return time_zones
 end
 
 function resolve(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDict; max_year::Integer=MAX_YEAR, debug=false)
@@ -581,28 +581,28 @@ function tzparse(tz_source_file::AbstractString)
 end
 
 function load(tz_source_dir::AbstractString=TZ_SOURCE_DIR; max_year::Integer=MAX_YEAR)
-    timezones = Dict{AbstractString,TimeZone}()
+    time_zones = Dict{AbstractString,TimeZone}()
     for filename in readdir(tz_source_dir)
         zones, rules = tzparse(joinpath(tz_source_dir, filename))
-        merge!(timezones, resolve(zones, rules; max_year=max_year))
+        merge!(time_zones, resolve(zones, rules; max_year=max_year))
     end
-    return timezones
+    return time_zones
 end
 
 function compile(tz_source_dir::AbstractString=TZ_SOURCE_DIR, dest_dir::AbstractString=COMPILED_DIR; max_year::Integer=MAX_YEAR)
-    timezones = load(tz_source_dir; max_year=max_year)
+    time_zones = load(tz_source_dir; max_year=max_year)
 
     isdir(dest_dir) || error("Destination directory doesn't exist")
     empty!(TIME_ZONES)
 
-    for (name, timezone) in timezones
+    for (name, tz) in time_zones
         parts = split(name, "/")
         tz_dir, tz_file = joinpath(dest_dir, parts[1:end-1]...), parts[end]
 
         isdir(tz_dir) || mkpath(tz_dir)
 
         open(joinpath(tz_dir, tz_file), "w") do fp
-            serialize(fp, timezone)
+            serialize(fp, tz)
         end
     end
 end
