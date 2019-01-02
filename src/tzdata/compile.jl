@@ -83,44 +83,100 @@ for (abbr, dayofweek) in DAYS
     end
 end
 
+# Generate various DateFormats based the number of periods provided.
+const UNTIL_FORMATS = let
+    parts = split("yyyy uuu dd HH:MM:SS", ' ')
+    map(i -> DateFormat(join(parts[1:i], ' ')), eachindex(parts))
+end
+
+
 isflag(flag::Char) = flag in ('w', 'u', 's')
+
+"""
+    tryparse_dayofmonth(str::AbstractString) -> Union{Function,Nothing}
+
+Parse the various day-of-month formats used within tzdata source files.
+
+```julia
+julia> tryparse_dayofmonth("lastSun")
+last_sunday (generic function with 1 method)
+
+julia> tryparse_dayofmonth("Sun>=8")
+#15 (generic function with 1 method)
+
+julia> TimeZones.TZData.tryparse_dayofmonth("15")
+#16 (generic function with 1 method)
+```
+"""
+function tryparse_dayofmonth(str::AbstractString)
+    if occursin(r"^last\w{3}$", str)
+        # We pre-built these functions above
+        # They follow the format: "lastSun", "lastMon", etc.
+        LAST_DAY_OF_WEEK[str]
+    elseif (m = match(r"^(?<dow>\w{3})(?<op>[<>]=)(?<dom>\d{1,2})$", str)) !== nothing
+        # The first day of the week that occurs before or after a given day of month.
+        # i.e. Sun>=8 refers to the Sunday after the 8th of the month
+        # or in other words, the 2nd Sunday.
+        dow = DAYS[m[:dow]]
+        dom = parse(Int, m[:dom])
+        if m[:op] == "<="
+            dt -> day(dt) <= dom && dayofweek(dt) == dow
+        else
+            dt -> day(dt) >= dom && dayofweek(dt) == dow
+        end
+    elseif occursin(r"^\d{1,2}$", str)
+        # Matches just a plain old day of the month
+        dom = parse(Int, str)
+        dt -> day(dt) == dom
+    else
+        nothing
+    end
+end
 
 # Olson time zone dates can be a single year (1900), yyyy-mm-dd (1900-Jan-01),
 # or minute-precision (1900-Jan-01 2:00).
 # They can also be given in Local Wall Time, UTC time (u), or Local Standard time (s)
-function parsedate(s::AbstractString)
-    s = replace(s, r"\s+" => " ")
-    num_periods = length(split(s, " "))
-    s, flag = num_periods > 3 && isflag(s[end]) ? (s[1:end-1], s[end]) : (s, DEFAULT_FLAG)
-    if occursin("lastSun", s)
-        dt = DateTime(replace(s, "lastSun" => "1", count=1), "yyyy uuu d H:MM:SS")
-        dt = tonext(last_sunday, dt; same=true)
-    elseif occursin("lastSat", s)
-        dt = DateTime(replace(s, "lastSat" => "1", count=1), "yyyy uuu d H:MM:SS")
-        dt = tonext(last_saturday, dt; same=true)
-    elseif occursin("Sun>=1", s)
-        dt = DateTime(replace(s, "Sun>=" => "", count=1), "yyyy uuu d H:MM:SS")
-        dt = tonext(d -> dayofweek(d) == Sun, dt; same=true)
-    else
-        format = join(split("yyyy uuu dd HH:MM:SS", " ")[1:num_periods], ' ')
-        periods = parse_components(s, DateFormat(format))
+function parse_date(s::AbstractString)
+    period_strs = split(s, r"\s+")
+    num_periods = length(period_strs)
 
-        # Roll over 24:00 to the next day which occurs in "Pacific/Apia" and "Asia/Macau".
-        # Note: shift is applied after we create the DateTime to ensure that roll over works
-        # correctly at the end of the month or year.
-        shift = Day(0)
-        if length(periods) > 3 && periods[4] == Hour(24)
-            periods[4] = Hour(0)
-            shift += Day(1)
-        end
-        dt = DateTime(periods...) + shift
+    # Extract the flag when time is included
+    if num_periods > 3 && isflag(s[end])
+        flag = s[end]
+        period_strs[end] = period_strs[end][1:end - 1]
+    else
+        flag = DEFAULT_FLAG
     end
 
-    # TODO: I feel like there are issues here.
-    # If the time is UTC, we add back the offset and any saved amount
+    # Save the day of month string and substitute a non-numeric string for parsing.
+    dom_str = num_periods >= 3 ? period_strs[3] : ""
+    numeric_dom = all(isnumeric, dom_str)
+    !numeric_dom && splice!(period_strs, 3, ["1"])
+
+    periods = parse_components(join(period_strs, ' '), UNTIL_FORMATS[num_periods])
+
+    # Roll over 24:00 to the next day which occurs in "Pacific/Apia" and "Asia/Macau".
+    # Note: Apply the `shift` after we create the DateTime to ensure that roll over works
+    # correctly at the end of the month or year.
+    shift = Day(0)
+    if num_periods > 3 && periods[4] == Hour(24)
+        periods[4] = Hour(0)
+        shift += Day(1)
+    end
+    dt = DateTime(periods...)
+
+    # Adjust the DateTime to reflect the requirements of the day-of-month function.
+    if !numeric_dom
+        dom = tryparse_dayofmonth(dom_str)
+        dom !== nothing || throw(ArgumentError("Unable to parse day-of-month: \"$dom_str\""))
+        dt = tonext(dom, dt; step=Day(1), same=true)
+    end
+
+    dt += shift
+
+    # Note: If the time is UTC, we add back the offset and any saved amount
     # If it's local standard time, we just need to add any saved amount
     # return letter == 's' ? (dt - save) : (dt - offset - save)
-
     return dt, flag
 end
 
@@ -167,28 +223,9 @@ function ruleparse(from, to, rule_type, month, on, at, save, letter)
 
     # Now we need to get the right anonymous function
     # for determining the right day for transitioning
-    if occursin(r"last\w\w\w", on)
-        # We pre-built these functions above
-        # They follow the format: "lastSun", "lastMon".
-        on_func = LAST_DAY_OF_WEEK[on]
-    elseif occursin(r"\w\w\w[<>]=\d\d?", on)
-        # The first day of the week that occurs before or after a given day of month.
-        # i.e. Sun>=8 refers to the Sunday after the 8th of the month
-        # or in other words, the 2nd Sunday.
-        dow::Int = DAYS[match(r"\w\w\w", on).match]
-        dom::Int = parse(Int, match(r"\d\d?", on).match)
-        if occursin(on, "<=")
-            on_func = (dt -> day(dt) <= dom && dayofweek(dt) == dow)
-        else
-            on_func = (dt -> day(dt) >= dom && dayofweek(dt) == dow)
-        end
-    elseif occursin(r"\d\d?", on)
-        # Matches just a plain old day of the month
-        dom = parse(Int, on)
-        on_func = dt -> day(dt) == dom
-    else
-        error("Can't parse day of month for DST change")
-    end
+    on_func = tryparse_dayofmonth(on)
+    on_func === nothing && error("Can't parse day of month for DST change: \"$on\"")
+
     # Now we get the time of the transition
     c = at[end]
     at_hm = TimeOffset(isflag(c) ? at[1:end-1] : at)
@@ -225,7 +262,7 @@ function zoneparse(gmtoff, rules, format, until="")
     format = format == "zzz" ? "" : format
 
     # Parse the date the line rule applies up to
-    until_tuple = until == "" ? (nothing, 'w') : parsedate(until)
+    until_tuple = until == "" ? (nothing, 'w') : parse_date(until)
     until_dt, until_flag = convert(Nullable{DateTime}, until_tuple[1]), until_tuple[2]
 
     if rules == "-" || occursin(r"\d", rules)
