@@ -97,7 +97,7 @@ function istimezone(str::AbstractString)
 end
 
 """
-    build(version="latest", regions=REGIONS; force=false) -> Void
+    build(version="latest", regions=REGIONS; force=false) -> Nothing
 
 Builds the TimeZones package with the specified tzdata `version` and `regions`. The
 `version` is typically a 4-digit year followed by a lowercase ASCII letter (e.g. "2016j").

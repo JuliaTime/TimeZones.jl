@@ -1,5 +1,5 @@
 """
-    extract(archive, directory, [files]; [verbose=false]) -> Void
+    extract(archive, directory, [files]; [verbose=false]) -> Nothing
 
 Extracts files from a compressed tar `archive` to the specified `directory`. If `files` is
 specified only the files given will be extracted. The `verbose` flag can be used to display

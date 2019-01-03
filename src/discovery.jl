@@ -1,7 +1,7 @@
 using Mocking: Mocking, @mock
 
 """
-    timezone_names() -> Array{AbstractString}
+    timezone_names() -> Vector{AbstractString}
 
 Returns a sorted list of all of the valid names for constructing a `TimeZone`.
 """
@@ -29,7 +29,7 @@ function timezone_names()
 end
 
 """
-    all_timezones() -> Array{TimeZone}
+    all_timezones() -> Vector{TimeZone}
 
 Returns all pre-computed `TimeZone`s.
 """
@@ -42,7 +42,7 @@ function all_timezones()
 end
 
 """
-    all_timezones(criteria::Function) -> Array{TimeZone}
+    all_timezones(criteria::Function) -> Vector{TimeZone}
 
 Returns `TimeZone`s that match the given `criteria` function. The `criteria` function takes
 two parameters: UTC transition (`DateTime`) and transition zone (`FixedTimeZone`).
@@ -83,7 +83,7 @@ function all_timezones(criteria::Function)
 end
 
 """
-    timezones_from_abbr(abbr) -> Array{TimeZone}
+    timezones_from_abbr(abbr) -> Vector{TimeZone}
 
 Returns all `TimeZone`s that have the specified abbrevation
 """
@@ -108,7 +108,7 @@ end
 timezones_from_abbr(abbr::AbstractString) = timezones_from_abbr(Symbol(abbr))
 
 """
-    timezone_abbrs -> Array{AbstractString}
+    timezone_abbrs -> Vector{AbstractString}
 
 Returns a sorted list of all pre-computed time zone abbrevations.
 """
