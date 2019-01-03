@@ -1,7 +1,6 @@
 module TimeZones
 
 using Dates
-using Nullables
 using Printf
 using Serialization
 using Unicode

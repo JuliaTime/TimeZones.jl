@@ -144,9 +144,9 @@ function read_tzfile_internal(io::IO, name::AbstractString, force_version::Char=
         # Note: that without knowing that additional transitions do exist beyond the last
         # stored transition we cannot determine with perfect accuracy what the cutoff should
         # be.
-        cutoff = Nullable{DateTime}()
+        cutoff = nothing
         if DateTime(2037) <= last(transitions).utc_datetime < TZFILE_MAX
-            cutoff = Nullable(TZFILE_MAX)
+            cutoff = TZFILE_MAX
         end
 
         timezone = VariableTimeZone(name, transitions, cutoff)

@@ -1,6 +1,5 @@
 module TZData
 
-using Nullables
 using Printf
 using ...TimeZones: DEPS_DIR
 

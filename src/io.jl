@@ -39,7 +39,7 @@ function Base.show(io::IO, tz::VariableTimeZone)
         # Retrieve the "modern" time zone transitions. We'll treat the latest transitions as
         # the same as the transitions for `now()` since these future transitions should be
         # based upon the same rules.
-        if isnull(tz.cutoff) || length(trans) == 1
+        if tz.cutoff === nothing || length(trans) == 1
             trans = trans[end:end]
         else
             trans = trans[end-1:end]

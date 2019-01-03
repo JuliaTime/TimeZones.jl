@@ -38,11 +38,11 @@ function latest_version(now_utc::DateTime=now(Dates.UTC))
         latest_version, latest_retrieved_utc = LATEST[]
 
         if now_utc - latest_retrieved_utc < LATEST_DELAY
-            return Nullable{AbstractString}(latest_version)
+            return latest_version
         end
     end
 
-    return Nullable{AbstractString}()
+    return nothing
 end
 
 """
@@ -78,8 +78,8 @@ function tzdata_download(version::AbstractString="latest", dir::AbstractString=t
     now_utc = now(Dates.UTC)
     if version == "latest"
         v = latest_version(now_utc)
-        if !isnull(v)
-            archive = joinpath(dir, "tzdata$(unsafe_get(v)).tar.gz")
+        if v !== nothing
+            archive = joinpath(dir, "tzdata$(v).tar.gz")
             isfile(archive) && return archive
         end
     end

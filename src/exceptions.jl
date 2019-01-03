@@ -44,5 +44,5 @@ end
 
 function Base.showerror(io::IO, e::UnhandledTimeError)
     print(io, "UnhandledTimeError: ")
-    print(io, "TimeZone $(string(e.tz)) does not handle dates on or after $(get(e.tz.cutoff)) UTC")
+    print(io, "TimeZone $(string(e.tz)) does not handle dates on or after $(e.tz.cutoff) UTC")
 end

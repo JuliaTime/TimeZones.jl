@@ -4,8 +4,6 @@
 DocTestSetup = quote
     using TimeZones
 end
-# https://github.com/JuliaLang/julia/pull/30200
-DocTestFilters = r"Nullable\{DateTime\}\((\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}|DateTime\((\d+, ){0,6}\d+\))\)"
 ```
 
 ## [Why are the "Etc/\*" time zones unsupported?](@id etc_tzs)
@@ -34,7 +32,7 @@ julia> last(warsaw.transitions)
 2037-10-25T01:00:00 UTC+1/+0 (CET)
 
 julia> warsaw.cutoff  # DateTime up until the last transition is effective
-Nullable{DateTime}(DateTime(2038, 3, 28, 1))
+2038-03-28T01:00:00
 
 julia> ZonedDateTime(DateTime(2039), warsaw)
 ERROR: UnhandledTimeError: TimeZone Europe/Warsaw does not handle dates on or after 2038-03-28T01:00:00 UTC

@@ -13,13 +13,13 @@ struct Zone
     save::TimeOffset
     rules::AbstractString
     format::AbstractString
-    until::Nullable{DateTime}
+    until::Union{DateTime,Nothing}
     until_flag::Char
 end
 
-function Base.isless(x::Zone,y::Zone)
-    x_dt = get(x.until, typemax(DateTime))
-    y_dt = get(y.until, typemax(DateTime))
+function Base.isless(x::Zone, y::Zone)
+    x_dt = something(x.until, typemax(DateTime))
+    y_dt = something(y.until, typemax(DateTime))
 
     # Easy to compare until's if they are using the same flag. Alternatively, it should
     # be safe to compare different until flags if the DateTimes are far enough apart.
@@ -32,19 +32,16 @@ end
 
 # Rules govern how Daylight Savings transitions happen for a given time zone
 struct Rule
-    from::Nullable{Int}  # First year rule applies
-    to::Nullable{Int}    # Rule applies up until, but not including this year
-    month::Int           # Month in which DST transition happens
-    on::Function         # Anonymous boolean function to determine day
-    at::TimeOffset       # Hour and minute at which the transition happens
-    at_flag::Char        # Local wall time (w), UTC time (u), Local Standard time (s)
-    save::TimeOffset     # How much time is "saved" in daylight savings transition
-    letter::AbstractString  # Timezone abbr letter(s). ie. CKT ("") => CKHST ("HS")
+    from::Union{Int,Nothing}  # First year rule applies
+    to::Union{Int,Nothing}    # Rule applies up until, but not including this year
+    month::Int                # Month in which DST transition happens
+    on::Function              # Anonymous boolean function to determine day
+    at::TimeOffset            # Hour and minute at which the transition happens
+    at_flag::Char             # Local wall time (w), UTC time (u), Local Standard time (s)
+    save::TimeOffset          # How much time is "saved" in daylight savings transition
+    letter::AbstractString    # Timezone abbr letter(s). ie. CKT ("") => CKHST ("HS")
 
-    function Rule(
-        from::Nullable{Int}, to::Nullable{Int}, month::Int, on::Function, at::TimeOffset,
-        at_flag::Char, save::TimeOffset, letter::AbstractString,
-    )
+    function Rule(from, to, month, on, at, at_flag, save, letter)
         isflag(at_flag) || throw(ArgumentError("Unhandled flag '$at_flag'"))
         new(from, to, month, on, at, at_flag, save, letter)
     end
@@ -218,8 +215,8 @@ function abbr_string(format::AbstractString, save::TimeOffset, letter::AbstractS
 end
 
 function ruleparse(from, to, rule_type, month, on, at, save, letter)
-    from_int = convert(Nullable{Int}, from == "min" ? nothing : parse(Int, from))
-    to_int = convert(Nullable{Int}, to == "only" ? from_int : to == "max" ? nothing : parse(Int, to))
+    from_int = from == "min" ? nothing : parse(Int, from)
+    to_int = to == "max" ? nothing : (to == "only" ? from_int : parse(Int, to))
     month_int = MONTHS[month]
 
     # Now we need to get the right anonymous function
@@ -263,8 +260,7 @@ function zoneparse(gmtoff, rules, format, until="")
     format = format == "zzz" ? "" : format
 
     # Parse the date the line rule applies up to
-    until_tuple = until == "" ? (nothing, 'w') : parse_date(until)
-    until_dt, until_flag = convert(Nullable{DateTime}, until_tuple[1]), until_tuple[2]
+    until_dt, until_flag = until == "" ? (nothing, 'w') : parse_date(until)
 
     if rules == "-" || occursin(r"\d", rules)
         save = TimeOffset(rules)
@@ -316,10 +312,10 @@ function order_rules(rules::Vector{Rule}; max_year::Integer=MAX_YEAR)
     dates = Date[]
     ordered = Rule[]
 
-    # Note: Typically rules are orderd by "from" and "in". Unfortunately
+    # Note: Typically rules are ordered by "from" and "in". Unfortunately
     for rule in rules
-        start_year = max(get(rule.from, MIN_YEAR), MIN_YEAR)
-        end_year = min(get(rule.to, max_year), max_year)
+        start_year = max(something(rule.from, MIN_YEAR), MIN_YEAR)
+        end_year = min(something(rule.to, max_year), max_year)
 
         # For each year the rule applies compute the transition date
         for rule_year in start_year:end_year
@@ -367,14 +363,14 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
     ordered::OrderedRuleDict; max_year::Integer=MAX_YEAR, debug=false)
 
     transitions = Transition[]
-    cutoff = Nullable{DateTime}()
+    cutoff = nothing
 
     # Set some default values and starting DateTime increment and away we go...
     start_utc = DateTime(MIN_YEAR)
     max_until = DateTime(max_year) + Year(1) - Second(1)
     save = ZERO
     letter = ""
-    start_rule = Nullable{Rule}()
+    start_rule = nothing
 
     # zones = Set{FixedTimeZone}()
 
@@ -385,7 +381,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
         # Break at the beginning of the loop instead of the end so that we know an
         # future zone exists beyond max_year and we can set cutoff.
         if year(start_utc) > max_year
-            cutoff = Nullable(start_utc)
+            cutoff = start_utc
             break
         end
 
@@ -393,8 +389,8 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
         format = zone.format
         # save = zone.save
         rule_name = zone.rules
-        until = get(zone.until, max_until)
-        cutoff = Nullable{DateTime}()  # Reset cutoff
+        until = something(zone.until, max_until)
+        cutoff = nothing  # Reset cutoff
 
         if rule_name == ""
             save = zone.save
@@ -422,12 +418,12 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
             # last iteration.
             index = searchsortedlast(dates, start_utc)
 
-            if !isnull(start_rule)
-                rule = get(start_rule)
+            if start_rule !== nothing
+                rule = start_rule
                 save = rule.save
                 letter = rule.letter
 
-                start_rule = Nullable{Rule}()
+                start_rule = nothing
             elseif index == 0
                 save = ZERO
 
@@ -463,9 +459,9 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
                 until_utc = asutc(until, zone.until_flag, offset, save)
 
                 if dt_utc == until_utc
-                    start_rule = Nullable{Rule}(rule)
+                    start_rule = rule
                 elseif dt_utc > until_utc
-                    cutoff = Nullable{DateTime}(dt_utc)
+                    cutoff = dt_utc
                 end
 
                 dt_utc >= until_utc && break
@@ -504,11 +500,11 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
         debug && println("Zone End   $rule_name, $offset, $save, $(start_utc)u")
     end
 
-    debug && println("Cutoff     $(isnull(cutoff) ? "nothing" : get(cutoff))")
+    debug && println("Cutoff     $(something(cutoff, "nothing"))")
 
     # Note: Transitions array is expected to be ordered and should be if both
     # zones and rules were ordered.
-    if length(transitions) > 1 || !isnull(cutoff)
+    if length(transitions) > 1 || cutoff !== nothing
         return VariableTimeZone(zone_name, transitions, cutoff)
     else
         # Although unlikely the time zone name in the transition and the zone_name

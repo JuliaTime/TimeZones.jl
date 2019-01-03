@@ -107,19 +107,11 @@ A `TimeZone` with an offset that changes over time.
 struct VariableTimeZone <: TimeZone
     name::Symbol
     transitions::Vector{Transition}
-    cutoff::Nullable{DateTime}
+    cutoff::Union{DateTime,Nothing}
 end
 
-function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::Nullable{DateTime})
+function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::Union{DateTime,Nothing}=nothing)
     return VariableTimeZone(Symbol(name), transitions, cutoff)
-end
-
-function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::DateTime)
-    return VariableTimeZone(Symbol(name), transitions, Nullable(cutoff))
-end
-
-function VariableTimeZone(name::AbstractString, transitions::Vector{Transition})
-    return VariableTimeZone(Symbol(name), transitions, Nullable{DateTime}())
 end
 
 
@@ -139,7 +131,7 @@ struct ZonedDateTime <: AbstractDateTime
     end
 
     function ZonedDateTime(utc_datetime::DateTime, timezone::VariableTimeZone, zone::FixedTimeZone)
-        if utc_datetime >= get(timezone.cutoff, typemax(DateTime))
+        if timezone.cutoff !== nothing && utc_datetime >= timezone.cutoff
             throw(UnhandledTimeError(timezone))
         end
 
@@ -248,19 +240,19 @@ end
 
 function ZonedDateTime(parts::Union{Period,TimeZone}...)
     periods = Period[]
-    timezone = Nullable{TimeZone}()
+    tz = nothing
     for part in parts
         if isa(part, Period)
             push!(periods, part)
-        elseif isnull(timezone)
-            timezone = Nullable{TimeZone}(part)
+        elseif tz === nothing
+            tz = part
         else
             throw(ArgumentError("Multiple time zones found"))
         end
     end
 
-    isnull(timezone) && throw(ArgumentError("Missing time zone"))
-    return ZonedDateTime(DateTime(periods...), get(timezone))
+    tz === nothing && throw(ArgumentError("Missing time zone"))
+    return ZonedDateTime(DateTime(periods...), tz)
 end
 
 # Promotion
@@ -306,7 +298,7 @@ Base.typemax(::Type{ZonedDateTime}) = ZonedDateTime(typemax(DateTime), utc_tz; f
 
 function Dates.validargs(::Type{ZonedDateTime}, y::Int64, m::Int64, d::Int64, h::Int64, mi::Int64, s::Int64, ms::Int64, tz::AbstractString)
     err = validargs(DateTime, y, m, d, h, mi, s, ms)
-    isnull(err) || return err
+    err === nothing || return err
     istimezone(tz) || return argerror("TimeZone: \"$str\" is not a recognized time zone")
     return argerror()
 end
