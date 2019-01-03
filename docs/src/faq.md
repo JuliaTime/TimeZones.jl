@@ -4,13 +4,15 @@
 DocTestSetup = quote
     using TimeZones
 end
+# https://github.com/JuliaLang/julia/pull/30200
+DocTestFilters = r"Nullable\{DateTime\}\((\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}|DateTime\((\d+, ){0,6}\d+\))\)"
 ```
 
-## [Why are the "Etc/*" time zones unsupported?](@id etc_tzs)
+## [Why are the "Etc/\*" time zones unsupported?](@id etc_tzs)
 
-According to [IANA](ftp://ftp.iana.org/tz/data/etcetera) the "Etc/*" time zones are only included in the tz database for "historical reasons". Furthermore the time zones offsets provided the Etc/GMT±HH can be misleading. For example the Etc/GMT+4 time zone is 4 hours **behind** UTC rather than 4 hours **ahead** as most people expect. Since TimeZones.jl already provides an easy way of constructing fixed offset time zones using `FixedTimeZone` it was decided to leave these time zones out.
+According to [IANA](ftp://ftp.iana.org/tz/data/etcetera) the "Etc/\*" time zones are only included in the tz database for "historical reasons". Furthermore the time zones offsets provided the Etc/GMT±HH can be misleading. For example the Etc/GMT+4 time zone is 4 hours **behind** UTC rather than 4 hours **ahead** as most people expect. Since TimeZones.jl already provides an easy way of constructing fixed offset time zones using `FixedTimeZone` it was decided to leave these time zones out.
 
-If you truly do want to include the "Etc/*" time zones you just need to download the tz source file and re-compile:
+If you truly do want to include the "Etc/\*" time zones you just need to download the tz source file and re-compile:
 
 ```@example
 using TimeZones; # hide
@@ -32,7 +34,7 @@ julia> last(warsaw.transitions)
 2037-10-25T01:00:00 UTC+1/+0 (CET)
 
 julia> warsaw.cutoff  # DateTime up until the last transition is effective
-Nullable{DateTime}(2038-03-28T01:00:00)
+Nullable{DateTime}(DateTime(2038, 3, 28, 1))
 
 julia> ZonedDateTime(DateTime(2039), warsaw)
 ERROR: UnhandledTimeError: TimeZone Europe/Warsaw does not handle dates on or after 2038-03-28T01:00:00 UTC
