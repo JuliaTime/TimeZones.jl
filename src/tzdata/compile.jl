@@ -1,10 +1,11 @@
-using Compat.Dates, Compat.Serialization
-import Compat.Dates: parse_components
+using Dates
+using Serialization
+using Dates: parse_components
 
-import ...TimeZones: TIME_ZONES
-import ...TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
-import ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET,
-    MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET
+using ...TimeZones: TIME_ZONES
+using ...TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
+using ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET, MIN_SAVE, MAX_SAVE,
+    ABS_DIFF_OFFSET
 
 # Zone type maps to an Olson Timezone database entity
 struct Zone

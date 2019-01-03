@@ -1,4 +1,4 @@
-import Compat.Dates: parse_components, default_format
+using Dates: parse_components, default_format
 
 @testset "parse" begin
     @test isequal(
@@ -26,11 +26,11 @@ end
 @testset "tryparse" begin
     @test isequal(
         tryparse(ZonedDateTime, "2013-03-20 11:00:00+04:00", dateformat"y-m-d H:M:SSz"),
-        TimeZones.nullable(ZonedDateTime, ZonedDateTime(2013, 3, 20, 11, tz"UTC+04")),
+        ZonedDateTime(2013, 3, 20, 11, tz"UTC+04"),
     )
     @test isequal(
         tryparse(ZonedDateTime, "2016-04-11 08:00 EST", dateformat"yyyy-mm-dd HH:MM zzz"),
-        TimeZones.nullable(ZonedDateTime, nothing),
+        nothing,
     )
 end
 

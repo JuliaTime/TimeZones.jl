@@ -1,4 +1,4 @@
-import TimeZones: optional
+using TimeZones: optional
 
 function strip(ex::Expr)
     args = []

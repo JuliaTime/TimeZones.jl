@@ -1,18 +1,4 @@
-import Compat.Dates: DateFormat, DatePart, tryparsenext, format, min_width, max_width,
-    default_format
-using Compat: isletter
-
-# Handle Nullable deprecation on Julia 0.7
-if VERSION < v"0.7.0-DEV.3017"
-    nullable(T::Type, x) = Nullable{T}(x)
-else
-    nullable(T::Type, x) = x  # Ignore nullable container type T
-end
-
-# https://github.com/JuliaLang/julia/pull/25261
-if VERSION < v"0.7.0-DEV.5126"
-    iterate(str::AbstractString, i::Int) = next(str, i)
-end
+using Dates: DateFormat, DatePart, min_width, max_width
 
 function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
     tz_start, tz_end = i, 0
@@ -39,14 +25,10 @@ function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
     end
 
     if tz_end <= min_pos
-        return @static if VERSION < v"0.7.0-DEV.4797"
-            nullable(String, nothing), i
-        else
-            nothing
-        end
+        return nothing
     else
         tz = SubString(str, tz_start, tz_end)
-        return nullable(String, tz), i
+        return tz, i
     end
 end
 
@@ -65,11 +47,7 @@ function tryparsenext_tz(str, i, len, min_width::Int=1, max_width::Int=0)
     end
 
     if tz_end == 0
-        return @static if VERSION < v"0.7.0-DEV.4797"
-            nullable(String, nothing), i
-        else
-            nothing
-        end
+        return nothing
     else
         name = SubString(str, tz_start, tz_end)
 
@@ -77,30 +55,26 @@ function tryparsenext_tz(str, i, len, min_width::Int=1, max_width::Int=0)
         # purposes we'll treat all abbreviations except for UTC and GMT as ambiguous.
         # e.g. "MST": "Mountain Standard Time" (UTC-7) or "Moscow Summer Time" (UTC+3:31).
         if occursin("/", name) || name in ("UTC", "GMT")
-            return nullable(String, name), i
+            return name, i
         else
-            return @static if VERSION < v"0.7.0-DEV.4797"
-                nullable(String, nothing), i
-            else
-                nothing
-            end
+            return nothing
         end
     end
 end
 
-function tryparsenext(d::DatePart{'z'}, str, i, len)
+function Dates.tryparsenext(d::DatePart{'z'}, str, i, len)
     tryparsenext_fixedtz(str, i, len, min_width(d), max_width(d))
 end
 
-function tryparsenext(d::DatePart{'Z'}, str, i, len)
+function Dates.tryparsenext(d::DatePart{'Z'}, str, i, len)
     tryparsenext_tz(str, i, len, min_width(d), max_width(d))
 end
 
-function format(io::IO, d::DatePart{'z'}, zdt, locale)
+function Dates.format(io::IO, d::DatePart{'z'}, zdt, locale)
     write(io, string(zdt.zone.offset))
 end
 
-function format(io::IO, d::DatePart{'Z'}, zdt, locale)
+function Dates.format(io::IO, d::DatePart{'Z'}, zdt, locale)
     write(io, string(zdt.zone))  # In most cases will be an abbreviation.
 end
 
@@ -110,7 +84,7 @@ function ZonedDateTime(str::AbstractString, df::DateFormat=ISOZonedDateTimeForma
     parse(ZonedDateTime, str, df)
 end
 function ZonedDateTime(str::AbstractString, format::AbstractString; locale::AbstractString="english")
-    ZonedDateTime(str, DateFormat(format,locale))
+    ZonedDateTime(str, DateFormat(format, locale))
 end
 
-default_format(::Type{ZonedDateTime}) = ISOZonedDateTimeFormat
+Dates.default_format(::Type{ZonedDateTime}) = ISOZonedDateTimeFormat

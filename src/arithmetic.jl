@@ -1,27 +1,19 @@
-import Base: +, -
-import Compat: @static
-
-if VERSION < v"0.7.0-DEV.4955"
-    import Base: broadcast
-    const broadcasted = broadcast
-else
-    import Base.Broadcast: broadcasted
-end
+import Base.Broadcast: broadcasted
 
 # ZonedDateTime arithmetic
-(+)(x::ZonedDateTime) = x
-(-)(x::ZonedDateTime, y::ZonedDateTime) = x.utc_datetime - y.utc_datetime
+Base.:(+)(x::ZonedDateTime) = x
+Base.:(-)(x::ZonedDateTime, y::ZonedDateTime) = x.utc_datetime - y.utc_datetime
 
-function (+)(zdt::ZonedDateTime, p::DatePeriod)
+function Base.:(+)(zdt::ZonedDateTime, p::DatePeriod)
     return ZonedDateTime(localtime(zdt) + p, timezone(zdt))
 end
-function (+)(zdt::ZonedDateTime, p::TimePeriod)
+function Base.:(+)(zdt::ZonedDateTime, p::TimePeriod)
     return ZonedDateTime(zdt.utc_datetime + p, timezone(zdt); from_utc=true)
 end
-function (-)(zdt::ZonedDateTime, p::DatePeriod)
+function Base.:(-)(zdt::ZonedDateTime, p::DatePeriod)
     return ZonedDateTime(localtime(zdt) - p, timezone(zdt))
 end
-function (-)(zdt::ZonedDateTime, p::TimePeriod)
+function Base.:(-)(zdt::ZonedDateTime, p::TimePeriod)
     return ZonedDateTime(zdt.utc_datetime - p, timezone(zdt); from_utc=true)
 end
 

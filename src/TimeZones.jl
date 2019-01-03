@@ -1,12 +1,11 @@
-VERSION < v"0.7.0-beta2.199" && __precompile__()
-
 module TimeZones
 
-import Compat: Sys, occursin, undef, @info, @warn
-
-using Compat.Dates, Compat.Printf, Compat.Serialization, Compat.Unicode
-import Compat.Dates: TimeZone, AbstractTime
+using Dates
 using Nullables
+using Printf
+using Serialization
+using Unicode
+import Dates: TimeZone
 
 export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
     DateTime, TimeError, AmbiguousTimeError, NonExistentTimeError, UnhandledTimeError,

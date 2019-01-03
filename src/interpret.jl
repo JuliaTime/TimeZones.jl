@@ -1,4 +1,4 @@
-import TimeZones.TZData: MIN_OFFSET, MAX_OFFSET
+using TimeZones.TZData: MIN_OFFSET, MAX_OFFSET
 
 # TimeZone concepts used to disambiguate context of DateTimes
 # abstract type UTC <: TimeZone end # Defined in Dates

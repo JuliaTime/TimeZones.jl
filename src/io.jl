@@ -1,21 +1,20 @@
-import Base: print, show
-import Compat.Dates: value, DateFormat
+using Dates: value
 
-print(io::IO, tz::TimeZone) = print(io, tz.name)
-function print(io::IO, tz::FixedTimeZone)
+Base.print(io::IO, tz::TimeZone) = print(io, tz.name)
+function Base.print(io::IO, tz::FixedTimeZone)
     name = string(tz.name)
     isempty(name) ? print(io, "UTC", tz.offset) : print(io, name)
 end
-print(io::IO, zdt::ZonedDateTime) = print(io, localtime(zdt), zdt.zone.offset)
+Base.print(io::IO, zdt::ZonedDateTime) = print(io, localtime(zdt), zdt.zone.offset)
 
-function show(io::IO, t::Transition)
+function Base.show(io::IO, t::Transition)
     name_str = string(t.zone.name)
     print(io, t.utc_datetime, " ")
     show(io, t.zone.offset)
     !isempty(name_str) && print(io, " (", name_str, ")")
 end
 
-function show(io::IO, tz::FixedTimeZone)
+function Base.show(io::IO, tz::FixedTimeZone)
     if get(io, :compact, false)
         print(io, tz)
     else
@@ -31,7 +30,7 @@ function show(io::IO, tz::FixedTimeZone)
     end
 end
 
-function show(io::IO, tz::VariableTimeZone)
+function Base.show(io::IO, tz::VariableTimeZone)
     if get(io, :compact, false)
         print(io, tz)
     else
@@ -60,4 +59,4 @@ function show(io::IO, tz::VariableTimeZone)
     end
 end
 
-show(io::IO,dt::ZonedDateTime) = print(io, string(dt))
+Base.show(io::IO,dt::ZonedDateTime) = print(io, string(dt))

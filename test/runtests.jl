@@ -2,13 +2,13 @@ using Mocking
 Mocking.enable(force=true)
 const compiled_modules_enabled = false
 
-import Compat: Sys, occursin, @info, @warn
-using Compat.Unicode
-using Compat.Test
-using TimeZones
-import TimeZones: PKG_DIR
-import TimeZones.TZData: ARCHIVE_DIR, ZoneDict, RuleDict, tzparse, resolve, build
 using Nullables
+using Test
+using TimeZones
+using Unicode
+
+using TimeZones: PKG_DIR
+using TimeZones.TZData: ARCHIVE_DIR, ZoneDict, RuleDict, tzparse, resolve, build
 
 const TZDATA_VERSION = "2016j"
 const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(PKG_DIR, "test", "tzsource"))

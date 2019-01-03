@@ -1,6 +1,6 @@
 using PkgBenchmark
 using TimeZones
-import Compat.Dates: DateFormat
+import Dates: DateFormat
 import TimeZones.TZData: parse_components
 
 @benchgroup "parse" begin

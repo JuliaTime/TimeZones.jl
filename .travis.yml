@@ -9,7 +9,6 @@ os:
   - osx
   - linux
 julia:
-  - 0.6
   - 0.7
   - 1.0
   - nightly
@@ -25,8 +24,8 @@ script:
   - git fetch origin +:refs/remotes/origin/HEAD; if ! git diff --quiet origin/HEAD HEAD -- deps/build.jl; then unset JULIA_TZ_VERSION; fi
   - |
     julia -e '
-      VERSION >= v"0.7.0-DEV.3656" && using Pkg
-      if VERSION >= v"0.7.0-DEV.5183" && (isfile("Project.toml") || isfile("JuliaProject.toml"))
+      using Pkg
+      if isfile("Project.toml") || isfile("JuliaProject.toml")
           Pkg.build(); Pkg.test(coverage=true)
       else
           Pkg.clone(pwd()); Pkg.build("TimeZones"); Pkg.test("TimeZones"; coverage=true)
@@ -34,8 +33,7 @@ script:
 after_success:
   - |
     julia -e '
-      VERSION >= v"0.7.0-DEV.3656" && using Pkg
-      VERSION >= v"0.7.0-DEV.5183" || cd(Pkg.dir("TimeZones"))
+      using Pkg
       Pkg.add("Coverage"); using Coverage
       Codecov.submit(process_folder())
       Coveralls.submit(Coveralls.process_folder())'
