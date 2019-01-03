@@ -370,7 +370,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
 
     # Set some default values and starting DateTime increment and away we go...
     start_utc = DateTime(MIN_YEAR)
-    max_until = DateTime(max_year, 12, 31, 23, 59, 59)
+    max_until = DateTime(max_year) + Year(1) - Second(1)
     save = ZERO
     letter = ""
     start_rule = Nullable{Rule}()
