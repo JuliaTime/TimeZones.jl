@@ -13,7 +13,7 @@
     @test length(readdir(TZData.TZ_SOURCE_DIR)) == 1
 
     # Using a version we already have avoids triggering a download
-    TimeZones.build(TZDATA_VERSION, TZData.REGIONS)
+    TimeZones.build(TZDATA_VERSION)
 
     @test isdir(TZData.COMPILED_DIR)
     @test length(readdir(TZData.COMPILED_DIR)) > 0

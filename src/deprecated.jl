@@ -9,3 +9,9 @@ if VERSION < v"1.0.0-DEV.44"
 end
 
 # END TimeZones 0.6 deprecations
+
+# BEGIN TimeZones 0.9 deprecations
+
+@deprecate build(version::AbstractString, regions; kwargs...) build(version; kwargs...) false
+
+# END TimeZones 0.9 deprecations

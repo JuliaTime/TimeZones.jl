@@ -585,6 +585,17 @@ function load!(tz_source::TZSource, file::AbstractString)
     end
 end
 
+function Base.names(tz_source::TZSource)
+    sort!([collect(keys(tz_source.zones)); collect(keys(tz_source.links))])
+end
+
+function Base.merge!(a::TZSource, b::TZSource)
+    merge!(a.zones, b.zones)
+    merge!(a.rules, b.rules)
+    merge!(a.links, b.links)
+    return a
+end
+
 function compile(name::AbstractString, tz_source::TZSource; kwargs...)
     ordered = OrderedRuleDict()
     if haskey(tz_source.links, name)
@@ -617,11 +628,8 @@ function compile(tz_source::TZSource; kwargs...)
     return time_zones
 end
 
-
-
-function compile(tz_source_dir::AbstractString=TZ_SOURCE_DIR, dest_dir::AbstractString=COMPILED_DIR; max_year::Integer=MAX_YEAR)
-    tz_source_paths = joinpath.(tz_source_dir, readdir(tz_source_dir))
-    time_zones = compile(TZSource(tz_source_paths); max_year=max_year)
+function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
+    time_zones = compile(tz_source; kwargs...)
 
     isdir(dest_dir) || error("Destination directory doesn't exist")
     empty!(TIME_ZONES)
@@ -637,4 +645,12 @@ function compile(tz_source_dir::AbstractString=TZ_SOURCE_DIR, dest_dir::Abstract
             serialize(fp, tz)
         end
     end
+
+    return time_zones
+end
+
+# TODO: Deprecate?
+function compile(tz_source_dir::AbstractString=TZ_SOURCE_DIR, dest_dir::AbstractString=COMPILED_DIR; kwargs...)
+    tz_source_paths = joinpath.(tz_source_dir, readdir(tz_source_dir))
+    compile(TZSource(tz_source_paths), dest_dir; kwargs...)
 end
