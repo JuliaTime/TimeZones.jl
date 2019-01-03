@@ -29,7 +29,7 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
 
 const PKG_DIR = normpath(joinpath(dirname(@__FILE__), ".."))
 const DEPS_DIR = joinpath(PKG_DIR, "deps")
-const TIME_ZONES = Dict{AbstractString,TimeZone}()
+const TIME_ZONES = Dict{String,TimeZone}()
 
 function __init__()
     # Base extension needs to happen everytime the module is loaded (issue #24)

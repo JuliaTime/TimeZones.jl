@@ -23,8 +23,7 @@ const FIXED_TIME_ZONE_REGEX = r"""
     )$
     """x
 
-# Using type Symbol instead of AbstractString for name since it
-# gets us ==, and hash for free.
+# On Julia 0.7+ type String gets us ==, and hash for free.
 
 """
     FixedTimeZone
@@ -32,11 +31,9 @@ const FIXED_TIME_ZONE_REGEX = r"""
 A `TimeZone` with a constant offset for all of time.
 """
 struct FixedTimeZone <: TimeZone
-    name::Symbol
+    name::String
     offset::UTCOffset
 end
-
-FixedTimeZone(name::AbstractString, offset::UTCOffset) = FixedTimeZone(Symbol(name), offset)
 
 """
     FixedTimeZone(name, utc_offset, dst_offset=0) -> FixedTimeZone
@@ -45,11 +42,11 @@ Constructs a `FixedTimeZone` with the given `name`, UTC offset (in seconds), and
 (in seconds).
 """
 function FixedTimeZone(name::AbstractString, utc_offset::Integer, dst_offset::Integer=0)
-    FixedTimeZone(Symbol(name), UTCOffset(utc_offset, dst_offset))
+    FixedTimeZone(name, UTCOffset(utc_offset, dst_offset))
 end
 
 function FixedTimeZone(name::AbstractString, utc_offset::Second, dst_offset::Second=Second(0))
-    FixedTimeZone(Symbol(name), UTCOffset(utc_offset, dst_offset))
+    FixedTimeZone(name, UTCOffset(utc_offset, dst_offset))
 end
 
 """
@@ -105,13 +102,13 @@ Base.isless(x::Transition,y::Transition) = isless(x.utc_datetime,y.utc_datetime)
 A `TimeZone` with an offset that changes over time.
 """
 struct VariableTimeZone <: TimeZone
-    name::Symbol
+    name::String
     transitions::Vector{Transition}
     cutoff::Union{DateTime,Nothing}
 end
 
 function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::Union{DateTime,Nothing}=nothing)
-    return VariableTimeZone(Symbol(name), transitions, cutoff)
+    return VariableTimeZone(String(name), transitions, cutoff)
 end
 
 

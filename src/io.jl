@@ -2,16 +2,14 @@ using Dates: value
 
 Base.print(io::IO, tz::TimeZone) = print(io, tz.name)
 function Base.print(io::IO, tz::FixedTimeZone)
-    name = string(tz.name)
-    isempty(name) ? print(io, "UTC", tz.offset) : print(io, name)
+    isempty(tz.name) ? print(io, "UTC", tz.offset) : print(io, tz.name)
 end
 Base.print(io::IO, zdt::ZonedDateTime) = print(io, localtime(zdt), zdt.zone.offset)
 
 function Base.show(io::IO, t::Transition)
-    name_str = string(t.zone.name)
     print(io, t.utc_datetime, " ")
     show(io, t.zone.offset)
-    !isempty(name_str) && print(io, " (", name_str, ")")
+    !isempty(t.zone.name) && print(io, " (", t.zone.name, ")")
 end
 
 function Base.show(io::IO, tz::FixedTimeZone)
@@ -19,13 +17,12 @@ function Base.show(io::IO, tz::FixedTimeZone)
         print(io, tz)
     else
         offset_str = "UTC" * offset_string(tz.offset, true)  # Use ISO 8601 for comparision
-        name_str = string(tz.name)
-        if isempty(name_str)
+        if isempty(tz.name)
             print(io, offset_str)
-        elseif name_str != offset_str && !(value(tz.offset) == 0 && name_str in ("UTC", "GMT"))
-            print(io, name_str, " (UTC", offset_string(tz.offset), ")")
+        elseif tz.name != offset_str && !(value(tz.offset) == 0 && tz.name in ("UTC", "GMT"))
+            print(io, tz.name, " (UTC", offset_string(tz.offset), ")")
         else
-            print(io, name_str)
+            print(io, tz.name)
         end
     end
 end
@@ -53,7 +50,7 @@ function Base.show(io::IO, tz::VariableTimeZone)
         # Show standard time offset before daylight saving time offset.
         print(
             io,
-            string(tz.name),
+            tz.name,
             " (", join(["UTC" * offset_string(t.zone.offset) for t in trans], "/"), ")",
         )
     end
