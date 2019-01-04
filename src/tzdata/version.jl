@@ -1,4 +1,3 @@
-import ...TimeZones: DEPS_DIR, ARCHIVE_DIR
 import Compat: read
 
 # Note: A tz code or data version consists of a year and letter while a release consists of

@@ -1,5 +1,4 @@
-import TimeZones: ARCHIVE_DIR
-import TimeZones.TZData: isarchive, readarchive, extract
+import TimeZones.TZData: ARCHIVE_DIR, isarchive, readarchive, extract
 
 const ARCHIVE_PATH = let
     archives = filter(file -> endswith(file, "tar.gz"), readdir(ARCHIVE_DIR))

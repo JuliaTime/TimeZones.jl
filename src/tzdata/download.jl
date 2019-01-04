@@ -7,9 +7,8 @@ const LATEST_FORMAT = Dates.DateFormat("yyyy-mm-ddTHH:MM:SS")
 const LATEST_DELAY = Hour(1)  # In 1996 a correction to a release was made an hour later
 
 function read_latest(io::IO)
-    # Note: Prior to Julia 0.6 readline did not automatically chomp
-    version = chomp(readline(io))
-    retrieved_utc = DateTime(chomp(readline(io)), LATEST_FORMAT)
+    version = readline(io)
+    retrieved_utc = DateTime(readline(io), LATEST_FORMAT)
     return version, retrieved_utc
 end
 

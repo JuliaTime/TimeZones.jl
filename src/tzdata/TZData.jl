@@ -5,12 +5,17 @@ using Compat: occursin, @info, @warn
 import Compat: Sys
 using Compat.Printf
 using Nullables
+import ...TimeZones: DEPS_DIR
 
 # Note: The tz database is made up of two parts: code and data. TimeZones.jl only requires
 # the "tzdata" archive or more specifically the "tz source" files within the archive
 # (africa, australasia, ...)
 
-export build
+const ARCHIVE_DIR = joinpath(DEPS_DIR, "tzarchive")
+const TZ_SOURCE_DIR = joinpath(DEPS_DIR, "tzsource")
+const COMPILED_DIR = joinpath(DEPS_DIR, "compiled")
+
+export ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, REGIONS, LEGACY_REGIONS
 
 function __init__()
     if Sys.iswindows()

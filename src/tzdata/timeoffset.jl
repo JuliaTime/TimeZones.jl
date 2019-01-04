@@ -2,7 +2,8 @@ import Base: convert, promote_rule, string, print, show
 import Compat.Dates: Period, TimePeriod, Week, Day, Hour, Minute, Second, Millisecond,
     value, toms, hour, minute, second
 
-# Convenience type for working with HH:MM:SS.
+# Convenience type for working with HH:MM:SS durations which can be negative or exceed
+# 24-hours.
 struct TimeOffset <: TimePeriod
     seconds::Int
 end

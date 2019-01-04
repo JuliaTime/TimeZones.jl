@@ -6,8 +6,8 @@ import Compat: Sys, occursin, @info, @warn
 using Compat.Unicode
 using Compat.Test
 using TimeZones
-import TimeZones: PKG_DIR, ARCHIVE_DIR
-import TimeZones.TZData: ZoneDict, RuleDict, tzparse, resolve, build
+import TimeZones: PKG_DIR
+import TimeZones.TZData: ARCHIVE_DIR, ZoneDict, RuleDict, tzparse, resolve, build
 using Nullables
 
 const TZDATA_VERSION = "2016j"

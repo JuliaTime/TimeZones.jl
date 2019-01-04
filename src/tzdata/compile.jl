@@ -1,7 +1,7 @@
 using Compat.Dates, Compat.Serialization
 import Compat.Dates: parse_components
 
-import ...TimeZones: TZ_SOURCE_DIR, COMPILED_DIR, TIME_ZONES
+import ...TimeZones: TIME_ZONES
 import ...TimeZones: TimeZone, FixedTimeZone, VariableTimeZone, Transition
 import ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET,
     MIN_SAVE, MAX_SAVE, ABS_DIFF_OFFSET
@@ -370,7 +370,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
 
     # Set some default values and starting DateTime increment and away we go...
     start_utc = DateTime(MIN_YEAR)
-    max_until = DateTime(max_year, 12, 31, 23, 59, 59)
+    max_until = DateTime(max_year) + Year(1) - Second(1)
     save = ZERO
     letter = ""
     start_rule = Nullable{Rule}()
@@ -519,14 +519,14 @@ end
 
 function resolve(zoneset::ZoneDict, ruleset::RuleDict; max_year::Integer=MAX_YEAR, debug=false)
     ordered = OrderedRuleDict()
-    timezones = Dict{AbstractString,TimeZone}()
+    time_zones = Dict{AbstractString,TimeZone}()
 
     for zone_name in keys(zoneset)
         tz = resolve!(zone_name, zoneset, ruleset, ordered; max_year=max_year, debug=debug)
-        timezones[zone_name] = tz
+        time_zones[zone_name] = tz
     end
 
-    return timezones
+    return time_zones
 end
 
 function resolve(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDict; max_year::Integer=MAX_YEAR, debug=false)
@@ -581,28 +581,28 @@ function tzparse(tz_source_file::AbstractString)
 end
 
 function load(tz_source_dir::AbstractString=TZ_SOURCE_DIR; max_year::Integer=MAX_YEAR)
-    timezones = Dict{AbstractString,TimeZone}()
+    time_zones = Dict{AbstractString,TimeZone}()
     for filename in readdir(tz_source_dir)
         zones, rules = tzparse(joinpath(tz_source_dir, filename))
-        merge!(timezones, resolve(zones, rules; max_year=max_year))
+        merge!(time_zones, resolve(zones, rules; max_year=max_year))
     end
-    return timezones
+    return time_zones
 end
 
 function compile(tz_source_dir::AbstractString=TZ_SOURCE_DIR, dest_dir::AbstractString=COMPILED_DIR; max_year::Integer=MAX_YEAR)
-    timezones = load(tz_source_dir; max_year=max_year)
+    time_zones = load(tz_source_dir; max_year=max_year)
 
     isdir(dest_dir) || error("Destination directory doesn't exist")
     empty!(TIME_ZONES)
 
-    for (name, timezone) in timezones
+    for (name, tz) in time_zones
         parts = split(name, "/")
         tz_dir, tz_file = joinpath(dest_dir, parts[1:end-1]...), parts[end]
 
         isdir(tz_dir) || mkpath(tz_dir)
 
         open(joinpath(tz_dir, tz_file), "w") do fp
-            serialize(fp, timezone)
+            serialize(fp, tz)
         end
     end
 end
