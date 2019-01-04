@@ -105,10 +105,10 @@ struct VariableTimeZone <: TimeZone
     name::String
     transitions::Vector{Transition}
     cutoff::Union{DateTime,Nothing}
-end
 
-function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::Union{DateTime,Nothing}=nothing)
-    return VariableTimeZone(String(name), transitions, cutoff)
+    function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::Union{DateTime,Nothing}=nothing)
+        new(name, transitions, cutoff)
+    end
 end
 
 
