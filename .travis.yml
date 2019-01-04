@@ -4,6 +4,25 @@ stages:
   - name: Documentation (Deploy)
     if: (branch = master AND type != pull_request) OR tag =~ ^v
 
+.doc_test: &doc_test
+  stage: "Documentation (Test)"
+  os: linux
+  julia: 1.0
+  script:
+    - julia --project=docs/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd())); Pkg.build("TimeZones")'
+    - julia --project=docs/ docs/make.jl
+  after_success: skip
+
+.doc_deploy: &doc_deploy
+  stage: "Documentation (Deploy)"
+  os: linux
+  julia: 1.0
+  script:
+    - julia --project=docs/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd())); Pkg.build("TimeZones")'
+    - julia --project=docs/ docs/deploy.jl
+  after_success: skip
+
+# Note: At the moment `codecov: true` and `coveralls: true` are not working.
 language: julia
 os:
   - osx
@@ -13,15 +32,14 @@ julia:
   - 1.0
   - nightly
 env:
-  - JULIA_PROJECT="@."
+  - JULIA_TZ_VERSION="2016j"  # Ideally only set for the "test" stage
 notifications:
   email: false
-env:
-  - JULIA_TZ_VERSION="2016j"
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
   # Avoid setting JULIA_TZ_VERSION if the deps/build.jl file has been modified
   - git fetch origin +:refs/remotes/origin/HEAD; if ! git diff --quiet origin/HEAD HEAD -- deps/build.jl; then unset JULIA_TZ_VERSION; fi
+  - echo $JULIA_TZ_VERSION  # Display version here as Julia 0.7+ doesn't show the build logs by default
   - |
     julia -e '
       using Pkg
@@ -37,27 +55,19 @@ after_success:
       Pkg.add("Coverage"); using Coverage
       Codecov.submit(process_folder())
       Coveralls.submit(Coveralls.process_folder())'
+
 jobs:
   include:
-    - &doctest
-      stage: "Documentation (Test)"
+    - <<: *doc_test
       os: linux
       julia: 1.0
-      script:
-        - julia --project=docs/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd())); Pkg.build("TimeZones")'
-        - julia --project=docs/ docs/make.jl
-      after_success: skip
-    - <<: *doctest
-      julia: nightly
-    - <<: *doctest
-      os: osx
-    - <<: *doctest
-      os: osx
-      julia: nightly
-    - stage: "Documentation (Deploy)"
+    - <<: *doc_test
       os: linux
+      julia: nightly
+    - <<: *doc_test
+      os: osx
       julia: 1.0
-      script:
-        - julia --project=docs/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd())); Pkg.build("TimeZones")'
-        - julia --project=docs/ docs/deploy.jl
-      after_success: skip
+    - <<: *doc_test
+      os: osx
+      julia: nightly
+    - <<: *doc_deploy
