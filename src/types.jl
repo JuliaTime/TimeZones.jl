@@ -1,11 +1,4 @@
-
-# import Compat.Dates: UTInstant, DateTime, TimeZone, Millisecond
-using Compat
-using Compat.Dates
-using Compat: AbstractDateTime
-import Compat.Dates: value, argerror, validargs
-import Base: promote_rule, ==, hash, isequal, isless, typemin, typemax
-import Compat: xor
+using Dates: AbstractDateTime, value, argerror, validargs
 
 const FIXED_TIME_ZONE_REGEX = r"""
     ^(?|
@@ -114,19 +107,11 @@ A `TimeZone` with an offset that changes over time.
 struct VariableTimeZone <: TimeZone
     name::Symbol
     transitions::Vector{Transition}
-    cutoff::Nullable{DateTime}
+    cutoff::Union{DateTime,Nothing}
 end
 
-function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::Nullable{DateTime})
+function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::Union{DateTime,Nothing}=nothing)
     return VariableTimeZone(Symbol(name), transitions, cutoff)
-end
-
-function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::DateTime)
-    return VariableTimeZone(Symbol(name), transitions, Nullable(cutoff))
-end
-
-function VariableTimeZone(name::AbstractString, transitions::Vector{Transition})
-    return VariableTimeZone(Symbol(name), transitions, Nullable{DateTime}())
 end
 
 
@@ -146,7 +131,7 @@ struct ZonedDateTime <: AbstractDateTime
     end
 
     function ZonedDateTime(utc_datetime::DateTime, timezone::VariableTimeZone, zone::FixedTimeZone)
-        if utc_datetime >= get(timezone.cutoff, typemax(DateTime))
+        if timezone.cutoff !== nothing && utc_datetime >= timezone.cutoff
             throw(UnhandledTimeError(timezone))
         end
 
@@ -255,19 +240,19 @@ end
 
 function ZonedDateTime(parts::Union{Period,TimeZone}...)
     periods = Period[]
-    timezone = Nullable{TimeZone}()
+    tz = nothing
     for part in parts
         if isa(part, Period)
             push!(periods, part)
-        elseif isnull(timezone)
-            timezone = Nullable{TimeZone}(part)
+        elseif tz === nothing
+            tz = part
         else
             throw(ArgumentError("Multiple time zones found"))
         end
     end
 
-    isnull(timezone) && throw(ArgumentError("Missing time zone"))
-    return ZonedDateTime(DateTime(periods...), get(timezone))
+    tz === nothing && throw(ArgumentError("Missing time zone"))
+    return ZonedDateTime(DateTime(periods...), tz)
 end
 
 # Promotion
@@ -276,14 +261,14 @@ end
 # undefined promote_rule on TimeType types.
 # Otherwise, typejoin(T,S) is called (returning TimeType) so no conversion happens, and
 # isless(promote(x,y)...) is called again, causing a stack overflow.
-function promote_rule(::Type{T}, ::Type{S}) where {T<:TimeType, S<:ZonedDateTime}
+function Base.promote_rule(::Type{T}, ::Type{S}) where {T<:TimeType, S<:ZonedDateTime}
     error("no promotion exists for ", T, " and ", S)
 end
 
 # Equality
-==(a::ZonedDateTime, b::ZonedDateTime) = a.utc_datetime == b.utc_datetime
-isless(a::ZonedDateTime, b::ZonedDateTime) = isless(a.utc_datetime, b.utc_datetime)
-isequal(a::ZonedDateTime, b::ZonedDateTime) = isequal(a.utc_datetime, b.utc_datetime)
+Base.:(==)(a::ZonedDateTime, b::ZonedDateTime) = a.utc_datetime == b.utc_datetime
+Base.isless(a::ZonedDateTime, b::ZonedDateTime) = isless(a.utc_datetime, b.utc_datetime)
+Base.isequal(a::ZonedDateTime, b::ZonedDateTime) = isequal(a.utc_datetime, b.utc_datetime)
 
 """
     hash(::ZonedDateTime, h)
@@ -291,29 +276,29 @@ isequal(a::ZonedDateTime, b::ZonedDateTime) = isequal(a.utc_datetime, b.utc_date
 Compute an integer hash code for a ZonedDateTime by hashing the `utc_datetime` field.
 `hash(:utc_instant, h)` is used to avoid collisions with `DateTime` hashes.
 """
-function hash(zdt::ZonedDateTime, h::UInt)
+function Base.hash(zdt::ZonedDateTime, h::UInt)
     h = hash(:utc_instant, h)
     h = hash(zdt.utc_datetime, h)
     return h
 end
 
-function ==(a::VariableTimeZone, b::VariableTimeZone)
+function Base.:(==)(a::VariableTimeZone, b::VariableTimeZone)
     a.name == b.name && a.transitions == b.transitions
 end
 
-function hash(tz::VariableTimeZone, h::UInt)
+function Base.hash(tz::VariableTimeZone, h::UInt)
     h = hash(tz.name, h)
     h = hash(tz.transitions, h)
     h = hash(tz.cutoff, h)
     return h
 end
 
-typemin(::Type{ZonedDateTime}) = ZonedDateTime(typemin(DateTime), utc_tz; from_utc=true)
-typemax(::Type{ZonedDateTime}) = ZonedDateTime(typemax(DateTime), utc_tz; from_utc=true)
+Base.typemin(::Type{ZonedDateTime}) = ZonedDateTime(typemin(DateTime), utc_tz; from_utc=true)
+Base.typemax(::Type{ZonedDateTime}) = ZonedDateTime(typemax(DateTime), utc_tz; from_utc=true)
 
-function validargs(::Type{ZonedDateTime}, y::Int64, m::Int64, d::Int64, h::Int64, mi::Int64, s::Int64, ms::Int64, tz::AbstractString)
+function Dates.validargs(::Type{ZonedDateTime}, y::Int64, m::Int64, d::Int64, h::Int64, mi::Int64, s::Int64, ms::Int64, tz::AbstractString)
     err = validargs(DateTime, y, m, d, h, mi, s, ms)
-    isnull(err) || return err
+    err === nothing || return err
     istimezone(tz) || return argerror("TimeZone: \"$str\" is not a recognized time zone")
     return argerror()
 end

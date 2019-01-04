@@ -1,5 +1,5 @@
-import TimeZones: Transition
-import Compat.Dates: Hour, Second, UTM
+using TimeZones: Transition
+using Dates: Hour, Second, UTM
 
 
 # Constructor FixedTimeZone from a string.

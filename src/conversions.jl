@@ -1,6 +1,5 @@
-import Compat.Dates: unix2datetime, datetime2unix, julian2datetime, datetime2julian,
-    now, today
-using Mocking
+using Dates: unix2datetime, datetime2unix, julian2datetime, datetime2julian
+using Mocking: Mocking, @mock
 
 # UTC is an abstract type defined in Dates, for some reason
 const utc_tz = FixedTimeZone("UTC")
@@ -17,7 +16,7 @@ DateTime(zdt::ZonedDateTime) = localtime(zdt)
 
 Returns a `ZonedDateTime` corresponding to the user's system time in the specified `TimeZone`.
 """
-function now(tz::TimeZone)
+function Dates.now(tz::TimeZone)
     utc = unix2datetime(time())
     ZonedDateTime(utc, tz, from_utc=true)
 end
@@ -40,7 +39,7 @@ julia> today(tz"Pacific/Midway"), today(tz"Pacific/Apia")
 (2017-11-09, 2017-11-10)
 ```
 """
-today(tz::TimeZone) = Date(localtime(now(tz)))
+Dates.today(tz::TimeZone) = Date(localtime(now(tz)))
 
 """
     todayat(tod::Time, tz::TimeZone, [amb]) -> ZonedDateTime

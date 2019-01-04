@@ -1,5 +1,3 @@
-import Compat: @static, devnull
-
 """
     extract(archive, directory, [files]; [verbose=false]) -> Void
 

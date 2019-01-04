@@ -45,7 +45,7 @@ if lowercase(get(ENV, "CI", "false")) == "true"
     warsaw = TimeZone("Europe/Warsaw")
 
     @test last(warsaw.transitions).utc_datetime == DateTime(2037, 10, 25, 1)
-    @test get(warsaw.cutoff) == DateTime(2038, 3, 28, 1)
+    @test warsaw.cutoff == DateTime(2038, 3, 28, 1)
     @test_throws TimeZones.UnhandledTimeError ZonedDateTime(DateTime(2039), warsaw)
 
     TimeZones.TZData.compile(max_year=2200)
@@ -53,7 +53,7 @@ if lowercase(get(ENV, "CI", "false")) == "true"
 
     @test warsaw !== new_warsaw
     @test last(new_warsaw.transitions).utc_datetime == DateTime(2200, 10, 26, 1)
-    @test get(new_warsaw.cutoff) == DateTime(2201, 3, 29, 1)
+    @test new_warsaw.cutoff == DateTime(2201, 3, 29, 1)
     ZonedDateTime(2100, new_warsaw)  # Test this doesn't throw an exception
 
     @test_throws TimeZones.UnhandledTimeError ZonedDateTime(2100, warsaw)
@@ -62,6 +62,6 @@ if lowercase(get(ENV, "CI", "false")) == "true"
     # Using the tz string macro which runs at parse time means that the resulting TimeZone
     # will not reflect changes made from compile or new builds during runtime.
     @test tz"Africa/Windhoek" != TimeZone("Africa/Windhoek")
-    @test get(tz"Africa/Windhoek".cutoff, typemax(DateTime)) != DateTime(2201, 4, 5)
-    @test get(TimeZone("Africa/Windhoek").cutoff) == DateTime(2201, 4, 5)
+    @test tz"Africa/Windhoek".cutoff != DateTime(2201, 4, 5)
+    @test TimeZone("Africa/Windhoek").cutoff == DateTime(2201, 4, 5)
 end

@@ -1,5 +1,4 @@
-import Base: +, -, isequal, isless, print, show
-import Compat.Dates: AbstractTime, Second, value
+using Dates: AbstractTime, Second, value
 
 # Note: The IANA time zone database rounds offset precision to the nearest second
 # See "America/New_York" notes in tzdata file "northamerica" for an example.
@@ -22,21 +21,21 @@ function UTCOffset(std_offset::Integer, dst_offset::Integer=0)
     UTCOffset(Second(std_offset), Second(dst_offset))
 end
 
-value(offset::UTCOffset) = value(offset.std + offset.dst)
+Dates.value(offset::UTCOffset) = value(offset.std + offset.dst)
 
-(+)(dt::DateTime, offset::UTCOffset) = dt + (offset.std + offset.dst)
-(-)(dt::DateTime, offset::UTCOffset) = dt - (offset.std + offset.dst)
-(-)(a::UTCOffset, b::UTCOffset) = UTCOffset(a.std - b.std, a.dst - b.dst)
+Base.:(+)(dt::DateTime, offset::UTCOffset) = dt + (offset.std + offset.dst)
+Base.:(-)(dt::DateTime, offset::UTCOffset) = dt - (offset.std + offset.dst)
+Base.:(-)(a::UTCOffset, b::UTCOffset) = UTCOffset(a.std - b.std, a.dst - b.dst)
 
 # Determines if the given `UTCOffset` is an offset for daylight saving time.
 isdst(offset::UTCOffset) = offset.dst != Second(0)
 
 # Two `UTCOffset`s can be considered equal if the total offset is the same and they are
 # both either offsets for standard time or daylight saving time.
-function isequal(x::UTCOffset, y::UTCOffset)
+function Base.isequal(x::UTCOffset, y::UTCOffset)
     x == y || value(x) == value(y) && isdst(x) == isdst(y)
 end
-isless(x::UTCOffset, y::UTCOffset) = isless(value(x), value(y))
+Base.isless(x::UTCOffset, y::UTCOffset) = isless(value(x), value(y))
 
 function offset_string(seconds::Second, iso8601::Bool=false)
     val = value(seconds)
@@ -57,8 +56,8 @@ function offset_string(offset::UTCOffset, iso8601::Bool=false)
     offset_string(offset.std + offset.dst, iso8601)
 end
 
-print(io::IO, o::UTCOffset) = print(io, offset_string(o, true))
-function show(io::IO, o::UTCOffset)
+Base.print(io::IO, o::UTCOffset) = print(io, offset_string(o, true))
+function Base.show(io::IO, o::UTCOffset)
     # Show DST as a separate offset since we want to distinguish between normal hourly
     # daylight saving time offsets and exotic DST offsets (e.g. midsummer time).
     print(io, "UTC", offset_string(o.std), "/", offset_string(o.dst))

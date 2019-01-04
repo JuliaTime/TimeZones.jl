@@ -1,7 +1,6 @@
-import TimeZones: TimeZone, localzone
-import Mocking: @patch, apply
-import Base: AbstractCmd
-import Compat: Sys, read
+using Base: AbstractCmd
+using Mocking: @patch, apply
+using TimeZones: TimeZone, localzone
 
 # For mocking make sure we are actually changing the time zone
 name = string(localzone()) == "Europe/Warsaw" ? "Pacific/Apia" : "Europe/Warsaw"

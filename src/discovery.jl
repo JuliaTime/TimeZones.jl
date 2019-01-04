@@ -1,5 +1,4 @@
-using Mocking
-using Compat: stdout
+using Mocking: Mocking, @mock
 
 """
     timezone_names() -> Array{AbstractString}

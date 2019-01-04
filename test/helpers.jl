@@ -1,9 +1,8 @@
 # Utility functions for testing
-import Compat
 
 function ignore_output(body::Function; stdout::Bool=true, stderr::Bool=true)
-    out_old = Compat.stdout
-    err_old = Compat.stderr
+    out_old = Base.stdout
+    err_old = Base.stderr
 
     if stdout
         (out_rd, out_wr) = redirect_stdout()

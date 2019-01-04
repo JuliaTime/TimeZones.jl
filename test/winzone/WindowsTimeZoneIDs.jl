@@ -1,4 +1,4 @@
-import TimeZones.WindowsTimeZoneIDs
+using TimeZones.WindowsTimeZoneIDs
 
 xml_file = TimeZones.WindowsTimeZoneIDs.WINDOWS_XML_FILE
 !isfile(xml_file) && error("Missing required XML file. Run Pkg.build(\"TimeZones\").")

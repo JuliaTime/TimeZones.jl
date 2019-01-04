@@ -18,11 +18,12 @@ function build(
     compiled_dir::AbstractString="";
     verbose::Bool=false,
 )
-    # Avoids spaming remote servers requesting the latest version
+    # Avoids spamming remote servers requesting the latest version
     if version == "latest"
-        version = get(latest_version(), "latest")
+        v = latest_version()
 
-        if version != "latest"
+        if v !== nothing
+            version = v
             @info "Latest tzdata is $version"
         end
     end

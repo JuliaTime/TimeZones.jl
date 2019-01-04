@@ -1,5 +1,5 @@
-import TimeZones: timezone_names
-import Compat.Dates: Millisecond
+using TimeZones: timezone_names
+using Dates: Millisecond
 
 
 names = timezone_names()

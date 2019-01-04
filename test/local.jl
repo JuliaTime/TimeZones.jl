@@ -1,5 +1,4 @@
-import TimeZones: TimeZone, localzone, parse_tz_format
-import Compat: Sys
+using TimeZones: TimeZone, localzone, parse_tz_format
 
 # Parse the TZ environment variable format
 # Should mirror the behaviour of running:

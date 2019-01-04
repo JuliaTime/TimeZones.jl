@@ -1,4 +1,4 @@
-import Compat.Dates: Day, Hour, Minute
+using Dates: Day, Hour, Minute
 
 
 utc = FixedTimeZone("UTC", 0)
@@ -94,12 +94,8 @@ range = ZonedDateTime(2015, 11, 1, dst):Dates.Hour(1):ZonedDateTime(2015, 11, 3,
 ]
 
 # default step for a ZonedDateTime range
-if VERSION < v"0.7.0-DEV.2778"
-    range = ZonedDateTime(2017, 10, 1, 9, utc):ZonedDateTime(2017, 12, 8, 23, utc)
-    @test step(range) == Dates.Day(1)
-elseif VERSION < v"0.7-DEV+"  # Currently failing on Julia 0.7-DEV. Disabling for now.
-    @test_warn(
-        "colon(start::T, stop::T) where T <: ZonedDateTime is deprecated, use start:Day(1):stop instead.",
-        ZonedDateTime(2017, 10, 1, 9, utc):ZonedDateTime(2017, 12, 8, 23, utc)
-    )
-end
+# Currently unable to test the deprecation
+# @test_warn(
+#     "colon(start::T, stop::T) where T <: ZonedDateTime is deprecated, use start:Day(1):stop instead.",
+#     ZonedDateTime(2017, 10, 1, 9, utc):ZonedDateTime(2017, 12, 8, 23, utc)
+# )

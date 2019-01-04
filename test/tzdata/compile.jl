@@ -1,6 +1,6 @@
-import TimeZones: Transition
-import TimeZones.TZData: ZoneDict, RuleDict, zoneparse, ruleparse, resolve, parse_date, order_rules
-import Compat.Dates: Hour, Minute, Second, DateTime, Date
+using TimeZones: Transition
+using TimeZones.TZData: ZoneDict, RuleDict, zoneparse, ruleparse, resolve, parse_date, order_rules
+using Dates: Hour, Minute, Second, DateTime, Date
 
 ### parse_date ###
 
@@ -175,7 +175,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
         @test tz.transitions[7] == Transition(DateTime(1947,6,8,12,30), zone["HST_NEW"])
 
         @test length(tz.transitions) == 7
-        @test isnull(tz.cutoff)
+        @test tz.cutoff === nothing
     end
 
     # Zone Pacific/Apia contains the following properties which make it good for testing:
@@ -291,7 +291,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
 
         @test tz.transitions[1] == Transition(typemin(DateTime), zone["CUT-1"])
         @test tz.transitions[2] == Transition(DateTime(1933,4,1,12), zone["CUT-2"])
-        @test isnull(tz.cutoff)
+        @test tz.cutoff === nothing
 
         tz = resolve("Pacific/Cutoff", zones, rules, max_year=1900)
 
@@ -299,7 +299,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
         # when a cutoff is included.
         @test isa(tz, VariableTimeZone)
         @test length(tz.transitions) == 1
-        @test get(tz.cutoff) == DateTime(1933,4,1,12)
+        @test tz.cutoff == DateTime(1933,4,1,12)
     end
 
     # Behaviour of mixing "RULES" as a String and as a Time. In reality this behaviour has never
