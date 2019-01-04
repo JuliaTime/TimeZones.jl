@@ -29,7 +29,7 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
 
 const PKG_DIR = normpath(joinpath(dirname(@__FILE__), ".."))
 const DEPS_DIR = joinpath(PKG_DIR, "deps")
-const TIME_ZONES = Dict{AbstractString,TimeZone}()
+const TIME_ZONES = Dict{String,TimeZone}()
 
 function __init__()
     # Base extension needs to happen everytime the module is loaded (issue #24)
@@ -97,7 +97,7 @@ function istimezone(str::AbstractString)
 end
 
 """
-    build(version="latest", regions=REGIONS; force=false) -> Void
+    build(version="latest", regions=REGIONS; force=false) -> Nothing
 
 Builds the TimeZones package with the specified tzdata `version` and `regions`. The
 `version` is typically a 4-digit year followed by a lowercase ASCII letter (e.g. "2016j").

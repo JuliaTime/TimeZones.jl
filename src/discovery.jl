@@ -1,14 +1,14 @@
 using Mocking: Mocking, @mock
 
 """
-    timezone_names() -> Array{AbstractString}
+    timezone_names() -> Vector{String}
 
 Returns a sorted list of all of the valid names for constructing a `TimeZone`.
 """
 function timezone_names()
     # Note: IANA time zone names are typically encoded only in ASCII.
-    names = AbstractString[]
-    check = Tuple{AbstractString,AbstractString}[(COMPILED_DIR, "")]
+    names = String[]
+    check = Tuple{String,String}[(COMPILED_DIR, "")]
 
     for (dir, partial) in check
         for filename in readdir(dir)
@@ -29,7 +29,7 @@ function timezone_names()
 end
 
 """
-    all_timezones() -> Array{TimeZone}
+    all_timezones() -> Vector{TimeZone}
 
 Returns all pre-computed `TimeZone`s.
 """
@@ -42,7 +42,7 @@ function all_timezones()
 end
 
 """
-    all_timezones(criteria::Function) -> Array{TimeZone}
+    all_timezones(criteria::Function) -> Vector{TimeZone}
 
 Returns `TimeZone`s that match the given `criteria` function. The `criteria` function takes
 two parameters: UTC transition (`DateTime`) and transition zone (`FixedTimeZone`).
@@ -83,13 +83,13 @@ function all_timezones(criteria::Function)
 end
 
 """
-    timezones_from_abbr(abbr) -> Array{TimeZone}
+    timezones_from_abbr(abbr) -> Vector{TimeZone}
 
 Returns all `TimeZone`s that have the specified abbrevation
 """
 function timezones_from_abbr end
 
-function timezones_from_abbr(abbr::Symbol)
+function timezones_from_abbr(abbr::AbstractString)
     results = TimeZone[]
     for tz in all_timezones()
         if isa(tz, FixedTimeZone)
@@ -105,21 +105,20 @@ function timezones_from_abbr(abbr::Symbol)
     end
     return results
 end
-timezones_from_abbr(abbr::AbstractString) = timezones_from_abbr(Symbol(abbr))
 
 """
-    timezone_abbrs -> Array{AbstractString}
+    timezone_abbrs -> Vector{String}
 
 Returns a sorted list of all pre-computed time zone abbrevations.
 """
 function timezone_abbrs()
-    abbrs = Set{AbstractString}()
+    abbrs = Set{String}()
     for tz in all_timezones()
         if isa(tz, FixedTimeZone)
-            push!(abbrs, string(tz.name))
+            push!(abbrs, tz.name)
         else
             for t in tz.transitions
-                push!(abbrs, string(t.zone.name))
+                push!(abbrs, t.zone.name)
             end
         end
     end
@@ -216,7 +215,7 @@ function show_next_transition(io::IO, zdt::ZonedDateTime)
     direction = value(to.zone.offset - from.zone.offset) < 0 ? "Backward" : "Forward"
 
     function zdt_format(zdt)
-        name_suffix = string(zdt.zone.name)
+        name_suffix = zdt.zone.name
         !isempty(name_suffix) && (name_suffix = string(" (", name_suffix, ")"))
         string(
             Dates.format(zdt, dateformat"yyyy-mm-ddTHH:MM:SS.sss"),

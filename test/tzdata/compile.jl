@@ -118,10 +118,10 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
 
         # Europe/Warsaw time zone has a combination of factors that requires computing
         # the abbreviation to be done in a specific way.
-        @test tz.transitions[1].zone.name == :LMT
-        @test tz.transitions[2].zone.name == :WMT
-        @test tz.transitions[3].zone.name == :CET   # Standard time
-        @test tz.transitions[4].zone.name == :CEST  # Daylight saving time
+        @test tz.transitions[1].zone.name == "LMT"
+        @test tz.transitions[2].zone.name == "WMT"
+        @test tz.transitions[3].zone.name == "CET"   # Standard time
+        @test tz.transitions[4].zone.name == "CEST"  # Daylight saving time
         @test issorted(tz.transitions)
 
         zone = Dict{AbstractString,FixedTimeZone}()

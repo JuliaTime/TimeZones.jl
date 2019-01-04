@@ -63,12 +63,12 @@ local_dt = DateTime(1916, 2, 1, 0)
 utc_dt = DateTime(1916, 1, 31, 23)
 
 # Disambiguating parameters ignored when there is no ambiguity.
-@test ZonedDateTime(local_dt, warsaw).zone.name == :CET
-@test ZonedDateTime(local_dt, warsaw, 1).zone.name == :CET
-@test ZonedDateTime(local_dt, warsaw, 2).zone.name == :CET
-@test ZonedDateTime(local_dt, warsaw, true).zone.name == :CET
-@test ZonedDateTime(local_dt, warsaw, false).zone.name == :CET
-@test ZonedDateTime(utc_dt, warsaw, from_utc=true).zone.name == :CET
+@test ZonedDateTime(local_dt, warsaw).zone.name == "CET"
+@test ZonedDateTime(local_dt, warsaw, 1).zone.name == "CET"
+@test ZonedDateTime(local_dt, warsaw, 2).zone.name == "CET"
+@test ZonedDateTime(local_dt, warsaw, true).zone.name == "CET"
+@test ZonedDateTime(local_dt, warsaw, false).zone.name == "CET"
+@test ZonedDateTime(utc_dt, warsaw, from_utc=true).zone.name == "CET"
 
 @test ZonedDateTime(local_dt, warsaw).utc_datetime == utc_dt
 @test ZonedDateTime(local_dt, warsaw, 1).utc_datetime == utc_dt
@@ -83,12 +83,12 @@ local_dt = DateTime(1916, 6, 1, 0)
 utc_dt = DateTime(1916, 5, 31, 22)
 
 # Disambiguating parameters ignored when there is no ambiguity.
-@test ZonedDateTime(local_dt, warsaw).zone.name == :CEST
-@test ZonedDateTime(local_dt, warsaw, 1).zone.name == :CEST
-@test ZonedDateTime(local_dt, warsaw, 2).zone.name == :CEST
-@test ZonedDateTime(local_dt, warsaw, true).zone.name == :CEST
-@test ZonedDateTime(local_dt, warsaw, false).zone.name == :CEST
-@test ZonedDateTime(utc_dt, warsaw, from_utc=true).zone.name == :CEST
+@test ZonedDateTime(local_dt, warsaw).zone.name == "CEST"
+@test ZonedDateTime(local_dt, warsaw, 1).zone.name == "CEST"
+@test ZonedDateTime(local_dt, warsaw, 2).zone.name == "CEST"
+@test ZonedDateTime(local_dt, warsaw, true).zone.name == "CEST"
+@test ZonedDateTime(local_dt, warsaw, false).zone.name == "CEST"
+@test ZonedDateTime(utc_dt, warsaw, from_utc=true).zone.name == "CEST"
 
 @test ZonedDateTime(local_dt, warsaw).utc_datetime == utc_dt
 @test ZonedDateTime(local_dt, warsaw, 1).utc_datetime == utc_dt
@@ -114,10 +114,10 @@ utc_dts = (
 @test_throws NonExistentTimeError ZonedDateTime(local_dts[2], warsaw, true)
 @test_throws NonExistentTimeError ZonedDateTime(local_dts[2], warsaw, false)
 
-@test ZonedDateTime(local_dts[1], warsaw).zone.name == :CET
-@test ZonedDateTime(local_dts[3], warsaw).zone.name == :CEST
-@test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).zone.name == :CET
-@test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).zone.name == :CEST
+@test ZonedDateTime(local_dts[1], warsaw).zone.name == "CET"
+@test ZonedDateTime(local_dts[3], warsaw).zone.name == "CEST"
+@test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).zone.name == "CET"
+@test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).zone.name == "CEST"
 
 @test ZonedDateTime(local_dts[1], warsaw).utc_datetime == utc_dts[1]
 @test ZonedDateTime(local_dts[3], warsaw).utc_datetime == utc_dts[2]
@@ -130,12 +130,12 @@ local_dt = DateTime(1916, 10, 1, 0)
 utc_dts = (DateTime(1916, 9, 30, 22), DateTime(1916, 9, 30, 23))
 @test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw)
 
-@test ZonedDateTime(local_dt, warsaw, 1).zone.name == :CEST
-@test ZonedDateTime(local_dt, warsaw, 2).zone.name == :CET
-@test ZonedDateTime(local_dt, warsaw, true).zone.name == :CEST
-@test ZonedDateTime(local_dt, warsaw, false).zone.name == :CET
-@test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).zone.name == :CEST
-@test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).zone.name == :CET
+@test ZonedDateTime(local_dt, warsaw, 1).zone.name == "CEST"
+@test ZonedDateTime(local_dt, warsaw, 2).zone.name == "CET"
+@test ZonedDateTime(local_dt, warsaw, true).zone.name == "CEST"
+@test ZonedDateTime(local_dt, warsaw, false).zone.name == "CET"
+@test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).zone.name == "CEST"
+@test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).zone.name == "CET"
 
 @test ZonedDateTime(local_dt, warsaw, 1).utc_datetime == utc_dts[1]
 @test ZonedDateTime(local_dt, warsaw, 2).utc_datetime == utc_dts[2]
@@ -149,12 +149,12 @@ local_dt = DateTime(1922,5,31,23)
 utc_dts = (DateTime(1922, 5, 31, 21), DateTime(1922, 5, 31, 22))
 @test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw)
 
-@test ZonedDateTime(local_dt, warsaw, 1).zone.name == :EET
-@test ZonedDateTime(local_dt, warsaw, 2).zone.name == :CET
+@test ZonedDateTime(local_dt, warsaw, 1).zone.name == "EET"
+@test ZonedDateTime(local_dt, warsaw, 2).zone.name == "CET"
 @test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw, true)
 @test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw, false)
-@test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).zone.name == :EET
-@test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).zone.name == :CET
+@test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).zone.name == "EET"
+@test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).zone.name == "CET"
 
 @test ZonedDateTime(local_dt, warsaw, 1).utc_datetime == utc_dts[1]
 @test ZonedDateTime(local_dt, warsaw, 2).utc_datetime == utc_dts[2]
@@ -254,14 +254,14 @@ dup = VariableTimeZone("DuplicateTest", [
 
 # Make sure that the duplicated hour only doesn't contain an additional entry.
 @test_throws AmbiguousTimeError ZonedDateTime(DateTime(1935,9,1), dup)
-@test ZonedDateTime(DateTime(1935,9,1), dup, 1).zone.name == Symbol("DTDT-2")
-@test ZonedDateTime(DateTime(1935,9,1), dup, 2).zone.name == :DTST
+@test ZonedDateTime(DateTime(1935,9,1), dup, 1).zone.name == "DTDT-2"
+@test ZonedDateTime(DateTime(1935,9,1), dup, 2).zone.name == "DTST"
 @test_throws BoundsError ZonedDateTime(DateTime(1935,9,1), dup, 3)
 
 # Ensure that DTDT-1 is completely ignored.
 @test_throws NonExistentTimeError ZonedDateTime(DateTime(1935,4,1), dup)
-@test ZonedDateTime(DateTime(1935,4,1,1), dup).zone.name == Symbol("DTDT-2")
-@test ZonedDateTime(DateTime(1935,8,31,23), dup).zone.name == Symbol("DTDT-2")
+@test ZonedDateTime(DateTime(1935,4,1,1), dup).zone.name == "DTDT-2"
+@test ZonedDateTime(DateTime(1935,8,31,23), dup).zone.name == "DTDT-2"
 
 
 # Check equality between ZonedDateTimes
