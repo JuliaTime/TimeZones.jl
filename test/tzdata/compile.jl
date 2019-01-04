@@ -1,54 +1,58 @@
 import TimeZones: Transition
-import TimeZones.TZData: ZoneDict, RuleDict, zoneparse, ruleparse, resolve, parsedate, order_rules
+import TimeZones.TZData: ZoneDict, RuleDict, zoneparse, ruleparse, resolve, parse_date, order_rules
 import Compat.Dates: Hour, Minute, Second, DateTime, Date
 
-### parsedate ###
+### parse_date ###
 
 # Variations of until dates
-@test parsedate("1945") == (DateTime(1945), 'w')
-@test parsedate("1945 Aug") == (DateTime(1945,8), 'w')
-@test parsedate("1945 Aug 2") == (DateTime(1945,8,2), 'w')
-@test parsedate("1945 Aug 2 12") == (DateTime(1945,8,2,12), 'w')  # Doesn't actually occur
-@test parsedate("1945 Aug 2 12:34") == (DateTime(1945,8,2,12,34), 'w')
-@test parsedate("1945 Aug 2 12:34:56") == (DateTime(1945,8,2,12,34,56), 'w')
+@test parse_date("1945") == (DateTime(1945), 'w')
+@test parse_date("1945 Aug") == (DateTime(1945,8), 'w')
+@test parse_date("1945 Aug 2") == (DateTime(1945,8,2), 'w')
+@test parse_date("1945 Aug 2 12") == (DateTime(1945,8,2,12), 'w')  # Doesn't actually occur
+@test parse_date("1945 Aug 2 12:34") == (DateTime(1945,8,2,12,34), 'w')
+@test parse_date("1945 Aug 2 12:34:56") == (DateTime(1945,8,2,12,34,56), 'w')
 
 # Make sure parsing can handle additional spaces.
-@test parsedate("1945  Aug") == (DateTime(1945,8), 'w')
-@test parsedate("1945  Aug  2") == (DateTime(1945,8,2), 'w')
-@test parsedate("1945  Aug  2  12") == (DateTime(1945,8,2,12), 'w')
-@test parsedate("1945  Aug  2  12:34") == (DateTime(1945,8,2,12,34), 'w')
-@test parsedate("1945  Aug  2  12:34:56") == (DateTime(1945,8,2,12,34,56), 'w')
+@test parse_date("1945  Aug") == (DateTime(1945,8), 'w')
+@test parse_date("1945  Aug  2") == (DateTime(1945,8,2), 'w')
+@test parse_date("1945  Aug  2  12") == (DateTime(1945,8,2,12), 'w')
+@test parse_date("1945  Aug  2  12:34") == (DateTime(1945,8,2,12,34), 'w')
+@test parse_date("1945  Aug  2  12:34:56") == (DateTime(1945,8,2,12,34,56), 'w')
+
+# Rollover at the end of the year
+@test parse_date("2017 Dec Sun>=31 24:00") == (DateTime(2018,1,1), 'w')
 
 # Explicit zone "local wall time"
-@test_throws ArgumentError parsedate("1945w")
-@test_throws Exception parsedate("1945 Augw")  # Julia <=0.6 KeyError, 0.6 ArgumentError
-@test_throws ArgumentError parsedate("1945 Aug 2w")
-@test parsedate("1945 Aug 2 12w") == (DateTime(1945,8,2,12), 'w')
-@test parsedate("1945 Aug 2 12:34w") == (DateTime(1945,8,2,12,34), 'w')
-@test parsedate("1945 Aug 2 12:34:56w") == (DateTime(1945,8,2,12,34,56), 'w')
+@test_throws ArgumentError parse_date("1945w")
+@test_throws Exception parse_date("1945 Augw")  # Julia <=0.6 KeyError, 0.6 ArgumentError
+@test_throws ArgumentError parse_date("1945 Aug 2w")
+@test parse_date("1945 Aug 2 12w") == (DateTime(1945,8,2,12), 'w')
+@test parse_date("1945 Aug 2 12:34w") == (DateTime(1945,8,2,12,34), 'w')
+@test parse_date("1945 Aug 2 12:34:56w") == (DateTime(1945,8,2,12,34,56), 'w')
 
 # Explicit zone "UTC time"
-@test_throws ArgumentError parsedate("1945u")
-@test_throws Exception parsedate("1945 Augu")
-@test_throws ArgumentError parsedate("1945 Aug 2u")
-@test parsedate("1945 Aug 2 12u") == (DateTime(1945,8,2,12), 'u')
-@test parsedate("1945 Aug 2 12:34u") == (DateTime(1945,8,2,12,34), 'u')
-@test parsedate("1945 Aug 2 12:34:56u") == (DateTime(1945,8,2,12,34,56), 'u')
+@test_throws ArgumentError parse_date("1945u")
+@test_throws Exception parse_date("1945 Augu")
+@test_throws ArgumentError parse_date("1945 Aug 2u")
+@test parse_date("1945 Aug 2 12u") == (DateTime(1945,8,2,12), 'u')
+@test parse_date("1945 Aug 2 12:34u") == (DateTime(1945,8,2,12,34), 'u')
+@test parse_date("1945 Aug 2 12:34:56u") == (DateTime(1945,8,2,12,34,56), 'u')
 
 # Explicit zone "standard time"
-@test_throws ArgumentError parsedate("1945s")
-@test_throws Exception parsedate("1945 Augs")
-@test_throws ArgumentError parsedate("1945 Aug 2s")
-@test parsedate("1945 Aug 2 12s") == (DateTime(1945,8,2,12), 's')
-@test parsedate("1945 Aug 2 12:34s") == (DateTime(1945,8,2,12,34), 's')
-@test parsedate("1945 Aug 2 12:34:56s") == (DateTime(1945,8,2,12,34,56), 's')
+@test_throws ArgumentError parse_date("1945s")
+@test_throws Exception parse_date("1945 Augs")
+@test_throws ArgumentError parse_date("1945 Aug 2s")
+@test parse_date("1945 Aug 2 12s") == (DateTime(1945,8,2,12), 's')
+@test parse_date("1945 Aug 2 12:34s") == (DateTime(1945,8,2,12,34), 's')
+@test parse_date("1945 Aug 2 12:34:56s") == (DateTime(1945,8,2,12,34,56), 's')
 
 # Invalid zone
-@test_throws ArgumentError parsedate("1945 Aug 2 12:34i")
+@test_throws ArgumentError parse_date("1945 Aug 2 12:34i")
 
 # Actual dates found tzdata files
-@test parsedate("2011 Dec 29 24:00") == (DateTime(2011,12,30), 'w')  # Pacific/Apia (2014f)
-@test parsedate("1945 Sep 30 24:00") == (DateTime(1945,10,1), 'w')  # Asia/Macau (2018f)
+@test parse_date("2011 Dec 29 24:00") == (DateTime(2011,12,30), 'w')      # Pacific/Apia (2014f)
+@test parse_date("1945 Sep 30 24:00") == (DateTime(1945,10,1), 'w')       # Asia/Macau (2018f)
+@test parse_date("2019 Mar Sun>=8 3:00") == (DateTime(2019,3,10,3), 'w')  # America/Metlakatla (2018h)
 
 
 ### order_rules ###
