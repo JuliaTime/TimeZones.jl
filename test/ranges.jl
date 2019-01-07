@@ -2,8 +2,8 @@ using Dates: Day, Hour, Minute
 
 
 utc = FixedTimeZone("UTC", 0)
-dst = resolve("America/Winnipeg", tzdata["northamerica"]...)
-no_dst = resolve("America/Regina", tzdata["northamerica"]...)
+dst = compile("America/Winnipeg", tzdata["northamerica"])
+no_dst = compile("America/Regina", tzdata["northamerica"])
 fixed = FixedTimeZone("Fixed", -5 * 3600)
 
 

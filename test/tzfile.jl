@@ -40,7 +40,7 @@ open(joinpath(TZFILE_DIR, "Etc", "GMT-6")) do f
     @test tz == utc_plus_6
 end
 
-warsaw = resolve("Europe/Warsaw", tzdata["europe"]...)
+warsaw = compile("Europe/Warsaw", tzdata["europe"])
 open(joinpath(TZFILE_DIR, "Europe", "Warsaw")) do f
     tz = TimeZones.read_tzfile(f, "Europe/Warsaw")
     @test string(tz) == "Europe/Warsaw"
@@ -74,7 +74,7 @@ open(joinpath(TZFILE_DIR, "Europe", "Warsaw (Version 2)")) do f
 end
 
 
-godthab = resolve("America/Godthab", tzdata["europe"]...)
+godthab = compile("America/Godthab", tzdata["europe"])
 open(joinpath(TZFILE_DIR, "America", "Godthab")) do f
     tz = TimeZones.read_tzfile(f, "America/Godthab")
     @test string(tz) == "America/Godthab"
@@ -109,7 +109,7 @@ end
 # "Pacific/Apia" was the time zone I was thinking could be an issue for the
 # DST calculation. The entire day of 2011/12/30 was skipped when they changed from a
 # -11:00 GMT offset to 13:00 GMT offset
-apia = resolve("Pacific/Apia", tzdata["australasia"]...)
+apia = compile("Pacific/Apia", tzdata["australasia"])
 open(joinpath(TZFILE_DIR, "Pacific", "Apia")) do f
     tz = TimeZones.read_tzfile(f, "Pacific/Apia")
     @test string(tz) == "Pacific/Apia"
@@ -123,7 +123,7 @@ end
 # time then the resulting utc and dst might not be quite right. Most notably during
 # midsomer back in 1940's there were 2 different dst one after another, we get a
 # different utc and dst than Olson.
-paris = resolve("Europe/Paris", tzdata["europe"]...)
+paris = compile("Europe/Paris", tzdata["europe"])
 open(joinpath(TZFILE_DIR, "Europe", "Paris")) do f
     tz = TimeZones.read_tzfile(f, "Europe/Paris")
     @test string(tz) == "Europe/Paris"
@@ -141,7 +141,7 @@ open(joinpath(TZFILE_DIR, "Europe", "Paris")) do f
     @test all(map(issimilar, tz_transitions[neg_mask], paris_transitions[neg_mask]))
 end
 
-madrid = resolve("Europe/Madrid", tzdata["europe"]...)
+madrid = compile("Europe/Madrid", tzdata["europe"])
 open(joinpath(TZFILE_DIR, "Europe", "Madrid")) do f
     tz = TimeZones.read_tzfile(f, "Europe/Madrid")
     @test string(tz) == "Europe/Madrid"
@@ -161,7 +161,7 @@ end
 
 
 # "Australia/Perth" test processing a tzfile that should not contain a cutoff
-perth = resolve("Australia/Perth", tzdata["australasia"]...)
+perth = compile("Australia/Perth", tzdata["australasia"])
 open(joinpath(TZFILE_DIR, "Australia", "Perth")) do f
     tz = TimeZones.read_tzfile(f, "Australia/Perth")
     @test string(tz) == "Australia/Perth"
