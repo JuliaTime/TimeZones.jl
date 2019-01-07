@@ -11,7 +11,7 @@ using ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET, MIN_SAVE, MAX_
 struct Zone
     gmtoffset::TimeOffset
     save::TimeOffset
-    rules::AbstractString
+    rules::Union{String,Nothing}
     format::AbstractString
     until::Union{DateTime,Nothing}
     until_flag::Char
@@ -270,7 +270,7 @@ function Base.parse(::Type{Zone}, str::AbstractString)
         save_offset = ZERO
     end
 
-    return Zone(gmt_offset, save_offset, rule_name !== nothing ? rule_name : "", abbr_format, until, until_flag)
+    return Zone(gmt_offset, save_offset, rule_name, abbr_format, until, until_flag)
 end
 
 """
@@ -386,7 +386,7 @@ function resolve!(zone_name::AbstractString, zoneset::ZoneDict, ruleset::RuleDic
         until = something(zone.until, max_until)
         cutoff = nothing  # Reset cutoff
 
-        if rule_name == ""
+        if rule_name === nothing
             save = zone.save
             abbr = abbr_string(format, save)
 
