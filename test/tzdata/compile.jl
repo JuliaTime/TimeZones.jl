@@ -1,5 +1,5 @@
 using TimeZones: Transition
-using TimeZones.TZData: ZoneDict, RuleDict, zoneparse, ruleparse, resolve, parse_date, order_rules
+using TimeZones.TZData: ZoneDict, RuleDict, Zone, Rule, resolve, parse_date, order_rules
 using Dates: Hour, Minute, Second, DateTime, Date
 
 ### parse_date ###
@@ -60,9 +60,9 @@ using Dates: Hour, Minute, Second, DateTime, Date
 # Rule    Poland  1918    1919    -   Sep 16  2:00s   0       -
 # Rule    Poland  1919    only    -   Apr 15  2:00s   1:00    S
 # Rule    Poland  1944    only    -   Apr  3  2:00s   1:00    S
-rule_a = ruleparse("1918", "1919", "-", "Sep", "16", "2:00s", "0", "-")
-rule_b = ruleparse("1919", "only", "-", "Apr", "15", "2:00s", "1:00", "S")
-rule_c = ruleparse("1944", "only", "-", "Apr", "3", "2:00s", "1:00", "S")
+rule_a = parse(Rule, "1918    1919    -   Sep 16  2:00s   0       -")
+rule_b = parse(Rule, "1919    only    -   Apr 15  2:00s   1:00    S")
+rule_c = parse(Rule, "1944    only    -   Apr  3  2:00s   1:00    S")
 
 # Note: Alternatively we could be using `permutations` here.
 for rules in ([rule_a, rule_b, rule_c], [rule_c, rule_b, rule_a], [rule_a, rule_c, rule_b])
@@ -78,10 +78,10 @@ dates, ordered = order_rules([rule_a, rule_b, rule_c], max_year=1940)
 @test ordered == [rule_a, rule_b, rule_a]
 
 # truncate rules ending after the cutoff
-rule_pre = ruleparse("1999", "only", "-", "Jun", "7", "2:00s", "0", "P" )
-rule_overlap = ruleparse("1999", "2001", "-", "Jan", "1", "0:00s", "0", "-")
-rule_endless = ruleparse("1993", "max", "-", "Feb", "2", "6:00s", "0", "G")
-rule_post = ruleparse("2002", "only", "-", "Jan", "1", "0:00s", "0", "IP")
+rule_pre     = parse(Rule, "1999    only    -   Jun 7  2:00s   0   P")
+rule_overlap = parse(Rule, "1999    2001    -   Jan 1  0:00s   0   -")
+rule_endless = parse(Rule, "1993    max     -   Feb 2  6:00s   0   G")
+rule_post    = parse(Rule, "2002    only    -   Jan 1  0:00s   0   IP")
 
 dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], max_year=2000)
 @test dates == [
@@ -279,8 +279,8 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
         rules = RuleDict()
 
         zones["Pacific/Cutoff"] = [
-            zoneparse("-10:00", "-", "CUT-1", "1933 Apr 1 2:00s"),
-            zoneparse("-11:00", "-", "CUT-2", ""),
+            parse(Zone, "-10:00    -   CUT-1   1933 Apr 1 2:00s"),
+            parse(Zone, "-11:00    -   CUT-2"),
         ]
 
         tz = resolve("Pacific/Cutoff", zones, rules)
@@ -310,15 +310,15 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
         rules = RuleDict()
 
         zones["Pacific/Test"] = [
-            zoneparse("-10:00", "-", "TST-1", "1933 Apr 1 2:00s"),
-            zoneparse("-10:00", "1:00", "TDT-2", "1933 Sep 1 2:00s"),
-            zoneparse("-10:00", "Testing", "T%sT-3", "1934 Sep 1 3:00s"),
-            zoneparse("-10:00", "1:00", "TDT-4", "1935 Sep 1 3:00s"),
-            zoneparse("-10:00", "Testing", "T%sT-5", ""),
+            parse(Zone, "-10:00      -         TST-1    1933 Apr 1 2:00s"),
+            parse(Zone, "-10:00      1:00      TDT-2    1933 Sep 1 2:00s"),
+            parse(Zone, "-10:00      Testing   T%sT-3   1934 Sep 1 3:00s"),
+            parse(Zone, "-10:00      1:00      TDT-4    1935 Sep 1 3:00s"),
+            parse(Zone, "-10:00      Testing   T%sT-5"),
         ]
         rules["Testing"] = [
-            ruleparse("1934", "1935", "-", "Apr", "1", "3:00s", "1", "D"),
-            ruleparse("1934", "1935", "-", "Sep", "1", "3:00s", "0", "S"),
+            parse(Rule, "1934  1935  -         Apr 1    3:00s   1   D"),
+            parse(Rule, "1934  1935  -         Sep 1    3:00s   0   S"),
         ]
 
         tz = resolve("Pacific/Test", zones, rules)
