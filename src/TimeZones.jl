@@ -40,9 +40,14 @@ function __init__()
     )
 
     global ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
+
+    # Note: Keeping names sorted for use in `timezone_names`
+    TIME_ZONE_NAMES[STANDARD] = sort!(readlines(joinpath(DEPS_DIR, _class_name(STANDARD))))
+    TIME_ZONE_NAMES[LEGACY] = sort!(readlines(joinpath(DEPS_DIR, _class_name(LEGACY))))
 end
 
 include("utils.jl")
+include("class.jl")
 include("utcoffset.jl")
 include(joinpath("types", "timezone.jl"))
 include(joinpath("types", "fixedtimezone.jl"))
