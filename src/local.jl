@@ -12,6 +12,11 @@ end
 Returns a `TimeZone` object that is equivalent to the system's current time zone.
 """
 function localzone()
+    # Only allow creating a TimeZone using standard and legacy IANA time zone database
+    # names. We allow the use of legacy names here as most operating systems still use the
+    # legacy names.
+    mask = STANDARD | LEGACY
+
     @static if Sys.isapple()
         name = @mock read(`systemsetup -gettimezone`, String)  # Appears to only work as root
         if startswith(name, "Time Zone: ")
@@ -21,10 +26,9 @@ function localzone()
             name = @mock readlink("/etc/localtime")
             name = match(r"(?<=zoneinfo/).*$", name).match
         end
-        return TimeZone(name)
+        return TimeZone(name, mask)
     elseif Sys.isunix()
         name = ""
-        validnames = timezone_names()
 
         # Try getting the time zone from the "TZ" environment variable
         # http://linux.die.net/man/3/tzset
@@ -45,7 +49,7 @@ function localzone()
                 end
             else
                 # Relative name matches pre-compiled time zone name
-                name in validnames && return TimeZone(name)
+                istimezone(name, mask) && return TimeZone(name, mask)
 
                 # The system time zone directory used depends on the (g)libc version
                 tzdirs = ["/usr/lib/zoneinfo", "/usr/share/zoneinfo"]
@@ -75,7 +79,7 @@ function localzone()
                 name = replace(name, ' ' => '_')
             end
 
-            name in validnames && return TimeZone(name)
+            istimezone(name, mask) && return TimeZone(name, mask)
         end
 
         # CentOS has a ZONE setting in /etc/sysconfig/clock,
@@ -96,7 +100,7 @@ function localzone()
                 end
             end
 
-            name in validnames && return TimeZone(name)
+            istimezone(name, mask) && return TimeZone(name, mask)
         end
 
         # systemd distributions use symlinks that include the zone name,
@@ -108,7 +112,7 @@ function localzone()
 
             while pos !== nothing
                 name = SubString(filepath, pos + 1)
-                name in validnames && return TimeZone(name)
+                istimezone(name, mask) && return TimeZone(name, mask)
                 pos = findnext(isequal('/'), filepath, pos + 1)
             end
         end
@@ -125,25 +129,7 @@ function localzone()
         win_name = strip(@mock read(`powershell -Command "[TimeZoneInfo]::Local.Id"`, String))
 
         if haskey(WINDOWS_TRANSLATION, win_name)
-            posix_name = WINDOWS_TRANSLATION[win_name]
-
-            # Translation dict includes Etc time zones which we currently are not supporting
-            # since they are deemed historical. To ensure compatibility with the translation
-            # dict we will manually convert these fixed time zones.
-            if startswith(posix_name, "Etc/GMT")
-                name = replace(posix_name, r"Etc/GMT0?" => "UTC")
-
-                # Note: Etc/GMT[+-] are reversed compared to UTC[+-]
-                if occursin('+', name)
-                    name = replace(name, '+' => '-')
-                else
-                    name = replace(name, '-' => '+')
-                end
-
-                return FixedTimeZone(name)
-            else
-                return TimeZone(posix_name)
-            end
+            return TimeZone(WINDOWS_TRANSLATION[win_name], mask)
         else
             error("unable to translate to POSIX time zone name from: \"$win_name\"")
         end

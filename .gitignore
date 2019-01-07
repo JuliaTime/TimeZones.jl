@@ -9,6 +9,8 @@ deps/compiled
 deps/local
 !deps/local/windowsZones.xml
 deps/active_version
+deps/STANDARD
+deps/LEGACY
 test/tzsource
 
 # PkgBenchmark
