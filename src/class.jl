@@ -1,37 +1,70 @@
-const NONE     = 0x00
-const FIXED    = 0x01
-const STANDARD = 0x02
-const LEGACY   = 0x04
+"""
+    Class
 
-const DEFAULT_MASK = STANDARD | FIXED
+A type used for controlling which classes of `TimeZone` are considered valid. Instances of
+`Class` can be combined using bitwise operators to generate a mask which allows multiple
+classes to be considered valid at once.
+
+Currently supported masks are:
+
+- `Class.FIXED`: Class indicating the time zone name is parsable as a fixed UTC offset.
+- `Class.STANDARD`: The time zone name is included in the primary IANA tz source files.
+- `Class.LEGACY`: The time zone name is included in the deprecated IANA tz source files.
+- `Class.NONE`: Mask that will match nothing.
+- `Class.DEFAULT`: Default mask used by functions: `Class.FIXED | Class.STANDARD`
+- `Class.ALL`: Mask allowing all supported classes.
+"""
+struct Class
+    val::UInt8
+end
+
+function Base.getproperty(::Type{Class}, field::Symbol)
+    if field == :NONE
+        Class(0x00)
+    elseif field == :FIXED
+        Class(0x01)
+    elseif field == :STANDARD
+        Class(0x02)
+    elseif field == :LEGACY
+        Class(0x04)
+    elseif field == :DEFAULT
+        Class.FIXED | Class.STANDARD
+    elseif field == :ALL
+        Class.FIXED | Class.STANDARD | Class.LEGACY
+    else
+        getfield(Class, field)
+    end
+end
 
 """
-    _timezone_class(str::AbstractString) -> UInt8
+    classify(str::AbstractString) -> Class
 
 Classifies the provided time zone string.
 """
-function _timezone_class(str::AbstractString)
+function classify(str::AbstractString)
     if occursin(FIXED_TIME_ZONE_REGEX, str)
-        FIXED
-    elseif str in TIME_ZONE_NAMES[STANDARD]
-        STANDARD
-    elseif str in TIME_ZONE_NAMES[LEGACY]
-        LEGACY
+        Class.FIXED
+    elseif str in TIME_ZONE_NAMES[Class.STANDARD]
+        Class.STANDARD
+    elseif str in TIME_ZONE_NAMES[Class.LEGACY]
+        Class.LEGACY
     else
-        NONE
+        Class.NONE
     end
 end
 
-function _class_name(class::UInt8)
-    if class == NONE
-        "NONE"
-    elseif class == FIXED
-        "FIXED"
-    elseif class == STANDARD
-        "STANDARD"
-    elseif class == LEGACY
-        "LEGACY"
-    else
-        "UNKNOWN"
-    end
+Base.:(|)(a::Class, b::Class) = Class(a.val | b.val)
+Base.:(&)(a::Class, b::Class) = Class(a.val & b.val)
+Base.:(==)(a::Class, b::Class) = a.val == b.val
+
+function labels(mask::Class)
+    names = String[]
+    mask & Class.FIXED == Class.FIXED && push!(names, "FIXED")
+    mask & Class.STANDARD == Class.STANDARD && push!(names, "STANDARD")
+    mask & Class.LEGACY == Class.LEGACY && push!(names, "LEGACY")
+    mask == Class.NONE && push!(names, "NONE")
+    return names
 end
+
+Base.print(io::IO, mask::Class) = join(io, labels(mask), " | ")
+Base.show(io::IO, mask::Class) = join(io, string.("Class.", labels(mask)), " | ")

@@ -6,18 +6,16 @@ DocTestSetup = quote
 end
 ```
 
-## [Why are the "Etc/\*" time zones unsupported?](@id etc_tzs)
+## [Where are the "Etc/\*" time zones?](@id etc_tzs)
 
-According to [IANA](ftp://ftp.iana.org/tz/data/etcetera) the "Etc/\*" time zones are only included in the tz database for "historical reasons". Furthermore the time zones offsets provided the Etc/GMT±HH can be misleading. For example the Etc/GMT+4 time zone is 4 hours **behind** UTC rather than 4 hours **ahead** as most people expect. Since TimeZones.jl already provides an easy way of constructing fixed offset time zones using `FixedTimeZone` it was decided to leave these time zones out.
+According to [IANA](ftp://ftp.iana.org/tz/data/etcetera) the "Etc/\*" time zones are only included in the tz database for "historical reasons". Furthermore the time zones offsets provided the Etc/GMT±HH can be misleading. For example the Etc/GMT+4 time zone is 4 hours _behind_ UTC rather than 4 hours _ahead_ as most people expect. Since TimeZones.jl already provides an easy way of constructing fixed offset time zones using `FixedTimeZone` it was decided to only allow users to create these time zones if they explicitly ask for them.
 
-If you truly do want to include the "Etc/\*" time zones you just need to download the tz source file and re-compile:
+```jldoctest
+julia> TimeZone("Etc/GMT+4")
+ERROR: ArgumentError: The time zone "Etc/GMT+4" is of class `Class.LEGACY` which is currently not allowed by the mask: `Class.FIXED | Class.STANDARD`
 
-```@example
-using TimeZones; # hide
-import TimeZones.TZData: TZ_SOURCE_DIR, extract, active_archive, compile
-extract(active_archive(), TZ_SOURCE_DIR, "etcetera")
-compile()
-nothing; # hide
+julia> TimeZone("Etc/GMT+4", TimeZones.Class.LEGACY)
+Etc/GMT+4 (UTC-4)
 ```
 
 ## [Far-future ZonedDateTime with VariableTimeZone](@id future_tzs)

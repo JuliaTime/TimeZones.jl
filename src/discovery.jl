@@ -1,18 +1,18 @@
 using Mocking: Mocking, @mock
 
 """
-    timezone_names(class_mask::UInt8=DEFAULT_MASK) -> Vector{String}
+    timezone_names(mask::Class=Class.DEFAULT) -> Vector{String}
 
 Returns a sorted list of all of the valid names for constructing a `TimeZone` that are
-classified within `class_mask`.
+classified within `mask`.
 """
-function timezone_names(class_mask::UInt8=DEFAULT_MASK)
+function timezone_names(mask::Class=Class.DEFAULT)
     names = String[]
-    if class_mask & STANDARD == STANDARD
-        append!(names, TIME_ZONE_NAMES[STANDARD])
+    if mask & Class.STANDARD == Class.STANDARD
+        append!(names, TIME_ZONE_NAMES[Class.STANDARD])
     end
-    if class_mask & LEGACY == LEGACY
-        append!(names, TIME_ZONE_NAMES[LEGACY])
+    if mask & Class.LEGACY == Class.LEGACY
+        append!(names, TIME_ZONE_NAMES[Class.LEGACY])
     end
     return sort!(names)
 end

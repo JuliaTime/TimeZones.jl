@@ -1,4 +1,4 @@
-using ...TimeZones: TimeZones, STANDARD, LEGACY
+using ...TimeZones: Class
 
 # The default tz source files we care about. See "ftp://ftp.iana.org/tz/data/Makefile"
 # "PRIMARY_YDATA" for listing of tz source files to include.
@@ -28,7 +28,7 @@ function build(
     compiled_dir::AbstractString="";
     verbose::Bool=false,
 )
-    tz_category = Dict{UInt8,Vector{String}}()
+    tz_category = Dict{Class,Vector{String}}()
 
     # Avoids spamming remote servers requesting the latest version
     if version == "latest"
@@ -72,8 +72,8 @@ function build(
         legacy = TZSource(legacy_files)
 
         # Record the time zone names associated with the category
-        tz_category[STANDARD] = names(standard)
-        tz_category[LEGACY] = setdiff(names(legacy), tz_category[STANDARD])
+        tz_category[Class.STANDARD] = names(standard)
+        tz_category[Class.LEGACY] = setdiff(names(legacy), tz_category[Class.STANDARD])
 
         # Combine the sources as legacy links depend on standard time zones
         tz_source = merge!(standard, legacy)
@@ -103,7 +103,7 @@ function build(version::AbstractString="latest")
 
     # Save time zone category information
     for (class, tz_names) in tz_category
-        open(joinpath(DEPS_DIR, TimeZones._class_name(class)), "w+") do io
+        open(joinpath(DEPS_DIR, string(class)), "w+") do io
             for name in tz_names
                 println(io, name)
             end
