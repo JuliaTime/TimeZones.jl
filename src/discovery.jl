@@ -8,7 +8,7 @@ Returns a sorted list of all of the valid names for constructing a `TimeZone`.
 function timezone_names()
     # Note: IANA time zone names are typically encoded only in ASCII.
     names = String[]
-    check = Tuple{String,String}[(COMPILED_DIR, "")]
+    check = Tuple{String,String}[(TZData.COMPILED_DIR, "")]
 
     for (dir, partial) in check
         for filename in readdir(dir)

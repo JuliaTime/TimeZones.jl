@@ -29,7 +29,6 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
 
 const PKG_DIR = normpath(joinpath(dirname(@__FILE__), ".."))
 const DEPS_DIR = joinpath(PKG_DIR, "deps")
-const TIME_ZONES = Dict{String,TimeZone}()
 
 function __init__()
     # Base extension needs to happen everytime the module is loaded (issue #24)
@@ -43,84 +42,16 @@ function __init__()
     global ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
 end
 
-"""
-    TimeZone(str::AbstractString) -> TimeZone
-
-Constructs a `TimeZone` subtype based upon the string. If the string is a recognized time
-zone name then data is loaded from the compiled IANA time zone database. Otherwise the
-string is assumed to be a static time zone.
-
-A list of recognized time zones names is available from `timezone_names()`. Supported static
-time zone string formats can be found in `FixedTimeZone(::AbstractString)`.
-"""
-function TimeZone(str::AbstractString)
-    return get!(TIME_ZONES, str) do
-        if occursin(FIXED_TIME_ZONE_REGEX, str)
-            return FixedTimeZone(str)
-        end
-
-        tz_path = joinpath(COMPILED_DIR, split(str, "/")...)
-        isfile(tz_path) || throw(ArgumentError("Unknown time zone \"$str\""))
-
-        open(tz_path, "r") do fp
-            return deserialize(fp)
-        end
-    end
-end
-
-"""
-    @tz_str -> TimeZone
-
-Constructs a `TimeZone` subtype based upon the string at parse time. See docstring of
-`TimeZone` for more details.
-
-```julia
-julia> tz"Africa/Nairobi"
-Africa/Nairobi (UTC+3)
-```
-"""
-macro tz_str(str)
-    TimeZone(str)
-end
-
-"""
-    istimezone(str::AbstractString) -> Bool
-
-Tests whether a string is a valid name for constructing a `TimeZone`.
-"""
-function istimezone(str::AbstractString)
-    return (
-        haskey(TIME_ZONES, str) ||
-        occursin(FIXED_TIME_ZONE_REGEX, str) ||
-        isfile(joinpath(COMPILED_DIR, split(str, "/")...))
-    )
-end
-
-"""
-    build(version="latest", regions=REGIONS; force=false) -> Nothing
-
-Builds the TimeZones package with the specified tzdata `version` and `regions`. The
-`version` is typically a 4-digit year followed by a lowercase ASCII letter (e.g. "2016j").
-Users can also specify which `regions`, or tz source files, should be compiled. Available
-regions are listed under `TimeZones.REGIONS` and `TimeZones.LEGACY_REGIONS`. The `force`
-flag is used to re-download tzdata archives.
-"""
-function build(version::AbstractString="latest", regions=REGIONS; force::Bool=false)
-    TimeZones.TZData.build(version, regions)
-
-    if Sys.iswindows()
-        TimeZones.WindowsTimeZoneIDs.build(force=force)
-    end
-
-    @info "Successfully built TimeZones"
-end
-
 include("utils.jl")
 include("utcoffset.jl")
-include("types.jl")
+include(joinpath("types", "timezone.jl"))
+include(joinpath("types", "fixedtimezone.jl"))
+include(joinpath("types", "variabletimezone.jl"))
+include(joinpath("types", "zoneddatetime.jl"))
 include("exceptions.jl")
 include(joinpath("tzdata", "TZData.jl"))
 Sys.iswindows() && include(joinpath("winzone", "WindowsTimeZoneIDs.jl"))
+include("build.jl")
 include("interpret.jl")
 include("accessors.jl")
 include("arithmetic.jl")
@@ -134,7 +65,5 @@ include("discovery.jl")
 include("rounding.jl")
 include("parse.jl")
 include("deprecated.jl")
-
-using TimeZones.TZData: ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, REGIONS, LEGACY_REGIONS
 
 end # module
