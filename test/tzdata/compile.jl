@@ -356,16 +356,16 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     # Link  Europe/Oslo  Arctic/Longyearbyen
     @testset "Link" begin
         # Make sure that that the link time zone was parsed.
-        @test !("Arctic/Longyearbyen" in keys(tzdata["europe"].zones))
-        @test "Arctic/Longyearbyen" in keys(tzdata["europe"].links)
+        @test !haskey(tzdata["europe"].zones, "Arctic/Longyearbyen")
+        @test  haskey(tzdata["europe"].links, "Arctic/Longyearbyen")
         @test tzdata["europe"].links["Arctic/Longyearbyen"] == "Europe/Oslo"
 
         oslo = compile("Europe/Oslo", tzdata["europe"])
         longyearbyen = compile("Arctic/Longyearbyen", tzdata["europe"])
 
-        @test longyearbyen != oslo
         @test longyearbyen.name != oslo.name
         @test longyearbyen.transitions == oslo.transitions
+        @test longyearbyen.cutoff == oslo.cutoff
     end
 
     # Zones that don't include multiple lines and no rules should be treated as a FixedTimeZone.
