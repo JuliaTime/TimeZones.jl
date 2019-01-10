@@ -93,3 +93,52 @@ elseif Sys.islinux()
         end
     end
 end
+
+# Generates a cross-platform patched environment to run `localzone()`
+function with_localzone(func::Function, name::AbstractString)
+    @static if Sys.isapple()
+        patches = [
+            @patch read(cmd::AbstractCmd, ::Type{String}) = "Time Zone:  $name\n"
+        ]
+    elseif Sys.iswindows()
+        patches = [
+            @patch read(cmd::AbstractCmd, ::Type{String}) = "$name\r\n"
+        ]
+    elseif Sys.islinux()
+        patches = [
+            @patch isfile(f::AbstractString) = f == "/etc/timezone"
+            @patch open(fn::Function, f::AbstractString) = fn(IOBuffer("$name\n"))
+        ]
+    else
+        error("Unhandled OS")
+    end
+
+    withenv("TZ" => nothing) do
+        apply(patches) do
+            func()
+        end
+    end
+end
+
+# https://github.com/JuliaTime/TimeZones.jl/issues/154
+@testset "legacy time zones" begin
+    # "US/Pacific" is deprecated in favor of "America/Los_Angeles"
+    name = Sys.isunix() ? "US/Pacific" : "Pacific Standard Time"
+    with_localzone(name) do
+        @test localzone().transitions == tz"America/Los_Angeles".transitions
+    end
+
+    # "America/Montreal" is deprecated in favor of "America/Toronto"
+    if Sys.isunix()
+        with_localzone("America/Montreal") do
+            @test localzone().transitions == tz"America/Toronto".transitions
+        end
+    end
+
+    # "America/Indianapolis" is deprecated in favor of "America/Indiana/Indianapolis"
+    # Note: On Windows "US Eastern Standard Time" translates to "America/Indianapolis"
+    name = Sys.isunix() ? "America/Indianapolis" : "US Eastern Standard Time"
+    with_localzone(name) do
+        @test localzone().transitions == tz"America/Indiana/Indianapolis".transitions
+    end
+end
