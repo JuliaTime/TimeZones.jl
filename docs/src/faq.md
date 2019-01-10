@@ -14,8 +14,8 @@ If you truly do want to include the "Etc/\*" time zones you just need to downloa
 
 ```@example
 using TimeZones; # hide
-import TimeZones.TZData: extract, active_archive, compile
-extract(active_archive(), TimeZones.TZ_SOURCE_DIR, "etcetera")
+import TimeZones.TZData: TZ_SOURCE_DIR, extract, active_archive, compile
+extract(active_archive(), TZ_SOURCE_DIR, "etcetera")
 compile()
 nothing; # hide
 ```

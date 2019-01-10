@@ -43,7 +43,11 @@ include("helpers.jl")
     include(joinpath("tzdata", "compile.jl"))
     Sys.iswindows() && include(joinpath("winzone", "WindowsTimeZoneIDs.jl"))
     include("utcoffset.jl")
-    include("types.jl")
+    include(joinpath("types", "timezone.jl"))
+    include(joinpath("types", "fixedtimezone.jl"))
+    include(joinpath("types", "variabletimezone.jl"))
+    include(joinpath("types", "zoneddatetime.jl"))
+    include("exceptions.jl")
     include("interpret.jl")
     include("accessors.jl")
     include("arithmetic.jl")
@@ -57,5 +61,10 @@ include("helpers.jl")
     include("discovery.jl")
     include("rounding.jl")
     include("parse.jl")
-    include("TimeZones.jl")
+
+    # Note: Run the build tests last to ensure that re-compiling the time zones files
+    # doesn't interfere with other tests.
+    if lowercase(get(ENV, "CI", "false")) == "true"
+        include("ci.jl")
+    end
 end
