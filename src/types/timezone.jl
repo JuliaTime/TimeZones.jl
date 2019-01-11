@@ -56,9 +56,22 @@ end
 Check whether a string is a valid for constructing a `TimeZone` with the provided `mask`.
 """
 function istimezone(str::AbstractString, mask::Class=Class.DEFAULT)
-    return (
-        haskey(TIME_ZONE_CACHE, str) ||
-        mask & Class.FIXED != Class.NONE && occursin(FIXED_TIME_ZONE_REGEX, str) ||
-        isfile(joinpath(TZData.COMPILED_DIR, split(str, "/")...))
-    )
+    # Start by performing quick FIXED class test
+    if mask & Class.FIXED != Class.NONE && occursin(FIXED_TIME_ZONE_REGEX, str)
+        return true
+    end
+
+    # Perform more expensive checks against pre-compiled time zones
+    tz, class = get(TIME_ZONE_CACHE, str) do
+        tz_path = joinpath(TZData.COMPILED_DIR, split(str, "/")...)
+
+        if isfile(tz_path)
+            # Cache the data since we're already performing the deserialization
+            TIME_ZONE_CACHE[str] = open(deserialize, tz_path, "r")
+        else
+            nothing, Class.NONE
+        end
+    end
+
+    return tz !== nothing && mask & class != Class.NONE
 end

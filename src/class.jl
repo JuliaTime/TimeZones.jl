@@ -23,32 +23,28 @@ function Base.getproperty(::Type{Class}, field::Symbol)
         Class(0x00)
     elseif field == :FIXED
         Class(0x01)
-    elseif field == :VARIABLE
-        Class(0x02)
     elseif field == :STANDARD
-        Class(0x04)
+        Class(0x02)
     elseif field == :LEGACY
-        Class(0x08)
+        Class(0x04)
     elseif field == :DEFAULT
         Class.FIXED | Class.STANDARD
     elseif field == :ALL
-        Class.FIXED | Class.VARIABLE | Class.STANDARD | Class.LEGACY
+        Class.FIXED | Class.STANDARD | Class.LEGACY
     else
         getfield(Class, field)
     end
 end
 
-function classify(tz::TimeZone, regions::AbstractSet{<:AbstractString}=Set{String}())
+function classify(str::AbstractString, regions::AbstractSet{<:AbstractString})
     class = Class.NONE
-    tz isa FixedTimeZone && (class |= Class.FIXED)
-    tz isa VariableTimeZone && (class |= Class.VARIABLE)
+    occursin(FIXED_TIME_ZONE_REGEX, str) && (class |= Class.FIXED)
     !isempty(intersect(regions, TZData.STANDARD_REGIONS)) && (class |= Class.STANDARD)
     !isempty(intersect(regions, TZData.LEGACY_REGIONS)) && (class |= Class.LEGACY)
     return class
 end
 
-classify(tz::TimeZone, regions::AbstractVector) = classify(tz, Set(regions))
-classify(tz::TimeZone, region::AbstractString) = classify(tz, [region])
+classify(str::AbstractString, regions::AbstractVector) = classify(str, Set{String}(regions))
 
 Base.:(|)(a::Class, b::Class) = Class(a.val | b.val)
 Base.:(&)(a::Class, b::Class) = Class(a.val & b.val)
@@ -57,7 +53,6 @@ Base.:(==)(a::Class, b::Class) = a.val == b.val
 function labels(mask::Class)
     names = String[]
     mask & Class.FIXED == Class.FIXED && push!(names, "FIXED")
-    mask & Class.VARIABLE == Class.VARIABLE && push!(names, "VARIABLE")
     mask & Class.STANDARD == Class.STANDARD && push!(names, "STANDARD")
     mask & Class.LEGACY == Class.LEGACY && push!(names, "LEGACY")
     mask == Class.NONE && push!(names, "NONE")

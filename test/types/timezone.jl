@@ -16,9 +16,9 @@ end
 @testset "etcetera" begin
     # Note: In previous versions of TimeZones.jl the "etcetera" source file was not parsed
     # by default.
-    # @test !istimezone("Etc/GMT")
-    # @test !istimezone("Etc/GMT+12")
-    # @test !istimezone("Etc/GMT-14")
+    @test !istimezone("Etc/GMT")
+    @test !istimezone("Etc/GMT+12")
+    @test !istimezone("Etc/GMT-14")
 
     @test istimezone("Etc/GMT", Class.LEGACY)
     @test istimezone("Etc/GMT+12", Class.LEGACY)

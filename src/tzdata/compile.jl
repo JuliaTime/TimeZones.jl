@@ -591,7 +591,7 @@ function load!(tz_source::TZSource, file::AbstractString)
     end
 end
 
-function regions(tz_source::TZSource, zone_name::AbstractString)
+function zone_regions(tz_source::TZSource, zone_name::AbstractString)
     get(tz_source.regions, zone_name, Set{String}())
 end
 
@@ -601,14 +601,14 @@ function compile(name::AbstractString, tz_source::TZSource; kwargs...)
     if haskey(tz_source.links, name)
         # When the name is a link we'll generate a time zone from the link's target and
         # rename the time zone with the link name.
-        target = tz_source.links[name]
-        tz = compile!(target, tz_source, ordered; kwargs...)
-        class = classify(tz, regions(tz_source, target))
+        zone_name = tz_source.links[name]
+        tz = compile!(zone_name, tz_source, ordered; kwargs...)
+        class = classify(name, zone_regions(tz_source, zone_name))
 
         return rename(tz, name), class
     else
         tz = compile!(name, tz_source, ordered; kwargs...)
-        class = classify(tz, regions(tz_source, name))
+        class = classify(name, zone_regions(tz_source, name))
 
         return tz, class
     end
@@ -617,24 +617,25 @@ end
 function compile(tz_source::TZSource; kwargs...)
     results = Vector{Tuple{TimeZone,Class}}()
     ordered = OrderedRuleDict()
-    lookup = Dict{String, Tuple{TimeZone,Class}}()
+    lookup = Dict{String,Tuple{TimeZone,Set{String}}}()
 
     for zone_name in keys(tz_source.zones)
         tz = compile!(zone_name, tz_source, ordered; kwargs...)
-        class = classify(tz, regions(tz_source, zone_name))
-        result = (tz, class)
+        regions = zone_regions(tz_source, zone_name)
+        class = classify(zone_name, regions)
 
-        push!(results, result)
-        lookup[zone_name] = result
+        push!(results, (tz, class))
+        lookup[zone_name] = (tz, regions)
     end
 
     # Convert links into time zones.
     for (link_name, target) in tz_source.links
         if !haskey(lookup, link_name) && haskey(lookup, target)
-            target_tz, target_class = lookup[target]
-            result = rename(target_tz, link_name), target_class
+            target_tz, target_regions = lookup[target]
+            tz = rename(target_tz, link_name)
+            class = classify(link_name, target_regions)
 
-            push!(results, result)
+            push!(results, (tz, class))
         elseif !haskey(lookup, target)
             error("Unable to resolve link \"$link_name\" referencing \"$target\"")
         end
