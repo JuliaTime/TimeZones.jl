@@ -52,7 +52,7 @@ struct TZSource
     zones::Dict{String,Vector{Zone}}
     rules::Dict{String,Vector{Rule}}
     links::Dict{String,String}         # link name => zone name
-    regions::Dict{String,Set{String}}  # zone name => tz sources
+    regions::Dict{String,Set{String}}  # zone/link name => tz sources
 end
 
 function TZSource(
@@ -577,6 +577,7 @@ function load!(tz_source::TZSource, filename::AbstractString, io::IO)
             target = name
             link_name = line
             links[link_name] = target
+            regions[link_name] = push!(get(regions, link_name, Set{String}()), region_name)
         else
             @warn "Unhandled line found with type: $kind"
         end
@@ -591,8 +592,8 @@ function load!(tz_source::TZSource, file::AbstractString)
     end
 end
 
-function zone_regions(tz_source::TZSource, zone_name::AbstractString)
-    get(tz_source.regions, zone_name, Set{String}())
+function associated_regions(tz_source::TZSource, name::AbstractString)
+    get(tz_source.regions, name, Set{String}())
 end
 
 function compile(name::AbstractString, tz_source::TZSource; kwargs...)
@@ -603,12 +604,12 @@ function compile(name::AbstractString, tz_source::TZSource; kwargs...)
         # rename the time zone with the link name.
         zone_name = tz_source.links[name]
         tz = compile!(zone_name, tz_source, ordered; kwargs...)
-        class = classify(name, zone_regions(tz_source, zone_name))
+        class = classify(name, associated_regions(tz_source, name))
 
         return rename(tz, name), class
     else
         tz = compile!(name, tz_source, ordered; kwargs...)
-        class = classify(name, zone_regions(tz_source, name))
+        class = classify(name, associated_regions(tz_source, name))
 
         return tz, class
     end
@@ -617,23 +618,22 @@ end
 function compile(tz_source::TZSource; kwargs...)
     results = Vector{Tuple{TimeZone,Class}}()
     ordered = OrderedRuleDict()
-    lookup = Dict{String,Tuple{TimeZone,Set{String}}}()
+    lookup = Dict{String,TimeZone}()
 
     for zone_name in keys(tz_source.zones)
         tz = compile!(zone_name, tz_source, ordered; kwargs...)
-        regions = zone_regions(tz_source, zone_name)
-        class = classify(zone_name, regions)
+        class = classify(zone_name, associated_regions(tz_source, zone_name))
 
         push!(results, (tz, class))
-        lookup[zone_name] = (tz, regions)
+        lookup[zone_name] = tz
     end
 
     # Convert links into time zones.
     for (link_name, target) in tz_source.links
         if !haskey(lookup, link_name) && haskey(lookup, target)
-            target_tz, target_regions = lookup[target]
+            target_tz = lookup[target]
             tz = rename(target_tz, link_name)
-            class = classify(link_name, target_regions)
+            class = classify(link_name, associated_regions(tz_source, link_name))
 
             push!(results, (tz, class))
         elseif !haskey(lookup, target)
