@@ -1,4 +1,3 @@
-const TIME_ZONE_NAMES = Dict{Class,Vector{String}}()
 const TIME_ZONE_CACHE = Dict{String,Tuple{TimeZone,Class}}()
 
 """
@@ -15,18 +14,15 @@ function TimeZone(str::AbstractString, mask::Class=Class.DEFAULT)
     # Note: If the class `mask` does not match the time zone we'll still load the
     # information into the cache to ensure the result is consistent.
     tz, class = get!(TIME_ZONE_CACHE, str) do
-        class = classify(str)
+        tz_path = joinpath(TZData.COMPILED_DIR, split(str, "/")...)
 
-        tz = if class == Class.FIXED
-            FixedTimeZone(str)
-        elseif class == Class.STANDARD || class == Class.LEGACY
-            tz_path = joinpath(TZData.COMPILED_DIR, split(str, '/')...)
+        if isfile(tz_path)
             open(deserialize, tz_path, "r")
+        elseif occursin(FIXED_TIME_ZONE_REGEX, str)
+            FixedTimeZone(str), Class.FIXED
         else
             throw(ArgumentError("Unknown time zone \"$str\""))
         end
-
-        tz, class
     end
 
     if mask & class == Class.NONE
@@ -61,8 +57,8 @@ Check whether a string is a valid for constructing a `TimeZone` with the provide
 """
 function istimezone(str::AbstractString, mask::Class=Class.DEFAULT)
     return (
-        mask & Class.STANDARD != Class.NONE && str in TIME_ZONE_NAMES[Class.STANDARD] ||
-        mask & Class.LEGACY != Class.NONE && str in TIME_ZONE_NAMES[Class.LEGACY] ||
-        mask & Class.FIXED != Class.NONE && occursin(FIXED_TIME_ZONE_REGEX, str)
+        haskey(TIME_ZONE_CACHE, str) ||
+        mask & Class.FIXED != Class.NONE && occursin(FIXED_TIME_ZONE_REGEX, str) ||
+        isfile(joinpath(TZData.COMPILED_DIR, split(str, "/")...))
     )
 end

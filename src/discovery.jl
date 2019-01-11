@@ -1,19 +1,29 @@
 using Mocking: Mocking, @mock
 
 """
-    timezone_names(mask::Class=Class.DEFAULT) -> Vector{String}
+    timezone_names() -> Vector{String}
 
-Returns a sorted list of all of the valid names for constructing a `TimeZone` that are
-classified within `mask`.
+Returns a sorted list of all of the pre-computed time zone names.
 """
-function timezone_names(mask::Class=Class.DEFAULT)
+function timezone_names()
     names = String[]
-    if mask & Class.STANDARD == Class.STANDARD
-        append!(names, TIME_ZONE_NAMES[Class.STANDARD])
+    check = Tuple{String,String}[(TZData.COMPILED_DIR, "")]
+
+    for (dir, partial) in check
+        for filename in readdir(dir)
+            startswith(filename, ".") && continue
+
+            path = joinpath(dir, filename)
+            name = partial == "" ? filename : join([partial, filename], "/")
+
+            if isdir(path)
+                push!(check, (path, name))
+            else
+                push!(names, name)
+            end
+        end
     end
-    if mask & Class.LEGACY == Class.LEGACY
-        append!(names, TIME_ZONE_NAMES[Class.LEGACY])
-    end
+
     return sort!(names)
 end
 

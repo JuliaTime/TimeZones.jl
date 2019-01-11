@@ -114,7 +114,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
 
 @testset "compile" begin
     @testset "Europe/Warsaw" begin
-        tz = compile("Europe/Warsaw", tzdata["europe"])
+        tz = first(compile("Europe/Warsaw", tzdata["europe"]))
 
         # Europe/Warsaw time zone has a combination of factors that requires computing
         # the abbreviation to be done in a specific way.
@@ -158,7 +158,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     # - Zone abbreviation redefined: HST
     # - Is not cutoff
     @testset "Pacific/Honolulu" begin
-        tz = compile("Pacific/Honolulu", tzdata["northamerica"])
+        tz = first(compile("Pacific/Honolulu", tzdata["northamerica"]))
 
         zone = Dict{AbstractString,FixedTimeZone}()
         zone["LMT"] = FixedTimeZone("LMT", -37886, 0)
@@ -186,7 +186,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     # - Changed zone format while in a non-standard transition
     # - Zone abbreviation redefined: LMT, WSST
     @testset "Pacific/Apia" begin
-        tz = compile("Pacific/Apia", tzdata["australasia"])
+        tz = first(compile("Pacific/Apia", tzdata["australasia"]))
 
         zone = Dict{AbstractString,FixedTimeZone}()
         zone["LMT_OLD"] = FixedTimeZone("LMT", 45184, 0)
@@ -215,7 +215,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     # - End of midsummer time also switches both the UTC offset and the saving time
     # - In 1979-01-01 switches from "Spain" to "EU" rules which could create a redundant entry
     @testset "Europe/Madrid" begin
-        tz = compile("Europe/Madrid", tzdata["europe"])
+        tz = first(compile("Europe/Madrid", tzdata["europe"]))
 
         zone = Dict{AbstractString,FixedTimeZone}()
         zone["WET"] = FixedTimeZone("WET", 0, 0)
@@ -244,7 +244,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     #   Alternatives include: Europe/London, Europe/Dublin, and Europe/Moscow.
     # - Observed war/peace time
     @testset "America/Anchorage" begin
-        tz = compile("America/Anchorage", tzdata["northamerica"])
+        tz = first(compile("America/Anchorage", tzdata["northamerica"]))
 
         zone = Dict{AbstractString,FixedTimeZone}()
         zone["CAT"] = FixedTimeZone("CAT", -36000, 0)
@@ -265,7 +265,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
     # - With the exception of LMT all Zone and Rule abbreviations are UTC offsets which should
     #   be treated as NULL.
     @testset "Europe/Ulyanovsk" begin
-        ulyanovsk = compile("Europe/Ulyanovsk", tzdata["europe"])
+        ulyanovsk = first(compile("Europe/Ulyanovsk", tzdata["europe"]))
         @test all(t -> string(t.zone.name) == "", ulyanovsk.transitions[2:end])
     end
 
@@ -285,7 +285,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
         ]
         tz_source = TZSource(zones, rules, links)
 
-        tz = compile("Pacific/Cutoff", tz_source)
+        tz = first(compile("Pacific/Cutoff", tz_source))
 
         zone = Dict{AbstractString,FixedTimeZone}()
         zone["CUT-1"] = FixedTimeZone("CUT-1", -36000)
@@ -295,7 +295,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
         @test tz.transitions[2] == Transition(DateTime(1933,4,1,12), zone["CUT-2"])
         @test tz.cutoff === nothing
 
-        tz = compile("Pacific/Cutoff", tz_source, max_year=1900)
+        tz = first(compile("Pacific/Cutoff", tz_source, max_year=1900))
 
         # Normally compiled TimeZones with a single transition are returned as a
         # FixedTimeZone except when a cutoff is included.
@@ -325,7 +325,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
         ]
         tz_source = TZSource(zones, rules, links)
 
-        tz = compile("Pacific/Test", tz_source)
+        tz = first(compile("Pacific/Test", tz_source))
 
         zone = Dict{AbstractString,FixedTimeZone}()
         zone["TST-1"] = FixedTimeZone("TST-1", -36000, 0)
@@ -360,8 +360,8 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
         @test  haskey(tzdata["europe"].links, "Arctic/Longyearbyen")
         @test tzdata["europe"].links["Arctic/Longyearbyen"] == "Europe/Oslo"
 
-        oslo = compile("Europe/Oslo", tzdata["europe"])
-        longyearbyen = compile("Arctic/Longyearbyen", tzdata["europe"])
+        oslo = first(compile("Europe/Oslo", tzdata["europe"]))
+        longyearbyen = first(compile("Arctic/Longyearbyen", tzdata["europe"]))
 
         @test longyearbyen.name != oslo.name
         @test longyearbyen.transitions == oslo.transitions
@@ -370,7 +370,7 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
 
     # Zones that don't include multiple lines and no rules should be treated as a FixedTimeZone.
     @testset "FixedTimeZone" begin
-        tz = compile("MST", tzdata["northamerica"])
+        tz = first(compile("MST", tzdata["northamerica"]))
         @test isa(tz, FixedTimeZone)
     end
 end

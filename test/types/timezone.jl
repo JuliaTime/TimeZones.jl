@@ -1,8 +1,13 @@
 using TimeZones: Class
 
-@test istimezone("Europe/Warsaw")
-@test istimezone("UTC+02")
-@test !istimezone("Europe/Camelot")
+@testset "istimezone" begin
+    # Invalidate the cache to ensure that `istimezone` works for non-loaded time zones.
+    empty!(TimeZones.TIME_ZONE_CACHE)
+
+    @test istimezone("Europe/Warsaw")
+    @test istimezone("UTC+02")
+    @test !istimezone("Europe/Camelot")
+end
 
 # Deserialization can cause us to have two immutables that are not using the same memory
 @test TimeZone("Europe/Warsaw") === TimeZone("Europe/Warsaw")
@@ -11,9 +16,9 @@ using TimeZones: Class
 @testset "etcetera" begin
     # Note: In previous versions of TimeZones.jl the "etcetera" source file was not parsed
     # by default.
-    @test !istimezone("Etc/GMT")
-    @test !istimezone("Etc/GMT+12")
-    @test !istimezone("Etc/GMT-14")
+    # @test !istimezone("Etc/GMT")
+    # @test !istimezone("Etc/GMT+12")
+    # @test !istimezone("Etc/GMT-14")
 
     @test istimezone("Etc/GMT", Class.LEGACY)
     @test istimezone("Etc/GMT+12", Class.LEGACY)

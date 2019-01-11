@@ -3,11 +3,11 @@ using TimeZones.TZData: parse_components
 null = FixedTimeZone("", 10800)
 fixed = FixedTimeZone("UTC+01:00")
 est = FixedTimeZone("EST", -18000)
-warsaw = compile("Europe/Warsaw", tzdata["europe"])
-apia = compile("Pacific/Apia", tzdata["australasia"])
-honolulu = compile("Pacific/Honolulu", tzdata["northamerica"])  # Uses cutoff
-ulyanovsk = compile("Europe/Ulyanovsk", tzdata["europe"])  # No named abbreviations
-new_york = compile("America/New_York", tzdata["northamerica"])  # Underscore in name
+warsaw = first(compile("Europe/Warsaw", tzdata["europe"]))
+apia = first(compile("Pacific/Apia", tzdata["australasia"]))
+honolulu = first(compile("Pacific/Honolulu", tzdata["northamerica"]))  # Uses cutoff
+ulyanovsk = first(compile("Europe/Ulyanovsk", tzdata["europe"]))  # No named abbreviations
+new_york = first(compile("America/New_York", tzdata["northamerica"]))  # Underscore in name
 dt = DateTime(1942,12,25,1,23,45)
 
 # TimeZones as a string

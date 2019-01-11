@@ -40,12 +40,6 @@ function __init__()
     )
 
     global ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
-
-    # Note: Keeping names sorted for use in `timezone_names`
-    for class in (Class.STANDARD, Class.LEGACY)
-        path = joinpath(DEPS_DIR, string(class))
-        TIME_ZONE_NAMES[class] = isfile(path) ? sort!(readlines(path)) : String[]
-    end
 end
 
 include("utils.jl")

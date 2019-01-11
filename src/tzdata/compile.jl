@@ -3,7 +3,8 @@ using Serialization
 using Dates: parse_components
 
 using ...TimeZones: TIME_ZONE_CACHE
-using ...TimeZones: TimeZones, TimeZone, FixedTimeZone, VariableTimeZone, Transition, rename
+using ...TimeZones: TimeZones, TimeZone, FixedTimeZone, VariableTimeZone, Transition, Class
+using ...TimeZones: classify, rename
 using ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET, MIN_SAVE, MAX_SAVE,
     ABS_DIFF_OFFSET
 
@@ -50,15 +51,17 @@ end
 struct TZSource
     zones::Dict{String,Vector{Zone}}
     rules::Dict{String,Vector{Rule}}
-    links::Dict{String,String}
+    links::Dict{String,String}         # link name => zone name
+    regions::Dict{String,Set{String}}  # zone name => tz sources
 end
 
-function TZSource()
-    TZSource(
-        Dict{String,Vector{Zone}}(),
-        Dict{String,Vector{Rule}}(),
-        Dict{String,String}(),
-    )
+function TZSource(
+    zones::AbstractDict=Dict{String,Vector{Zone}}(),
+    rules::AbstractDict=Dict{String,Vector{Rule}}(),
+    links::AbstractDict=Dict{String,String}(),
+    regions::AbstractDict=Dict{String,Set{String}}(),
+)
+    TZSource(zones, rules, links, regions)
 end
 
 TZSource(file::AbstractString) = load!(TZSource(), file)
@@ -540,13 +543,15 @@ function compile!(
 end
 
 
-function load!(tz_source::TZSource, io::IO)
+function load!(tz_source::TZSource, filename::AbstractString, io::IO)
     zones = tz_source.zones
     rules = tz_source.rules
     links = tz_source.links
+    regions = tz_source.regions
 
     local kind
     local name
+    region_name = basename(filename)
 
     # For the intial pass we'll collect the zone and rule lines.
     for line in eachline(io)
@@ -567,6 +572,7 @@ function load!(tz_source::TZSource, io::IO)
         elseif kind == "Zone"
             zone = parse(Zone, line)
             zones[name] = push!(get(zones, name, Zone[]), zone)
+            regions[name] = push!(get(regions, name, Set{String}()), region_name)
         elseif kind == "Link"
             target = name
             link_name = line
@@ -581,60 +587,69 @@ end
 
 function load!(tz_source::TZSource, file::AbstractString)
     open(file, "r") do io
-        load!(tz_source, io)
+        load!(tz_source, file, io)
     end
 end
 
-function Base.names(tz_source::TZSource)
-    sort!([collect(keys(tz_source.zones)); collect(keys(tz_source.links))])
-end
-
-function Base.merge!(a::TZSource, b::TZSource)
-    merge!(a.zones, b.zones)
-    merge!(a.rules, b.rules)
-    merge!(a.links, b.links)
-    return a
+function regions(tz_source::TZSource, zone_name::AbstractString)
+    get(tz_source.regions, zone_name, Set{String}())
 end
 
 function compile(name::AbstractString, tz_source::TZSource; kwargs...)
     ordered = OrderedRuleDict()
+
     if haskey(tz_source.links, name)
-        tz = compile!(tz_source.links[name], tz_source, ordered; kwargs...)
-        rename(tz, name)
+        # When the name is a link we'll generate a time zone from the link's target and
+        # rename the time zone with the link name.
+        target = tz_source.links[name]
+        tz = compile!(target, tz_source, ordered; kwargs...)
+        class = classify(tz, regions(tz_source, target))
+
+        return rename(tz, name), class
     else
-        compile!(name, tz_source, ordered; kwargs...)
+        tz = compile!(name, tz_source, ordered; kwargs...)
+        class = classify(tz, regions(tz_source, name))
+
+        return tz, class
     end
 end
 
 function compile(tz_source::TZSource; kwargs...)
-    time_zones = Vector{TimeZone}()
+    results = Vector{Tuple{TimeZone,Class}}()
     ordered = OrderedRuleDict()
-    lookup = Dict{String, TimeZone}()
+    lookup = Dict{String, Tuple{TimeZone,Class}}()
+
     for zone_name in keys(tz_source.zones)
         tz = compile!(zone_name, tz_source, ordered; kwargs...)
-        push!(time_zones, tz)
-        lookup[zone_name] = tz
+        class = classify(tz, regions(tz_source, zone_name))
+        result = (tz, class)
+
+        push!(results, result)
+        lookup[zone_name] = result
     end
 
     # Convert links into time zones.
     for (link_name, target) in tz_source.links
         if !haskey(lookup, link_name) && haskey(lookup, target)
-            push!(time_zones, rename(lookup[target], link_name))
+            target_tz, target_class = lookup[target]
+            result = rename(target_tz, link_name), target_class
+
+            push!(results, result)
         elseif !haskey(lookup, target)
             error("Unable to resolve link \"$link_name\" referencing \"$target\"")
         end
     end
 
-    return time_zones
+    return results
 end
 
 function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
-    time_zones = compile(tz_source; kwargs...)
+    results = compile(tz_source; kwargs...)
 
     isdir(dest_dir) || error("Destination directory doesn't exist")
     empty!(TIME_ZONE_CACHE)
 
-    for tz in time_zones
+    for (tz, class) in results
         parts = split(TimeZones.name(tz), '/')
         tz_path = joinpath(dest_dir, parts...)
         tz_dir = dirname(tz_path)
@@ -642,11 +657,11 @@ function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
         isdir(tz_dir) || mkpath(tz_dir)
 
         open(tz_path, "w") do fp
-            serialize(fp, tz)
+            serialize(fp, (tz, class))
         end
     end
 
-    return time_zones
+    return results
 end
 
 # TODO: Deprecate?

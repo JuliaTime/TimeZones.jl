@@ -28,8 +28,6 @@ function build(
     compiled_dir::AbstractString="";
     verbose::Bool=false,
 )
-    tz_category = Dict{Class,Vector{String}}()
-
     # Avoids spamming remote servers requesting the latest version
     if version == "latest"
         v = latest_version()
@@ -63,24 +61,11 @@ function build(
 
     if !isempty(compiled_dir)
         @info "Converting tz source files into TimeZone data"
-
-        # Separate standard/legacy tz source files
-        standard_files = joinpath.(tz_source_dir, intersect(regions, STANDARD_REGIONS))
-        legacy_files = joinpath.(tz_source_dir, intersect(regions, LEGACY_REGIONS))
-
-        standard = TZSource(standard_files)
-        legacy = TZSource(legacy_files)
-
-        # Record the time zone names associated with the category
-        tz_category[Class.STANDARD] = names(standard)
-        tz_category[Class.LEGACY] = setdiff(names(legacy), tz_category[Class.STANDARD])
-
-        # Combine the sources as legacy links depend on standard time zones
-        tz_source = merge!(standard, legacy)
+        tz_source = TZSource(joinpath.(tz_source_dir, regions))
         compile(tz_source, compiled_dir)
     end
 
-    return version, tz_category
+    return version
 end
 
 function build(version::AbstractString="latest")
@@ -94,21 +79,12 @@ function build(version::AbstractString="latest")
         rm(joinpath(COMPILED_DIR, file), recursive=true)
     end
 
-    version, tz_category = build(
+    version = build(
         version, REGIONS, ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, verbose=true,
     )
 
     # Store the version of the compiled tzdata
     write(ACTIVE_VERSION_FILE, version)
 
-    # Save time zone category information
-    for (class, tz_names) in tz_category
-        open(joinpath(DEPS_DIR, string(class)), "w+") do io
-            for name in tz_names
-                println(io, name)
-            end
-        end
-    end
-
-    return version, tz_category
+    return version
 end
