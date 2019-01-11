@@ -4,7 +4,7 @@ using Dates: parse_components
 
 using ...TimeZones: TIME_ZONE_CACHE
 using ...TimeZones: TimeZones, TimeZone, FixedTimeZone, VariableTimeZone, Transition, Class
-using ...TimeZones: classify, rename
+using ...TimeZones: rename
 using ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET, MIN_SAVE, MAX_SAVE,
     ABS_DIFF_OFFSET
 
@@ -604,12 +604,12 @@ function compile(name::AbstractString, tz_source::TZSource; kwargs...)
         # rename the time zone with the link name.
         zone_name = tz_source.links[name]
         tz = compile!(zone_name, tz_source, ordered; kwargs...)
-        class = classify(name, associated_regions(tz_source, name))
+        class = Class(name, associated_regions(tz_source, name))
 
         return rename(tz, name), class
     else
         tz = compile!(name, tz_source, ordered; kwargs...)
-        class = classify(name, associated_regions(tz_source, name))
+        class = Class(name, associated_regions(tz_source, name))
 
         return tz, class
     end
@@ -622,7 +622,7 @@ function compile(tz_source::TZSource; kwargs...)
 
     for zone_name in keys(tz_source.zones)
         tz = compile!(zone_name, tz_source, ordered; kwargs...)
-        class = classify(zone_name, associated_regions(tz_source, zone_name))
+        class = Class(zone_name, associated_regions(tz_source, zone_name))
 
         push!(results, (tz, class))
         lookup[zone_name] = tz
@@ -633,7 +633,7 @@ function compile(tz_source::TZSource; kwargs...)
         if !haskey(lookup, link_name) && haskey(lookup, target)
             target_tz = lookup[target]
             tz = rename(target_tz, link_name)
-            class = classify(link_name, associated_regions(tz_source, link_name))
+            class = Class(link_name, associated_regions(tz_source, link_name))
 
             push!(results, (tz, class))
         elseif !haskey(lookup, target)

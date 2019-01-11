@@ -16,13 +16,13 @@ using TimeZones: Class, Transition
         @test sprint(show, Class) == "Class"
     end
 
-    @testset "classify" begin
-        @test TimeZones.classify("Foobar", []) == Class.NONE
-        @test TimeZones.classify("UTC+1", []) == Class.FIXED
-        @test TimeZones.classify("Europe/Warsaw", ["europe"]) == Class.STANDARD
-        @test TimeZones.classify("US/Pacific", ["backward"]) == Class.LEGACY
-        @test TimeZones.classify("Etc/GMT-14", ["etcetera"]) == Class.LEGACY
-        @test TimeZones.classify("UTC", ["utc", "backward"]) == Class.FIXED | Class.STANDARD | Class.LEGACY
+    @testset "classify name/regions" begin
+        @test Class("Foobar", []) == Class.NONE
+        @test Class("UTC+1", []) == Class.FIXED
+        @test Class("Europe/Warsaw", ["europe"]) == Class.STANDARD
+        @test Class("US/Pacific", ["backward"]) == Class.LEGACY
+        @test Class("Etc/GMT-14", ["etcetera"]) == Class.LEGACY
+        @test Class("UTC", ["utc", "backward"]) == Class.FIXED | Class.STANDARD | Class.LEGACY
     end
 
     @testset "bitwise-or" begin

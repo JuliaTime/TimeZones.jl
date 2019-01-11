@@ -36,7 +36,7 @@ function Base.getproperty(::Type{Class}, field::Symbol)
     end
 end
 
-function classify(str::AbstractString, regions::AbstractSet{<:AbstractString})
+function Class(str::AbstractString, regions::AbstractSet{<:AbstractString})
     class = Class.NONE
     occursin(FIXED_TIME_ZONE_REGEX, str) && (class |= Class.FIXED)
     !isempty(intersect(regions, TZData.STANDARD_REGIONS)) && (class |= Class.STANDARD)
@@ -44,7 +44,7 @@ function classify(str::AbstractString, regions::AbstractSet{<:AbstractString})
     return class
 end
 
-classify(str::AbstractString, regions::AbstractVector) = classify(str, Set{String}(regions))
+Class(str::AbstractString, regions::AbstractVector) = Class(str, Set{String}(regions))
 
 Base.:(|)(a::Class, b::Class) = Class(a.val | b.val)
 Base.:(&)(a::Class, b::Class) = Class(a.val & b.val)
