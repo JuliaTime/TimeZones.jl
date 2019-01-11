@@ -1,15 +1,45 @@
 const TIME_ZONE_CACHE = Dict{String,Tuple{TimeZone,Class}}()
 
 """
-    TimeZone(str::AbstractString, mask::Class=Class.DEFAULT) -> TimeZone
+    TimeZone(str::AbstractString) -> TimeZone
 
-Constructs a `TimeZone` subtype based upon the string and the provided `mask`. If the
-string is a recognized time zone name then data is loaded from the compiled IANA time zone
-database. Otherwise the string is assumed to be a fixed time zone.
+Constructs a `TimeZone` subtype based upon the string. If the string is a recognized
+standard time zone name then data is loaded from the compiled IANA time zone database.
+Otherwise the string is parsed as a fixed time zone.
 
-A list of recognized time zones names is available from `timezone_names()`. Supported fixed
-time zone string formats can be found in docstring for: `FixedTimeZone(::AbstractString)`.
+A list of recognized standard and legacy time zones names can is available by running
+`timezone_names()`. Supported fixed time zone string formats can be found in docstring for
+[`FixedTimeZone(::AbstractString)`](@ref).
+
+## Examples
+```jldoctest
+julia> TimeZone("Europe/Warsaw")
+Europe/Warsaw (UTC+1/UTC+2)
+
+julia> TimeZone("UTC")
+UTC
+```
 """
+TimeZone(::AbstractString)
+
+"""
+    TimeZone(str::AbstractString, mask::Class) -> TimeZone
+
+Similar to [`TimeZone(::AbstractString)`](@ref) but allows you to control what time zone
+classes are allowed to be constructed with `mask`. Can be used to construct time zones
+which are classified as "legacy".
+
+## Examples
+```jldoctest
+julia> TimeZone("US/Pacific")
+ERROR: ArgumentError: The time zone "US/Pacific" is of class `Class.LEGACY` which is currently not allowed by the mask: `Class.FIXED | Class.STANDARD`
+
+julia> TimeZone("US/Pacific", TimeZones.Class.LEGACY)
+US/Pacific (UTC-8/UTC-7)
+```
+"""
+TimeZone(::AbstractString, ::Class)
+
 function TimeZone(str::AbstractString, mask::Class=Class.DEFAULT)
     # Note: If the class `mask` does not match the time zone we'll still load the
     # information into the cache to ensure the result is consistent.
