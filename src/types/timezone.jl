@@ -32,7 +32,7 @@ which are classified as "legacy".
 ## Examples
 ```jldoctest
 julia> TimeZone("US/Pacific")
-ERROR: ArgumentError: The time zone "US/Pacific" is of class `Class(:LEGACY)` which is currently not allowed by the mask: `Class(:FIXED) | Class(:STANDARD)`
+ERROR: ArgumentError: The time zone "US/Pacific" is of class `TimeZones.Class(:LEGACY)` which is currently not allowed by the mask: `TimeZones.Class(:FIXED) | TimeZones.Class(:STANDARD)`
 
 julia> TimeZone("US/Pacific", TimeZones.Class(:LEGACY))
 US/Pacific (UTC-8/UTC-7)

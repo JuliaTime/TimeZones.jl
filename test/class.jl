@@ -39,25 +39,16 @@ using TimeZones: Class, Transition
         @test Class(0x01) & Class(0x01) == Class(0x01)
     end
 
-    @testset "labels" begin
-        @test TimeZones.labels(Class(:NONE)) == ["NONE"]
-        @test TimeZones.labels(Class(:FIXED)) == ["FIXED"]
-        @test TimeZones.labels(Class(:STANDARD)) == ["STANDARD"]
-        @test TimeZones.labels(Class(:LEGACY)) == ["LEGACY"]
-
-        @test TimeZones.labels(Class(:DEFAULT)) == ["FIXED", "STANDARD"]
-        @test TimeZones.labels(Class(:ALL)) == ["FIXED", "STANDARD", "LEGACY"]
-
-        @test TimeZones.labels(Class(0x08)) == ["Class(0x08)"]
-    end
-
-    @testset "string" begin
-        @test string(Class(:DEFAULT)) == "FIXED | STANDARD"
-        @test string(Class(0x09)) == "FIXED | Class(0x08)"
-    end
-
     @testset "repr" begin
+        @test repr(Class(:NONE)) == "Class(:NONE)"
+        @test repr(Class(:FIXED)) == "Class(:FIXED)"
+        @test repr(Class(:STANDARD)) == "Class(:STANDARD)"
+        @test repr(Class(:LEGACY)) == "Class(:LEGACY)"
+
         @test repr(Class(:DEFAULT)) == "Class(:FIXED) | Class(:STANDARD)"
+        @test repr(Class(:ALL)) == "Class(:FIXED) | Class(:STANDARD) | Class(:LEGACY)"
+
+        @test repr(Class(0x08)) == "Class(0x08)"
         @test repr(Class(0x09)) == "Class(:FIXED) | Class(0x08)"
     end
 end
