@@ -15,7 +15,7 @@ function localzone()
     # Only allow creating a TimeZone using standard and legacy IANA time zone database
     # names. We allow the use of legacy names here as most operating systems still use the
     # legacy names.
-    mask = Class.STANDARD | Class.LEGACY
+    mask = Class(:STANDARD) | Class(:LEGACY)
 
     @static if Sys.isapple()
         name = @mock read(`systemsetup -gettimezone`, String)  # Appears to only work as root

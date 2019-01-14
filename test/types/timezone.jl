@@ -20,11 +20,11 @@ end
     @test !istimezone("Etc/GMT+12")
     @test !istimezone("Etc/GMT-14")
 
-    @test istimezone("Etc/GMT", Class.LEGACY)
-    @test istimezone("Etc/GMT+12", Class.LEGACY)
-    @test istimezone("Etc/GMT-14", Class.LEGACY)
+    @test istimezone("Etc/GMT", Class(:LEGACY))
+    @test istimezone("Etc/GMT+12", Class(:LEGACY))
+    @test istimezone("Etc/GMT-14", Class(:LEGACY))
 
-    @test TimeZone("Etc/GMT", Class.LEGACY) == FixedTimeZone("Etc/GMT", 0)
-    @test TimeZone("Etc/GMT+12", Class.LEGACY) == FixedTimeZone("Etc/GMT+12", -12 * 3600)
-    @test TimeZone("Etc/GMT-14", Class.LEGACY) == FixedTimeZone("Etc/GMT-14", 14 * 3600)
+    @test TimeZone("Etc/GMT", Class(:LEGACY)) == FixedTimeZone("Etc/GMT", 0)
+    @test TimeZone("Etc/GMT+12", Class(:LEGACY)) == FixedTimeZone("Etc/GMT+12", -12 * 3600)
+    @test TimeZone("Etc/GMT-14", Class(:LEGACY)) == FixedTimeZone("Etc/GMT-14", 14 * 3600)
 end

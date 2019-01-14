@@ -123,14 +123,14 @@ end
 # https://github.com/JuliaTime/TimeZones.jl/issues/154
 @testset "legacy time zones" begin
     # "US/Pacific" is deprecated in favor of "America/Los_Angeles"
-    @test istimezone("US/Pacific", Class.LEGACY)
+    @test istimezone("US/Pacific", Class(:LEGACY))
     name = Sys.isunix() ? "US/Pacific" : "Pacific Standard Time"
     with_localzone(name) do
         @test localzone().transitions == tz"America/Los_Angeles".transitions
     end
 
     # "America/Montreal" is deprecated in favor of "America/Toronto"
-    @test istimezone("America/Montreal", Class.LEGACY)
+    @test istimezone("America/Montreal", Class(:LEGACY))
     if Sys.isunix()
         with_localzone("America/Montreal") do
             @test localzone().transitions == tz"America/Toronto".transitions
@@ -139,7 +139,7 @@ end
 
     # "America/Indianapolis" is deprecated in favor of "America/Indiana/Indianapolis"
     # Note: On Windows "US Eastern Standard Time" translates to "America/Indianapolis"
-    @test istimezone("America/Indianapolis", Class.LEGACY)
+    @test istimezone("America/Indianapolis", Class(:LEGACY))
     name = Sys.isunix() ? "America/Indianapolis" : "US Eastern Standard Time"
     with_localzone(name) do
         @test localzone().transitions == tz"America/Indiana/Indianapolis".transitions

@@ -35,7 +35,7 @@ Returns all pre-computed `TimeZone`s.
 function all_timezones()
     results = TimeZone[]
     for name in timezone_names()
-        push!(results, TimeZone(name, Class.ALL))
+        push!(results, TimeZone(name, Class(:ALL)))
     end
     return results
 end

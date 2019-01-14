@@ -32,15 +32,15 @@ which are classified as "legacy".
 ## Examples
 ```jldoctest
 julia> TimeZone("US/Pacific")
-ERROR: ArgumentError: The time zone "US/Pacific" is of class `Class.LEGACY` which is currently not allowed by the mask: `Class.FIXED | Class.STANDARD`
+ERROR: ArgumentError: The time zone "US/Pacific" is of class `Class(:LEGACY)` which is currently not allowed by the mask: `Class(:FIXED) | Class(:STANDARD)`
 
-julia> TimeZone("US/Pacific", TimeZones.Class.LEGACY)
+julia> TimeZone("US/Pacific", TimeZones.Class(:LEGACY))
 US/Pacific (UTC-8/UTC-7)
 ```
 """
 TimeZone(::AbstractString, ::Class)
 
-function TimeZone(str::AbstractString, mask::Class=Class.DEFAULT)
+function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
     # Note: If the class `mask` does not match the time zone we'll still load the
     # information into the cache to ensure the result is consistent.
     tz, class = get!(TIME_ZONE_CACHE, str) do
@@ -49,13 +49,13 @@ function TimeZone(str::AbstractString, mask::Class=Class.DEFAULT)
         if isfile(tz_path)
             open(deserialize, tz_path, "r")
         elseif occursin(FIXED_TIME_ZONE_REGEX, str)
-            FixedTimeZone(str), Class.FIXED
+            FixedTimeZone(str), Class(:FIXED)
         else
             throw(ArgumentError("Unknown time zone \"$str\""))
         end
     end
 
-    if mask & class == Class.NONE
+    if mask & class == Class(:NONE)
         throw(ArgumentError(
             "The time zone \"$str\" is of class `$(repr(class))` which is " *
             "currently not allowed by the mask: `$(repr(mask))`"
@@ -81,13 +81,13 @@ macro tz_str(str)
 end
 
 """
-    istimezone(str::AbstractString, mask::Class=Class.DEFAULT) -> Bool
+    istimezone(str::AbstractString, mask::Class=Class(:DEFAULT)) -> Bool
 
 Check whether a string is a valid for constructing a `TimeZone` with the provided `mask`.
 """
-function istimezone(str::AbstractString, mask::Class=Class.DEFAULT)
+function istimezone(str::AbstractString, mask::Class=Class(:DEFAULT))
     # Start by performing quick FIXED class test
-    if mask & Class.FIXED != Class.NONE && occursin(FIXED_TIME_ZONE_REGEX, str)
+    if mask & Class(:FIXED) != Class(:NONE) && occursin(FIXED_TIME_ZONE_REGEX, str)
         return true
     end
 
@@ -99,9 +99,9 @@ function istimezone(str::AbstractString, mask::Class=Class.DEFAULT)
             # Cache the data since we're already performing the deserialization
             TIME_ZONE_CACHE[str] = open(deserialize, tz_path, "r")
         else
-            nothing, Class.NONE
+            nothing, Class(:NONE)
         end
     end
 
-    return tz !== nothing && mask & class != Class.NONE
+    return tz !== nothing && mask & class != Class(:NONE)
 end

@@ -12,9 +12,9 @@ According to [IANA](ftp://ftp.iana.org/tz/data/etcetera) the "Etc/\*" time zones
 
 ```jldoctest
 julia> TimeZone("Etc/GMT+4")
-ERROR: ArgumentError: The time zone "Etc/GMT+4" is of class `Class.LEGACY` which is currently not allowed by the mask: `Class.FIXED | Class.STANDARD`
+ERROR: ArgumentError: The time zone "Etc/GMT+4" is of class `Class(:LEGACY)` which is currently not allowed by the mask: `Class(:FIXED) | Class(:STANDARD)`
 
-julia> TimeZone("Etc/GMT+4", TimeZones.Class.LEGACY)
+julia> TimeZone("Etc/GMT+4", TimeZones.Class(:LEGACY))
 Etc/GMT+4 (UTC-4)
 ```
 
