@@ -48,14 +48,16 @@ using TimeZones: Class, Transition
         @test TimeZones.labels(Class.DEFAULT) == ["FIXED", "STANDARD"]
         @test TimeZones.labels(Class.ALL) == ["FIXED", "STANDARD", "LEGACY"]
 
-        @test TimeZones.labels(Class(0x08)) == String[]
+        @test TimeZones.labels(Class(0x08)) == ["Class(0x08)"]
     end
 
     @testset "string" begin
         @test string(Class.DEFAULT) == "FIXED | STANDARD"
+        @test string(Class(0x09)) == "FIXED | Class(0x08)"
     end
 
     @testset "repr" begin
         @test repr(Class.DEFAULT) == "Class.FIXED | Class.STANDARD"
+        @test repr(Class(0x09)) == "Class.FIXED | Class(0x08)"
     end
 end

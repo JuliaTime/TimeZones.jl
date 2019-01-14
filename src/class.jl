@@ -19,17 +19,17 @@ struct Class
 end
 
 function Base.getproperty(::Type{Class}, field::Symbol)
-    if field == :NONE
+    if field === :NONE
         Class(0x00)
-    elseif field == :FIXED
+    elseif field === :FIXED
         Class(0x01)
-    elseif field == :STANDARD
+    elseif field === :STANDARD
         Class(0x02)
-    elseif field == :LEGACY
+    elseif field === :LEGACY
         Class(0x04)
-    elseif field == :DEFAULT
+    elseif field === :DEFAULT
         Class.FIXED | Class.STANDARD
-    elseif field == :ALL
+    elseif field === :ALL
         Class.FIXED | Class.STANDARD | Class.LEGACY
     else
         getfield(Class, field)
@@ -49,15 +49,24 @@ Class(str::AbstractString, regions::AbstractVector) = Class(str, Set{String}(reg
 Base.:(|)(a::Class, b::Class) = Class(a.val | b.val)
 Base.:(&)(a::Class, b::Class) = Class(a.val & b.val)
 Base.:(==)(a::Class, b::Class) = a.val == b.val
+Base.:(~)(a::Class) = Class(~a.val)
 
 function labels(mask::Class)
+    mask == Class.NONE && return ["NONE"]
+
     names = String[]
     mask & Class.FIXED == Class.FIXED && push!(names, "FIXED")
     mask & Class.STANDARD == Class.STANDARD && push!(names, "STANDARD")
     mask & Class.LEGACY == Class.LEGACY && push!(names, "LEGACY")
-    mask == Class.NONE && push!(names, "NONE")
+
+    unused = mask & ~Class.ALL
+    unused != Class.NONE && push!(names, "Class($(repr(unused.val)))")
+
     return names
 end
 
 Base.print(io::IO, mask::Class) = join(io, labels(mask), " | ")
-Base.show(io::IO, mask::Class) = join(io, string.("Class.", labels(mask)), " | ")
+
+function Base.show(io::IO, mask::Class)
+    join(io, [startswith(l, "Class") ? l : "Class.$l" for l in labels(mask)], " | ")
+end
