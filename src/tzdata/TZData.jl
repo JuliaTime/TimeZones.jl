@@ -25,5 +25,6 @@ include("version.jl")
 include("download.jl")
 include("compile.jl")
 include("build.jl")
+include("deprecated.jl")
 
 end

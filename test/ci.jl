@@ -1,3 +1,5 @@
+using TimeZones: TZData
+
 # Note: These tests are only meant to be run in a CI environment as they will modify the
 # build time zones in the COMPILED_DIR.
 
@@ -13,26 +15,11 @@
     @test length(readdir(TZData.TZ_SOURCE_DIR)) == 1
 
     # Using a version we already have avoids triggering a download
-    TimeZones.build(TZDATA_VERSION, TZData.REGIONS)
+    TimeZones.build(TZDATA_VERSION)
 
     @test isdir(TZData.COMPILED_DIR)
     @test length(readdir(TZData.COMPILED_DIR)) > 0
-    @test readdir(TZData.TZ_SOURCE_DIR) == sort!([TZData.REGIONS; "utc"])
-
-
-    # Compile the "etcetera" tz source file. An example from the FAQ.
-    @test !isfile(joinpath(TZData.TZ_SOURCE_DIR, "etcetera"))
-
-    archive = TZData.active_archive()
-    TZData.extract(archive, TZData.TZ_SOURCE_DIR, "etcetera")
-
-    @test isfile(joinpath(TZData.TZ_SOURCE_DIR, "etcetera"))
-    TZData.compile()
-
-    @test TimeZone("Etc/GMT") == FixedTimeZone("Etc/GMT", 0)
-    @test TimeZone("Etc/GMT+12") == FixedTimeZone("Etc/GMT+12", -12 * 3600)
-    @test TimeZone("Etc/GMT-14") == FixedTimeZone("Etc/GMT-14", 14 * 3600)
-
+    @test readdir(TZData.TZ_SOURCE_DIR) == sort(TZData.REGIONS)
 
     # Compile tz source files with an extended max_year. An example from the FAQ.
     warsaw = TimeZone("Europe/Warsaw")

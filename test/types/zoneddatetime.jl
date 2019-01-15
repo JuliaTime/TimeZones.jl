@@ -3,7 +3,7 @@ using Dates: Hour, Second, UTM
 
 @testset "ZonedDateTime" begin
     utc = FixedTimeZone("UTC", 0, 0)
-    warsaw = compile("Europe/Warsaw", tzdata["europe"])
+    warsaw = first(compile("Europe/Warsaw", tzdata["europe"]))
 
     @testset "standard time" begin
         local_dt = DateTime(1916, 2, 1, 0)
@@ -113,7 +113,7 @@ using Dates: Hour, Second, UTM
 
     @testset "2-hour daylight saving time offset" begin
         # Check behaviour when the "save" offset is larger than an hour.
-        paris = compile("Europe/Paris", tzdata["europe"])
+        paris = first(compile("Europe/Paris", tzdata["europe"]))
 
         @test ZonedDateTime(DateTime(1945,4,2,1), paris).zone == FixedTimeZone("WEST", 0, 3600)
         @test_throws NonExistentTimeError ZonedDateTime(DateTime(1945,4,2,2), paris)
@@ -181,7 +181,7 @@ using Dates: Hour, Second, UTM
 
     @testset "skip an entire day" begin
         # Significant offset change: -11:00 -> 13:00.
-        apia = compile("Pacific/Apia", tzdata["australasia"])
+        apia = first(compile("Pacific/Apia", tzdata["australasia"]))
 
         # Skips an entire day.
         @test ZonedDateTime(DateTime(2011,12,29,23),apia).utc_datetime == DateTime(2011,12,30,9)
@@ -221,7 +221,7 @@ using Dates: Hour, Second, UTM
 
     @testset "equality" begin
         # Check equality between ZonedDateTimes
-        apia = compile("Pacific/Apia", tzdata["australasia"])
+        apia = first(compile("Pacific/Apia", tzdata["australasia"]))
 
         spring_utc = ZonedDateTime(DateTime(2010, 5, 1, 12), utc)
         spring_apia = ZonedDateTime(DateTime(2010, 5, 1, 1), apia)
@@ -303,7 +303,7 @@ using Dates: Hour, Second, UTM
     @testset "no cutoff" begin
         # TimeZones that no longer have any transitions after the max_year shouldn't have a cutoff
         # eg. Asia/Hong_Kong, Pacific/Honolulu, Australia/Perth
-        perth = compile("Australia/Perth", tzdata["australasia"])
+        perth = first(compile("Australia/Perth", tzdata["australasia"]))
         zdt = ZonedDateTime(DateTime(2200, 1, 1), perth, from_utc=true)
     end
 

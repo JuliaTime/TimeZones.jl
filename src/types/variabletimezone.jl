@@ -30,6 +30,14 @@ function Base.:(==)(a::VariableTimeZone, b::VariableTimeZone)
     a.name == b.name && a.transitions == b.transitions
 end
 
+function Base.isequal(a::VariableTimeZone, b::VariableTimeZone)
+    return (
+        isequal(a.name, b.name) &&
+        isequal(a.transitions, b.transitions) &&
+        isequal(a.cutoff, b.cutoff)
+    )
+end
+
 function Base.hash(tz::VariableTimeZone, h::UInt)
     h = hash(tz.name, h)
     h = hash(tz.transitions, h)

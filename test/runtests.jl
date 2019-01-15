@@ -12,7 +12,7 @@ using TimeZones.TZData: ARCHIVE_DIR, TZSource, compile, build
 const TZDATA_VERSION = "2016j"
 const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(PKG_DIR, "test", "tzsource"))
 const TZFILE_DIR = joinpath(PKG_DIR, "test", "tzfile")
-const TEST_REGIONS = ("asia", "australasia", "europe", "northamerica")
+const TEST_REGIONS = ["asia", "australasia", "europe", "northamerica"]
 
 isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
 isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)
@@ -36,6 +36,7 @@ include("helpers.jl")
 
 @testset "TimeZones" begin
     include("utils.jl")
+    include("class.jl")
     include(joinpath("tzdata", "timeoffset.jl"))
     include(joinpath("tzdata", "archive.jl"))
     include(joinpath("tzdata", "version.jl"))

@@ -3,10 +3,9 @@ using Mocking: Mocking, @mock
 """
     timezone_names() -> Vector{String}
 
-Returns a sorted list of all of the valid names for constructing a `TimeZone`.
+Returns a sorted list of all of the pre-computed time zone names.
 """
 function timezone_names()
-    # Note: IANA time zone names are typically encoded only in ASCII.
     names = String[]
     check = Tuple{String,String}[(TZData.COMPILED_DIR, "")]
 
@@ -36,7 +35,7 @@ Returns all pre-computed `TimeZone`s.
 function all_timezones()
     results = TimeZone[]
     for name in timezone_names()
-        push!(results, TimeZone(name))
+        push!(results, TimeZone(name, Class(:ALL)))
     end
     return results
 end
