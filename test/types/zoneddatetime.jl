@@ -254,6 +254,12 @@ using Dates: Hour, Second, UTM
         @test hash(astimezone(fall_utc, apia)) == hash(fall_apia)
     end
 
+    @testset "broadcastable" begin
+        # Validate that ZonedDateTime is treated as a scalar during broadcasting
+        zdt = ZonedDateTime(2000, 1, 2, 3, utc)
+        @test size(zdt .== zdt) == ()
+    end
+
     @testset "deepcopy hash" begin
         # Issue #78
         x = ZonedDateTime(2017, 7, 6, 15, 44, 55, 28, warsaw)

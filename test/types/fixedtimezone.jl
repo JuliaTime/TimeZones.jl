@@ -35,4 +35,10 @@
     @test_throws ArgumentError FixedTimeZone("UTC1")
     @test_throws ArgumentError FixedTimeZone("+1")
     @test_throws ArgumentError FixedTimeZone("-2")
+
+    @testset "broadcastable" begin
+        # Validate that FixedTimeZone is treated as a scalar during broadcasting
+        fixed_tz = FixedTimeZone("UTC")
+        @test size(fixed_tz .== fixed_tz) == ()
+    end
 end
