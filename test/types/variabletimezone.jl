@@ -11,6 +11,13 @@
         @test hash(warsaw) == hash(another_warsaw)
     end
 
+    @testset "broadcastable" begin
+        warsaw = first(compile("Europe/Warsaw", tzdata["europe"]))
+
+        # Validate that VariableTimeZone is treated as a scalar during broadcasting
+        @test size(warsaw .== warsaw) == ()
+    end
+
     @testset "links" begin
         # "Arctic/Longyearbyen" is a link to "Europe/Oslo"
         oslo = first(compile("Europe/Oslo", tzdata["europe"]))

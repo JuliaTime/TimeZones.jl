@@ -105,3 +105,11 @@ function istimezone(str::AbstractString, mask::Class=Class(:DEFAULT))
 
     return tz !== nothing && mask & class != Class(:NONE)
 end
+
+# After `broadcastable` was defined but before this was addressed in the `Dates` stdlib
+# - Broadcastable introduction: https://github.com/JuliaLang/julia/pull/26601
+# - Fixed in Dates: https://github.com/JuliaLang/julia/pull/30159
+# Note: The change was backported to 1.1 as well.
+if v"0.7.0-DEV.4743" <= VERSION < v"1.1.0-DEV.722" || v"1.2-" <= VERSION < v"1.2.0-DEV.114"
+    Base.broadcastable(tz::TimeZone) = Ref(tz)
+end
