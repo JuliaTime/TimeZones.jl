@@ -1,7 +1,7 @@
 import TimeZones.TZData: tzdata_url, tzdata_download, isarchive, LATEST_FILE, read_latest
 
-@test tzdata_url("2016j") == "https://www.iana.org/time-zones/repository/releases/tzdata2016j.tar.gz"
-@test tzdata_url("latest") == "https://www.iana.org/time-zones/repository/tzdata-latest.tar.gz"
+@test tzdata_url("2016j") == "https://data.iana.org/time-zones/releases/tzdata2016j.tar.gz"
+@test tzdata_url("latest") == "https://data.iana.org/time-zones/tzdata-latest.tar.gz"
 
 # Note: Try to keep the number of `tzdata_download` calls low to avoid unnecessary network traffic
 mktempdir() do temp_dir
