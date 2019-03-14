@@ -1,9 +1,46 @@
 using TimeZones: Transition
-using Dates: Hour, Second, UTM
+using Dates: Hour, Second, UTM, @dateformat_str
 
 @testset "ZonedDateTime" begin
     utc = FixedTimeZone("UTC", 0, 0)
     warsaw = first(compile("Europe/Warsaw", tzdata["europe"]))
+
+    @testset "dateformat parsing" begin
+        # Make sure all dateformat codes parse correctly
+        # yYmuUdHMSseEzZ and yyyymmdd
+        zdt = ZonedDateTime(1, 2, 3, 4, 5, 6, 7, utc)
+        # Test y, u, d, H, M, S, s, Z
+        p_zdt = parse(
+            ZonedDateTime,
+            "Feb 3 1, 4:5:6.007 UTC",
+            dateformat"u d y, H:M:S.s Z",
+        )
+        @test zdt == p_zdt
+
+        # Test m, e, Y, z
+        p_zdt = parse(
+            ZonedDateTime,
+            "2 mon 3 1, 4:5:6.007+00:00",
+            dateformat"m e d Y, H:M:S.s+z",
+        )
+        @test zdt == p_zdt
+
+        # Test E, U
+        p_zdt = parse(
+            ZonedDateTime,
+            "February Monday 3 1 4:5:6.007 UTC",
+            dateformat"U E d y H:M:S.s Z",
+        )
+        @test zdt == p_zdt
+
+        # Test yyyymmdd
+        p_zdt = parse(
+            ZonedDateTime,
+            "00010203 4:5:6.007 UTC",
+            dateformat"yyyymmdd H:M:S.s Z",
+        )
+        @test zdt == p_zdt
+    end
 
     @testset "standard time" begin
         local_dt = DateTime(1916, 2, 1, 0)
