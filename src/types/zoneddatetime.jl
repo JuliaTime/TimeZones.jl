@@ -118,7 +118,8 @@ end
 
 # Parsing constructor. Note we typically don't support passing in time zone information as a
 # string since we cannot do not know if we need to support resolving ambiguity.
-function ZonedDateTime(y::Int64, m::Int64, d::Int64, h::Int64, mi::Int64, s::Int64, ms::Int64, tz::AbstractString)
+# Month Union issue: https://github.com/JuliaTime/TimeZones.jl/issues/187#issuecomment-473012078
+function ZonedDateTime(y::Int64, m::Union{Int32, Int64}, d::Int64, h::Int64, mi::Int64, s::Int64, ms::Int64, tz::AbstractString)
     ZonedDateTime(DateTime(y,m,d,h,mi,s,ms), TimeZone(tz))
 end
 
