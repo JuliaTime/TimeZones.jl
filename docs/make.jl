@@ -1,7 +1,8 @@
-using Documenter, TimeZones
+using Dates, Documenter, TimeZones
 
 makedocs(
-    sitename="TimeZones.jl",
+    modules=[TimeZones],
+    format = Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true"),
     pages = [
         "Introduction" => "index.md",
         "Types" => "types.md",
@@ -10,9 +11,11 @@ makedocs(
         "Rounding" => "rounding.md",
         "Current Time" => "current.md",
         "Frequently Asked Questions" => "faq.md",
+        "API – Public" => "api-public.md",
+        "API – Private" => "api-private.md",
     ],
-    html_prettyurls=false,  # makes local builds work
+    sitename="TimeZones.jl",
+    checkdocs=:exports,
     linkcheck=true,
-    linkcheck_ignore=[r"^ftp://.*"],
     strict=true,
 )
