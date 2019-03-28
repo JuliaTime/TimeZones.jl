@@ -126,11 +126,12 @@ end
 
 
 """
-    next_transition_instant(zdt::ZonedDateTime) -> ZonedDateTime
-    next_transition_instant(tz::TimeZone=localzone()) -> ZonedDateTime
+    next_transition_instant(zdt::ZonedDateTime) -> Union{ZonedDateTime, Nothing}
+    next_transition_instant(tz::TimeZone=localzone()) -> Union{ZonedDateTime, Nothing}
 
 Determine the next instant at which a time zone transition occurs (typically
-due to daylight-savings time).
+due to daylight-savings time). If no there exists no future transition then `nothing` will
+be returned.
 
 Note that the provided `ZonedDateTime` isn't normally constructable:
 
@@ -153,12 +154,15 @@ next_transition_instant
 
 function next_transition_instant(zdt::ZonedDateTime)
     tz = zdt.timezone
+    tz isa VariableTimeZone || return nothing
 
     # Determine the index of the transition which occurs after the UTC datetime specified
     index = searchsortedfirst(
         tz.transitions, TimeZones.utc(zdt),
         by=el -> isa(el, TimeZones.Transition) ? el.utc_datetime : el,
     )
+
+    index <= length(tz.transitions) || return nothing
 
     # Use the UTC datetime of the transition and the offset information prior to the
     # transition to create a `ZonedDateTime` which cannot be constructed with the high-level
@@ -208,7 +212,18 @@ Transition To:     2011-12-31T00:00:00.000+14:00
 show_next_transition
 
 function show_next_transition(io::IO, zdt::ZonedDateTime)
+    if timezone(zdt) isa FixedTimeZone
+        @warn "No transitions exist in time zone $(timezone(zdt))"
+        return
+    end
+
     instant = next_transition_instant(zdt)
+
+    if instant === nothing
+        @warn "No transition exists in $(timezone(zdt)) after: $zdt"
+        return
+    end
+
     epsilon = eps(instant)
     from, to = instant - epsilon, instant + zero(epsilon)
     direction = value(to.zone.offset - from.zone.offset) < 0 ? "Backward" : "Forward"

@@ -68,6 +68,19 @@ paris = first(compile("Europe/Paris", tzdata["europe"]))
             end
         end
     end
+
+    @testset "fixed time zone" begin
+        @test next_transition_instant(ZonedDateTime(2018, 1, 1, tz"UTC")) === nothing
+    end
+
+    @testset "no future transition" begin
+        # Determine the last transition instant for the time zone
+        t = wpg.transitions[end]
+        last_trans_instant = ZonedDateTime(t.utc_datetime, wpg, t.zone)
+
+        @test next_transition_instant(last_trans_instant) !== nothing
+        @test next_transition_instant(last_trans_instant + Millisecond(1)) === nothing
+    end
 end
 
 @testset "show_next_transition" begin
@@ -122,5 +135,23 @@ end
                 @test occursin("2000-04-02", sprint(show_next_transition, wpg))
             end
         end
+    end
+
+    @testset "fixed time zone" begin
+        msg = "No transitions exist in time zone UTC"
+        instant = ZonedDateTime(2019 ,1, 1, tz"UTC")
+
+        io = IOBuffer()
+        @test_logs (:warn, msg) show_next_transition(io, instant)
+        @test isempty(read(seekstart(io), String))
+    end
+
+    @testset "no future transition" begin
+        msg = "No transition exists in America/Winnipeg after: 2038-03-14T01:59:59.999-06:00"
+        instant = ZonedDateTime(wpg.cutoff - Millisecond(1), wpg; from_utc=true)
+
+        io = IOBuffer()
+        @test_logs (:warn, msg) show_next_transition(io, instant)
+        @test isempty(read(seekstart(io), String))
     end
 end
