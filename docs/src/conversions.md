@@ -53,7 +53,7 @@ julia> ZonedDateTime("2015-03-30+02:00", df)
 
 ## Formatting strings
 
-Formatting a `ZonedDateTime` as a string also extends the functionality provided by `Base.Dates`. The `TimeZones` package adds the new formatting character codes `z` and `Z` to the list of available [formatting character codes](https://docs.julialang.org/en/v1/stdlib/Dates/#Dates.format-Tuple{TimeType,AbstractString}):
+Formatting a `ZonedDateTime` as a string also extends the functionality provided by `Base.Dates`. The `TimeZones` package adds the new formatting character codes `z` and `Z` to the list of available [formatting character codes](https://docs.julialang.org/en/v1/stdlib/Dates/#Dates.DateFormat):
 
 | Code | Examples             | Comment                                          |
 |:-----|:---------------------|:-------------------------------------------------|

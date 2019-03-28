@@ -155,7 +155,8 @@ const TZ_REGEX = r"""
     parse_tz_format(str) -> TimeZone
 
 Parse the time zone format typically provided via the "TZ" environment variable. Details on
-the format can be found under the [tzset man page](http://linux.die.net/man/3/tzset).
+the format can be found under the man page for
+[tzset](http://man7.org/linux/man-pages/man3/tzset.3.html).
 
 Currently this function handles only the first format which is a fixed time zone without
 daylight saving time.

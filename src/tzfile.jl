@@ -19,7 +19,7 @@ end
 
 Read the content of an I/O stream and process it as a
 [POSIX tzfile](http://man7.org/linux/man-pages/man5/tzfile.5.html). The returned
-`TimeZone` will be given the suppiled name `name` unless a `FixedTimeZone` is returned.
+`TimeZone` will be given the supplied name `name` unless a `FixedTimeZone` is returned.
 """
 function read_tzfile(io::IO, name::AbstractString)
     version, tz = read_tzfile_internal(io, name)
