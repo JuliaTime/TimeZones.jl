@@ -51,3 +51,24 @@ end
 @testset "default format" begin
     @test default_format(ZonedDateTime) === TimeZones.ISOZonedDateTimeFormat
 end
+
+@testset "parse constructor" begin
+    @test isequal(
+        ZonedDateTime("2000-01-02T03:04:05.006+0700"),
+        ZonedDateTime(2000, 1, 2, 3, 4, 5, 6, tz"UTC+07")
+    )
+    @test isequal(
+        ZonedDateTime("2018-11-01-0600", dateformat"yyyy-mm-ddzzzz"),
+        ZonedDateTime(2018, 11, 1, tz"UTC-06"),
+    )
+
+    # Validate that error message contains the original string and the format used
+    str = "2018-11-01"
+    try
+        ZonedDateTime(str)
+    catch e
+        @test e isa ArgumentError
+        @test occursin(str, e.msg)
+        @test occursin(string(TimeZones.ISOZonedDateTimeFormat), e.msg)
+    end
+end
