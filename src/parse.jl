@@ -81,8 +81,19 @@ end
 # Note: ISOZonedDateTimeFormat is defined in the module __init__ which means that this
 # function can not be called from within this module. TODO: Ignore linting for this line
 function ZonedDateTime(str::AbstractString, df::DateFormat=ISOZonedDateTimeFormat)
-    parse(ZonedDateTime, str, df)
+    try
+        parse(ZonedDateTime, str, df)
+    catch e
+        if e isa ArgumentError
+            rethrow(ArgumentError(
+                "Unable to parse string \"$str\" using format $df. $(e.msg)"
+            ))
+        else
+            rethrow()
+        end
+    end
 end
+
 function ZonedDateTime(str::AbstractString, format::AbstractString; locale::AbstractString="english")
     ZonedDateTime(str, DateFormat(format, locale))
 end
