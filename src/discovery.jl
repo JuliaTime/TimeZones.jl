@@ -243,7 +243,7 @@ function show_next_transition(io::IO, zdt::ZonedDateTime)
 
     println(io, "Transition Date:   ", Dates.format(instant, dateformat"yyyy-mm-dd"))
     println(io, "Local Time Change: ", time_format(instant), " → ", time_format(to), " (", direction, ")")
-    println(io, "Offset Change:     ", repr(from.zone.offset), " → ", repr(to.zone.offset))
+    println(io, "Offset Change:     ", repr("text/plain", from.zone.offset), " → ", repr("text/plain", to.zone.offset))
     println(io, "Transition From:   ", zdt_format(from))
     println(io, "Transition To:     ", zdt_format(to))
 

@@ -1,20 +1,8 @@
 using Dates: value
 
-Base.print(io::IO, tz::TimeZone) = print(io, tz.name)
 function Base.print(io::IO, tz::FixedTimeZone)
-    isempty(tz.name) ? print(io, "UTC", tz.offset) : print(io, tz.name)
-end
-Base.print(io::IO, zdt::ZonedDateTime) = print(io, localtime(zdt), zdt.zone.offset)
-
-function Base.show(io::IO, t::Transition)
-    print(io, t.utc_datetime, " ")
-    show(io, t.zone.offset)
-    !isempty(t.zone.name) && print(io, " (", t.zone.name, ")")
-end
-
-function Base.show(io::IO, tz::FixedTimeZone)
-    if get(io, :compact, false)
-        print(io, tz)
+    if get(io, :compact, true)
+        isempty(tz.name) ? print(io, "UTC", tz.offset) : print(io, tz.name)
     else
         offset_str = "UTC" * offset_string(tz.offset, true)  # Use ISO 8601 for comparision
         if isempty(tz.name)
@@ -27,9 +15,9 @@ function Base.show(io::IO, tz::FixedTimeZone)
     end
 end
 
-function Base.show(io::IO, tz::VariableTimeZone)
-    if get(io, :compact, false)
-        print(io, tz)
+function Base.print(io::IO, tz::VariableTimeZone)
+    if get(io, :compact, true)
+        print(io, tz.name)
     else
         trans = tz.transitions
 
@@ -56,4 +44,85 @@ function Base.show(io::IO, tz::VariableTimeZone)
     end
 end
 
-Base.show(io::IO,dt::ZonedDateTime) = print(io, string(dt))
+function Base.print(io::IO, t::Transition)
+    print(io, t.utc_datetime, " ")
+    show(io, MIME("text/plain"), t.zone.offset)  # Long-form
+    !isempty(t.zone.name) && print(io, " (", t.zone.name, ")")
+end
+
+Base.print(io::IO, zdt::ZonedDateTime) = print(io, localtime(zdt), zdt.zone.offset)
+
+
+function Base.show(io::IO, tz::FixedTimeZone)
+    if istimezone(tz.name, Class(:ALL)) && isequal(tz, TimeZone(tz.name, Class(:ALL)))
+        print(io, "tz\"$(tz.name)\"")
+    else
+        std = Dates.value(tz.offset.std)
+        dst = Dates.value(tz.offset.dst)
+
+        params = [repr(tz.name), repr(std)]
+        dst != 0 && push!(params, repr(dst))
+        print(io, FixedTimeZone, "(", join(params, ", "), ")")
+    end
+end
+
+function Base.show(io::IO, tz::VariableTimeZone)
+    # Compat printing when the time zone can be constructed with `@tz_str`
+    if istimezone(tz.name, Class(:ALL)) && isequal(tz, TimeZone(tz.name, Class(:ALL)))
+        print(io, "tz\"$(tz.name)\"")
+
+    # Compact printing of a custom time zone which is non-constructable
+    elseif get(io, :compact, false)
+        print(io, VariableTimeZone, "(")
+        show(io, tz.name)
+        print(io, ", ...)")
+
+    # Verbose printing which should print a fully constructable `VariableTimeZone`.
+    else
+        # Force `:compact => false` to make the force the transition vector printing into
+        # long form.
+        print(io, VariableTimeZone, "(")
+        show(io, tz.name)
+        print(io, ", ")
+        show(IOContext(io, :compact => false), tz.transitions)
+        print(io, ", ")
+        show(io, tz.cutoff)
+        print(io, ")")
+    end
+end
+
+function Base.show(io::IO, t::Transition)
+    # Note: Using combo of `:typeinfo` and `:limit` as a way of detecting when a vector of
+    # transitions is being printed in the REPL.
+    if get(io, :compact, false) || get(io, :typeinfo, Union{}) == Transition && get(io, :limit, false)
+        print(io, t)
+    else
+        invoke(show, Tuple{IO, Any}, io, t)
+    end
+end
+
+function Base.show(io::IO, zdt::ZonedDateTime)
+    if get(io, :compact, false)
+        print(io, zdt)
+    else
+        values = [
+            yearmonthday(zdt)...
+            hour(zdt)
+            minute(zdt)
+            second(zdt)
+            millisecond(zdt)
+        ]
+        index = something(findlast(!iszero, values), 1)
+        params = [
+            map(repr, values[1:index]);
+            repr(timezone(zdt); context=:compact => true)
+        ]
+
+        print(io, ZonedDateTime, "(", join(params, ", "), ")")
+    end
+end
+
+
+Base.show(io::IO, ::MIME"text/plain", t::Transition) = print(io, t)
+Base.show(io::IO, ::MIME"text/plain", tz::TimeZone) = print(IOContext(io, :compact => false), tz)
+Base.show(io::IO, ::MIME"text/plain", zdt::ZonedDateTime) = print(io, zdt)

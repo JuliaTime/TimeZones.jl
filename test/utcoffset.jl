@@ -42,5 +42,17 @@ let a = UTCOffset(7200, 3600), b = UTCOffset(3600, 7200)
     @test isequal(a, b)
 end
 
-@test sprint(show, UTCOffset(0, 0)) == "UTC+0/+0"
-@test sprint(show, UTCOffset(3600, 7200)) == "UTC+1/+2"
+@test sprint(show_compact, UTCOffset(0, 0)) == "UTC+0/+0"
+@test sprint(show_compact, UTCOffset(3600, 7200)) == "UTC+1/+2"
+
+# https://github.com/JuliaLang/julia/pull/30817
+if VERSION >= v"1.2.0-DEV.223"
+    @test sprint(show, UTCOffset(0, 0)) == "UTCOffset(Second(0), Second(0))"
+    @test sprint(show, UTCOffset(3600, 7200)) == "UTCOffset(Second(3600), Second(7200))"
+else
+    @test sprint(show, UTCOffset(0, 0)) == "UTCOffset(0 seconds, 0 seconds)"
+    @test sprint(show, UTCOffset(3600, 7200)) == "UTCOffset(3600 seconds, 7200 seconds)"
+end
+
+@test sprint(show, MIME("text/plain"), UTCOffset(0, 0)) == "UTC+0/+0"
+@test sprint(show, MIME("text/plain"), UTCOffset(3600, 7200)) == "UTC+1/+2"

@@ -1,52 +1,76 @@
 using TimeZones.TZData: parse_components
+using TimeZones: Transition
 
+dt = DateTime(1942,12,25,1,23,45)
+custom_dt = DateTime(1800,1,1)
+
+utc = FixedTimeZone("UTC")
+gmt = FixedTimeZone("GMT", 0)
+foo = FixedTimeZone("FOO", 0)
 null = FixedTimeZone("", 10800)
 fixed = FixedTimeZone("UTC+01:00")
 est = FixedTimeZone("EST", -18000)
 warsaw = first(compile("Europe/Warsaw", tzdata["europe"]))
-apia = first(compile("Pacific/Apia", tzdata["australasia"]))
-honolulu = first(compile("Pacific/Honolulu", tzdata["northamerica"]))  # Uses cutoff
+apia = cache_tz(compile("Pacific/Apia", tzdata["australasia"]))
+honolulu = cache_tz(compile("Pacific/Honolulu", tzdata["northamerica"]))  # Uses cutoff
 ulyanovsk = first(compile("Europe/Ulyanovsk", tzdata["europe"]))  # No named abbreviations
 new_york = first(compile("America/New_York", tzdata["northamerica"]))  # Underscore in name
-dt = DateTime(1942,12,25,1,23,45)
+custom = VariableTimeZone("Test/Custom", [Transition(custom_dt, utc)])  # Non-cached variable time zone
 
-# TimeZones as a string
-@test string(null) == "UTC+03:00"
-@test string(fixed) == "UTC+01:00"
-@test string(est) == "EST"
-@test string(warsaw) == "Europe/Warsaw"
-@test string(apia) == "Pacific/Apia"
-@test string(honolulu) == "Pacific/Honolulu"
-@test string(ulyanovsk) == "Europe/Ulyanovsk"
+@test sprint(print, utc) == "UTC"
+@test sprint(print, gmt) == "GMT"
+@test sprint(print, foo) == "FOO"
+@test sprint(print, null) == "UTC+03:00"
+@test sprint(print, fixed) == "UTC+01:00"
+@test sprint(print, est) == "EST"
+@test sprint(print, warsaw) == "Europe/Warsaw"
+@test sprint(print, apia) == "Pacific/Apia"
+@test sprint(print, honolulu) == "Pacific/Honolulu"
+@test sprint(print, ulyanovsk) == "Europe/Ulyanovsk"
+@test sprint(print, custom) == "Test/Custom"
 
-# Alternatively in Julia 0.7.0-DEV.4517 we could use
-# `sprint(show, ..., context=:compact => true)`
-show_compact = (io, args...) -> show(IOContext(io, :compact => true), args...)
-@test sprint(show_compact, null) == "UTC+03:00"
-@test sprint(show_compact, fixed) == "UTC+01:00"
-@test sprint(show_compact, est) == "EST"
-@test sprint(show_compact, warsaw) == "Europe/Warsaw"
-@test sprint(show_compact, apia) == "Pacific/Apia"
-@test sprint(show_compact, honolulu) == "Pacific/Honolulu"
-@test sprint(show_compact, ulyanovsk) == "Europe/Ulyanovsk"
+@test sprint(show_compact, utc) == "tz\"UTC\""
+@test sprint(show_compact, gmt) == "tz\"GMT\""
+@test sprint(show_compact, foo) == "FixedTimeZone(\"FOO\", 0)"
+@test sprint(show_compact, null) == "FixedTimeZone(\"\", 10800)"
+@test sprint(show_compact, fixed) == "tz\"UTC+01:00\""
+@test sprint(show_compact, est) == "tz\"EST\""
+@test sprint(show_compact, warsaw) == "tz\"Europe/Warsaw\""
+@test sprint(show_compact, apia) == "tz\"Pacific/Apia\""
+@test sprint(show_compact, honolulu) == "tz\"Pacific/Honolulu\""
+@test sprint(show_compact, ulyanovsk) == "tz\"Europe/Ulyanovsk\""
+@test sprint(show_compact, custom) == "VariableTimeZone(\"Test/Custom\", ...)"
 
-@test sprint(show, null) == "UTC+03:00"
-@test sprint(show, fixed) == "UTC+01:00"
-@test sprint(show, est) == "EST (UTC-5)"
-@test sprint(show, warsaw) == "Europe/Warsaw (UTC+1/UTC+2)"
-@test sprint(show, apia) == "Pacific/Apia (UTC+13/UTC+14)"
-@test sprint(show, honolulu) == "Pacific/Honolulu (UTC-10)"
-@test sprint(show, ulyanovsk) == "Europe/Ulyanovsk (UTC+4)"
+@test sprint(show, utc) == "tz\"UTC\""
+@test sprint(show, gmt) == "tz\"GMT\""
+@test sprint(show, foo) == "FixedTimeZone(\"FOO\", 0)"
+@test sprint(show, null) == "FixedTimeZone(\"\", 10800)"
+@test sprint(show, fixed) == "tz\"UTC+01:00\""
+@test sprint(show, est) == "tz\"EST\""
+@test sprint(show, warsaw) == "tz\"Europe/Warsaw\""
+@test sprint(show, apia) == "tz\"Pacific/Apia\""
+@test sprint(show, honolulu) == "tz\"Pacific/Honolulu\""
+@test sprint(show, ulyanovsk) == "tz\"Europe/Ulyanovsk\""
+@test sprint(show, custom) == "VariableTimeZone(\"Test/Custom\", Transition[Transition($(repr(custom_dt)), tz\"UTC\")], nothing)"
 
-# UTC and GMT are special cases
-@test sprint(show, FixedTimeZone("UTC")) == "UTC"
-@test sprint(show, FixedTimeZone("GMT", 0)) == "GMT"
-@test sprint(show, FixedTimeZone("FOO", 0)) == "FOO (UTC+0)"
+@test sprint(show, MIME("text/plain"), utc) == "UTC"
+@test sprint(show, MIME("text/plain"), gmt) == "GMT"
+@test sprint(show, MIME("text/plain"), foo) == "FOO (UTC+0)"
+@test sprint(show, MIME("text/plain"), null) == "UTC+03:00"
+@test sprint(show, MIME("text/plain"), fixed) == "UTC+01:00"
+@test sprint(show, MIME("text/plain"), est) == "EST (UTC-5)"
+@test sprint(show, MIME("text/plain"), warsaw) == "Europe/Warsaw (UTC+1/UTC+2)"
+@test sprint(show, MIME("text/plain"), apia) == "Pacific/Apia (UTC+13/UTC+14)"
+@test sprint(show, MIME("text/plain"), honolulu) == "Pacific/Honolulu (UTC-10)"
+@test sprint(show, MIME("text/plain"), ulyanovsk) == "Europe/Ulyanovsk (UTC+4)"
+@test sprint(show, MIME("text/plain"), custom) == "Test/Custom (UTC+0)"
 
 # ZonedDateTime as a string
 zdt = ZonedDateTime(dt, warsaw)
 @test string(zdt) == "1942-12-25T01:23:45+01:00"
-@test sprint(show, zdt) == "1942-12-25T01:23:45+01:00"
+@test sprint(show_compact, zdt) == "1942-12-25T01:23:45+01:00"
+@test sprint(show, zdt) == "ZonedDateTime(1942, 12, 25, 1, 23, 45, tz\"Europe/Warsaw\")"
+@test sprint(show, MIME("text/plain"), zdt) == "1942-12-25T01:23:45+01:00"
 
 
 # TimeZone parsing
@@ -105,3 +129,38 @@ f = "yyyy/m/d H:M:S zzz"
 df = Dates.DateFormat("yyyy-mm-ddTHH:MM:SS ZZZ")
 zdt = ZonedDateTime(dt, warsaw)
 @test_throws ArgumentError parse(ZonedDateTime, Dates.format(zdt, df), df)
+
+
+# Displaying VariableTimeZone's vector of transitions on the REPL has a special printing
+@testset "Transitions I/O" begin
+    transitions = honolulu.transitions  # Only contains a few transitions
+    t = transitions[2]  # 1896-01-13T22:31:26 UTC-10:30/+0 (HST)
+
+    @testset "basic" begin
+        @test sprint(print, t) == "1896-01-13T22:31:26 UTC-10:30/+0 (HST)"
+        @test sprint(show_compact, t) == "1896-01-13T22:31:26 UTC-10:30/+0 (HST)"
+        @test sprint(show, t) == "Transition($(repr(t.utc_datetime)), FixedTimeZone(\"HST\", -37800))"
+        @test sprint(show, MIME("text/plain"), t) == "1896-01-13T22:31:26 UTC-10:30/+0 (HST)"
+    end
+
+    @testset "REPL vector" begin
+        expected_full = string(
+            TimeZones.Transition,
+            "[",
+            join(map(t -> sprint(show, t, context=:compact => false), transitions), ", "),
+            "]",
+        )
+
+        # Note: The output here is different from the interactive REPL but is representative
+        # of the output.
+        expected_repl = string(
+            TimeZones.Transition,
+            "[",
+            join(map(t -> sprint(show, t, context=:compact => true), transitions), ", "),
+            "]",
+        )
+
+        @test sprint(show, transitions, context=:compact => false) == expected_full
+        @test sprint(show, transitions; context=:limit => true) == expected_repl
+    end
+end

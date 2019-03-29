@@ -28,3 +28,15 @@ function ignore_output(body::Function; stdout::Bool=true, stderr::Bool=true)
 
     return result
 end
+
+# Alternatively in Julia 0.7.0-DEV.4517 we could use
+# `sprint(show, ..., context=:compact => true)`
+show_compact = (io, args...) -> show(IOContext(io, :compact => true), args...)
+
+# Takes the tuple from `compile` and adds the result into TimeZones cache. Typically should
+# not be used and only should be required if the test tzdata version and built tzdata
+# version do not match.
+function cache_tz((tz, class)::Tuple{TimeZone, TimeZones.Class})
+    TimeZones.TIME_ZONE_CACHE[TimeZones.name(tz)] = (tz, class)
+    return tz
+end
