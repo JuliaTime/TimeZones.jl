@@ -57,8 +57,18 @@ function offset_string(offset::UTCOffset, iso8601::Bool=false)
 end
 
 Base.print(io::IO, o::UTCOffset) = print(io, offset_string(o, true))
+
 function Base.show(io::IO, o::UTCOffset)
-    # Show DST as a separate offset since we want to distinguish between normal hourly
-    # daylight saving time offsets and exotic DST offsets (e.g. midsummer time).
-    print(io, "UTC", offset_string(o.std), "/", offset_string(o.dst))
+    if get(io, :compact, false)
+        # Show DST as a separate offset since we want to distinguish between normal hourly
+        # daylight saving time offsets and exotic DST offsets (e.g. midsummer time).
+        print(io, "UTC", offset_string(o.std), "/", offset_string(o.dst))
+    else
+        # Fallback to calling the default show instead of reimplementing it.
+        invoke(show, Tuple{IO, Any}, io, o)
+    end
+end
+
+function Base.show(io::IO, ::MIME"text/plain", o::UTCOffset)
+    show(IOContext(io, :compact => true), o)
 end
