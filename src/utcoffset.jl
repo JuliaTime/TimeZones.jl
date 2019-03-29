@@ -64,6 +64,7 @@ function Base.show(io::IO, o::UTCOffset)
         # daylight saving time offsets and exotic DST offsets (e.g. midsummer time).
         print(io, "UTC", offset_string(o.std), "/", offset_string(o.dst))
     else
+        # Fallback to calling the default show instead of reimplementing it.
         invoke(show, Tuple{IO, Any}, io, o)
     end
 end

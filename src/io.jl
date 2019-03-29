@@ -97,6 +97,7 @@ function Base.show(io::IO, t::Transition)
     if get(io, :compact, false) || get(io, :typeinfo, Union{}) == Transition && get(io, :limit, false)
         print(io, t)
     else
+        # Fallback to calling the default show instead of reimplementing it.
         invoke(show, Tuple{IO, Any}, io, t)
     end
 end

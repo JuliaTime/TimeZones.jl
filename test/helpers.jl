@@ -29,8 +29,7 @@ function ignore_output(body::Function; stdout::Bool=true, stderr::Bool=true)
     return result
 end
 
-# Alternatively in Julia 0.7.0-DEV.4517 we could use
-# `sprint(show, ..., context=:compact => true)`
+# Used in tests as a shorter form of: `sprint(show, ..., context=:compact => true)`
 show_compact = (io, args...) -> show(IOContext(io, :compact => true), args...)
 
 # Takes the tuple from `compile` and adds the result into TimeZones cache. Typically should
