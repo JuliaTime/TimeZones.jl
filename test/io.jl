@@ -145,7 +145,7 @@ zdt = ZonedDateTime(dt, warsaw)
 
     @testset "REPL vector" begin
         expected_full = string(
-            TimeZones.Transition,
+            Transition,
             "[",
             join(map(t -> sprint(show, t, context=:compact => false), transitions), ", "),
             "]",
@@ -154,13 +154,13 @@ zdt = ZonedDateTime(dt, warsaw)
         # Note: The output here is different from the interactive REPL but is representative
         # of the output.
         expected_repl = string(
-            TimeZones.Transition,
+            Transition,
             "[",
             join(map(t -> sprint(show, t, context=:compact => true), transitions), ", "),
             "]",
         )
 
         @test sprint(show, transitions, context=:compact => false) == expected_full
-        @test sprint(show, transitions; context=:limit => true) == expected_repl
+        @test sprint(show, transitions; context=:compact_el => true) == expected_repl
     end
 end
