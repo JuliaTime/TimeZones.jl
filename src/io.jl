@@ -92,8 +92,6 @@ function Base.show(io::IO, tz::VariableTimeZone)
 end
 
 function Base.show(io::IO, t::Transition)
-    # Note: Using combo of `:typeinfo` and `:limit` as a way of detecting when a vector of
-    # transitions is being printed in the REPL.
     if get(io, :compact, false) || get(io, :compact_el, false)
         print(io, t)
     else
@@ -103,8 +101,6 @@ function Base.show(io::IO, t::Transition)
 end
 
 function Base.show(io::IO, zdt::ZonedDateTime)
-    # Note: Using combo of `:typeinfo` and `:limit` as a way of detecting when a vector of
-    # ZonedDateTimes is being printed in the REPL.
     if get(io, :compact, false) || get(io, :compact_el, false)
         print(io, zdt)
     else
@@ -133,6 +129,8 @@ Base.show(io::IO, ::MIME"text/plain", zdt::ZonedDateTime) = print(io, zdt)
 # Use compact printing on certain element types
 for T in (:Transition, :ZonedDateTime)
     @eval function Base.show(io::IO, m::MIME"text/plain", X::AbstractArray{$T})
+        # Specify a custom IO context which we can use to perform compact printing of
+        # elements.
         io = IOContext(io, :compact_el => true)
         invoke(show, Tuple{IO, MIME"text/plain", AbstractArray}, io, m, X)
     end
