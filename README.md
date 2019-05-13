@@ -1,11 +1,6 @@
 TimeZones.jl
 ============
 
-[![TimeZones v0.4](http://pkg.julialang.org/badges/TimeZones_0.4.svg)](http://pkg.julialang.org/?pkg=TimeZones&ver=0.4)
-[![TimeZones v0.5](http://pkg.julialang.org/badges/TimeZones_0.5.svg)](http://pkg.julialang.org/?pkg=TimeZones&ver=0.5)
-[![TimeZones v0.6](http://pkg.julialang.org/badges/TimeZones_0.6.svg)](http://pkg.julialang.org/?pkg=TimeZones&ver=0.6)
-[![TimeZones v0.7](http://pkg.julialang.org/badges/TimeZones_0.7.svg)](http://pkg.julialang.org/?pkg=TimeZones&ver=0.7)
-<br/>
 [![Travis CI](https://travis-ci.org/JuliaTime/TimeZones.jl.svg?branch=master)](https://travis-ci.org/JuliaTime/TimeZones.jl)
 [![AppVeyor](https://ci.appveyor.com/api/projects/status/ru96a9u8h83j9ixu/branch/master?svg=true)](https://ci.appveyor.com/project/omus/timezones-jl)
 [![codecov](https://codecov.io/gh/JuliaTime/TimeZones.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaTime/TimeZones.jl)
