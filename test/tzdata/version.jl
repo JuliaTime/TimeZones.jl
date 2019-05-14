@@ -52,7 +52,7 @@ mktempdir() do temp_dir
 end
 
 @test tzdata_version_archive(archive) == TZDATA_VERSION
-@test_throws ErrorException tzdata_version_archive(@__FILE__) == TZDATA_VERSION
+@test_throws ProcessFailedException tzdata_version_archive(@__FILE__) == TZDATA_VERSION
 
 
 # Active/built tzdata version

@@ -11,7 +11,7 @@ end
 
 files = readarchive(ARCHIVE_PATH)
 @test !isempty(files)
-@test_throws ErrorException readarchive(@__FILE__)
+@test_throws ProcessFailedException readarchive(@__FILE__)
 
 mktempdir() do temp_dir
     @test isempty(readdir(temp_dir))
@@ -34,5 +34,5 @@ mktempdir() do temp_dir
     @test readdir(temp_dir) == files[1:2]
 
     # Attempt to decompress a non-archive
-    @test_throws ErrorException extract(@__FILE__, temp_dir)
+    @test_throws ProcessFailedException extract(@__FILE__, temp_dir)
 end

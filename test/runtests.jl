@@ -14,6 +14,11 @@ const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(PKG_DIR, "test", "tzsou
 const TZFILE_DIR = joinpath(PKG_DIR, "test", "tzfile")
 const TEST_REGIONS = ["asia", "australasia", "europe", "northamerica"]
 
+# https://github.com/JuliaLang/julia/pull/27900
+if VERSION < v"1.2.0-DEV.642"
+    const ProcessFailedException = ErrorException
+end
+
 isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
 isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)
 
