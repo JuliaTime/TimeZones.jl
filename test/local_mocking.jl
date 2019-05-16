@@ -8,13 +8,13 @@ name = string(localzone()) == "Europe/Warsaw" ? "Pacific/Apia" : "Europe/Warsaw"
 tzfile_path = joinpath(TZFILE_DIR, split(name, '/')...)
 @assert isfile(tzfile_path) "Tests require a local tzfile present"
 win_name = name == "Europe/Warsaw" ? "Central European Standard Time" : "Samoa Standard Time"
-timezone = TimeZone(name)
+tz = TimeZone(name)
 
 if Sys.isapple()
     # Determine time zone via systemsetup.
     patch = @patch read(cmd::AbstractCmd, ::Type{String}) = "Time Zone:  " * name * "\n"
     apply(patch) do
-        @test localzone() == timezone
+        @test localzone() == tz
     end
 
     # Determine time zone from /etc/localtime.
@@ -23,13 +23,13 @@ if Sys.isapple()
         @patch readlink(filename::AbstractString) = "/usr/share/zoneinfo/$name"
     ]
     apply(patches) do
-        @test localzone() == timezone
+        @test localzone() == tz
     end
 
 elseif Sys.iswindows()
     patch = @patch read(cmd::AbstractCmd, ::Type{String}) = "$win_name\r\n"
     apply(patch) do
-        @test localzone() == timezone
+        @test localzone() == tz
     end
 
     # Dateline Standard Time -> Etc/GMT+12 -> UTC-12:00
@@ -37,7 +37,7 @@ elseif Sys.iswindows()
 elseif Sys.islinux()
     # Test TZ environmental variable
     withenv("TZ" => ":$name") do
-        @test localzone() == timezone
+        @test localzone() == tz
     end
 
     withenv("TZ" => nothing) do
@@ -47,7 +47,7 @@ elseif Sys.islinux()
             @patch open(fn::Function, f::AbstractString) = fn(IOBuffer("$name #Works with comments\n"))
         ]
         apply(patches) do
-            @test localzone() == timezone
+            @test localzone() == tz
         end
 
         # Determine time zone from /etc/conf.d/clock
@@ -56,7 +56,7 @@ elseif Sys.islinux()
             @patch open(fn::Function, f::AbstractString) = fn(IOBuffer("\n\nTIMEZONE=\"$name\""))
         ]
         apply(patches) do
-            @test localzone() == timezone
+            @test localzone() == tz
         end
 
         # Determine time zone from symlink /etc/localtime
@@ -66,7 +66,7 @@ elseif Sys.islinux()
             @patch readlink(f::AbstractString) = "/usr/share/zoneinfo/$name"
         ]
         apply(patches) do
-            @test localzone() == timezone
+            @test localzone() == tz
         end
 
         # Determine time zone from contents of /etc/localtime

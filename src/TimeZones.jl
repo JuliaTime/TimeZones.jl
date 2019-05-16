@@ -12,7 +12,7 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
     timezone_names, all_timezones, timezones_from_abbr, timezone_abbrs,
     next_transition_instant, show_next_transition,
     # accessors.jl
-    hour, minute, second, millisecond,
+    timezone, hour, minute, second, millisecond,
     # adjusters.jl
     firstdayofweek, lastdayofweek,
     firstdayofmonth, lastdayofmonth,

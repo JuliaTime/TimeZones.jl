@@ -93,7 +93,7 @@ round_trip = TimeZones.unix2zdt(TimeZones.zdt2unix(Int64, zdt))
 zdt = ZonedDateTime(2010, 1, 2, 3, 4, 5, warsaw)
 round_trip = TimeZones.unix2zdt(TimeZones.zdt2unix(Int64, zdt))
 @test round_trip == zdt
-@test TimeZones.timezone(round_trip) != TimeZones.timezone(zdt)
+@test timezone(round_trip) != timezone(zdt)
 
 # Julian dates
 jd = 2457241.855
