@@ -2,8 +2,8 @@ using Dates, Documenter, TimeZones
 
 makedocs(
     modules=[TimeZones],
-    format = Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true"),
-    pages = [
+    format=Documenter.HTML(prettyurls=get(ENV, "CI", nothing) == "true"),
+    pages=[
         "Introduction" => "index.md",
         "Types" => "types.md",
         "Converting" => "conversions.md",
