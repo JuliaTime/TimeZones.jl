@@ -5,8 +5,8 @@ TimeZones.jl
 [![AppVeyor](https://ci.appveyor.com/api/projects/status/ru96a9u8h83j9ixu/branch/master?svg=true)](https://ci.appveyor.com/project/omus/timezones-jl)
 [![codecov](https://codecov.io/gh/JuliaTime/TimeZones.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaTime/TimeZones.jl)
 <br/>
-[![Stable Documentation](https://img.shields.io/badge/docs-stable-blue.svg)](http://timezonesjl.readthedocs.io/en/stable/)
-[![Latest Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](http://timezonesjl.readthedocs.io/en/latest/)
+[![Stable Documentation](https://img.shields.io/badge/docs-stable-blue.svg)](https://juliatime.github.io/TimeZones.jl/stable)
+[![Dev Documentation](https://img.shields.io/badge/docs-dev-blue.svg)](https://juliatime.github.io/TimeZones.jl/dev)
 
 [IANA time zone database](http://www.iana.org/time-zones) access for the [Julia](http://julialang.org/) programming language. TimeZones.jl extends the Date/DateTime support for Julia to include a new time zone aware TimeType: ZonedDateTime.
 
