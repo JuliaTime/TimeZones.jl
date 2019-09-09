@@ -28,9 +28,10 @@ os:
   - osx
   - linux
 julia:
-  - 0.7
   - 1.0
   - 1.1
+  - 1.2
+  - 1.3
   - nightly
 env:
   - JULIA_TZ_VERSION="2016j"  # Ideally only set for the "test" stage
