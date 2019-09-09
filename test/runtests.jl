@@ -1,13 +1,16 @@
 using Mocking
-Mocking.enable(force=true)
-const compiled_modules_enabled = false
+
+if isdefined(Mocking, :activate)
+    Mocking.activate()  # Mocking v0.7.0
+else
+    Mocking.enable(force=true)
+end
 
 using Test
 using TimeZones
-using Unicode
-
 using TimeZones: PKG_DIR
 using TimeZones.TZData: ARCHIVE_DIR, TZSource, compile, build
+using Unicode
 
 const TZDATA_VERSION = "2016j"
 const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(PKG_DIR, "test", "tzsource"))
@@ -63,7 +66,7 @@ include("helpers.jl")
     include("conversions.jl")
     include("ranges.jl")
     include("local.jl")
-    !compiled_modules_enabled && include("local_mocking.jl")
+    include("local_mocking.jl")
     include("discovery.jl")
     include("rounding.jl")
     include("parse.jl")
