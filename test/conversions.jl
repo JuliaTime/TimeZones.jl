@@ -37,13 +37,11 @@ zdt = now(warsaw)
     end
 
     @testset "ambiguous" begin
-        if !compiled_modules_enabled
-            local patch = @patch today(tz::TimeZone) = Date(1916, 10, 1)
-            apply(patch) do
-                @test_throws AmbiguousTimeError todayat(Time(0), warsaw)
-                @test todayat(Time(0), warsaw, 1) == ZonedDateTime(1916, 10, 1, 0, warsaw, 1)
-                @test todayat(Time(0), warsaw, 2) == ZonedDateTime(1916, 10, 1, 0, warsaw, 2)
-            end
+        local patch = @patch today(tz::TimeZone) = Date(1916, 10, 1)
+        apply(patch) do
+            @test_throws AmbiguousTimeError todayat(Time(0), warsaw)
+            @test todayat(Time(0), warsaw, 1) == ZonedDateTime(1916, 10, 1, 0, warsaw, 1)
+            @test todayat(Time(0), warsaw, 2) == ZonedDateTime(1916, 10, 1, 0, warsaw, 2)
         end
     end
 end
