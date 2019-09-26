@@ -1,6 +1,19 @@
 using TimeZones: Transition
-using TimeZones.TZData: TZSource, Zone, Rule, compile, parse_date, order_rules
+using TimeZones.TZData: TZSource, Zone, Rule, compile, parse_date, order_rules,
+    tryparse_dayofmonth_function
 using Dates: Hour, Minute, Second, DateTime, Date
+
+@testset "tryparse_dayofmonth_function" begin
+    # Using 2019/03 as the test month. Results can be validated by viewing a calendar:
+    # https://www.timeanddate.com/calendar/monthly.html?year=2019&month=3&country=1
+    @test tryparse_dayofmonth_function("lastSun")(2019, 3) == Date(2019, 3, 31)
+    @test tryparse_dayofmonth_function("lastThu")(2019, 3) == Date(2019, 3, 28)
+    @test tryparse_dayofmonth_function("Sun>=1")(2019, 3) == Date(2019, 3, 3)
+    @test tryparse_dayofmonth_function("Sun>=8")(2019, 3) == Date(2019, 3, 10)
+    @test tryparse_dayofmonth_function("Fri<=1")(2019, 4) == Date(2019, 3, 29)
+    @test tryparse_dayofmonth_function("Wed>=28")(2019, 2) == Date(2019, 3, 6)
+    @test tryparse_dayofmonth_function("15")(2019, 3) == Date(2019, 3, 15)
+end
 
 ### parse_date ###
 
@@ -53,6 +66,7 @@ using Dates: Hour, Minute, Second, DateTime, Date
 @test parse_date("2011 Dec 29 24:00") == (DateTime(2011,12,30), 'w')      # Pacific/Apia (2014f)
 @test parse_date("1945 Sep 30 24:00") == (DateTime(1945,10,1), 'w')       # Asia/Macau (2018f)
 @test parse_date("2019 Mar Sun>=8 3:00") == (DateTime(2019,3,10,3), 'w')  # America/Metlakatla (2018h)
+@test parse_date("2006 Apr Fri<=1 2:00") == (DateTime(2006,3,31,2), 'w')  # Asia/Jerusalem (2019b)
 
 
 ### order_rules ###
