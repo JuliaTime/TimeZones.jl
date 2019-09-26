@@ -96,10 +96,10 @@ const DAYS = Dict(
 
 const LAST_DAY_OF_WEEK = Dict{String, Function}()
 
-# Create adjuster functions such as `last_sunday`.
+# Create adjuster functions such as `islastsunday`.
 for (abbr, dayofweek) in DAYS
-    str = "last" * abbr
-    f = Symbol("last_" * lowercase(dayname(dayofweek)))
+    str = "last" * abbr  # e.g. "lastSun"
+    f = Symbol("islast" * lowercase(dayname(dayofweek)))  # e.g. :islastsunday
     LAST_DAY_OF_WEEK[str] = @eval begin
         function $f(dt)
             return dayofweek(dt) == $dayofweek &&
