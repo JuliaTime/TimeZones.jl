@@ -18,7 +18,7 @@ TimeZones.TZData.tzdata_version_dir
 TimeZones.TZData.tzdata_version_archive
 TimeZones.TZData.read_news
 TimeZones.TZData.compile!
-TimeZones.TZData.tryparse_dayofmonth
+TimeZones.TZData.tryparse_dayofmonth_function
 TimeZones.TZData.order_rules
 ```
 

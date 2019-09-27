@@ -94,17 +94,32 @@ const DAYS = Dict(
     "Mon" => 1, "Tue" => 2, "Wed" => 3, "Thu" => 4, "Fri" => 5, "Sat" => 6, "Sun" => 7,
 )
 
-const LAST_DAY_OF_WEEK = Dict{String, Function}()
+const LAST_WEEKDAY_OF_MONTH = Dict{String, Function}()
 
-# Create adjuster functions such as `last_sunday`.
+# Create functions such as `is_last_sunday` and `last_sunday_of_month`.
 for (abbr, dayofweek) in DAYS
-    str = "last" * abbr
-    f = Symbol("last_" * lowercase(dayname(dayofweek)))
-    LAST_DAY_OF_WEEK[str] = @eval begin
-        function $f(dt)
+    on_str = "last" * abbr  # e.g. "lastSun"
+    weekday = dayname(dayofweek)  # e.g. "Sunday"
+    is_last_weekday = Symbol("is_last_", lowercase(weekday))
+    last_weekday_of_month = Symbol("last_", lowercase(weekday), "_of_month")
+
+    LAST_WEEKDAY_OF_MONTH[on_str] = @eval begin
+        function $is_last_weekday(dt)
             return dayofweek(dt) == $dayofweek &&
             dayofweekofmonth(dt) == daysofweekinmonth(dt)
         end
+
+        """
+            $($last_weekday_of_month)(year::Integer, month::Integer) -> Date
+
+        Produce a `Date` which is the last $($weekday) in the given month.
+        """
+        function $last_weekday_of_month(year::Integer, month::Integer)
+            date = Date(year, month, daysinmonth(year, month))  # Last day of month
+            tonext($is_last_weekday, date; step=Day(-1), same=true, limit=7)
+        end
+
+        $last_weekday_of_month
     end
 end
 
@@ -118,44 +133,67 @@ end
 isflag(flag::Char) = flag in ('w', 'u', 's')
 
 """
-    tryparse_dayofmonth(str::AbstractString) -> Union{Function,Nothing}
+    tryparse_dayofmonth_function(str::AbstractString) -> Union{Function,Nothing}
 
-Parse the various day-of-month formats used within tzdata source files.
+Parse the various day-of-month formats used within tzdata source files. Returns a function
+which generates a `Date` observing the rule. The function returned (`f`) can be called by
+providing a year and month arguments or a `Date` (e.g. `f(year, month)` or `f(::Date)`).
 
 ```julia
-julia> tryparse_dayofmonth("lastSun")
-last_sunday (generic function with 1 method)
+julia> f = tryparse_dayofmonth_function("lastSun")
+last_sunday_of_month (generic function with 1 method)
 
-julia> tryparse_dayofmonth("Sun>=8")
-#15 (generic function with 1 method)
+julia> f(2019, 3)
+2019-03-31
 
-julia> TimeZones.TZData.tryparse_dayofmonth("15")
+julia> f = tryparse_dayofmonth_function("Sun>=8")
 #16 (generic function with 1 method)
+
+julia> f(2019, 3)
+2019-03-10
+
+julia> f = tryparse_dayofmonth_function("Fri<=1")
+#16 (generic function with 1 method)
+
+julia> f(2019, 4)
+2019-03-29
+
+julia> f = tryparse_dayofmonth_function("15")
+#18 (generic function with 1 method)
+
+julia> f(2019, 3)
+2019-03-15
 ```
 """
-function tryparse_dayofmonth(str::AbstractString)
-    if occursin(r"^last\w{3}$", str)
+function tryparse_dayofmonth_function(str::AbstractString)
+    func = if occursin(r"^last\w{3}$", str)
         # We pre-built these functions above
         # They follow the format: "lastSun", "lastMon", etc.
-        LAST_DAY_OF_WEEK[str]
-    elseif (m = match(r"^(?<dow>\w{3})(?<op>[<>]=)(?<dom>\d{1,2})$", str)) !== nothing
+        LAST_WEEKDAY_OF_MONTH[str]
+    elseif (m = match(r"^(?<dow>\w{3})(?<op><=|>=)(?<dom>\d{1,2})$", str)) !== nothing
         # The first day of the week that occurs before or after a given day of month.
         # i.e. Sun>=8 refers to the Sunday after the 8th of the month
         # or in other words, the 2nd Sunday.
         dow = DAYS[m[:dow]]
         dom = parse(Int, m[:dom])
-        if m[:op] == "<="
-            dt -> day(dt) <= dom && dayofweek(dt) == dow
-        else
-            dt -> day(dt) >= dom && dayofweek(dt) == dow
+        step = m[:op] == "<=" ? Day(-1) : Day(1)
+
+        function (year::Integer, month::Integer)
+            date = Date(year, month, dom)
+            tonext(d -> dayofweek(d) == dow, date; step=step, same=true, limit=7)
         end
     elseif occursin(r"^\d{1,2}$", str)
-        # Matches just a plain old day of the month
+        # Matches just a simple day of the month
         dom = parse(Int, str)
-        dt -> day(dt) == dom
+
+        function (year::Integer, month::Integer)
+            Date(year, month, dom)
+        end
     else
         nothing
     end
+
+    return func
 end
 
 # Olson time zone dates can be a single year (1900), yyyy-mm-dd (1900-Jan-01),
@@ -178,6 +216,7 @@ function parse_date(s::AbstractString)
     numeric_dom = all(isnumeric, dom_str)
     !numeric_dom && splice!(period_strs, 3, ["1"])
 
+    # Note: Order of periods returned matches the order of the directives in the DateFormat.
     periods = parse_components(join(period_strs, ' '), UNTIL_FORMATS[num_periods])
 
     # Roll over 24:00 to the next day which occurs in "Pacific/Apia" and "Asia/Macau".
@@ -188,16 +227,27 @@ function parse_date(s::AbstractString)
         periods[4] = Hour(0)
         shift += Day(1)
     end
-    dt = DateTime(periods...)
 
     # Adjust the DateTime to reflect the requirements of the day-of-month function.
+    # Note: `numeric_dom` will only be `false` when `dom_str` is not-empty which implies
+    # there are at least 3 elements within `periods` (year, month, day).
     if !numeric_dom
-        dom = tryparse_dayofmonth(dom_str)
-        dom !== nothing || throw(ArgumentError("Unable to parse day-of-month: \"$dom_str\""))
-        dt = tonext(dom, dt; step=Day(1), same=true)
+        dom_func = tryparse_dayofmonth_function(dom_str)
+
+        if dom_func === nothing
+            throw(ArgumentError("Unable to parse day-of-month: \"$dom_str\""))
+        end
+
+        year = Dates.value(periods[1])
+        month = Dates.value(periods[2])
+
+        date = dom_func(year, month)
+
+        # Replace the Year, Month, and Day periods
+        splice!(periods, 1:3, [Year(date), Month(date), Day(date)])
     end
 
-    dt += shift
+    dt = DateTime(periods...) + shift
 
     # Note: If the time is UTC, we add back the offset and any saved amount
     # If it's local standard time, we just need to add any saved amount
@@ -253,7 +303,7 @@ function Base.parse(::Type{Rule}, str::AbstractString)
 
     # Now we need to get the right anonymous function
     # for determining the right day for transitioning
-    on = tryparse_dayofmonth(on_str)
+    on = tryparse_dayofmonth_function(on_str)
     on === nothing && error("Can't parse day of month for DST change: \"$on_str\"")
 
     # Now we get the time of the transition
@@ -337,19 +387,15 @@ function order_rules(rules::Vector{Rule}; max_year::Integer=MAX_YEAR)
     for rule in rules
         start_year = max(something(rule.from, MIN_YEAR), MIN_YEAR)
         end_year = min(something(rule.to, max_year), max_year)
+        month = rule.month
 
         # For each year the rule applies compute the transition date
-        for rule_year in start_year:end_year
-            # Determine the rule transition day by starting at the
-            # beginning of the month and applying our "on" function
-            # until we reach the correct day.
-            date = Date(rule_year, rule.month)
-            try
-                # The "on" function should evaluate to a day within the current month.
-                date = tonext(rule.on, date; same=true, limit=daysinmonth(date))
+        for year in start_year:end_year
+            date = try
+                rule.on(year, month)
             catch e
                 if isa(e, ArgumentError)
-                    error("Unable to find matching day in month $(year(date))/$(month(date))")
+                    error("Unable to determine transition date in $year/$month")
                 else
                     rethrow(e)
                 end
