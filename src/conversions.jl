@@ -89,7 +89,13 @@ function astimezone(zdt::ZonedDateTime, tz::FixedTimeZone)
     return ZonedDateTime(zdt.utc_datetime, tz, tz)
 end
 
-unix2datetime(zdt::ZonedDateTime) = unix2datetime(utc(zdt))
+datetime2julian(zdt::ZonedDateTime) = datetime2julian(utc(zdt))
+
+datetime2julian(::Type{T}, zdt::ZonedDateTime) where T<:Integer = floor(T, datetime2julian(utc(zdt)))
+
+datetime2julian(::Type{T}, zdt::ZonedDateTime) where T<:Real = convert(T, datetime2julian(utc(zdt)))
+
+julian2datetime(::Type{<:ZonedDateTime}, jd::Real) = ZonedDateTime(julian2datetime(jd), utc_tz, from_utc=true)
 
 datetime2unix(zdt::ZonedDateTime) = datetime2unix(utc(zdt))
 
@@ -97,16 +103,4 @@ datetime2unix(::Type{T}, zdt::ZonedDateTime) where T<:Integer = floor(T, datetim
 
 datetime2unix(::Type{T}, zdt::ZonedDateTime) where T<:Real = convert(T, datetime2unix(utc(zdt)))
 
-unix2datetime(seconds::Real) = ZonedDateTime(unix2datetime(seconds), utc_tz, from_utc=true)
-
-datetime2julian(::Type{T}, zdt::ZonedDateTime) where T<:Integer = floor(T, datetime2julian(zdt))
-
-datetime2julian(::Type{T}, zdt::ZonedDateTime) where T<:Real = convert(T, datetime2julian(utc(zdt)))
-
-julian2datetime(jd::Real) = ZonedDateTime(julian2datetime(jd), utc_tz, from_utc=true)
-
-datetime2rata(::Type{T}, zdt::ZonedDateTime) where T<:Integer = floor(T, datetime2rata(zdt))
-
-datetime2rata(::Type{T}, zdt::ZonedDateTime) where T<:Real = convert(T, datetime2rata(utc(zdt)))
-
-rata2datetime(days::Real) = ZonedDateTime(rata2datetime(days), utc_tz, from_utc=true)
+unix2datetime(::Type{<:ZonedDateTime}, seconds::Real) = ZonedDateTime(unix2datetime(seconds), utc_tz, from_utc=true)

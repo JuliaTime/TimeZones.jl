@@ -57,7 +57,7 @@ zdt_warsaw = ZonedDateTime(dt, warsaw; from_utc=true)
 
 # ZonedDateTime to Unix timestamp (and vice versa)
 @test datetime2unix(ZonedDateTime(1970, utc)) == 0
-@test unix2datetime(0) == ZonedDateTime(1970, utc)
+@test unix2datetime(ZonedDateTime, 0) == ZonedDateTime(1970, utc)
 
 for dt in (DateTime(2013, 2, 13), DateTime(2016, 8, 11))
     local dt
@@ -78,18 +78,18 @@ end
 
 # round-trip
 zdt = ZonedDateTime(2010, 1, 2, 3, 4, 5, 999, utc)
-round_trip = unix2datetime(datetime2unix(zdt))
+round_trip = unix2datetime(ZonedDateTime, datetime2unix(zdt))
 @test round_trip == zdt
 
 # millisecond loss
 zdt = ZonedDateTime(2010, 1, 2, 3, 4, 5, 999, utc)
-round_trip = unix2datetime(datetime2unix(Int64, zdt))
+round_trip = unix2datetime(ZonedDateTime, datetime2unix(Int64, zdt))
 @test round_trip != zdt
 @test round_trip == floor(zdt, Dates.Second(1))
 
 # timezone loss
 zdt = ZonedDateTime(2010, 1, 2, 3, 4, 5, warsaw)
-round_trip = unix2datetime(datetime2unix(Int64, zdt))
+round_trip = unix2datetime(ZonedDateTime, datetime2unix(Int64, zdt))
 @test round_trip == zdt
 @test timezone(round_trip) != timezone(zdt)
 
@@ -99,4 +99,4 @@ jd_zdt = ZonedDateTime(julian2datetime(jd), warsaw, from_utc=true)
 @test datetime2julian(jd_zdt) == jd
 @test datetime2julian(Int, jd_zdt) === floor(Int, jd)
 @test datetime2julian(Float64, jd_zdt) === jd
-@test datetime2julian(jd) == jd_zdt
+@test julian2datetime(ZonedDateTime, jd) == jd_zdt
