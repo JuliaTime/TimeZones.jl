@@ -15,7 +15,14 @@ export ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, REGIONS, LEGACY_REGIONS
 
 function __init__()
     if Sys.iswindows()
-        global exe7z = joinpath(Sys.BINDIR, "7z.exe")
+        if isfile(joinpath(Sys.BINDIR, "7z.exe"))
+            global exe7z = joinpath(Sys.BINDIR, "7z.exe")
+        else if isfile(joinpath(Sys.BINDIR, "..", "libexec", "7z.exe"))
+            # from Julia 1.3 the 7z.exe has moved to this new location
+            global exe7z = joinpath(Sys.BINDIR, "..", "libexec", "7z.exe")
+        else
+            throw("7z.exe not found")
+        end
     end
 end
 
