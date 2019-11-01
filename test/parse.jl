@@ -58,6 +58,10 @@ end
         ZonedDateTime(2000, 1, 2, 3, 4, 5, 6, tz"UTC+07")
     )
     @test isequal(
+        ZonedDateTime("2000-01-02T03:04:05.006Z"),
+        ZonedDateTime(2000, 1, 2, 3, 4, 5, 6, tz"UTC+00")
+    )
+    @test isequal(
         ZonedDateTime("2018-11-01-0600", dateformat"yyyy-mm-ddzzzz"),
         ZonedDateTime(2018, 11, 1, tz"UTC-06"),
     )
