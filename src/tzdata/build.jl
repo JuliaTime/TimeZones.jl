@@ -55,7 +55,7 @@ function build(
     end
 
     if !isempty(tz_source_dir)
-        @info "Extracting tzdata archive"
+        @info "Extracting $version tzdata archive"
         extract(archive, tz_source_dir, setdiff(regions, CUSTOM_REGIONS), verbose=verbose)
     end
 
@@ -68,7 +68,7 @@ function build(
     return version
 end
 
-function build(version::AbstractString="latest")
+function build(version::AbstractString=tzdata_version())
     isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
     isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)
     isdir(COMPILED_DIR) || mkdir(COMPILED_DIR)
