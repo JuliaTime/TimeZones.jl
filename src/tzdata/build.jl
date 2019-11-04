@@ -68,7 +68,7 @@ function build(
     return version
 end
 
-function build(version::AbstractString="latest")
+function build(version::AbstractString=tzdata_version())
     isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
     isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)
     isdir(COMPILED_DIR) || mkdir(COMPILED_DIR)
