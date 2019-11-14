@@ -1,5 +1,7 @@
 const FIXED_TIME_ZONE_REGEX = r"""
     ^(?|
+        Z
+    |
         UTC
         (?:
             (?<sign>[+-])
@@ -46,6 +48,9 @@ function FixedTimeZone(name::AbstractString, utc_offset::Second, dst_offset::Sec
     FixedTimeZone(name, UTCOffset(utc_offset, dst_offset))
 end
 
+# https://en.wikipedia.org/wiki/ISO_8601#Coordinated_Universal_Time_(UTC)
+const UTC_ZERO = FixedTimeZone("Z", 0)
+
 """
     FixedTimeZone(::AbstractString) -> FixedTimeZone
 
@@ -65,6 +70,8 @@ UTC+15:45:21
 ```
 """
 function FixedTimeZone(s::AbstractString)
+    s == "Z" && return UTC_ZERO
+
     m = match(FIXED_TIME_ZONE_REGEX, s)
     m === nothing && throw(ArgumentError("Unrecognized time zone: $s"))
 

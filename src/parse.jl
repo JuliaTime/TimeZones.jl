@@ -1,6 +1,8 @@
 using Dates: DateFormat, DatePart, min_width, max_width
 
 function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
+    i == len && str[i] == 'Z' && return ("Z", i+1)
+
     tz_start, tz_end = i, 0
     min_pos = min_width <= 0 ? i : i + min_width - 1
     max_pos = max_width <= 0 ? len : min(chr2ind(str, ind2chr(str,i) + max_width - 1), len)
