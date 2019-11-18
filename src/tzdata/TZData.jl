@@ -13,9 +13,11 @@ const COMPILED_DIR = joinpath(DEPS_DIR, "compiled")
 
 export ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, REGIONS, LEGACY_REGIONS
 
-function __init__()
-    if Sys.iswindows()
-        global exe7z = joinpath(Sys.BINDIR, "7z.exe")
+if Sys.iswindows()
+    if isdefined(Base, :LIBEXECDIR)
+        const exe7z = joinpath(Sys.BINDIR, Base.LIBEXECDIR, "7z.exe")
+    else
+        const exe7z = joinpath(Sys.BINDIR, "7z.exe")
     end
 end
 
