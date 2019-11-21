@@ -12,6 +12,14 @@ Returns an equivalent `DateTime` without any `TimeZone` information.
 DateTime(zdt::ZonedDateTime) = localtime(zdt)
 
 """
+    Date(::ZonedDateTime) -> Date
+
+Returns an equivalent `Date` without any `TimeZone`, or time information.
+"""
+Dates.Date(zdt::ZonedDateTime) = Date(DateTime(zdt))
+
+
+"""
     now(::TimeZone) -> ZonedDateTime
 
 Returns a `ZonedDateTime` corresponding to the user's system time in the specified `TimeZone`.
