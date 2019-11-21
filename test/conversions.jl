@@ -6,28 +6,27 @@ warsaw = first(compile("Europe/Warsaw", tzdata["europe"]))
 apia = first(compile("Pacific/Apia", tzdata["australasia"]))
 midway = first(compile("Pacific/Midway", tzdata["australasia"]))
 
-# Converting a ZonedDateTime into a DateTime
-dt = DateTime(2015, 1, 1, 0)
-zdt = ZonedDateTime(dt, warsaw)
-@test DateTime(zdt) == dt
+@testset "Between ZonedDateTime and DateTime" begin
+    # Constructing a ZonedDateTime from a DateTime and the reverse
+    dt = DateTime(2015, 1, 1, 0)
+    zdt = ZonedDateTime(dt, warsaw)
+    @test DateTime(zdt) == dt
 
-# Converting from ZonedDateTime to DateTime isn't possible as it is always inexact.
-@test_throws MethodError convert(DateTime, zdt)
+    # Converting from ZonedDateTime to DateTime isn't possible as it is always inexact.
+    @test_throws MethodError convert(DateTime, zdt)
+end
 
-# Vectorized accessors
-n = 10
-arr = fill(zdt, n)
-@test Dates.DateTime.(arr) == fill(dt, n)
+@testset "now" begin
+    dt = now(Dates.UTC)::DateTime
+    zdt = now(warsaw)
+    @test zdt.timezone == warsaw
+    @test Dates.datetime2unix(TimeZones.utc(zdt)) ≈ Dates.datetime2unix(dt)
+end
 
-# now function
-dt = now(Dates.UTC)::DateTime
-zdt = now(warsaw)
-@test zdt.timezone == warsaw
-@test Dates.datetime2unix(TimeZones.utc(zdt)) ≈ Dates.datetime2unix(dt)
-
-# today function
-@test abs(today() - today(warsaw)) <= Dates.Day(1)
-@test today(apia) - today(midway) == Dates.Day(1)
+@testset "today" begin
+    @test abs(today() - today(warsaw)) <= Dates.Day(1)
+    @test today(apia) - today(midway) == Dates.Day(1)
+end
 
 @testset "todayat" begin
     @testset "current time" begin
