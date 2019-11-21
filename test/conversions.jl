@@ -6,7 +6,7 @@ warsaw = first(compile("Europe/Warsaw", tzdata["europe"]))
 apia = first(compile("Pacific/Apia", tzdata["australasia"]))
 midway = first(compile("Pacific/Midway", tzdata["australasia"]))
 
-@testset "Between ZonedDateTime and DateTime" begin
+@testset "Construct ZonedDateTime / DateTime" begin
     # Constructing a ZonedDateTime from a DateTime and the reverse
     dt = DateTime(2015, 1, 1, 0)
     zdt = ZonedDateTime(dt, warsaw)
@@ -14,6 +14,13 @@ midway = first(compile("Pacific/Midway", tzdata["australasia"]))
 
     # Converting from ZonedDateTime to DateTime isn't possible as it is always inexact.
     @test_throws MethodError convert(DateTime, zdt)
+end
+
+@testset "Construct Date / ZonedDateTime" begin
+    date = Date(2018, 6, 14)
+    zdt = ZonedDateTime(date, warsaw)
+    @test DateTime(zdt) == DateTime(2018, 6, 14)
+    @test Date(zdt) == Date(2018, 6, 14)
 end
 
 @testset "now" begin
