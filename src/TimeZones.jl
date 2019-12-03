@@ -4,10 +4,12 @@ using Dates
 using Printf
 using Serialization
 using Unicode
-import Dates: TimeZone
+
+import Dates: TimeZone, UTC
 
 export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
-    DateTime, TimeError, AmbiguousTimeError, NonExistentTimeError, UnhandledTimeError,
+    DateTime, Date, Time, UTC, Local, TimeError, AmbiguousTimeError, NonExistentTimeError,
+    UnhandledTimeError,
     # discovery.jl
     timezone_names, all_timezones, timezones_from_abbr, timezone_abbrs,
     next_transition_instant, show_next_transition,

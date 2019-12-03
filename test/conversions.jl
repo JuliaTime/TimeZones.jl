@@ -8,26 +8,41 @@ midway = first(compile("Pacific/Midway", tzdata["australasia"]))
 
 @testset "Construct ZonedDateTime / DateTime" begin
     # Constructing a ZonedDateTime from a DateTime and the reverse
-    dt = DateTime(2015, 1, 1, 0)
+    dt = DateTime(2019, 4, 11, 0)
     zdt = ZonedDateTime(dt, warsaw)
-    @test DateTime(zdt) == dt
+    @test DateTime(zdt, Local) == DateTime(2019, 4, 11, 0)
+    @test DateTime(zdt, UTC) == DateTime(2019, 4, 10, 22)
 
-    # Converting from ZonedDateTime to DateTime isn't possible as it is always inexact.
+    # Converting between ZonedDateTime and DateTime isn't possible as it isn't lossless.
     @test_throws MethodError convert(DateTime, zdt)
+    @test_throws MethodError convert(ZonedDateTime, dt)
 end
 
 @testset "Construct Date / ZonedDateTime" begin
     date = Date(2018, 6, 14)
     zdt = ZonedDateTime(date, warsaw)
-    @test DateTime(zdt) == DateTime(2018, 6, 14)
-    @test Date(zdt) == Date(2018, 6, 14)
+    @test Date(zdt, Local) == Date(2018, 6, 14)
+    @test Date(zdt, UTC) == Date(2018, 6, 13)
+
+    # Converting between ZonedDateTime and Date isn't possible as it isn't lossless.
+    @test_throws MethodError convert(Date, zdt)
+    @test_throws MethodError convert(ZonedDateTime, date)
+end
+
+@testset "Construct Time" begin
+    zdt = ZonedDateTime(2017, 8, 21, 0, 12, warsaw)
+    @test Time(zdt, Local) == Time(0, 12)
+    @test Time(zdt, UTC) == Time(22, 12)
+
+    # Converting between ZonedDateTime and Time isn't possible as it isn't lossless.
+    @test_throws MethodError convert(Time, zdt)
 end
 
 @testset "now" begin
     dt = now(Dates.UTC)::DateTime
     zdt = now(warsaw)
     @test zdt.timezone == warsaw
-    @test Dates.datetime2unix(TimeZones.utc(zdt)) ≈ Dates.datetime2unix(dt)
+    @test Dates.datetime2unix(DateTime(zdt, UTC)) ≈ Dates.datetime2unix(dt)
 end
 
 @testset "today" begin
@@ -38,7 +53,7 @@ end
 @testset "todayat" begin
     @testset "current time" begin
         local zdt = now(warsaw)
-        now_time = Time(TimeZones.localtime(zdt))
+        now_time = Time(zdt, Local)
         @test todayat(now_time, warsaw) == zdt
     end
 

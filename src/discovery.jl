@@ -158,13 +158,13 @@ function next_transition_instant(zdt::ZonedDateTime)
 
     # Determine the index of the transition which occurs after the UTC datetime specified
     index = searchsortedfirst(
-        tz.transitions, TimeZones.utc(zdt),
+        tz.transitions, DateTime(zdt, UTC),
         by=el -> isa(el, TimeZones.Transition) ? el.utc_datetime : el,
     )
 
     index <= length(tz.transitions) || return nothing
 
-    # Use the UTC datetime of the transition and the offset information prior to the
+    # Use the UTC daftetime of the transition and the offset information prior to the
     # transition to create a `ZonedDateTime` which cannot be constructed with the high-level
     # constructors. The instant constructed is equivalent to the first instant after the
     # transition but visually appears to be before the transition. For example in a

@@ -5,18 +5,111 @@ using Mocking: Mocking, @mock
 const utc_tz = FixedTimeZone("UTC")
 
 """
-    DateTime(::ZonedDateTime) -> DateTime
+    DateTime(::ZonedDateTime, ::Type{Local}) -> DateTime
 
-Returns an equivalent `DateTime` without any `TimeZone` information.
+Create an implicit local time `DateTime` from the given `ZonedDateTime`.
+
+# Example
+
+```jldoctest
+julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
+2014-05-30T21:00:00-04:00
+
+julia> DateTime(zdt, Local)
+2014-05-30T21:00:00
+```
 """
-DateTime(zdt::ZonedDateTime) = localtime(zdt)
+Dates.DateTime(zdt::ZonedDateTime, ::Type{Local}) = zdt.utc_datetime + zdt.zone.offset
+
 
 """
-    Date(::ZonedDateTime) -> Date
+    DateTime(::ZonedDateTime, ::Type{UTC}) -> DateTime
 
-Returns an equivalent `Date` without any `TimeZone`, or time information.
+Create an implicit utc `DateTime` from the given `ZonedDateTime`.
+
+# Example
+
+```jldoctest
+julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
+2014-05-30T21:00:00-04:00
+
+julia> DateTime(zdt, UTC)
+2014-05-31T01:00:00
+```
 """
-Dates.Date(zdt::ZonedDateTime) = Date(DateTime(zdt))
+Dates.DateTime(zdt::ZonedDateTime, ::Type{UTC}) = zdt.utc_datetime
+
+
+"""
+    Date(::ZonedDateTime, ::Type{Local}) -> DateTime
+
+Create an implicit local time `Date` from the given `ZonedDateTime`.
+
+# Example
+
+```jldoctest
+julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
+2014-05-30T21:00:00-04:00
+
+julia> Date(zdt, Local)
+2014-05-30
+```
+"""
+Dates.Date(zdt::ZonedDateTime, ::Type{Local}) = Date(DateTime(zdt, Local))
+
+
+"""
+    Date(::ZonedDateTime, ::Type{UTC}) -> DateTime
+
+Create an implicit utc `Date` from the given `ZonedDateTime`.
+
+# Example
+
+```jldoctest
+julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
+2014-05-30T21:00:00-04:00
+
+julia> Date(zdt, UTC)
+2014-05-31
+```
+"""
+Dates.Date(zdt::ZonedDateTime, ::Type{UTC}) = Date(DateTime(zdt, UTC))
+
+
+"""
+    Time(::ZonedDateTime, ::Type{Local}) -> Time
+
+Create an implicit local `Time` from the given `ZonedDateTime`.
+
+# Example
+
+```jldoctest
+julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
+2014-05-30T21:00:00-04:00
+
+julia> Time(zdt, Local)
+21:00:00
+```
+"""
+Dates.Time(zdt::ZonedDateTime, ::Type{Local}) = Time(DateTime(zdt, Local))
+
+
+"""
+    Time(::ZonedDateTime, ::Type{UTC}) -> DateTime
+
+Create an implicit utc `Time` from the given `ZonedDateTime`.
+
+# Example
+
+```jldoctest
+julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
+2014-05-30T21:00:00-04:00
+
+julia> Time(zdt, UTC)
+01:00:00
+```
+"""
+Dates.Time(zdt::ZonedDateTime, ::Type{UTC}) = Time(DateTime(zdt, UTC))
 
 
 """
@@ -47,7 +140,7 @@ julia> today(tz"Pacific/Midway"), today(tz"Pacific/Apia")
 (2017-11-09, 2017-11-10)
 ```
 """
-Dates.today(tz::TimeZone) = Date(localtime(now(tz)))
+Dates.today(tz::TimeZone) = Date(now(tz), Local)
 
 """
     todayat(tod::Time, tz::TimeZone, [amb]) -> ZonedDateTime
@@ -86,7 +179,7 @@ function astimezone(zdt::ZonedDateTime, tz::VariableTimeZone)
     )
 
     if i == 0
-        throw(NonExistentTimeError(localtime(zdt), tz))
+        throw(NonExistentTimeError(DateTime(zdt, Local), tz))
     end
 
     zone = tz.transitions[i].zone
@@ -98,15 +191,15 @@ function astimezone(zdt::ZonedDateTime, tz::FixedTimeZone)
 end
 
 function zdt2julian(zdt::ZonedDateTime)
-    datetime2julian(utc(zdt))
+    datetime2julian(DateTime(zdt, UTC))
 end
 
 function zdt2julian(::Type{T}, zdt::ZonedDateTime) where T<:Integer
-    floor(T, datetime2julian(utc(zdt)))
+    floor(T, datetime2julian(DateTime(zdt, UTC)))
 end
 
 function zdt2julian(::Type{T}, zdt::ZonedDateTime) where T<:Real
-    convert(T, datetime2julian(utc(zdt)))
+    convert(T, datetime2julian(DateTime(zdt, UTC)))
 end
 
 function julian2zdt(jd::Real)
@@ -114,15 +207,15 @@ function julian2zdt(jd::Real)
 end
 
 function zdt2unix(zdt::ZonedDateTime)
-    datetime2unix(utc(zdt))
+    datetime2unix(DateTime(zdt, UTC))
 end
 
 function zdt2unix(::Type{T}, zdt::ZonedDateTime) where T<:Integer
-    floor(T, datetime2unix(utc(zdt)))
+    floor(T, datetime2unix(DateTime(zdt, UTC)))
 end
 
 function zdt2unix(::Type{T}, zdt::ZonedDateTime) where T<:Real
-    convert(T, datetime2unix(utc(zdt)))
+    convert(T, datetime2unix(DateTime(zdt, UTC)))
 end
 
 function unix2zdt(seconds::Real)

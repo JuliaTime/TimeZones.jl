@@ -34,9 +34,12 @@ ZonedDateTime(::DateTime, ::VariableTimeZone, ::Integer)
 ZonedDateTime(::DateTime, ::VariableTimeZone, ::Bool)
 astimezone
 TimeZones.timezone(::ZonedDateTime)
-TimeZones.utc
-TimeZones.localtime
-DateTime(::ZonedDateTime)
+DateTime(::ZonedDateTime, ::Type{Local})
+DateTime(::ZonedDateTime, ::Type{UTC})
+Date(::ZonedDateTime, ::Type{Local})
+Date(::ZonedDateTime, ::Type{UTC})
+Time(::ZonedDateTime, ::Type{Local})
+Time(::ZonedDateTime, ::Type{UTC})
 ```
 
 ## Current Time
