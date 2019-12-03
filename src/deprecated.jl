@@ -1,7 +1,9 @@
-using Base: @deprecate, @deprecate_binding
+using Base: @deprecate
 
-# BEGIN TimeZones 0.9 deprecations
+# BEGIN TimeZones 1.0 deprecations
 
-@deprecate build(version::AbstractString, regions; kwargs...) build(version; kwargs...) false
+@deprecate localtime(zdt::ZonedDateTime) DateTime(zdt, Local) false
+@deprecate utc(zdt::ZonedDateTime) DateTime(zdt, UTC) false
+@deprecate DateTime(zdt::ZonedDateTime) DateTime(zdt, Local)
 
-# END TimeZones 0.9 deprecations
+# END TimeZones 1.0 deprecations
