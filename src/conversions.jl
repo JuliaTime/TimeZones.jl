@@ -5,9 +5,9 @@ using Mocking: Mocking, @mock
 const utc_tz = FixedTimeZone("UTC")
 
 """
-    DateTime(::ZonedDateTime, ::Type{Local}) -> DateTime
+    DateTime(zdt::ZonedDateTime, ::Union{Type{Local}, Type{UTC}}) -> DateTime
 
-Create an implicit local time `DateTime` from the given `ZonedDateTime`.
+Create an implicit local/UTC `DateTime` from the given `ZonedDateTime`.
 
 # Example
 
@@ -17,33 +17,21 @@ julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
 
 julia> DateTime(zdt, Local)
 2014-05-30T21:00:00
-```
-"""
-Dates.DateTime(zdt::ZonedDateTime, ::Type{Local}) = zdt.utc_datetime + zdt.zone.offset
-
-
-"""
-    DateTime(::ZonedDateTime, ::Type{UTC}) -> DateTime
-
-Create an implicit utc `DateTime` from the given `ZonedDateTime`.
-
-# Example
-
-```jldoctest
-julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
-2014-05-30T21:00:00-04:00
 
 julia> DateTime(zdt, UTC)
 2014-05-31T01:00:00
 ```
 """
+DateTime(::ZonedDateTime, ::Union{Type{Local}, Type{UTC}})
+
+Dates.DateTime(zdt::ZonedDateTime, ::Type{Local}) = zdt.utc_datetime + zdt.zone.offset
 Dates.DateTime(zdt::ZonedDateTime, ::Type{UTC}) = zdt.utc_datetime
 
 
 """
-    Date(::ZonedDateTime, ::Type{Local}) -> DateTime
+    Date(zdt::ZonedDateTime, ::Union{Type{Local}, Type{UTC}}) -> Date
 
-Create an implicit local time `Date` from the given `ZonedDateTime`.
+Create an implicit local/UTC `Date` from the given `ZonedDateTime`.
 
 # Example
 
@@ -53,33 +41,21 @@ julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
 
 julia> Date(zdt, Local)
 2014-05-30
-```
-"""
-Dates.Date(zdt::ZonedDateTime, ::Type{Local}) = Date(DateTime(zdt, Local))
-
-
-"""
-    Date(::ZonedDateTime, ::Type{UTC}) -> DateTime
-
-Create an implicit utc `Date` from the given `ZonedDateTime`.
-
-# Example
-
-```jldoctest
-julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
-2014-05-30T21:00:00-04:00
 
 julia> Date(zdt, UTC)
 2014-05-31
 ```
 """
+Date(::ZonedDateTime, ::Union{Type{Local}, Type{UTC}})
+
+Dates.Date(zdt::ZonedDateTime, ::Type{Local}) = Date(DateTime(zdt, Local))
 Dates.Date(zdt::ZonedDateTime, ::Type{UTC}) = Date(DateTime(zdt, UTC))
 
 
 """
-    Time(::ZonedDateTime, ::Type{Local}) -> Time
+    Time(zdt::ZonedDateTime, ::Union{Type{Local}, Type{UTC}}) -> Time
 
-Create an implicit local `Time` from the given `ZonedDateTime`.
+Create an implicit local/UTC `Time` from the given `ZonedDateTime`.
 
 # Example
 
@@ -89,26 +65,14 @@ julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
 
 julia> Time(zdt, Local)
 21:00:00
-```
-"""
-Dates.Time(zdt::ZonedDateTime, ::Type{Local}) = Time(DateTime(zdt, Local))
-
-
-"""
-    Time(::ZonedDateTime, ::Type{UTC}) -> DateTime
-
-Create an implicit utc `Time` from the given `ZonedDateTime`.
-
-# Example
-
-```jldoctest
-julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
-2014-05-30T21:00:00-04:00
 
 julia> Time(zdt, UTC)
 01:00:00
 ```
 """
+Time(::ZonedDateTime, ::Union{Type{Local}, Type{UTC}})
+
+Dates.Time(zdt::ZonedDateTime, ::Type{Local}) = Time(DateTime(zdt, Local))
 Dates.Time(zdt::ZonedDateTime, ::Type{UTC}) = Time(DateTime(zdt, UTC))
 
 
