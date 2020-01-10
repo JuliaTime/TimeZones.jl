@@ -27,12 +27,40 @@ language: julia
 os:
   - osx
   - linux
+  - windows
 julia:
   - 1.0
   - 1.1
   - 1.2
   - 1.3
   - nightly
+arch:
+  - x64
+  - x86
+jobs:
+  # Test 32-bit only on Linux
+  exclude:
+    - arch: x86
+      os: osx
+    - arch: x86
+      os: windows
+
+  # Documentation tests and deployment
+  include:
+    - <<: *doc_test
+      os: linux
+      julia: 1.0
+    - <<: *doc_test
+      os: linux
+      julia: nightly
+    - <<: *doc_test
+      os: osx
+      julia: 1.0
+    - <<: *doc_test
+      os: osx
+      julia: nightly
+    - <<: *doc_deploy
+
 env:
   - JULIA_TZ_VERSION="2016j"  # Ideally only set for the "test" stage
 notifications:
@@ -57,19 +85,3 @@ after_success:
       Pkg.add("Coverage"); using Coverage
       Codecov.submit(process_folder())
       Coveralls.submit(Coveralls.process_folder())'
-
-jobs:
-  include:
-    - <<: *doc_test
-      os: linux
-      julia: 1.0
-    - <<: *doc_test
-      os: linux
-      julia: nightly
-    - <<: *doc_test
-      os: osx
-      julia: 1.0
-    - <<: *doc_test
-      os: osx
-      julia: nightly
-    - <<: *doc_deploy
