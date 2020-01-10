@@ -48,8 +48,15 @@ end
 # Added: https://github.com/JuliaLang/julia/pull/30817
 # Reverted for v1.2.0-rc1: https://github.com/JuliaLang/julia/pull/31727
 # Reverted for v1.3.0-rc2: https://github.com/JuliaLang/julia/pull/32973
-# Active discussion: https://github.com/JuliaLang/julia/pull/33178
-if v"1.2.0-DEV.223" <= VERSION < v"1.2.0-pre.39" || v"1.3-DEV" <= VERSION < v"1.3.0-rc1.33" || v"1.4-DEV" <= VERSION
+# Reverted for v1.4.0-DEV.620: https://github.com/JuliaLang/julia/pull/34116
+# Discussions:
+# - https://github.com/JuliaLang/julia/issues/30901
+# - https://github.com/JuliaLang/julia/pull/33178
+if (
+    v"1.2.0-DEV.223" <= VERSION < v"1.2.0-pre.39" ||
+    v"1.3-DEV" <= VERSION < v"1.3.0-rc1.33" ||
+    v"1.4-DEV" <= VERSION < v"1.4.0-DEV.620"
+)
     @test sprint(show, UTCOffset(0, 0)) == "UTCOffset(Second(0), Second(0))"
     @test sprint(show, UTCOffset(3600, 7200)) == "UTCOffset(Second(3600), Second(7200))"
 else
