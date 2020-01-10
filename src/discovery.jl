@@ -253,5 +253,4 @@ function show_next_transition(io::IO, tz::TimeZone=localzone())
     show_next_transition(io, @mock now(tz))
 end
 
-show_next_transition(io::IO, x...) = throw(MethodError(show_next_transition, (io, x...)))
-show_next_transition(x...) = show_next_transition(stdout, x...)
+show_next_transition(x) = show_next_transition(stdout, x)
