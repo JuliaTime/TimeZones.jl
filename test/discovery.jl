@@ -150,4 +150,9 @@ end
         @test_logs (:warn, msg) show_next_transition(io, instant)
         @test isempty(read(seekstart(io), String))
     end
+
+    @testset "vararg stack overflow" begin
+        # Note: Would cause `Segmentation fault: 11` in Julia 1.0.5
+        @test_throws MethodError show_next_transition(1)
+    end
 end
