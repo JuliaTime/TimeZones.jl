@@ -1,4 +1,4 @@
-using Dates: unix2datetime, datetime2unix, julian2datetime, datetime2julian
+import Dates: unix2datetime, datetime2unix, julian2datetime, datetime2julian
 using Mocking: Mocking, @mock
 
 # UTC is an abstract type defined in Dates, for some reason
@@ -89,34 +89,18 @@ function astimezone(zdt::ZonedDateTime, tz::FixedTimeZone)
     return ZonedDateTime(zdt.utc_datetime, tz, tz)
 end
 
-function zdt2julian(zdt::ZonedDateTime)
-    datetime2julian(utc(zdt))
-end
+datetime2julian(zdt::ZonedDateTime) = datetime2julian(utc(zdt))
 
-function zdt2julian(::Type{T}, zdt::ZonedDateTime) where T<:Integer
-    floor(T, datetime2julian(utc(zdt)))
-end
+datetime2julian(::Type{T}, zdt::ZonedDateTime) where T<:Integer = floor(T, datetime2julian(utc(zdt)))
 
-function zdt2julian(::Type{T}, zdt::ZonedDateTime) where T<:Real
-    convert(T, datetime2julian(utc(zdt)))
-end
+datetime2julian(::Type{T}, zdt::ZonedDateTime) where T<:Real = convert(T, datetime2julian(utc(zdt)))
 
-function julian2zdt(jd::Real)
-    ZonedDateTime(julian2datetime(jd), utc_tz, from_utc=true)
-end
+julian2datetime(::Type{<:ZonedDateTime}, jd::Real) = ZonedDateTime(julian2datetime(jd), utc_tz, from_utc=true)
 
-function zdt2unix(zdt::ZonedDateTime)
-    datetime2unix(utc(zdt))
-end
+datetime2unix(zdt::ZonedDateTime) = datetime2unix(utc(zdt))
 
-function zdt2unix(::Type{T}, zdt::ZonedDateTime) where T<:Integer
-    floor(T, datetime2unix(utc(zdt)))
-end
+datetime2unix(::Type{T}, zdt::ZonedDateTime) where T<:Integer = floor(T, datetime2unix(utc(zdt)))
 
-function zdt2unix(::Type{T}, zdt::ZonedDateTime) where T<:Real
-    convert(T, datetime2unix(utc(zdt)))
-end
+datetime2unix(::Type{T}, zdt::ZonedDateTime) where T<:Real = convert(T, datetime2unix(utc(zdt)))
 
-function unix2zdt(seconds::Real)
-    ZonedDateTime(unix2datetime(seconds), utc_tz, from_utc=true)
-end
+unix2datetime(::Type{<:ZonedDateTime}, seconds::Real) = ZonedDateTime(unix2datetime(seconds), utc_tz, from_utc=true)
