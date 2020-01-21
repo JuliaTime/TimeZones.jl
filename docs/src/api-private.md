@@ -39,6 +39,7 @@ TimeZones.UTCOffset
 TimeZones.@optional
 TimeZones.read_tzfile
 TimeZones.parse_tz_format
+TimeZones.tryparse_tz_format
 hash(::ZonedDateTime, ::UInt)
 Dates.guess(::ZonedDateTime, ::ZonedDateTime, ::Any)
 ```
