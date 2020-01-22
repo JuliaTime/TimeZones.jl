@@ -52,7 +52,7 @@ end
 
 # Read version 1 compatible data
 open(joinpath(TZFILE_DIR, "Europe", "Warsaw (Version 2)")) do f
-    version, tz = TimeZones.read_tzfile_internal(f, "Europe/Warsaw")
+    version, tz = TimeZones._read_tzfile(f, "Europe/Warsaw")
     @test version == '2'
     @test string(tz) == "Europe/Warsaw"
     @test first(tz.transitions).utc_datetime == typemin(DateTime)
@@ -86,7 +86,7 @@ end
 
 # Read version 1 compatible data
 open(joinpath(TZFILE_DIR, "America", "Godthab (Version 3)")) do f
-    version, tz = TimeZones.read_tzfile_internal(f, "America/Godthab")
+    version, tz = TimeZones._read_tzfile(f, "America/Godthab")
     @test version == '3'
     @test string(tz) == "America/Godthab"
     @test first(tz.transitions).utc_datetime == typemin(DateTime)

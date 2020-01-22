@@ -32,15 +32,34 @@ function localzone()
 
         # Try getting the time zone from the "TZ" environment variable
         # http://linux.die.net/man/3/tzset
+        #
+        # Note: The macOS "man tzset 3" states some additional information about the colon
+        # being optional:
+        #
+        # > If TZ appears in the environment and its value begins with a colon (`:'), the
+        # > rest of its value is used as a pathname of a tzfile(5)-format file from which to
+        # > read the time conversion information. If the first character of the pathname is
+        # > a slash (`/'), it is used as an absolute pathname; otherwise, it is used as a
+        # > pathname relative to the system time conversion information directory.
+        # >
+        # > If its value does not begin with a colon, it is first used as the pathname of a
+        # > file (as described above) from which to read the time conversion information. If
+        # > that file cannot be read, the value is then interpreted as a direct
+        # > specification (the format is described below) of the time conversion
+        # > information.
         if haskey(ENV, "TZ")
             name = ENV["TZ"]
 
-            # When the TZ format starts with a colon this indicates that the time zone information
-            # should be read from a file.
+            # If the TZ format starts with a colon we'll prefer using the time zone
+            # information from the specified file.
             if startswith(name, ':')
-                name = name[2:end]
+                name = name[2:end]  # Name is either an relative or absolute path
             else
-                return parse_tz_format(name)
+                tz = tryparse_tz_format(name)
+                tz !== nothing && return tz
+
+                # Name matches pre-compiled time zone name
+                istimezone(name, mask) && return TimeZone(name, mask)
             end
 
             if startswith(name, '/')
@@ -48,9 +67,6 @@ function localzone()
                     read_tzfile(f, "local")
                 end
             else
-                # Relative name matches pre-compiled time zone name
-                istimezone(name, mask) && return TimeZone(name, mask)
-
                 # The system time zone directory used depends on the (g)libc version
                 tzdirs = ["/usr/lib/zoneinfo", "/usr/share/zoneinfo"]
                 haskey(ENV, "TZDIR") && pushfirst!(tzdirs, ENV["TZDIR"])
@@ -162,13 +178,27 @@ Currently this function handles only the first format which is a fixed time zone
 daylight saving time.
 """
 function parse_tz_format(str::AbstractString)
+    tz = tryparse_tz_format(str)
+
+    if tz !== nothing
+        return tz
+    else
+        throw(ArgumentError("Unhandled TZ environment variable format: \"$str\""))
+    end
+end
+
+"""
+    tryparse_tz_format(str) -> Union{TimeZone, Nothing}
+
+Like `parse_tz_format`, but returns either a value of the `TimeZone`, or `nothing` if
+the string does not contain a valid format.
+"""
+function tryparse_tz_format(str::AbstractString)
     m = match(TZ_REGEX, str)
 
     # Currently the only supported TZ format is reading time zone information from
     # a file.
-    if m === nothing
-        throw(ArgumentError("Unhandled TZ environment variable format: \"$str\""))
-    end
+    m === nothing && return nothing
 
     parse_digits(s) = s === nothing ? 0 : Base.parse(Int, s)
 
@@ -187,5 +217,5 @@ function parse_tz_format(str::AbstractString)
 
     offset = sign_val * (hour * 3600 + minute * 60 + second)
 
-    FixedTimeZone(name, offset)
+    return FixedTimeZone(name, offset)
 end

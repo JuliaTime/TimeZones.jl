@@ -10,7 +10,7 @@ struct TransitionTimeInfo
     abbrindex::UInt8  # tt_abbrind
 end
 
-function abbreviation(chars::AbstractArray{UInt8,1}, offset::Integer=1)
+function abbreviation(chars::AbstractVector{UInt8}, offset::Integer=1)
     unsafe_string(pointer(chars[offset:end]))
 end
 
@@ -22,15 +22,19 @@ Read the content of an I/O stream and process it as a
 `TimeZone` will be given the supplied name `name` unless a `FixedTimeZone` is returned.
 """
 function read_tzfile(io::IO, name::AbstractString)
-    version, tz = read_tzfile_internal(io, name)
+    # For compatibility reasons the tzfile will always start with version '\0' data.
+    version, tz = _read_tzfile(io, name, '\0')
+
+    # The higher precision data in version 2 and 3 formats occurs after the initial
+    # compatibility data.
     if version != '\0'
-        # Another even better transition table after this first one
-        version, tz = read_tzfile_internal(io, name, version)
+        version, tz = _read_tzfile(io, name, version)
     end
+
     return tz
 end
 
-function read_tzfile_internal(io::IO, name::AbstractString, force_version::Char='\0')
+function _read_tzfile(io::IO, name::AbstractString, force_version::Char='\0')
     magic = read(io, 4)  # Read the 4 byte magic identifier
     @assert magic == b"TZif" "Magic file identifier \"TZif\" not found."
 
@@ -50,15 +54,15 @@ function read_tzfile_internal(io::IO, name::AbstractString, force_version::Char=
     # Transition time that represents negative infinity
     initial_epoch = time_type == Int64 ? -Int64(2)^59 : typemin(Int32)
 
-    transition_times = Array{time_type}(undef, tzh_timecnt)
+    transition_times = Vector{time_type}(undef, tzh_timecnt)
     for i in eachindex(transition_times)
         transition_times[i] = ntoh(read(io, time_type))
     end
-    lindexes = Array{UInt8}(undef, tzh_timecnt)
+    lindexes = Vector{UInt8}(undef, tzh_timecnt)
     for i in eachindex(lindexes)
         lindexes[i] = ntoh(read(io, UInt8)) + 1 # Julia uses 1 indexing
     end
-    ttinfo = Array{TransitionTimeInfo}(undef, tzh_typecnt)
+    ttinfo = Vector{TransitionTimeInfo}(undef, tzh_typecnt)
     for i in eachindex(ttinfo)
         ttinfo[i] = TransitionTimeInfo(
             ntoh(read(io, Int32)),
@@ -66,25 +70,25 @@ function read_tzfile_internal(io::IO, name::AbstractString, force_version::Char=
             ntoh(read(io, UInt8)) + 1 # Julia uses 1 indexing
         )
     end
-    abbrs = Array{UInt8}(undef, tzh_charcnt)
+    abbrs = Vector{UInt8}(undef, tzh_charcnt)
     for i in eachindex(abbrs)
         abbrs[i] = ntoh(read(io, UInt8))
     end
 
     # leap seconds (unused)
-    leapseconds_time = Array{time_type}(undef, tzh_leapcnt)
-    leapseconds_seconds = Array{Int32}(undef, tzh_leapcnt)
+    leapseconds_time = Vector{time_type}(undef, tzh_leapcnt)
+    leapseconds_seconds = Vector{Int32}(undef, tzh_leapcnt)
     for i in eachindex(leapseconds_time)
         leapseconds_time[i] = ntoh(read(io, time_type))
         leapseconds_seconds[i] = ntoh(read(io, Int32))
     end
 
     # standard/wall and UTC/local indicators (unused)
-    isstd = Array{Int8}(undef, tzh_ttisstdcnt)
+    isstd = Vector{Int8}(undef, tzh_ttisstdcnt)
     for i in eachindex(isstd)
         isstd[i] = ntoh(read(io, Int8))
     end
-    isgmt = Array{Int8}(undef, tzh_ttisgmtcnt)
+    isgmt = Vector{Int8}(undef, tzh_ttisgmtcnt)
     for i in eachindex(isgmt)
         isgmt[i] = ntoh(read(io, Int8))
     end
