@@ -1,16 +1,12 @@
 using Mocking
 
-if isdefined(Mocking, :activate)
-    Mocking.activate()  # Mocking v0.7.0
-else
-    Mocking.enable(force=true)
-end
-
 using Test
 using TimeZones
 using TimeZones: PKG_DIR
 using TimeZones.TZData: ARCHIVE_DIR, TZSource, compile, build
 using Unicode
+
+Mocking.activate()
 
 const TZDATA_VERSION = "2016j"
 const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(PKG_DIR, "test", "tzsource"))
