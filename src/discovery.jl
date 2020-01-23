@@ -164,7 +164,7 @@ function next_transition_instant(zdt::ZonedDateTime)
 
     index <= length(tz.transitions) || return nothing
 
-    # Use the UTC daftetime of the transition and the offset information prior to the
+    # Use the UTC datetime of the transition and the offset information prior to the
     # transition to create a `ZonedDateTime` which cannot be constructed with the high-level
     # constructors. The instant constructed is equivalent to the first instant after the
     # transition but visually appears to be before the transition. For example in a
