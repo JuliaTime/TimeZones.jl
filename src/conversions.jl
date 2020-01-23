@@ -7,7 +7,9 @@ const utc_tz = FixedTimeZone("UTC")
 """
     DateTime(zdt::ZonedDateTime, ::Union{Type{Local}, Type{UTC}}) -> DateTime
 
-Create an implicit local/UTC `DateTime` from the given `ZonedDateTime`.
+Create a `DateTime` which is implicitly associated with a time zone. The result can be
+specified to either be in `UTC` or `Local` (relative to the provided `ZonedDateTime` and not
+user's system time zone).
 
 # Example
 
@@ -31,7 +33,9 @@ Dates.DateTime(zdt::ZonedDateTime, ::Type{UTC}) = zdt.utc_datetime
 """
     Date(zdt::ZonedDateTime, ::Union{Type{Local}, Type{UTC}}) -> Date
 
-Create an implicit local/UTC `Date` from the given `ZonedDateTime`.
+Create a `Date` which is implicitly associated with a time zone. The result can be
+specified to either be in `UTC` or `Local` (relative to the provided `ZonedDateTime` and not
+user's system time zone).
 
 # Example
 
@@ -55,7 +59,9 @@ Dates.Date(zdt::ZonedDateTime, ::Type{UTC}) = Date(DateTime(zdt, UTC))
 """
     Time(zdt::ZonedDateTime, ::Union{Type{Local}, Type{UTC}}) -> Time
 
-Create an implicit local/UTC `Time` from the given `ZonedDateTime`.
+Create a `Time` which is implicitly associated with a time zone. The result can be
+specified to either be in `UTC` or `Local` (relative to the provided `ZonedDateTime` and not
+user's system time zone).
 
 # Example
 
