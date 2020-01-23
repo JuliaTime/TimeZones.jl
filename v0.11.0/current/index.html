@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Current Time · TimeZones.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>TimeZones.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../">Introduction</a></li><li><a class="toctext" href="../types/">Types</a></li><li><a class="toctext" href="../conversions/">Converting</a></li><li><a class="toctext" href="../arithmetic/">Arithmetic</a></li><li><a class="toctext" href="../rounding/">Rounding</a></li><li class="current"><a class="toctext" href>Current Time</a><ul class="internal"><li><a class="toctext" href="#now-/-System-Time-Zone-1"><code>now</code> / System Time Zone</a></li><li><a class="toctext" href="#today-1"><code>today</code></a></li></ul></li><li><a class="toctext" href="../faq/">Frequently Asked Questions</a></li><li><a class="toctext" href="../api-public/">API – Public</a></li><li><a class="toctext" href="../api-private/">API – Private</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href>Current Time</a></li></ul><a class="edit-page" href="https://github.com/JuliaTime/TimeZones.jl/blob/master/docs/src/current.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Current Time</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Current-Time-1" href="#Current-Time-1">Current Time</a></h1><div></div><h2><a class="nav-anchor" id="now-/-System-Time-Zone-1" href="#now-/-System-Time-Zone-1"><code>now</code> / System Time Zone</a></h2><p>Julia provides the <code>now()</code> method to retrieve your current system&#39;s time as a <code>DateTime</code>. The TimeZones.jl package provides an additional <code>now(::TimeZone)</code> method providing the current time as a <code>ZonedDateTime</code>:</p><pre><code class="language-julia">now(tz&quot;Europe/Warsaw&quot;)</code></pre><p>To get the <code>TimeZone</code> currently specified on you system you can use <code>localzone()</code>. Combining this method with the new <code>now</code> method produces the current system time in the current system&#39;s time zone:</p><pre><code class="language-julia">now(localzone())</code></pre><h2><a class="nav-anchor" id="today-1" href="#today-1"><code>today</code></a></h2><p>Similar to <code>now</code> the TimeZones package also provides a <code>today(::TimeZone)</code> method which allows you to determine the current date as a <code>Date</code> in the specified <code>TimeZone</code>.</p><pre><code class="language-julia-repl">julia&gt; a, b = now(tz&quot;Pacific/Midway&quot;), now(tz&quot;Pacific/Apia&quot;)
+(ZonedDateTime(2020, 1, 23, 11, 18, 36, 252, tz&quot;Pacific/Midway&quot;), ZonedDateTime(2020, 1, 24, 12, 18, 36, 252, tz&quot;Pacific/Apia&quot;))
+
+julia&gt; a - b
+0 milliseconds
+
+julia&gt; today(tz&quot;Pacific/Midway&quot;), today(tz&quot;Pacific/Apia&quot;)
+(2020-01-23, 2020-01-24)</code></pre><p>You should be careful not to use <code>today()</code> when working with <code>ZonedDateTime</code>s as you may end up using the wrong day. For example:</p><pre><code class="language-julia-repl">julia&gt; midway, apia = tz&quot;Pacific/Midway&quot;, tz&quot;Pacific/Apia&quot;
+(tz&quot;Pacific/Midway&quot;, tz&quot;Pacific/Apia&quot;)
+
+julia&gt; ZonedDateTime(today() + Time(11), midway)
+2020-01-23T11:00:00-11:00
+
+julia&gt; ZonedDateTime(today() + Time(11), apia)  # Wrong date; with the current rules apia should be one day ahead of midway
+2020-01-23T11:00:00+14:00
+
+julia&gt; ZonedDateTime(today(midway) + Time(11), midway)
+2020-01-23T11:00:00-11:00
+
+julia&gt; ZonedDateTime(today(apia) + Time(11), apia)
+2020-01-24T11:00:00+14:00</code></pre><p>Alternatively, you can use the <code>todayat</code> function which takes care of this for you:</p><pre><code class="language-julia-repl">julia&gt; todayat(Time(11), tz&quot;Pacific/Midway&quot;)
+2020-01-23T11:00:00-11:00
+
+julia&gt; todayat(Time(11), tz&quot;Pacific/Apia&quot;)
+2020-01-24T11:00:00+14:00</code></pre><footer><hr/><a class="previous" href="../rounding/"><span class="direction">Previous</span><span class="title">Rounding</span></a><a class="next" href="../faq/"><span class="direction">Next</span><span class="title">Frequently Asked Questions</span></a></footer></article></body></html>
