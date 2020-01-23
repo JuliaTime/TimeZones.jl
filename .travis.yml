@@ -35,9 +35,9 @@ julia:
 arch:
   - x64
   - x86
-matrix:
-  fast_finish: true
 jobs:
+  fast_finish: true
+
   # Test 32-bit only on Linux
   exclude:
     - arch: x86
