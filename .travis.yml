@@ -64,6 +64,19 @@ script:
   # Avoid setting JULIA_TZ_VERSION if the deps/build.jl file has been modified
   - git fetch origin +:refs/remotes/origin/HEAD; if ! git diff --quiet origin/HEAD HEAD -- deps/build.jl; then unset JULIA_TZ_VERSION; fi
   - echo $JULIA_TZ_VERSION  # Display version here as Julia 0.7+ doesn't show the build logs by default
-  - julia -e 'using Pkg; Pkg.build(); Pkg.test(coverage=true)'
+  - |
+    julia -e '
+      using Pkg
+      if VERSION >= v"1.1"
+          Pkg.build(verbose=true)
+      else
+          Pkg.build()
+      end
+      Pkg.test(coverage=true)'
 after_success:
-  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
+  - |
+    julia -e '
+      using Pkg
+      Pkg.add("Coverage")
+      using Coverage
+      Codecov.submit(process_folder())'
