@@ -158,7 +158,7 @@ function next_transition_instant(zdt::ZonedDateTime)
 
     # Determine the index of the transition which occurs after the UTC datetime specified
     index = searchsortedfirst(
-        tz.transitions, TimeZones.utc(zdt),
+        tz.transitions, DateTime(zdt, UTC),
         by=el -> isa(el, TimeZones.Transition) ? el.utc_datetime : el,
     )
 

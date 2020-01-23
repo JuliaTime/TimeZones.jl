@@ -6,8 +6,6 @@ fixed = FixedTimeZone("Fixed", -7200, 3600)
 
 # ZonedDateTime accessors
 zdt = ZonedDateTime(DateTime(2014,6,12,23,59,58,57), fixed)
-@test TimeZones.localtime(zdt) == DateTime(2014,6,12,23,59,58,57)
-@test TimeZones.utc(zdt) == DateTime(2014,6,13,0,59,58,57)
 @test timezone(zdt) === fixed
 
 @test TimeZones.days(zdt) == 735396

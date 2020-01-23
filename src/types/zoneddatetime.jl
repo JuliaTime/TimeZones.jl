@@ -145,6 +145,10 @@ function ZonedDateTime(parts::Union{Period,TimeZone}...)
     return ZonedDateTime(DateTime(periods...), tz)
 end
 
+function ZonedDateTime(date::Date, args...; kwargs...)
+    return ZonedDateTime(DateTime(date), args...; kwargs...)
+end
+
 # Promotion
 
 # Because of the promoting fallback definitions for TimeType, we need a special case for

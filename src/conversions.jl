@@ -5,11 +5,82 @@ using Mocking: Mocking, @mock
 const utc_tz = FixedTimeZone("UTC")
 
 """
-    DateTime(::ZonedDateTime) -> DateTime
+    DateTime(zdt::ZonedDateTime, ::Union{Type{Local}, Type{UTC}}) -> DateTime
 
-Returns an equivalent `DateTime` without any `TimeZone` information.
+Create a `DateTime` which is implicitly associated with a time zone. The result can be
+specified to either be in `UTC` or `Local` (relative to the provided `ZonedDateTime` and not
+user's system time zone).
+
+# Example
+
+```jldoctest
+julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
+2014-05-30T21:00:00-04:00
+
+julia> DateTime(zdt, Local)
+2014-05-30T21:00:00
+
+julia> DateTime(zdt, UTC)
+2014-05-31T01:00:00
+```
 """
-DateTime(zdt::ZonedDateTime) = localtime(zdt)
+DateTime(::ZonedDateTime, ::Union{Type{Local}, Type{UTC}})
+
+Dates.DateTime(zdt::ZonedDateTime, ::Type{Local}) = zdt.utc_datetime + zdt.zone.offset
+Dates.DateTime(zdt::ZonedDateTime, ::Type{UTC}) = zdt.utc_datetime
+
+
+"""
+    Date(zdt::ZonedDateTime, ::Union{Type{Local}, Type{UTC}}) -> Date
+
+Create a `Date` which is implicitly associated with a time zone. The result can be
+specified to either be in `UTC` or `Local` (relative to the provided `ZonedDateTime` and not
+user's system time zone).
+
+# Example
+
+```jldoctest
+julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
+2014-05-30T21:00:00-04:00
+
+julia> Date(zdt, Local)
+2014-05-30
+
+julia> Date(zdt, UTC)
+2014-05-31
+```
+"""
+Date(::ZonedDateTime, ::Union{Type{Local}, Type{UTC}})
+
+Dates.Date(zdt::ZonedDateTime, ::Type{Local}) = Date(DateTime(zdt, Local))
+Dates.Date(zdt::ZonedDateTime, ::Type{UTC}) = Date(DateTime(zdt, UTC))
+
+
+"""
+    Time(zdt::ZonedDateTime, ::Union{Type{Local}, Type{UTC}}) -> Time
+
+Create a `Time` which is implicitly associated with a time zone. The result can be
+specified to either be in `UTC` or `Local` (relative to the provided `ZonedDateTime` and not
+user's system time zone).
+
+# Example
+
+```jldoctest
+julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
+2014-05-30T21:00:00-04:00
+
+julia> Time(zdt, Local)
+21:00:00
+
+julia> Time(zdt, UTC)
+01:00:00
+```
+"""
+Time(::ZonedDateTime, ::Union{Type{Local}, Type{UTC}})
+
+Dates.Time(zdt::ZonedDateTime, ::Type{Local}) = Time(DateTime(zdt, Local))
+Dates.Time(zdt::ZonedDateTime, ::Type{UTC}) = Time(DateTime(zdt, UTC))
+
 
 """
     now(::TimeZone) -> ZonedDateTime
@@ -39,7 +110,7 @@ julia> today(tz"Pacific/Midway"), today(tz"Pacific/Apia")
 (2017-11-09, 2017-11-10)
 ```
 """
-Dates.today(tz::TimeZone) = Date(localtime(now(tz)))
+Dates.today(tz::TimeZone) = Date(now(tz), Local)
 
 """
     todayat(tod::Time, tz::TimeZone, [amb]) -> ZonedDateTime
@@ -78,7 +149,7 @@ function astimezone(zdt::ZonedDateTime, tz::VariableTimeZone)
     )
 
     if i == 0
-        throw(NonExistentTimeError(localtime(zdt), tz))
+        throw(NonExistentTimeError(DateTime(zdt, Local), tz))
     end
 
     zone = tz.transitions[i].zone
@@ -90,15 +161,15 @@ function astimezone(zdt::ZonedDateTime, tz::FixedTimeZone)
 end
 
 function zdt2julian(zdt::ZonedDateTime)
-    datetime2julian(utc(zdt))
+    datetime2julian(DateTime(zdt, UTC))
 end
 
 function zdt2julian(::Type{T}, zdt::ZonedDateTime) where T<:Integer
-    floor(T, datetime2julian(utc(zdt)))
+    floor(T, datetime2julian(DateTime(zdt, UTC)))
 end
 
 function zdt2julian(::Type{T}, zdt::ZonedDateTime) where T<:Real
-    convert(T, datetime2julian(utc(zdt)))
+    convert(T, datetime2julian(DateTime(zdt, UTC)))
 end
 
 function julian2zdt(jd::Real)
@@ -106,15 +177,15 @@ function julian2zdt(jd::Real)
 end
 
 function zdt2unix(zdt::ZonedDateTime)
-    datetime2unix(utc(zdt))
+    datetime2unix(DateTime(zdt, UTC))
 end
 
 function zdt2unix(::Type{T}, zdt::ZonedDateTime) where T<:Integer
-    floor(T, datetime2unix(utc(zdt)))
+    floor(T, datetime2unix(DateTime(zdt, UTC)))
 end
 
 function zdt2unix(::Type{T}, zdt::ZonedDateTime) where T<:Real
-    convert(T, datetime2unix(utc(zdt)))
+    convert(T, datetime2unix(DateTime(zdt, UTC)))
 end
 
 function unix2zdt(seconds::Real)

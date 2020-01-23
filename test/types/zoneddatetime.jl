@@ -354,7 +354,7 @@ using Dates: Hour, Second, UTM, @dateformat_str
 
         # A FixedTimeZone is effective for all of time where as a VariableTimeZone has as
         # start.
-        @test TimeZones.utc(early_utc) < warsaw.transitions[1].utc_datetime
+        @test DateTime(early_utc, UTC) < warsaw.transitions[1].utc_datetime
         @test_throws NonExistentTimeError astimezone(early_utc, warsaw)
     end
 

@@ -6,33 +6,54 @@ warsaw = first(compile("Europe/Warsaw", tzdata["europe"]))
 apia = first(compile("Pacific/Apia", tzdata["australasia"]))
 midway = first(compile("Pacific/Midway", tzdata["australasia"]))
 
-# Converting a ZonedDateTime into a DateTime
-dt = DateTime(2015, 1, 1, 0)
-zdt = ZonedDateTime(dt, warsaw)
-@test DateTime(zdt) == dt
+@testset "Construct ZonedDateTime / DateTime" begin
+    # Constructing a ZonedDateTime from a DateTime and the reverse
+    dt = DateTime(2019, 4, 11, 0)
+    zdt = ZonedDateTime(dt, warsaw)
+    @test DateTime(zdt, Local) == DateTime(2019, 4, 11, 0)
+    @test DateTime(zdt, UTC) == DateTime(2019, 4, 10, 22)
 
-# Converting from ZonedDateTime to DateTime isn't possible as it is always inexact.
-@test_throws MethodError convert(DateTime, zdt)
+    # Converting between ZonedDateTime and DateTime isn't possible as it isn't lossless.
+    @test_throws MethodError convert(DateTime, zdt)
+    @test_throws MethodError convert(ZonedDateTime, dt)
+end
 
-# Vectorized accessors
-n = 10
-arr = fill(zdt, n)
-@test Dates.DateTime.(arr) == fill(dt, n)
+@testset "Construct Date / ZonedDateTime" begin
+    date = Date(2018, 6, 14)
+    zdt = ZonedDateTime(date, warsaw)
+    @test Date(zdt, Local) == Date(2018, 6, 14)
+    @test Date(zdt, UTC) == Date(2018, 6, 13)
 
-# now function
-dt = now(Dates.UTC)::DateTime
-zdt = now(warsaw)
-@test zdt.timezone == warsaw
-@test Dates.datetime2unix(TimeZones.utc(zdt)) ≈ Dates.datetime2unix(dt)
+    # Converting between ZonedDateTime and Date isn't possible as it isn't lossless.
+    @test_throws MethodError convert(Date, zdt)
+    @test_throws MethodError convert(ZonedDateTime, date)
+end
 
-# today function
-@test abs(today() - today(warsaw)) <= Dates.Day(1)
-@test today(apia) - today(midway) == Dates.Day(1)
+@testset "Construct Time" begin
+    zdt = ZonedDateTime(2017, 8, 21, 0, 12, warsaw)
+    @test Time(zdt, Local) == Time(0, 12)
+    @test Time(zdt, UTC) == Time(22, 12)
+
+    # Converting between ZonedDateTime and Time isn't possible as it isn't lossless.
+    @test_throws MethodError convert(Time, zdt)
+end
+
+@testset "now" begin
+    dt = now(Dates.UTC)::DateTime
+    zdt = now(warsaw)
+    @test zdt.timezone == warsaw
+    @test Dates.datetime2unix(DateTime(zdt, UTC)) ≈ Dates.datetime2unix(dt)
+end
+
+@testset "today" begin
+    @test abs(today() - today(warsaw)) <= Dates.Day(1)
+    @test today(apia) - today(midway) == Dates.Day(1)
+end
 
 @testset "todayat" begin
     @testset "current time" begin
         local zdt = now(warsaw)
-        now_time = Time(TimeZones.localtime(zdt))
+        now_time = Time(zdt, Local)
         @test todayat(now_time, warsaw) == zdt
     end
 
