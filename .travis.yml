@@ -55,15 +55,21 @@ jobs:
       julia: nightly
     - <<: *doc_deploy
 
-env:
-  - JULIA_TZ_VERSION="2016j"  # Ideally only set for the "test" stage
 notifications:
   email: false
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  # Avoid setting JULIA_TZ_VERSION if the deps/build.jl file has been modified
-  - git fetch origin +:refs/remotes/origin/HEAD; if ! git diff --quiet origin/HEAD HEAD -- deps/build.jl; then unset JULIA_TZ_VERSION; fi
-  - echo $JULIA_TZ_VERSION  # Display version here as Julia 0.7+ doesn't show the build logs by default
+  # Only download the tzdata version used in TimeZones.jl's tests to avoid unnecessary
+  # load on IANA's servers. However, if the DEFAULT_TZDATA_VERSION constant was
+  # changed we need to also build the version specified by the constant to ensure it can be
+  # compiled.
+  # Note: The `git diff` command has a `--quiet` flag that will suppress output but doesn't
+  # catch all changes.
+  - git fetch origin +:refs/remotes/origin/HEAD
+  - |
+    if git diff --exit-code -G"^const DEFAULT_TZDATA_VERSION" origin/HEAD..HEAD > /dev/null; then
+        export JULIA_TZ_VERSION="2016j"  # Matches version used by tests
+    fi
   - |
     julia -e '
       using Pkg
