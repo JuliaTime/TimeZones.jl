@@ -68,9 +68,15 @@ custom = VariableTimeZone("Test/Custom", [Transition(custom_dt, utc)])  # Non-ca
 # ZonedDateTime as a string
 zdt = ZonedDateTime(dt, warsaw)
 @test string(zdt) == "1942-12-25T01:23:45+01:00"
-@test sprint(show_compact, zdt) == "1942-12-25T01:23:45+01:00"
+@test sprint(show_compact, zdt) == "ZonedDateTime(1942, 12, 25, 1, 23, 45, tz\"Europe/Warsaw\")"
 @test sprint(show, zdt) == "ZonedDateTime(1942, 12, 25, 1, 23, 45, tz\"Europe/Warsaw\")"
 @test sprint(show, MIME("text/plain"), zdt) == "1942-12-25T01:23:45+01:00"
+
+# Note: Test can be removed once `:compact_el` code is eliminated
+@test sprint(show, MIME("text/plain"), [zdt]) == "1-element Array{ZonedDateTime,1}:\n 1942-12-25T01:23:45+01:00"
+
+prefix = VERSION >= v"1.5.0-DEV.224" ? "" : "ZonedDateTime"
+@test sprint(show, [zdt]; context=:compact => true) == "$prefix[ZonedDateTime(1942, 12, 25, 1, 23, 45, tz\"Europe/Warsaw\")]"
 
 
 # TimeZone parsing
