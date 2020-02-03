@@ -10,10 +10,10 @@ end
 
 To convert from a `ZonedDateTime` into a vanilla `DateTime`, one can use the `DateTime` constructor.
 Passing either `Local` to directly drop the timezone,  or `UTC` to convert to UTC time first.
-The canonical way to represent datetimes is generally in `UTC`, this is a requirement to correctly compute the [Unix Timestamp](https://en.wikipedia.org/wiki/Unix_time).
+The canonical way to represent datetimes is generally in `UTC`, as this is a requirement to correctly compute the [Unix Timestamp](https://en.wikipedia.org/wiki/Unix_time).
 
 ```jldoctest
-julia> x = ZonedDateTime(DateTime(2020, 11, 30, 22, 35), tz"America/Winnipeg")
+julia> x = ZonedDateTime(2020, 11, 30, 22, 35, tz"America/Winnipeg")
 2020-11-30T22:35:00-06:00
 
 julia> DateTime(x, Local)
@@ -26,7 +26,7 @@ julia> DateTime(x, UTC)
 Similar can be done for `Date` and `Time`:
 
 ```jldoctest
-julia> x = ZonedDateTime(DateTime(2020, 11, 30, 22, 35), tz"America/Winnipeg")
+julia> x = ZonedDateTime(2020, 11, 30, 22, 35, tz"America/Winnipeg")
 2020-11-30T22:35:00-06:00
 
 julia> Date(x, Local)
