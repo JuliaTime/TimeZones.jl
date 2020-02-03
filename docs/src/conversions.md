@@ -8,7 +8,7 @@ end
 
 ## Converting to plain Dates types without timezone information.
 
-To convert from a `ZonedDateTime` into a vanillia `DateTime`, one can use the `DateTime` constructor.
+To convert from a `ZonedDateTime` into a vanilla `DateTime`, one can use the `DateTime` constructor.
 Passing either `Local` to directly drop the timezone,  or `UTC` to convert to UTC time first.
 The canonical way to represent datetimes is generally in `UTC`, this is a requirement to correctly compute the [Unix Timestamp](https://en.wikipedia.org/wiki/Unix_time).
 
