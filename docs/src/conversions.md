@@ -13,33 +13,32 @@ Passing either `Local` to directly drop the time zone,  or `UTC` to extract the 
 The canonical way to represent datetimes is generally in `UTC`, as this is a requirement to correctly compute the [Unix Timestamp](https://en.wikipedia.org/wiki/Unix_time).
 
 ```jldoctest
-julia> x = ZonedDateTime(2020, 11, 30, 22, 35, tz"America/Winnipeg")
-2020-11-30T22:35:00-06:00
+julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
+2014-05-30T21:00:00-04:00
 
-julia> DateTime(x, Local)
-2020-11-30T22:35:00
+julia> DateTime(zdt, Local)
+2014-05-30T21:00:00
 
-julia> DateTime(x, UTC)
-2020-12-01T04:35:00
+julia> DateTime(zdt, UTC)
+2014-05-31T01:00:00
 ```
 
 Similar can be done for `Date` and `Time`:
 
 ```jldoctest
-julia> x = ZonedDateTime(2020, 11, 30, 22, 35, tz"America/Winnipeg")
-2020-11-30T22:35:00-06:00
+julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
+2014-05-30T21:00:00-04:00
 
-julia> Date(x, Local)
-2020-11-30
+julia> Date(zdt, Local)
+2014-05-30
 
-julia> Date(x, UTC)
-2020-12-01
+julia> Date(zdt, UTC)
+2014-05-31
 
-julia> Time(x, Local)
-22:35:00
-
-julia> Time(x, UTC)
-04:35:00
+julia> Time(zdt, Local)
+21:00:00
+julia> Time(zdt, UTC)
+01:00:00
 ```
 
 ## Switching Time Zones
