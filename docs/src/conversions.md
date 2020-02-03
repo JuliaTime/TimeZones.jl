@@ -6,10 +6,10 @@ DocTestSetup = quote
 end
 ```
 
-## Converting to plain Dates types without timezone information.
+## Converting Date/Time without time zone information
 
 To convert from a `ZonedDateTime` into a vanilla `DateTime`, one can use the `DateTime` constructor.
-Passing either `Local` to directly drop the timezone,  or `UTC` to convert to UTC time first.
+Passing either `Local` to directly drop the time zone,  or `UTC` to extract the time as UTC instead.
 The canonical way to represent datetimes is generally in `UTC`, as this is a requirement to correctly compute the [Unix Timestamp](https://en.wikipedia.org/wiki/Unix_time).
 
 ```jldoctest
