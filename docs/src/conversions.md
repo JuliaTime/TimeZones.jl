@@ -6,6 +6,42 @@ DocTestSetup = quote
 end
 ```
 
+## Converting to plain Dates types without timezone information.
+
+To convert from a `ZonedDateTime` into a vanillia `DateTime`, one can use the `DateTime` constructor.
+Passing either `Local` to directly drop the timezone,  or `UTC` to convert to UTC time first.
+The canonical way to represent datetimes is generally in `UTC`, this is a requirement to correctly compute the [Unix Timestamp](https://en.wikipedia.org/wiki/Unix_time).
+
+```jldoctest
+julia> x = ZonedDateTime(DateTime(2020, 11, 30, 22, 35), tz"America/Winnipeg")
+2020-11-30T22:35:00-06:00
+
+julia> DateTime(x, Local)
+2020-11-30T22:35:00
+
+julia> DateTime(x, UTC)
+2020-12-01T04:35:00
+```
+
+Similar can be done for `Date` and `Time`:
+
+```jldoctest
+julia> x = ZonedDateTime(DateTime(2020, 11, 30, 22, 35), tz"America/Winnipeg")
+2020-11-30T22:35:00-06:00
+
+julia> Date(x, Local)
+2020-11-30
+
+julia> Date(x, UTC)
+2020-12-01
+
+julia> Time(x, Local)
+22:35:00
+
+julia> Time(x, UTC)
+04:35:00
+```
+
 ## Switching Time Zones
 
 Switching an existing `ZonedDateTime` from one `TimeZone` to another can be done with the function `astimezone`:
