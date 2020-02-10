@@ -101,7 +101,7 @@ function Base.show(io::IO, t::Transition)
 end
 
 function Base.show(io::IO, zdt::ZonedDateTime)
-    if get(io, :compact, false) || get(io, :compact_el, false)
+    if VERSION <= v"1.5.0-DEV.163" && get(io, :compact_el, false)
         print(io, zdt)
     else
         values = [
@@ -126,9 +126,15 @@ Base.show(io::IO, ::MIME"text/plain", t::Transition) = print(io, t)
 Base.show(io::IO, ::MIME"text/plain", tz::TimeZone) = print(IOContext(io, :compact => false), tz)
 Base.show(io::IO, ::MIME"text/plain", zdt::ZonedDateTime) = print(io, zdt)
 
-# Use compact printing on certain element types
-for T in (:Transition, :ZonedDateTime)
-    @eval function Base.show(io::IO, m::MIME"text/plain", X::AbstractArray{$T})
+# https://github.com/JuliaLang/julia/pull/33290
+if VERSION >= v"1.5.0-DEV.224"
+    Base.typeinfo_implicit(::Type{ZonedDateTime}) = true
+end
+
+# Use compact printing on certain element types for Julia versions before:
+# https://github.com/JuliaLang/julia/pull/34387
+if VERSION <= v"1.5.0-DEV.163"
+    function Base.show(io::IO, m::MIME"text/plain", X::AbstractArray{T}) where T <: Union{Transition, ZonedDateTime}
         # Specify a custom IO context which we can use to perform compact printing of
         # elements.
         io = IOContext(io, :compact_el => true)
