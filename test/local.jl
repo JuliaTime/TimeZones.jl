@@ -1,37 +1,37 @@
-using TimeZones: TimeZone, localzone, parse_tz_format
+using TimeZones: ParseNextError, TimeZone, localzone, parse_tz_format
 using TimeZones: _path_tz_name
 
 # Parse the TZ environment variable format
 # Should mirror the behaviour of running:
 # `date -u; env TZ="..." date`
 
-@test_throws ArgumentError parse_tz_format("AB")
-@test_throws ArgumentError parse_tz_format("+")
-@test_throws ArgumentError parse_tz_format("12")
+@test_throws ParseNextError parse_tz_format("AB")
+@test_throws ParseNextError parse_tz_format("+")
+@test_throws ParseNextError parse_tz_format("12")
 
 @test parse_tz_format("") == FixedTimeZone("UTC", 0, 0)
-@test parse_tz_format("ABC") == FixedTimeZone("ABC", 0, 0)
-@test parse_tz_format("ABC+") == FixedTimeZone("ABC", 0, 0)
-@test parse_tz_format("ABC-") == FixedTimeZone("ABC", 0, 0)
+@test_throws ParseNextError parse_tz_format("ABC")
+@test_throws ParseNextError parse_tz_format("ABC+")
+@test_throws ParseNextError parse_tz_format("ABC-")
 
 @test parse_tz_format("ABC1") == FixedTimeZone("ABC", -1 * 3600, 0)
 @test parse_tz_format("ABC+1") == FixedTimeZone("ABC", -1 * 3600, 0)
 @test parse_tz_format("ABC-1") == FixedTimeZone("ABC", 1 * 3600, 0)
 
 @test parse_tz_format("ABC-24")  == FixedTimeZone("ABC", 24 * 3600, 0)
-@test parse_tz_format("ABC-25")  == FixedTimeZone("ABC", 24 * 3600, 0)
-@test parse_tz_format("ABC-100") == FixedTimeZone("ABC", 24 * 3600, 0)
+@test parse_tz_format("ABC-25")  == FixedTimeZone("ABC", 25 * 3600, 0)
+@test parse_tz_format("ABC-100") == FixedTimeZone("ABC", 100 * 3600, 0)
 
 @test parse_tz_format("ABC-00:59")  == FixedTimeZone("ABC", 59 * 60, 0)
-@test parse_tz_format("ABC-00:99")  == FixedTimeZone("ABC", 59 * 60, 0)
-@test parse_tz_format("ABC-00:100") == FixedTimeZone("ABC", 59 * 60, 0)
+@test_throws ParseNextError parse_tz_format("ABC-00:99")
+@test_throws ParseNextError parse_tz_format("ABC-00:100")
 
 @test parse_tz_format("ABC-00:00:59")  == FixedTimeZone("ABC", 59, 0)
-@test parse_tz_format("ABC-00:00:99")  == FixedTimeZone("ABC", 59, 0)
-@test parse_tz_format("ABC-00:00:100") == FixedTimeZone("ABC", 59, 0)
+@test_throws ParseNextError parse_tz_format("ABC-00:00:99")
+@test_throws ParseNextError parse_tz_format("ABC-00:00:100")
 
-@test_throws ArgumentError parse_tz_format("ABC+00:")  # Terminal test is valid and equal to "ABC"
-@test_throws ArgumentError parse_tz_format("ABC+12:")
+@test_throws ParseNextError parse_tz_format("ABC+00:")
+@test_throws ParseNextError parse_tz_format("ABC+12:")
 
 
 @testset "localzone" begin
@@ -78,13 +78,6 @@ using TimeZones: _path_tz_name
                 @test_throws ErrorException localzone()
             end
             withenv("TZ" => ":Etc/Foo") do
-                @test_throws ErrorException localzone()
-            end
-        end
-
-        @testset "direct specification" begin
-            # Currently unsupported TZ environment variable formats
-            withenv("TZ" => "NZST-12:00:00NZDT-13:00:00,M10.1.0,M3.3.0") do
                 @test_throws ErrorException localzone()
             end
         end

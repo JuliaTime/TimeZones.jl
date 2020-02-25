@@ -167,36 +167,20 @@ function _path_tz_name(path::AbstractString, mask::Class=Class(:ALL))
 end
 
 
-# Using conditional expressions `(?(condition)yes-regexp)` as control flow to indicate that
-# that a captured group is dependent on a previous group begin matched. This could also be
-# accomplished using nested groups.
-const TZ_REGEX = r"""
-    ^
-    (?<name>[a-zA-Z]{3,})?
-    (?(name)(?<sign>[+-]))?
-    (?(name)(?<hour>\d+))?
-    (?(hour)\:(?<minute>\d+))?
-    (?(minute)\:(?<second>\d+))?
-    $
-    """x
-
 """
     parse_tz_format(str) -> TimeZone
 
 Parse the time zone format typically provided via the "TZ" environment variable. Details on
 the format can be found under the man page for
 [tzset](http://man7.org/linux/man-pages/man3/tzset.3.html).
-
-Currently this function handles only the first format which is a fixed time zone without
-daylight saving time.
 """
 function parse_tz_format(str::AbstractString)
-    tz = tryparse_tz_format(str)
-
-    if tz !== nothing
+    x = parsesub_tz(str)
+    if x isa Tuple
+        tz, i = x
         return tz
     else
-        throw(ArgumentError("Unhandled TZ environment variable format: \"$str\""))
+        throw(ParseNextError("Unhandled TZ environment variable. $(x.msg)", x.str, x.s, x.e))
     end
 end
 
@@ -207,28 +191,11 @@ Like `parse_tz_format`, but returns either a value of the `TimeZone`, or `nothin
 the string does not contain a valid format.
 """
 function tryparse_tz_format(str::AbstractString)
-    m = match(TZ_REGEX, str)
-
-    # Currently the only supported TZ format is reading time zone information from
-    # a file.
-    m === nothing && return nothing
-
-    parse_digits(s) = s === nothing ? 0 : Base.parse(Int, s)
-
-    name = m[:name] === nothing ? "UTC" : m[:name]
-
-    # Note: positive indidates the local time zone is west of the Prime Meridian and
-    # negative if it is east. This is the opposite of what FixedTimeZone expects.
-    sign_val = m[:sign] == "-" ? 1 : -1
-
-    # The tzset specification indicates that hours must be between 0 and 24 and minutes and
-    # seconds 0 and 59. If values exceed these bounds they are clamped rather than treating
-    # the entire format as invalid.
-    hour = clamp(parse_digits(m[:hour]), 0, 24)
-    minute = clamp(parse_digits(m[:minute]), 0, 59)
-    second = clamp(parse_digits(m[:second]), 0, 59)
-
-    offset = sign_val * (hour * 3600 + minute * 60 + second)
-
-    return FixedTimeZone(name, offset)
+    x = parsesub_tz(str)
+    if x isa Tuple
+        tz, i = x
+        return tz
+    else
+        return nothing
+    end
 end
