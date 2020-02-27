@@ -41,7 +41,8 @@ function __init__()
         Year, Month, Day, Hour, Minute, Second, Millisecond, TimeZone,
     )
 
-    global ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
+    global ISOZonedDateTimeFormat = DateFormat("yyyy-mm-dd\\THH:MM:SS.ssszzz")
+    eval(PARSE_FAST)
 end
 
 include("utils.jl")
