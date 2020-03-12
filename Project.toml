@@ -8,16 +8,20 @@ Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
 Mocking = "78c3b35d-d492-501b-9361-3d52fe80e533"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 Serialization = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 Unicode = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [compat]
 EzXML = "0.9.1, 1"
 Mocking = "0.7"
+RecipesBase = "0.8"
 julia = "1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 
 [targets]
-test = ["Test"]
+test = ["Test", "Plots", "UnicodePlots"]
