@@ -3,7 +3,7 @@ module TimeZones
 using Dates
 using Printf
 using Serialization
-using RecipesBase
+using RecipesBase: @receipe
 using Unicode
 
 import Dates: TimeZone, UTC
@@ -68,9 +68,7 @@ include("ranges.jl")
 include("discovery.jl")
 include("rounding.jl")
 include("parse.jl")
-
 include("plotting.jl")
-
 include("deprecated.jl")
 
 end # module
