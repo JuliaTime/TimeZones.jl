@@ -3,7 +3,7 @@ module TimeZones
 using Dates
 using Printf
 using Serialization
-using RecipesBase: @receipe
+using RecipesBase: RecipesBase, @recipe
 using Unicode
 
 import Dates: TimeZone, UTC

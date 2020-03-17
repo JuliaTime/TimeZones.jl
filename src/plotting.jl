@@ -1,7 +1,10 @@
-# Note: type-recipes seem to need to use short-form functions
-@recipe function f(::Type{<:ZonedDateTime}, val::ZonedDateTime)
-    return (
-        zdt -> Dates.value(DateTime(zdt, UTC)),
-        dt -> string(DateTime(Dates.UTM(dt))),
-    )
+@recipe function f(xs::AbstractVector{<:ZonedDateTime}, ys)
+    # if no zoned date times nothing to do but return empty list
+    isempty(xs) && return xs
+    tz = timezone(first(xs))  # convert all to same timezone as first one
+    new_xs = DateTime.(astimezone.(xs, tz), Local)
+
+    # xguide is the proper name for xlabel
+    xguide := strip(get(plotattributes, :xguide, "") * " (timezone: $tz)")
+    new_xs, ys
 end
