@@ -4,7 +4,7 @@ environment:
   matrix:
   - julia_version: 1.0  # LTS (1.0.x)
   - julia_version: 1  # Latest release (1.x.y)
-  - julia_version: latest
+  - julia_version: nightly
 
 platform:
   - x64 # 64-bit

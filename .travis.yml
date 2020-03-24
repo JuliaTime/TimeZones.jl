@@ -26,6 +26,7 @@ stages:
 language: julia
 os:
   - linux
+  # - windows  # Unable to use Windows on Travis due to: https://github.com/JuliaTime/TimeZones.jl/pull/251#issuecomment-600360127
   - osx
 julia:
   - 1.0  # LTS
