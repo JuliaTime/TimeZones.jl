@@ -5,6 +5,10 @@
     new_xs = DateTime.(astimezone.(xs, tz), Local)
 
     # xguide is the proper name for xlabel
-    xguide := strip(get(plotattributes, :xguide, "") * " (timezone: $tz)")
+    label = get(plotattributes, :xguide, "")
+    if !isempty(label)
+        label *= " "  # leave space between original label and the timezone info
+    end
+    xguide := label *= "(timezone: $tz)"
     new_xs, ys
 end

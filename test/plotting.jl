@@ -17,7 +17,7 @@
         @test x_axis[:guide] == "(timezone: EST)"
     end
 
-    @testset "label" begin
+    @testset "label (should append to it)" begin
         result = scatter(zoned_dates, 1:11; xlabel="Hi")
         x_axis = result.subplots[1][:xaxis]
         check_extrema(x_axis)
