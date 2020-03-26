@@ -15,9 +15,7 @@ for details on the options and their tradeoffs.
 
     # xguide is the proper name for xlabel
     label = get(plotattributes, :xguide, "")
-    if !isempty(label)
-        label *= " "  # leave space between original label and the timezone info
-    end
-    xguide := label *= "(timezone: $tz)"
+    label *= isempty(label) ? "Time zone: $tz" : " ($tz)" 
+    xguide := label
     new_xs, ys
 end
