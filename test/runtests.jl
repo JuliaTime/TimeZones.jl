@@ -1,6 +1,6 @@
 using Mocking
 
-using Plots
+using RecipesBase
 using Test
 using TimeZones
 using TimeZones: PKG_DIR
@@ -8,7 +8,6 @@ using TimeZones.TZData: ARCHIVE_DIR, TZSource, compile, build
 using Unicode
 
 Mocking.activate()
-unicodeplots()  # so don't need X11 to test plotting
 
 
 const TZDATA_VERSION = "2016j"
