@@ -1,5 +1,6 @@
 using Mocking
 
+using RecipesBase
 using Test
 using TimeZones
 using TimeZones: PKG_DIR
@@ -7,6 +8,7 @@ using TimeZones.TZData: ARCHIVE_DIR, TZSource, compile, build
 using Unicode
 
 Mocking.activate()
+
 
 const TZDATA_VERSION = "2016j"
 const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(PKG_DIR, "test", "tzsource"))
@@ -66,6 +68,7 @@ include("helpers.jl")
     include("discovery.jl")
     include("rounding.jl")
     include("parse.jl")
+    include("plotting.jl")
 
     # Note: Run the build tests last to ensure that re-compiling the time zones files
     # doesn't interfere with other tests.
