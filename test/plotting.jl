@@ -33,7 +33,13 @@
     @testset "No items" begin
         empty_xs = ZonedDateTime[]
         empty_ys = 0:-1
-        result = RecipesBase.apply_recipe(Dict{Symbol, Any}(:xguide=>"X-Axis"), empty_xs, empty_ys)
-        @test true  # we are just making sure it it didn't error
+        result, = RecipesBase.apply_recipe(
+           Dict{Symbol, Any}(:xguide=>"X-Axis"), empty_xs, empty_ys
+        )
+        xs, ys = result.args
+        @test isempty(xs)  # not nesc same type
+        @test ys == empty_ys
+
+        @test result.plotattributes[:xguide] == "X-Axis"  # no change to axis
     end
 end
