@@ -8,14 +8,17 @@ See this PR: https://github.com/JuliaTime/TimeZones.jl/pull/251#issuecomment-603
 for details on the options and their tradeoffs.
 ==#
 @recipe function f(xs::AbstractVector{<:ZonedDateTime}, ys)
-    # if no zoned date times nothing to do but return empty list
-    isempty(xs) && return xs
-    tz = timezone(first(xs))  # convert all to same timezone as first one
-    new_xs = DateTime.(astimezone.(xs, tz), Local)
+    if !isempty(xs)
+        tz = timezone(first(xs))  # convert all to same timezone as first one
+        new_xs = DateTime.(astimezone.(xs, tz), Local)
 
-    # xguide is the proper name for xlabel
-    label = get(plotattributes, :xguide, "")
-    label *= isempty(label) ? "Time zone: $tz" : " ($tz)" 
-    xguide := label
-    new_xs, ys
+        # xguide is the proper name for xlabel
+        label = get(plotattributes, :xguide, "")
+        label *= isempty(label) ? "Time zone: $tz" : " ($tz)"
+        xguide := label
+        new_xs, ys
+    else
+        # Can't check timezone if empty so we just return an empty list
+        [], ys
+    end
 end
