@@ -18,15 +18,7 @@ function localzone()
     mask = Class(:STANDARD) | Class(:LEGACY)
 
     @static if Sys.isapple()
-        name = @mock read(`systemsetup -gettimezone`, String)  # Appears to only work as root
-        if startswith(name, "Time Zone: ")
-            name = strip(replace(name, "Time Zone: " => ""))
-        else
-            # link will be something like /usr/share/zoneinfo/Europe/Warsaw
-            name = @mock readlink("/etc/localtime")
-            name = match(r"(?<=zoneinfo/).*$", name).match
-        end
-        return TimeZone(name, mask)
+        return TimeZone(readlink("/etc/localtime")[27:end], mask)
     elseif Sys.isunix()
         name = ""
 
