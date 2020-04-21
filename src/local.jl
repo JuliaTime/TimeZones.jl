@@ -18,7 +18,10 @@ function localzone()
     mask = Class(:STANDARD) | Class(:LEGACY)
 
     @static if Sys.isapple()
-        return TimeZone(readlink("/etc/localtime")[27:end], mask)
+        # Link will point to something like "/usr/share/zoneinfo/Europe/Warsaw"
+        link = @mock readlink("/etc/localtime")
+        name = match(r"(?<=zoneinfo/).*$", link).match
+        return TimeZone(name, mask)
     elseif Sys.isunix()
         name = ""
 
