@@ -11,13 +11,9 @@ win_name = name == "Europe/Warsaw" ? "Central European Standard Time" : "Samoa S
 tz = TimeZone(name)
 
 if Sys.isapple()
-
     # Determine time zone from /etc/localtime.
-    patches = [
-        @patch read(cmd::AbstractCmd, ::Type{String}) = ""
-        @patch readlink(filename::AbstractString) = "/usr/share/zoneinfo/$name"
-    ]
-    apply(patches) do
+    patch = @patch readlink(filename::AbstractString) = "/usr/share/zoneinfo/$name"
+    apply(patch) do
         @test localzone() == tz
     end
 
