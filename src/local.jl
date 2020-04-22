@@ -115,17 +115,13 @@ function localzone()
         end
 
         # systemd distributions use symlinks that include the zone name,
-        # see manpage of localtime(5) and timedatectl(1)
+        # see man page of localtime(5) and timedatectl(1)
         link = "/etc/localtime"
         if @mock islink(link)
-            filepath = @mock readlink(link)
-            pos = findnext(isequal('/'), filepath, 1)
-
-            while pos !== nothing
-                name = SubString(filepath, pos + 1)
-                istimezone(name, mask) && return TimeZone(name, mask)
-                pos = findnext(isequal('/'), filepath, pos + 1)
-            end
+            # Link target example: "/usr/share/zoneinfo/Europe/Warsaw"
+            target = @mock readlink(link)
+            name = _path_tz_name(target, mask)
+            name !== nothing && return TimeZone(name, mask)
         end
 
         # No explicit setting existed. Use localtime
@@ -148,6 +144,18 @@ function localzone()
 
     error("Failed to find local time zone")
 end
+
+function _path_tz_name(path::AbstractString, mask::Class=Class(:ALL))
+    i = 0
+    while i !== nothing
+        name = SubString(path, i + 1)
+        istimezone(name, mask) && return name
+        i = findnext(isequal('/'), path, i + 1)
+    end
+
+    return nothing
+end
+
 
 # Using conditional expressions `(?(condition)yes-regexp)` as control flow to indicate that
 # that a captured group is dependent on a previous group begin matched. This could also be

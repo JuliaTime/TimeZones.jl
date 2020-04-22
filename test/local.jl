@@ -1,4 +1,5 @@
 using TimeZones: TimeZone, localzone, parse_tz_format
+using TimeZones: _path_tz_name
 
 # Parse the TZ environment variable format
 # Should mirror the behaviour of running:
@@ -34,6 +35,24 @@ using TimeZones: TimeZone, localzone, parse_tz_format
 
 
 @testset "localzone" begin
+    @testset "_path_tz_name" begin
+        for name in ("UTC", "Europe/Warsaw", "America/Indiana/Indianapolis")
+            # Use eval to improve readability of tests when failures occur
+            @eval begin
+                @test _path_tz_name($name) == $name
+                @test _path_tz_name("/usr/share/zoneinfo/$($name)") == $name
+                @test _path_tz_name("/var/db/timezone/zoneinfo/$($name)") == $name
+            end
+        end
+
+        # Verify that the algorithm employed extracts the full time zone name.
+        # e.g. Passing in "/usr/share/zoneinfo/Etc/GMT0" may return "GMT0" instead of
+        # "Etc/GMT0" if we process from right-to-left.
+        @testset "alternative match" begin
+            @test _path_tz_name("GMT0") == "GMT0"  # A valid time zone name
+            @test _path_tz_name("Etc/GMT0") == "Etc/GMT0"
+        end
+    end
 
     # Ensure that the current system's local time zone is supported. If this test fails make
     # sure to report it as an issue.
