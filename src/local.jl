@@ -17,19 +17,14 @@ function localzone()
     # legacy names.
     mask = Class(:STANDARD) | Class(:LEGACY)
 
-    @static if Sys.isapple()
-        # Link will point to something like "/usr/share/zoneinfo/Europe/Warsaw"
-        link = @mock readlink("/etc/localtime")
-        name = match(r"(?<=zoneinfo/).*$", link).match
-        return TimeZone(name, mask)
-    elseif Sys.isunix()
+    @static if Sys.isunix()
         name = ""
 
         # Try getting the time zone from the "TZ" environment variable
         # http://linux.die.net/man/3/tzset
         #
-        # Note: The macOS "man tzset 3" states some additional information about the colon
-        # being optional:
+        # Note: The macOS man page tzset(3) states some additional information about the
+        # colon being optional:
         #
         # > If TZ appears in the environment and its value begins with a colon (`:'), the
         # > rest of its value is used as a pathname of a tzfile(5)-format file from which to
@@ -78,47 +73,49 @@ function localzone()
             end
         end
 
-        # Look for distribution specific configuration files that contain the time zone name.
+        # Look for Linux distribution configuration files that contain the time zone name.
+        # Since we don't expect these files on macOS we'll avoid doing these checks to
+        # improve performance.
+        @static if Sys.islinux()
+            filename = "/etc/timezone"
+            if @mock isfile(filename)
+                @mock open(filename) do file
+                    name = read(file, String)
 
-        filename = "/etc/timezone"
-        if @mock isfile(filename)
-            @mock open(filename) do file
-                name = read(file, String)
+                    # Get rid of host definitions and comments:
+                    name = strip(replace(name, r"#.*" => ""))
+                    name = replace(name, ' ' => '_')
+                end
 
-                # Get rid of host definitions and comments:
-                name = strip(replace(name, r"#.*" => ""))
-                name = replace(name, ' ' => '_')
+                istimezone(name, mask) && return TimeZone(name, mask)
             end
 
-            istimezone(name, mask) && return TimeZone(name, mask)
-        end
+            # CentOS has a ZONE setting in /etc/sysconfig/clock,
+            # OpenSUSE has a TIMEZONE setting in /etc/sysconfig/clock and
+            # Gentoo has a TIMEZONE setting in /etc/conf.d/clock
 
-        # CentOS has a ZONE setting in /etc/sysconfig/clock,
-        # OpenSUSE has a TIMEZONE setting in /etc/sysconfig/clock and
-        # Gentoo has a TIMEZONE setting in /etc/conf.d/clock
-
-        zone_re = r"(TIME)?ZONE\s*=\s*\"(?<name>.*?)\""
-        for filepath in ("/etc/sysconfig/clock", "/etc/conf.d/clock")
-            (@mock isfile(filepath)) || continue
-            @mock open(filepath) do file
-                for line in readlines(file)
-                    matched = match(zone_re, line)
-                    if matched != nothing
-                        name = matched["name"]
-                        name = replace(name, ' ' => '_')
-                        break
+            zone_re = r"(TIME)?ZONE\s*=\s*\"(?<name>.*?)\""
+            for filepath in ("/etc/sysconfig/clock", "/etc/conf.d/clock")
+                (@mock isfile(filepath)) || continue
+                @mock open(filepath) do file
+                    for line in readlines(file)
+                        matched = match(zone_re, line)
+                        if matched != nothing
+                            name = matched["name"]
+                            name = replace(name, ' ' => '_')
+                            break
+                        end
                     end
                 end
-            end
 
-            istimezone(name, mask) && return TimeZone(name, mask)
+                istimezone(name, mask) && return TimeZone(name, mask)
+            end
         end
 
         # systemd distributions use symlinks that include the zone name,
         # see man page of localtime(5) and timedatectl(1)
         link = "/etc/localtime"
         if @mock islink(link)
-            # Link target example: "/usr/share/zoneinfo/Europe/Warsaw"
             target = @mock readlink(link)
             name = _path_tz_name(target, mask)
             name !== nothing && return TimeZone(name, mask)
@@ -145,6 +142,8 @@ function localzone()
     error("Failed to find local time zone")
 end
 
+# Extract a time zone name from a path.
+# e.g. "/usr/share/zoneinfo/Europe/Warsaw" becomes "Europe/Warsaw"
 function _path_tz_name(path::AbstractString, mask::Class=Class(:ALL))
     i = 0
     while i !== nothing

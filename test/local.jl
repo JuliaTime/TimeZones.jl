@@ -36,6 +36,9 @@ using TimeZones: _path_tz_name
 
 @testset "localzone" begin
     @testset "_path_tz_name" begin
+        @test _path_tz_name("") === nothing
+        @test _path_tz_name("/tmp/UTC/file") === nothing
+
         for name in ("UTC", "Europe/Warsaw", "America/Indiana/Indianapolis")
             # Use eval to improve readability of tests when failures occur
             @eval begin
@@ -63,7 +66,7 @@ using TimeZones: _path_tz_name
     # Note: Be careful not to have the tests rely on time zone information being
     # pre-installed on the system. Some minimal systems, such as Docker containers, will not
     # have any system time zone information.
-    Sys.islinux() && @testset "TZ environmental variable" begin
+    Sys.isunix() && @testset "TZ environmental variable" begin
         @testset "invalid" begin
             # Bad TZ environment variable formats
             withenv("TZ" => "+12:00") do
@@ -111,10 +114,10 @@ using TimeZones: _path_tz_name
         # Use a time zone unrecognized by IANA or TimeZones.jl to verify that the TZDIR
         # environmental variable is being respected.
         @testset "TZDIR environmental variable" begin
-            mkdir(joinpath(TZFILE_DIR, "Test"))
-            cp(joinpath(TZFILE_DIR, "Etc", "UTC"), joinpath(TZFILE_DIR, "Test", "UTC"))
-
             try
+                mkdir(joinpath(TZFILE_DIR, "Test"))
+                cp(joinpath(TZFILE_DIR, "Etc", "UTC"), joinpath(TZFILE_DIR, "Test", "UTC"))
+
                 @test_throws ArgumentError TimeZone("Test/UTC")
                 test_utc = open(joinpath(TZFILE_DIR, "Test", "UTC")) do f
                     TimeZones.read_tzfile(f, "Test/UTC")
