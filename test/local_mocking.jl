@@ -12,7 +12,7 @@ tz = TimeZone(name)
 
 if Sys.isapple()
     # Determine time zone from /etc/localtime.
-    patch = @patch readlink(filename::AbstractString) = "/usr/share/zoneinfo/$name"
+    patch = @patch readlink(::AbstractString) = "/usr/share/zoneinfo/$name"
     apply(patch) do
         @test localzone() == tz
     end
@@ -89,7 +89,7 @@ end
 function with_localzone(func::Function, name::AbstractString)
     @static if Sys.isapple()
         patches = [
-            @patch read(cmd::AbstractCmd, ::Type{String}) = "Time Zone:  $name\n"
+            @patch readlink(::AbstractString) = "/usr/share/zoneinfo/$name"
         ]
     elseif Sys.iswindows()
         patches = [
