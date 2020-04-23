@@ -424,6 +424,11 @@ end
 
 Parses a section of a string as a time of the form `hh[:mm[:ss]]`. Primarily this function
 is used to parse daylight saving transition times as outlined in tzset(3).
+
+Note that although a +/- sign for daylight saving times are supported by Linux platforms
+they are not supported by macOS and additionally are not part of the tzset(3) specification.
+In order to provide consistent cross-platform behaviour an exception will be thrown in the
+event a user has an incorrectly configured time zone specification.
 """
 function parsesub_time(
     str::AbstractString,
@@ -431,14 +436,22 @@ function parsesub_time(
     len::Integer=lastindex(str);
     name::AbstractString="time",
 )
+    if i > len
+        return ParseNextError("Expected $name and instead found end of string", str, i)
+    end
+
+    # Require time does not start with a sign.
+    c, ii = iterate(str, i)::Tuple{Char, Int}
+    has_sign = c in ('+', '-')
+
     val = parsesub_duration(str, i, len; name=name)
     if val isa Tuple
         start_time, ii = val
 
-        if start_time >= 0
+        if !has_sign
             return start_time, ii
         else
-            return ParseNextError("$(uppercasefirst(name)) should not be negative", str, i, prevind(str, ii))
+            return ParseNextError("$(uppercasefirst(name)) should not have a sign", str, i, prevind(str, ii))
         end
     else
         return val

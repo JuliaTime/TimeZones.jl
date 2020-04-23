@@ -150,9 +150,11 @@ end
 end
 
 @testset "parsesub_time" begin
-    @testset "negative" begin
-        @test parsesub_time("-1") == ParseNextError("Time should not be negative", "-1", 1, 2)
-    end
+    # Note: `parsesub_time` primarily makes use of `parsesub_duration`. Additional tests
+    # should be added here if that is no longer the case.
+    @test parsesub_time("1") == (3600, 2)
+    @test parsesub_time("-1") == ParseNextError("Time should not have a sign", "-1", 1, 2)
+    @test parsesub_time("+1") == ParseNextError("Time should not have a sign", "+1", 1, 2)
 end
 
 @testset "parsesub_tzdate" begin
@@ -282,16 +284,20 @@ end
         @test bar == Transition(DateTime(2020, 1, 1, 3), FixedTimeZone("BAR", 0))
         @test i == 19
 
-        # Note: Although strange Linux supports +/- transition date times but negative times
-        # in Linux are clamped to zero.
-        tz, i = parsesub_tz("FOO+0BAR+0,0/+3,1/+25")
+        # Times beyond 24-hours
+        tz, i = parsesub_tz("FOO+0BAR+0,0/25,1/720")
         bar, foo = filter(t -> year(t.utc_datetime) == 2020, tz.transitions)
-        @test foo == Transition(DateTime(2020, 1, 3, 1), FixedTimeZone("FOO", 0))
-        @test bar == Transition(DateTime(2020, 1, 1, 3), FixedTimeZone("BAR", 0))
+        @test foo == Transition(DateTime(2020, 2, 1, 0), FixedTimeZone("FOO", 0))
+        @test bar == Transition(DateTime(2020, 1, 2, 1), FixedTimeZone("BAR", 0))
         @test i == 22
 
-        @test parsesub_tz("FOO+0BAR+0,0/-1,1/1") == ParseNextError("Daylight saving start time should not be negative", "FOO+0BAR+0,0/-1,1/1", 14, 15)
-        @test parsesub_tz("FOO+0BAR+0,0/1,1/-1") == ParseNextError("Daylight saving end time should not be negative", "FOO+0BAR+0,0/1,1/-1", 18, 19)
+        # - Linux parses +/- times succesfully but clamps negative times to zero.
+        # - macOS fails to parse +/- times.
+        @test parsesub_tz("FOO+0BAR+0,0/+1,1/1") == ParseNextError("Daylight saving start time should not have a sign", "FOO+0BAR+0,0/+1,1/1", 14, 15)
+        @test parsesub_tz("FOO+0BAR+0,0/1,1/+1") == ParseNextError("Daylight saving end time should not have a sign", "FOO+0BAR+0,0/1,1/+1", 18, 19)
+
+        @test parsesub_tz("FOO+0BAR+0,0/-1,1/1") == ParseNextError("Daylight saving start time should not have a sign", "FOO+0BAR+0,0/-1,1/1", 14, 15)
+        @test parsesub_tz("FOO+0BAR+0,0/1,1/-1") == ParseNextError("Daylight saving end time should not have a sign", "FOO+0BAR+0,0/1,1/-1", 18, 19)
     end
 
     # Example found in the `tzset 3` man page
