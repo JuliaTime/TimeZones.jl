@@ -442,20 +442,11 @@ function parsesub_time(
 
     # Require time does not start with a sign.
     c, ii = iterate(str, i)::Tuple{Char, Int}
-    has_sign = c in ('+', '-')
-
-    val = parsesub_duration(str, i, len; name=name)
-    if val isa Tuple
-        start_time, ii = val
-
-        if !has_sign
-            return start_time, ii
-        else
-            return ParseNextError("$(uppercasefirst(name)) should not have a sign", str, i, prevind(str, ii))
-        end
-    else
-        return val
+    if c in ('+', '-')
+        return ParseNextError("$(uppercasefirst(name)) should not have a sign", str, i)
     end
+
+    return parsesub_duration(str, i, len; name=name)
 end
 
 """

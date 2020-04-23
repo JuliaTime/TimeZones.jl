@@ -153,8 +153,8 @@ end
     # Note: `parsesub_time` primarily makes use of `parsesub_duration`. Additional tests
     # should be added here if that is no longer the case.
     @test parsesub_time("1") == (3600, 2)
-    @test parsesub_time("-1") == ParseNextError("Time should not have a sign", "-1", 1, 2)
-    @test parsesub_time("+1") == ParseNextError("Time should not have a sign", "+1", 1, 2)
+    @test parsesub_time("-1") == ParseNextError("Time should not have a sign", "-1", 1, 1)
+    @test parsesub_time("+1") == ParseNextError("Time should not have a sign", "+1", 1, 1)
 end
 
 @testset "parsesub_tzdate" begin
@@ -293,11 +293,11 @@ end
 
         # - Linux parses +/- times succesfully but clamps negative times to zero.
         # - macOS fails to parse +/- times.
-        @test parsesub_tz("FOO+0BAR+0,0/+1,1/1") == ParseNextError("Daylight saving start time should not have a sign", "FOO+0BAR+0,0/+1,1/1", 14, 15)
-        @test parsesub_tz("FOO+0BAR+0,0/1,1/+1") == ParseNextError("Daylight saving end time should not have a sign", "FOO+0BAR+0,0/1,1/+1", 18, 19)
+        @test parsesub_tz("FOO+0BAR+0,0/+1,1/1") == ParseNextError("Daylight saving start time should not have a sign", "FOO+0BAR+0,0/+1,1/1", 14)
+        @test parsesub_tz("FOO+0BAR+0,0/1,1/+1") == ParseNextError("Daylight saving end time should not have a sign", "FOO+0BAR+0,0/1,1/+1", 18)
 
-        @test parsesub_tz("FOO+0BAR+0,0/-1,1/1") == ParseNextError("Daylight saving start time should not have a sign", "FOO+0BAR+0,0/-1,1/1", 14, 15)
-        @test parsesub_tz("FOO+0BAR+0,0/1,1/-1") == ParseNextError("Daylight saving end time should not have a sign", "FOO+0BAR+0,0/1,1/-1", 18, 19)
+        @test parsesub_tz("FOO+0BAR+0,0/-1,1/1") == ParseNextError("Daylight saving start time should not have a sign", "FOO+0BAR+0,0/-1,1/1", 14)
+        @test parsesub_tz("FOO+0BAR+0,0/1,1/-1") == ParseNextError("Daylight saving end time should not have a sign", "FOO+0BAR+0,0/1,1/-1", 18)
     end
 
     # Example found in the `tzset 3` man page
