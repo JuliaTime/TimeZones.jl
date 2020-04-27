@@ -2,6 +2,11 @@
 # Unfortunately, different platforms only follow parts of the specification which results in
 # differences from platform-to-platform.
 #
+# TimeZones.jl follows the tzset(3) specification and avoids supporting additional features
+# which may not be present on all platforms. As the platform specific functionality only
+# really deals with corner cases which are not required by any actual time zone definition
+# supporting for these features is purely academic.
+#
 # Here are some examples of the platform specific differences. Under macOS time zone offset
 # only supports hours under ±7 days (167 hours) and hours beyond this range result in
 # falling back to UTC:

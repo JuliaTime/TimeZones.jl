@@ -19,8 +19,8 @@ using TimeZones: _path_tz_name
 @test parse_tz_format("ABC-1") == FixedTimeZone("ABC", 1 * 3600, 0)
 
 @test parse_tz_format("ABC-24")  == FixedTimeZone("ABC", 24 * 3600, 0)
-@test parse_tz_format("ABC-25")  == FixedTimeZone("ABC", 25 * 3600, 0)
-@test parse_tz_format("ABC-100") == FixedTimeZone("ABC", 100 * 3600, 0)
+@test_throws ParseNextError parse_tz_format("ABC-25")
+@test_throws ParseNextError parse_tz_format("ABC-100")
 
 @test parse_tz_format("ABC-00:59")  == FixedTimeZone("ABC", 59 * 60, 0)
 @test_throws ParseNextError parse_tz_format("ABC-00:99")

@@ -132,7 +132,7 @@ function parsesub_tzabbr(
 
     @inbounds while i <= len
         c, ii = iterate(str, i)::Tuple{Char, Int}
-        # isascii(c) || break  # If we only want to support ASCII
+        isascii(c) || break  # Restricts abbreviation support to ASCII characters
 
         if state == :simple && isletter(c)
             name_end = i
@@ -175,31 +175,26 @@ end
 
 
 """
-    parsesub_duration(str, [i, len]) -> Union{Tuple{Integer, Integer}, Exception}
+    parsesub_offset(str, [i, len]) -> Union{Tuple{Integer, Integer}, Exception}
 
-Parses a section of a string as a duration of time of the form `[+|-]hh[:mm[:ss]]`. The
-minutes and seconds must be between 0 and 59.
-
-Mostly this follows the offset specification outlined in the tzset(3) man page except that
-hours are not limited to be between 0 and 24. Hours are unbounded as different operating
-systems handle hours greater-than 24 differently (e.g. macOS requires hours between 0 and
-167 while Linux clamps hours to 24). `parsesub_duration` strives to maintain compatiblity
-with OS behaviour but also not introduce unnecessary restrictions.
+Parses a section of a string as an offset of the form `[+|-]hh[:mm[:ss]]`. The hour must be
+between 0 and 24, and the minutes and seconds 00 and 59. This follows specification for
+offsets as defined in the tzset(3) man page.
 
 # Example
 ```jldoctest
-julia> parsesub_duration("1:0:0")
+julia> parsesub_offset("1:0:0")
 (3600, 5)
 
-julia> parsesub_duration("-0:1:2")
+julia> parsesub_offset("-0:1:2")
 (-62, 6)
 ```
 """
-function parsesub_duration(
+function parsesub_offset(
     str::AbstractString,
     i::Integer=firstindex(str),
     len::Integer=lastindex(str);
-    name::AbstractString="duration",
+    name::AbstractString="offset",
 )
     coefficient = 1
     hour = minute = second = 0
@@ -223,7 +218,11 @@ function parsesub_duration(
     if val === nothing
         return ParseNextError("Expected $name hour digits", str, i)
     end
-    hour, i = val
+    hour, ii = val
+    if hour < 0 || hour > 24
+        return ParseNextError("Hours outside of expected range [0, 24]", str, i, prevind(str, ii))
+    end
+    i = ii
     i > len && @goto done
 
     c, ii = iterate(str, i)::Tuple{Char, Int}
@@ -424,11 +423,6 @@ end
 
 Parses a section of a string as a time of the form `hh[:mm[:ss]]`. Primarily this function
 is used to parse daylight saving transition times as outlined in tzset(3).
-
-Note that although a +/- sign for daylight saving times are supported by Linux platforms
-they are not supported by macOS and additionally are not part of the tzset(3) specification.
-In order to provide consistent cross-platform behaviour an exception will be thrown in the
-event a user has an incorrectly configured time zone specification.
 """
 function parsesub_time(
     str::AbstractString,
@@ -446,7 +440,7 @@ function parsesub_time(
         return ParseNextError("$(uppercasefirst(name)) should not have a sign", str, i)
     end
 
-    return parsesub_duration(str, i, len; name=name)
+    return parsesub_offset(str, i, len; name=name)
 end
 
 """
@@ -479,7 +473,7 @@ function parsesub_tz(
         return x
     end
 
-    x = parsesub_duration(str, i, len; name="standard offset")
+    x = parsesub_offset(str, i, len; name="standard offset")
     if x isa Tuple
         std_offset, i = x
     else
@@ -500,7 +494,7 @@ function parsesub_tz(
     dst_offset = nothing
     if dst_name !== nothing
         if i <= len
-            x = parsesub_duration(str, i, len; name="daylight saving offset")
+            x = parsesub_offset(str, i, len; name="daylight saving offset")
             if x isa Tuple
                 dst_offset, i = x
             else

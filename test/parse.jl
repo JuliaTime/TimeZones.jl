@@ -1,5 +1,5 @@
 using Dates: parse_components, default_format
-using TimeZones: ParseNextError, parsesub_tzabbr, parsesub_duration, parsesub_time, parsesub_tzdate, parsesub_tz
+using TimeZones: ParseNextError, parsesub_tzabbr, parsesub_offset, parsesub_time, parsesub_tzdate, parsesub_tz
 
 @testset "parse" begin
     @test isequal(
@@ -95,62 +95,65 @@ end
     @test parsesub_tzabbr(">") == ParseNextError(empty_msg, ">", 1, 1)
     @test parsesub_tzabbr("AB") == ParseNextError(three_char_sim_msg, "AB", 1, 2)
     @test parsesub_tzabbr("<>") == ParseNextError(three_char_exp_msg, "<>", 2, 1)
-    @test parsesub_tzabbr("αβc") == ("αβc", 6)
+    @test parsesub_tzabbr("αβc") == ParseNextError(empty_msg, "αβc", 1, 1)
 end
 
-@testset "parsesub_duration" begin
-    end_of_string_msg = "Expected duration and instead found end of string"
-    missing_hours_msg = "Expected duration hour digits"
+@testset "parsesub_offset" begin
+    end_of_string_msg = "Expected offset and instead found end of string"
+    missing_hours_msg = "Expected offset hour digits"
+    hours_range_msg = "Hours outside of expected range [0, 24]"
     minutes_range_msg = "Minutes outside of expected range [0, 59]"
-    minutes_digits_msg = "Expected duration minute digits after colon delimiter"
+    minutes_digits_msg = "Expected offset minute digits after colon delimiter"
     seconds_range_msg = "Seconds outside of expected range [0, 59]"
-    seconds_digits_msg = "Expected duration second digits after colon delimiter"
+    seconds_digits_msg = "Expected offset second digits after colon delimiter"
 
     @testset "sign" begin
-        @test parsesub_duration("") == ParseNextError(end_of_string_msg, "", 1, 0)
-        @test parsesub_duration("&") == ParseNextError(missing_hours_msg, "&", 1, 1)
-        @test parsesub_duration("-") == ParseNextError("Duration sign (-) is not followed by a value", "-", 1, 1)
-        @test parsesub_duration("+") == ParseNextError("Duration sign (+) is not followed by a value", "+", 1, 1)
+        @test parsesub_offset("") == ParseNextError(end_of_string_msg, "", 1, 0)
+        @test parsesub_offset("&") == ParseNextError(missing_hours_msg, "&", 1, 1)
+        @test parsesub_offset("-") == ParseNextError("Offset sign (-) is not followed by a value", "-", 1, 1)
+        @test parsesub_offset("+") == ParseNextError("Offset sign (+) is not followed by a value", "+", 1, 1)
     end
 
     @testset "hours" begin
-        @test parsesub_duration("0") == (0, 2)
-        @test parsesub_duration("0&") == (0, 2)
+        @test parsesub_offset("0") == (0, 2)
+        @test parsesub_offset("0&") == (0, 2)
 
-        @test parsesub_duration("1")  == ( 1 * 3600, 2)
-        @test parsesub_duration("-1") == (-1 * 3600, 3)
-        @test parsesub_duration("+1") == (+1 * 3600, 3)
+        @test parsesub_offset("1")   == ( 1 * 3600, 2)
+        @test parsesub_offset("-1")  == (-1 * 3600, 3)
+        @test parsesub_offset("+1")  == (+1 * 3600, 3)
+        @test parsesub_offset("-24") == (-24 * 3600, 4)
+        @test parsesub_offset("+24") == (+24 * 3600, 4)
 
-        # Hours in year as an unbounded example
-        @test parsesub_duration("8760") == (8760 * 3600, 5)
+        @test parsesub_offset("-25") == ParseNextError(hours_range_msg, "-25", 2, 3)
+        @test parsesub_offset("+25") == ParseNextError(hours_range_msg, "+25", 2, 3)
     end
 
     @testset "minutes" begin
-        @test parsesub_duration("0:59")  == ( 59 * 60, 5)
-        @test parsesub_duration("-0:59") == (-59 * 60, 6)
-        @test parsesub_duration("+0:59") == (+59 * 60, 6)
+        @test parsesub_offset("0:59")  == ( 59 * 60, 5)
+        @test parsesub_offset("-0:59") == (-59 * 60, 6)
+        @test parsesub_offset("+0:59") == (+59 * 60, 6)
 
-        @test parsesub_duration("-0:60") == ParseNextError(minutes_range_msg, "-0:60", 4, 5)
-        @test parsesub_duration("+0:60") == ParseNextError(minutes_range_msg, "+0:60", 4, 5)
-        @test parsesub_duration("0:") == ParseNextError(minutes_digits_msg, "0:", 3, 2)
-        @test parsesub_duration("0:-1") == ParseNextError(minutes_digits_msg, "0:-1", 3, 3)
+        @test parsesub_offset("-0:60") == ParseNextError(minutes_range_msg, "-0:60", 4, 5)
+        @test parsesub_offset("+0:60") == ParseNextError(minutes_range_msg, "+0:60", 4, 5)
+        @test parsesub_offset("0:") == ParseNextError(minutes_digits_msg, "0:", 3, 2)
+        @test parsesub_offset("0:-1") == ParseNextError(minutes_digits_msg, "0:-1", 3, 3)
     end
 
     @testset "seconds" begin
-        @test parsesub_duration("0:0:59")  == ( 59, 7)
-        @test parsesub_duration("-0:0:59") == (-59, 8)
-        @test parsesub_duration("+0:0:59") == (+59, 8)
-        @test parsesub_duration("0:0:59:") == ( 59, 7)
+        @test parsesub_offset("0:0:59")  == ( 59, 7)
+        @test parsesub_offset("-0:0:59") == (-59, 8)
+        @test parsesub_offset("+0:0:59") == (+59, 8)
+        @test parsesub_offset("0:0:59:") == ( 59, 7)
 
-        @test parsesub_duration("-0:0:60") == ParseNextError(seconds_range_msg, "-0:0:60", 6, 7)
-        @test parsesub_duration("+0:0:60") == ParseNextError(seconds_range_msg, "+0:0:60", 6, 7)
-        @test parsesub_duration("0:0:") == ParseNextError(seconds_digits_msg, "0:0:", 5, 4)
-        @test parsesub_duration("0:0:-1") == ParseNextError(seconds_digits_msg, "0:0:-1", 5, 5)
+        @test parsesub_offset("-0:0:60") == ParseNextError(seconds_range_msg, "-0:0:60", 6, 7)
+        @test parsesub_offset("+0:0:60") == ParseNextError(seconds_range_msg, "+0:0:60", 6, 7)
+        @test parsesub_offset("0:0:") == ParseNextError(seconds_digits_msg, "0:0:", 5, 4)
+        @test parsesub_offset("0:0:-1") == ParseNextError(seconds_digits_msg, "0:0:-1", 5, 5)
     end
 end
 
 @testset "parsesub_time" begin
-    # Note: `parsesub_time` primarily makes use of `parsesub_duration`. Additional tests
+    # Note: `parsesub_time` primarily makes use of `parsesub_offset`. Additional tests
     # should be added here if that is no longer the case.
     @test parsesub_time("1") == (3600, 2)
     @test parsesub_time("-1") == ParseNextError("Time should not have a sign", "-1", 1, 1)
@@ -285,11 +288,9 @@ end
         @test i == 19
 
         # Times beyond 24-hours
-        tz, i = parsesub_tz("FOO+0BAR+0,0/25,1/720")
-        bar, foo = filter(t -> year(t.utc_datetime) == 2020, tz.transitions)
-        @test foo == Transition(DateTime(2020, 2, 1, 0), FixedTimeZone("FOO", 0))
-        @test bar == Transition(DateTime(2020, 1, 2, 1), FixedTimeZone("BAR", 0))
-        @test i == 22
+        # - Linux clamps hours when beyond 24.
+        # - macOS falls back to UTC hours beyond 167.
+        @test parsesub_tz("FOO+0BAR+0,0/25,1/720") == ParseNextError("Hours outside of expected range [0, 24]", "FOO+0BAR+0,0/25,1/720", 14, 15)
 
         # - Linux parses +/- times succesfully but clamps negative times to zero.
         # - macOS fails to parse +/- times.
