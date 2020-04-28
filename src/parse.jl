@@ -493,7 +493,8 @@ function parsesub_tz(
 
     dst_offset = nothing
     if dst_name !== nothing
-        if i <= len
+        iter = iterate(str, i)
+        if iter !== nothing && first(iter) != ','
             x = parsesub_offset(str, i, len; name="daylight saving offset")
             if x isa Tuple
                 dst_offset, i = x

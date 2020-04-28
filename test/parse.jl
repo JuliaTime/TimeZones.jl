@@ -310,6 +310,15 @@ end
         @test i == 42
     end
 
+    # Daylight saving offset is optional
+    @testset "EST/EDT" begin
+        tz, i = parsesub_tz("EST5EDT,M3.2.0,M11.1.0")
+        edt, est = filter(t -> year(t.utc_datetime) == 2020, tz.transitions)
+        @test est == Transition(DateTime(2020, 11, 1, 6), FixedTimeZone("EST", -18000))
+        @test edt == Transition(DateTime(2020, 3, 8, 7), FixedTimeZone("EDT", -18000, 3600))
+        @test i == 23
+    end
+
     # Validate the direct specification by comparing the result with a time zone computed
     # from tzdata.
     @testset "equivalent" begin
