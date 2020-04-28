@@ -70,7 +70,7 @@ using TimeZones: _path_tz_name
         @testset "invalid" begin
             # Bad TZ environment variable formats
             withenv("TZ" => "+12:00") do
-                @test_throws ErrorException localzone()
+                @test_throws ParseNextError localzone()
             end
 
             # Unable to locate time zone on system
@@ -79,6 +79,18 @@ using TimeZones: _path_tz_name
             end
             withenv("TZ" => ":Etc/Foo") do
                 @test_throws ErrorException localzone()
+            end
+
+            # Bad TZ which is not a file and not a direct representation. Under these
+            # conditions we should throw a error message from parsing the direct
+            # representation.
+            withenv("TZ" => "A") do
+                try
+                    localzone()
+                catch e
+                    @test e isa ParseNextError
+                    @test occursin("Unhandled TZ environment variable", e.msg)
+                end
             end
         end
 

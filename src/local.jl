@@ -39,16 +39,15 @@ function localzone()
         # > information.
         if haskey(ENV, "TZ")
             name = ENV["TZ"]
+            force_tzfile = false
 
             # If the TZ format starts with a colon we'll prefer using the time zone
             # information from the specified file.
             if startswith(name, ':')
-                name = name[2:end]  # Name is either an relative or absolute path
+                name = name[2:end]  # Either a relative or absolute path
+                force_tzfile = true
             else
-                tz = tryparse_tz_format(name)
-                tz !== nothing && return tz
-
-                # Name matches pre-compiled time zone name
+                # Check if name matches pre-compiled time zone
                 istimezone(name, mask) && return TimeZone(name, mask)
             end
 
@@ -69,7 +68,11 @@ function localzone()
                     end
                 end
 
-                error("unable to locate tzfile: $name")
+                if !force_tzfile
+                    return parse_tz_format(name)
+                else
+                    error("Unable to locate tzfile: $name")
+                end
             end
         end
 
