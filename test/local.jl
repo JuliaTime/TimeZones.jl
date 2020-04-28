@@ -133,7 +133,7 @@ using TimeZones: _path_tz_name
         @testset "absolute path" begin
             warsaw_path = joinpath(TZFILE_DIR, "Europe", "Warsaw")
             warsaw_from_file = open(warsaw_path) do f
-                TimeZones.read_tzfile(f, "local")
+                TimeZones.read_tzfile(f, "Europe/Warsaw")
             end
 
             withenv("TZ" => ":" * abspath(warsaw_path)) do

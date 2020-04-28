@@ -59,7 +59,7 @@ function localzone()
 
             if startswith(name, '/')
                 return @mock open(name) do f
-                    read_tzfile(f, "local")
+                    read_tzfile(f, something(_path_tz_name(name, mask), "local"))
                 end
             else
                 # The system time zone directory used depends on the (g)libc version
