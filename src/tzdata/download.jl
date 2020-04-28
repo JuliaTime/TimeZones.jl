@@ -86,7 +86,13 @@ function tzdata_download(version::AbstractString="latest", dir::AbstractString=t
     end
 
     url = tzdata_url(version)
-    archive = Base.download(url, joinpath(dir, basename(url)))  # Overwrites the local file if any
+
+    # Retry download in the event of a failure. Ideally we'd restrict when a retry would
+    # occur but `Base.download` prints the relevant context information.
+    download = retry(delays=ExponentialBackOff(n=2, first_delay=5, max_delay=60)) do
+        Base.download(url, joinpath(dir, basename(url)))  # Overwrites the local file if any
+    end
+    archive = download()
 
     # Note: An "HTTP 404 Not Found" may result in the 404 page being downloaded. Also,
     # catches issues with corrupt archives
