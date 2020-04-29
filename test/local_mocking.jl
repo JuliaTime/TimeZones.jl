@@ -10,14 +10,7 @@ tzfile_path = joinpath(TZFILE_DIR, split(name, '/')...)
 win_name = name == "Europe/Warsaw" ? "Central European Standard Time" : "Samoa Standard Time"
 tz = TimeZone(name)
 
-if Sys.isapple()
-    # Determine time zone from /etc/localtime.
-    patch = @patch readlink(::AbstractString) = "/usr/share/zoneinfo/$name"
-    apply(patch) do
-        @test localzone() == tz
-    end
-
-elseif Sys.iswindows()
+if Sys.iswindows()
     patch = @patch read(cmd::AbstractCmd, ::Type{String}) = "$win_name\r\n"
     apply(patch) do
         @test localzone() == tz
@@ -25,29 +18,26 @@ elseif Sys.iswindows()
 
     # Dateline Standard Time -> Etc/GMT+12 -> UTC-12:00
 
-elseif Sys.islinux()
-    # Test TZ environmental variable
-    withenv("TZ" => ":$name") do
-        @test localzone() == tz
-    end
-
+elseif Sys.isunix()
     withenv("TZ" => nothing) do
-        # Determine time zone from /etc/timezone
-        patches = [
-            @patch isfile(f::AbstractString) = f == "/etc/timezone"
-            @patch open(fn::Function, f::AbstractString) = fn(IOBuffer("$name #Works with comments\n"))
-        ]
-        apply(patches) do
-            @test localzone() == tz
-        end
+        if Sys.islinux()
+            # Determine time zone from /etc/timezone
+            patches = [
+                @patch isfile(f::AbstractString) = f == "/etc/timezone"
+                @patch open(fn::Function, f::AbstractString) = fn(IOBuffer("$name #Works with comments\n"))
+            ]
+            apply(patches) do
+                @test localzone() == tz
+            end
 
-        # Determine time zone from /etc/conf.d/clock
-        patches = [
-            @patch isfile(f::AbstractString) = f == "/etc/conf.d/clock"
-            @patch open(fn::Function, f::AbstractString) = fn(IOBuffer("\n\nTIMEZONE=\"$name\""))
-        ]
-        apply(patches) do
-            @test localzone() == tz
+            # Determine time zone from /etc/conf.d/clock
+            patches = [
+                @patch isfile(f::AbstractString) = f == "/etc/conf.d/clock"
+                @patch open(fn::Function, f::AbstractString) = fn(IOBuffer("\n\nTIMEZONE=\"$name\""))
+            ]
+            apply(patches) do
+                @test localzone() == tz
+            end
         end
 
         # Determine time zone from symlink /etc/localtime
@@ -89,6 +79,7 @@ end
 function with_localzone(func::Function, name::AbstractString)
     @static if Sys.isapple()
         patches = [
+            @patch islink(f::AbstractString) = f == "/etc/localtime"
             @patch readlink(::AbstractString) = "/usr/share/zoneinfo/$name"
         ]
     elseif Sys.iswindows()
