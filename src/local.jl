@@ -178,7 +178,7 @@ the format can be found under the man page for
 [tzset](http://man7.org/linux/man-pages/man3/tzset.3.html).
 """
 function parse_tz_format(str::AbstractString)
-    x = parsesub_tz(str)
+    x = _parsesub_tz(str)
     if x isa Tuple
         tz, i = x
         return tz
@@ -194,7 +194,7 @@ Like `parse_tz_format`, but returns either a value of the `TimeZone`, or `nothin
 the string does not contain a valid format.
 """
 function tryparse_tz_format(str::AbstractString)
-    x = parsesub_tz(str)
+    x = _parsesub_tz(str)
     if x isa Tuple
         tz, i = x
         return tz

@@ -105,7 +105,7 @@ Dates.default_format(::Type{ZonedDateTime}) = ISOZonedDateTimeFormat
 
 
 """
-    parsesub_tzabbr(str, [i, len]) -> Union{Tuple{AbstractString, Integer}, Exception}
+    _parsesub_tzabbr(str, [i, len]) -> Union{Tuple{AbstractString, Integer}, Exception}
 
 Parses a section of a string as a time zone abbreviation as defined in the tzset(3) man
 page. An abbreviation must be at least three or more alphabetic characters. When enclosed by
@@ -114,14 +114,14 @@ plus (+) sign, the minus (-) sign, and digits.
 
 # Examples
 ```jldoctest
-julia> parsesub_tzabbr("ABC+1")
+julia> _parsesub_tzabbr("ABC+1")
 ("ABC", 4)
 
-julia> parsesub_tzabbr("<ABC+1>+2")
+julia> _parsesub_tzabbr("<ABC+1>+2")
 ("ABC+1", 6)
 ```
 """
-function parsesub_tzabbr(
+function _parsesub_tzabbr(
     str::AbstractString,
     i::Integer=firstindex(str),
     len::Integer=lastindex(str),
@@ -175,7 +175,7 @@ end
 
 
 """
-    parsesub_offset(str, [i, len]) -> Union{Tuple{Integer, Integer}, Exception}
+    _parsesub_offset(str, [i, len]) -> Union{Tuple{Integer, Integer}, Exception}
 
 Parses a section of a string as an offset of the form `[+|-]hh[:mm[:ss]]`. The hour must be
 between 0 and 24, and the minutes and seconds 00 and 59. This follows specification for
@@ -183,14 +183,14 @@ offsets as defined in the tzset(3) man page.
 
 # Example
 ```jldoctest
-julia> parsesub_offset("1:0:0")
+julia> _parsesub_offset("1:0:0")
 (3600, 5)
 
-julia> parsesub_offset("-0:1:2")
+julia> _parsesub_offset("-0:1:2")
 (-62, 6)
 ```
 """
-function parsesub_offset(
+function _parsesub_offset(
     str::AbstractString,
     i::Integer=firstindex(str),
     len::Integer=lastindex(str);
@@ -262,7 +262,7 @@ function parsesub_offset(
 end
 
 """
-    parsesub_tzdate(str, [i, len]) -> Union{Tuple{Function, Integer}, Exception}
+    _parsesub_tzdate(str, [i, len]) -> Union{Tuple{Function, Integer}, Exception}
 
 Parses a section of a string as a day of the year as defined in tzset(3). The return value
 includes an anonymous function which takes the argument `year::Integer` and returns a
@@ -281,19 +281,19 @@ includes an anonymous function which takes the argument `year::Integer` and retu
 
 # Example
 ```jldoctest
-julia> f, i = parsesub_tzdate("J60");
+julia> f, i = _parsesub_tzdate("J60");
 
 julia> f.(2019:2020)
 2-element Array{Date,1}:
  2019-03-01
  2020-03-01
 
-julia> f, i = parsesub_tzdate("60");
+julia> f, i = _parsesub_tzdate("60");
 2-element Array{Date,1}:
  2019-03-02
  2020-03-01
 
-julia> f, i = parsesub_tzdate("M3.3.0");  # Third Sunday in March
+julia> f, i = _parsesub_tzdate("M3.3.0");  # Third Sunday in March
 
 julia> f.(2019:2020)
 2-element Array{Date,1}:
@@ -301,7 +301,7 @@ julia> f.(2019:2020)
  2020-03-15
 ```
 """
-function parsesub_tzdate(
+function _parsesub_tzdate(
     str::AbstractString,
     i::Integer=firstindex(str),
     len::Integer=lastindex(str),
@@ -419,12 +419,12 @@ function parsesub_tzdate(
 end
 
 """
-    parsesub_time(str, [i, len]) -> Union{Tuple{Integer, Integer}, Exception}
+    _parsesub_time(str, [i, len]) -> Union{Tuple{Integer, Integer}, Exception}
 
 Parses a section of a string as a time of the form `hh[:mm[:ss]]`. Primarily this function
 is used to parse daylight saving transition times as outlined in tzset(3).
 """
-function parsesub_time(
+function _parsesub_time(
     str::AbstractString,
     i::Integer=firstindex(str),
     len::Integer=lastindex(str);
@@ -440,23 +440,23 @@ function parsesub_time(
         return ParseNextError("$(uppercasefirst(name)) should not have a sign", str, i)
     end
 
-    return parsesub_offset(str, i, len; name=name)
+    return _parsesub_offset(str, i, len; name=name)
 end
 
 """
-    parsesub_tz(str, [i, len]) -> Union{Tuple{TimeZone, Integer}, Exception}
+    _parsesub_tz(str, [i, len]) -> Union{Tuple{TimeZone, Integer}, Exception}
 
 Parse a direct representation of a time zone as specified by the tzset(3) man page.
 
 # Examples
 ```jldoctest
-julia> first(parsesub_tz("EST+5"))
+julia> first(_parsesub_tz("EST+5"))
 EST (UTC-5)
 
-julia> first(parsesub_tz("NZST-12:00:00NZDT-13:00:00,M10.1.0,M3.3.0"))
+julia> first(_parsesub_tz("NZST-12:00:00NZDT-13:00:00,M10.1.0,M3.3.0"))
 NZST/NZDT (UTC+12/UTC+13)
 """
-function parsesub_tz(
+function _parsesub_tz(
     str::AbstractString,
     i::Integer=firstindex(str),
     len::Integer=lastindex(str),
@@ -466,14 +466,14 @@ function parsesub_tz(
         return FixedTimeZone("UTC"), i
     end
 
-    x = parsesub_tzabbr(str, i, len)
+    x = _parsesub_tzabbr(str, i, len)
     if x isa Tuple
         std_name, i = x
     else
         return x
     end
 
-    x = parsesub_offset(str, i, len; name="standard offset")
+    x = _parsesub_offset(str, i, len; name="standard offset")
     if x isa Tuple
         std_offset, i = x
     else
@@ -481,7 +481,7 @@ function parsesub_tz(
     end
 
     if i <= len
-        x = parsesub_tzabbr(str, i, len)
+        x = _parsesub_tzabbr(str, i, len)
         if x isa Tuple
             dst_name, i = x
         else
@@ -495,7 +495,7 @@ function parsesub_tz(
     if dst_name !== nothing
         iter = iterate(str, i)
         if iter !== nothing && first(iter) != ','
-            x = parsesub_offset(str, i, len; name="daylight saving offset")
+            x = _parsesub_offset(str, i, len; name="daylight saving offset")
             if x isa Tuple
                 dst_offset, i = x
             else
@@ -506,8 +506,8 @@ function parsesub_tz(
         end
     end
 
-    start_dst = first(parsesub_tzdate("M3.2.0"))::Function  # Second Sunday in March
-    end_dst = first(parsesub_tzdate("M11.1.0"))::Function   # First Sunday in November
+    start_dst = first(_parsesub_tzdate("M3.2.0"))::Function  # Second Sunday in March
+    end_dst = first(_parsesub_tzdate("M11.1.0"))::Function   # First Sunday in November
 
     start_time = end_time = Hour(2)  # 02:00
     if i <= len
@@ -518,7 +518,7 @@ function parsesub_tz(
         i = ii
 
         # Daylight saving goes into effect
-        x = parsesub_tzdate(str, i, len)
+        x = _parsesub_tzdate(str, i, len)
         if x isa Tuple
             start_dst, i = x
         else
@@ -536,7 +536,7 @@ function parsesub_tz(
         i = ii
 
         if c == '/'
-            x = parsesub_time(str, i, len; name="daylight saving start time")
+            x = _parsesub_time(str, i, len; name="daylight saving start time")
             if x isa Tuple
                 start_time, i = x
                 start_time = Second(start_time)
@@ -552,7 +552,7 @@ function parsesub_tz(
             i = ii
         end
 
-        x = parsesub_tzdate(str, i, len)
+        x = _parsesub_tzdate(str, i, len)
         if x isa Tuple
             end_dst, i = x
         else
@@ -569,7 +569,7 @@ function parsesub_tz(
             end
             i = ii
 
-            x = parsesub_time(str, i, len; name="daylight saving end time")
+            x = _parsesub_time(str, i, len; name="daylight saving end time")
             if x isa Tuple
                 end_time, i = x
                 end_time = Second(end_time)
