@@ -129,8 +129,17 @@ function localzone()
             end
         end
     elseif Sys.iswindows()
-        # Windows powershell should be available on Windows 7 and above
-        win_name = strip(@mock read(`powershell -Command "[TimeZoneInfo]::Local.Id"`, String))
+        # The Windows Time Zone Utility (tzutil) is pre-installed from Windows XP and later.
+        # This approach was used as it is the fastest without without adding additional
+        # package dependencies.
+        #
+        # https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/tzutil
+        # https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/hh875624(v=ws.11)
+        #
+        # Alternative approaches:
+        # - Call .NET via Powershell: `powershell -Command "[TimeZoneInfo]::Local.Id"`
+        # - Read the Windows registry
+        win_name = @mock read(`tzutil /g`, String)
 
         if haskey(WINDOWS_TRANSLATION, win_name)
             return TimeZone(WINDOWS_TRANSLATION[win_name], mask)
@@ -141,6 +150,8 @@ function localzone()
 
     error("Failed to find local time zone")
 end
+
+
 
 # Extract a time zone name from a path.
 # e.g. "/usr/share/zoneinfo/Europe/Warsaw" becomes "Europe/Warsaw"
