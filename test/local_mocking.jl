@@ -11,7 +11,7 @@ win_name = name == "Europe/Warsaw" ? "Central European Standard Time" : "Samoa S
 tz = TimeZone(name)
 
 if Sys.iswindows()
-    patch = @patch read(cmd::AbstractCmd, ::Type{String}) = "$win_name\r\n"
+    patch = @patch read(cmd::AbstractCmd, ::Type{String}) = win_name
     apply(patch) do
         @test localzone() == tz
     end
@@ -84,7 +84,7 @@ function with_localzone(func::Function, name::AbstractString)
         ]
     elseif Sys.iswindows()
         patches = [
-            @patch read(cmd::AbstractCmd, ::Type{String}) = "$name\r\n"
+            @patch read(cmd::AbstractCmd, ::Type{String}) = name
         ]
     elseif Sys.islinux()
         patches = [
