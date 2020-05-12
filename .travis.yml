@@ -38,11 +38,9 @@ arch:
 jobs:
   fast_finish: true
 
-  # Allow macOS nightly failures for now:
-  # https://github.com/JuliaLang/julia/issues/35732
-  allow_failures:
-    - julia: nightly
-      os: osx
+  # allow_failures:
+  #   - julia: nightly
+  #     os: osx
 
   # Test 32-bit only on Linux
   exclude:
