@@ -1,4 +1,5 @@
 using Dates: parse_components, default_format
+using TimeZones: ParseNextError, _parsesub_tzabbr, _parsesub_offset, _parsesub_time, _parsesub_tzdate, _parsesub_tz
 
 @testset "parse" begin
     @test isequal(
@@ -74,5 +75,267 @@ end
         @test e isa ArgumentError
         @test occursin(str, e.msg)
         @test occursin(string(TimeZones.ISOZonedDateTimeFormat), e.msg)
+    end
+end
+
+@testset "_parsesub_tzabbr" begin
+    empty_msg = "Time zone abbreviation must start with a letter or the less-than (<) character"
+    not_closed_msg = "Expected expanded time zone abbreviation end with the greater-than sign (>)"
+    three_char_sim_msg = "Time zone abbreviation must be at least three alphabetic characters"
+    three_char_exp_msg = "Time zone abbreviation must be at least three characters which are either alphanumeric, the plus sign (+), or the minus sign (-)"
+
+    @test _parsesub_tzabbr("") == ParseNextError(empty_msg, "", 1, 0)
+    @test _parsesub_tzabbr("&") == ParseNextError(empty_msg, "&", 1, 1)
+    @test _parsesub_tzabbr("FOO") == ("FOO", 4)
+    @test _parsesub_tzabbr("FOO&") == ("FOO", 4)
+    @test _parsesub_tzabbr("FOO+1") == ("FOO", 4)
+    @test _parsesub_tzabbr("<FOO+1>") == ("FOO+1", 8)
+    @test _parsesub_tzabbr("<FOO+1") == ParseNextError(not_closed_msg, "<FOO+1", 1, 7)
+    @test _parsesub_tzabbr("<") == ParseNextError(not_closed_msg, "<", 1, 2)
+    @test _parsesub_tzabbr(">") == ParseNextError(empty_msg, ">", 1, 1)
+    @test _parsesub_tzabbr("AB") == ParseNextError(three_char_sim_msg, "AB", 1, 2)
+    @test _parsesub_tzabbr("<>") == ParseNextError(three_char_exp_msg, "<>", 2, 1)
+    @test _parsesub_tzabbr("αβc") == ParseNextError(empty_msg, "αβc", 1, 1)
+end
+
+@testset "_parsesub_offset" begin
+    end_of_string_msg = "Expected offset and instead found end of string"
+    missing_hours_msg = "Expected offset hour digits"
+    hours_range_msg = "Hours outside of expected range [0, 24]"
+    minutes_range_msg = "Minutes outside of expected range [0, 59]"
+    minutes_digits_msg = "Expected offset minute digits after colon delimiter"
+    seconds_range_msg = "Seconds outside of expected range [0, 59]"
+    seconds_digits_msg = "Expected offset second digits after colon delimiter"
+
+    @testset "sign" begin
+        @test _parsesub_offset("") == ParseNextError(end_of_string_msg, "", 1, 0)
+        @test _parsesub_offset("&") == ParseNextError(missing_hours_msg, "&", 1, 1)
+        @test _parsesub_offset("-") == ParseNextError("Offset sign (-) is not followed by a value", "-", 1, 1)
+        @test _parsesub_offset("+") == ParseNextError("Offset sign (+) is not followed by a value", "+", 1, 1)
+    end
+
+    @testset "hours" begin
+        @test _parsesub_offset("0") == (0, 2)
+        @test _parsesub_offset("0&") == (0, 2)
+
+        @test _parsesub_offset("1")   == ( 1 * 3600, 2)
+        @test _parsesub_offset("-1")  == (-1 * 3600, 3)
+        @test _parsesub_offset("+1")  == (+1 * 3600, 3)
+        @test _parsesub_offset("-24") == (-24 * 3600, 4)
+        @test _parsesub_offset("+24") == (+24 * 3600, 4)
+
+        @test _parsesub_offset("-25") == ParseNextError(hours_range_msg, "-25", 2, 3)
+        @test _parsesub_offset("+25") == ParseNextError(hours_range_msg, "+25", 2, 3)
+    end
+
+    @testset "minutes" begin
+        @test _parsesub_offset("0:59")  == ( 59 * 60, 5)
+        @test _parsesub_offset("-0:59") == (-59 * 60, 6)
+        @test _parsesub_offset("+0:59") == (+59 * 60, 6)
+
+        @test _parsesub_offset("-0:60") == ParseNextError(minutes_range_msg, "-0:60", 4, 5)
+        @test _parsesub_offset("+0:60") == ParseNextError(minutes_range_msg, "+0:60", 4, 5)
+        @test _parsesub_offset("0:") == ParseNextError(minutes_digits_msg, "0:", 3, 2)
+        @test _parsesub_offset("0:-1") == ParseNextError(minutes_digits_msg, "0:-1", 3, 3)
+    end
+
+    @testset "seconds" begin
+        @test _parsesub_offset("0:0:59")  == ( 59, 7)
+        @test _parsesub_offset("-0:0:59") == (-59, 8)
+        @test _parsesub_offset("+0:0:59") == (+59, 8)
+        @test _parsesub_offset("0:0:59:") == ( 59, 7)
+
+        @test _parsesub_offset("-0:0:60") == ParseNextError(seconds_range_msg, "-0:0:60", 6, 7)
+        @test _parsesub_offset("+0:0:60") == ParseNextError(seconds_range_msg, "+0:0:60", 6, 7)
+        @test _parsesub_offset("0:0:") == ParseNextError(seconds_digits_msg, "0:0:", 5, 4)
+        @test _parsesub_offset("0:0:-1") == ParseNextError(seconds_digits_msg, "0:0:-1", 5, 5)
+    end
+end
+
+@testset "_parsesub_time" begin
+    # Note: `_parsesub_time` primarily makes use of `_parsesub_offset`. Additional tests
+    # should be added here if that is no longer the case.
+    @test _parsesub_time("1") == (3600, 2)
+    @test _parsesub_time("-1") == ParseNextError("Time should not have a sign", "-1", 1, 1)
+    @test _parsesub_time("+1") == ParseNextError("Time should not have a sign", "+1", 1, 1)
+end
+
+@testset "_parsesub_tzdate" begin
+    @testset "Julian day" begin
+        # Note: Hard-coding years in tests below make failed testsets easier to read
+
+        # Non-leap year
+        for d in [1; 59:61; 365]
+            f, i = TimeZones._parsesub_tzdate("J$d")
+            @test f(2019) == Date(2019) + Day(d - 1)
+            @test dayofyear(f(2019)) == d
+        end
+
+        # Leap year
+        for (j, d) in zip([1; 59:61; 365], [1; 59; 61:62; 366])
+            f, i = TimeZones._parsesub_tzdate("J$j")
+            @test f(2020) == Date(2020) + Day(d - 1)
+            @test dayofyear(f(2020)) == d
+        end
+    end
+
+    @testset "zero-based Julian day" begin
+        # Note: Hard-coding years in tests below make failed testsets easier to read
+
+        # Non-leap year
+        # Note: For non-leap years day 365 is actually the first day of the next year which
+        # is why the test for `dayofyear` requires mod 365.
+        for d in [0; 58:60; 365]
+            f, i = _parsesub_tzdate("$d")
+            @test f(2019) == Date(2019) + Day(d)
+            @test dayofyear(f(2019)) == (d % 365) + 1
+        end
+
+        # Leap year
+        for d in [0; 58:60; 365]
+            f, i = _parsesub_tzdate("$d")
+            @test f(2020) == Date(2020) + Day(d)
+            @test dayofyear(f(2020)) == d + 1
+        end
+    end
+
+    @testset "month, week-of-month, day-of-week" begin
+        @testset "First Sunday in October" begin
+            f, i = _parsesub_tzdate("M10.1.0")
+            @test f(2020) == Date(2020, 10, 4)
+            @test f(2019) == Date(2019, 10, 6)
+            @test f(2018) == Date(2018, 10, 7)
+            @test f(2017) == Date(2017, 10, 1)
+            @test i == 8
+        end
+
+        @testset "Third Sunday in March" begin
+            f, i = _parsesub_tzdate("M3.3.0")
+            @test f(2020) == Date(2020, 3, 15)
+            @test f(2019) == Date(2019, 3, 17)
+            @test f(2018) == Date(2018, 3, 18)
+            @test f(2017) == Date(2017, 3, 19)
+            @test i == 7
+        end
+
+        @testset "Last Saturday in January" begin
+            # Note: 2017 - 2020 only have 4 Saturdays in January
+            f1, i = _parsesub_tzdate("M1.5.6")
+            @test i == 7
+
+            f2, i = _parsesub_tzdate("M1.4.6")
+            @test i == 7
+
+            @test f1(2020) == f1(2020) == Date(2020, 1, 25)
+            @test f1(2019) == f2(2019) == Date(2019, 1, 26)
+            @test f1(2018) == f2(2018) == Date(2018, 1, 27)
+            @test f1(2017) == f2(2017) == Date(2017, 1, 28)
+        end
+    end
+end
+
+@testset "_parsesub_tz" begin
+    dst_start_date_msg = "Unable to parse daylight saving start date. Expected date and instead found end of string"
+    dst_start_time_msg = "Expected daylight saving start time and instead found end of string"
+    dst_end_missing_msg = "Expected to find daylight saving end and instead found end of string"
+    dst_end_date_msg = "Unable to parse daylight saving end date. Expected date and instead found end of string"
+
+    @testset "empty" begin
+        @test _parsesub_tz("") == (FixedTimeZone("UTC"), 1)
+    end
+
+    @testset "standard time only" begin
+        @test _parsesub_tz("FOO") == ParseNextError("Expected standard offset and instead found end of string", "FOO", 4, 3)
+        @test _parsesub_tz("FOO+1") == (FixedTimeZone("FOO", -3600), 6)
+        @test _parsesub_tz("<FOO+1>-1") == (FixedTimeZone("FOO+1", 3600), 10)
+    end
+
+    @testset "standard/daylight saving time" begin
+        tz, i = _parsesub_tz("FOO+0BAR")
+        bar, foo = filter(t -> year(t.utc_datetime) == 2020, tz.transitions)
+        @test foo == Transition(DateTime(2020, 11, 1, 1), FixedTimeZone("FOO", 0))
+        @test bar == Transition(DateTime(2020, 3, 8, 2), FixedTimeZone("BAR", 0, 3600))
+        @test i == 9
+
+        tz, i = _parsesub_tz("FOO+0BAR+1")
+        bar, foo = filter(t -> year(t.utc_datetime) == 2020, tz.transitions)
+        @test foo == Transition(DateTime(2020, 11, 1, 3), FixedTimeZone("FOO", 0))
+        @test bar == Transition(DateTime(2020, 3, 8, 2), FixedTimeZone("BAR", 0, -3600))
+        @test i == 11
+    end
+
+    @testset "transition dates" begin
+        @test _parsesub_tz("FOO+0BAR+0,") == ParseNextError(dst_start_date_msg, "FOO+0BAR+0,", 12, 11)
+        @test _parsesub_tz("FOO+0BAR+0,0") == ParseNextError(dst_end_missing_msg, "FOO+0BAR+0,0", 13, 12)
+        @test _parsesub_tz("FOO+0BAR+0,0,") == ParseNextError(dst_end_date_msg, "FOO+0BAR+0,0,", 14, 13)
+
+        tz, i = _parsesub_tz("FOO+0BAR+0,0,1")
+        bar, foo = filter(t -> year(t.utc_datetime) == 2020, tz.transitions)
+        @test foo == Transition(DateTime(2020, 1, 2, 2), FixedTimeZone("FOO", 0))
+        @test bar == Transition(DateTime(2020, 1, 1, 2), FixedTimeZone("BAR", 0))
+        @test i == 15
+    end
+
+    @testset "transition times" begin
+        @test _parsesub_tz("FOO+0BAR+0,0/") == ParseNextError(dst_start_time_msg, "FOO+0BAR+0,0/", 14, 13)
+        @test _parsesub_tz("FOO+0BAR+0,0/0") == ParseNextError(dst_end_missing_msg, "FOO+0BAR+0,0/0", 15, 14)
+        @test _parsesub_tz("FOO+0BAR+0,0/0,") == ParseNextError(dst_end_date_msg, "FOO+0BAR+0,0/0,", 16, 15)
+
+        tz, i = _parsesub_tz("FOO+0BAR+0,0/3,1/4")
+        bar, foo = filter(t -> year(t.utc_datetime) == 2020, tz.transitions)
+        @test foo == Transition(DateTime(2020, 1, 2, 4), FixedTimeZone("FOO", 0))
+        @test bar == Transition(DateTime(2020, 1, 1, 3), FixedTimeZone("BAR", 0))
+        @test i == 19
+
+        # Times beyond 24-hours
+        # - Linux clamps hours when beyond 24.
+        # - macOS falls back to UTC hours beyond 167.
+        @test _parsesub_tz("FOO+0BAR+0,0/25,1/720") == ParseNextError("Hours outside of expected range [0, 24]", "FOO+0BAR+0,0/25,1/720", 14, 15)
+
+        # - Linux parses +/- times succesfully but clamps negative times to zero.
+        # - macOS fails to parse +/- times.
+        @test _parsesub_tz("FOO+0BAR+0,0/+1,1/1") == ParseNextError("Daylight saving start time should not have a sign", "FOO+0BAR+0,0/+1,1/1", 14)
+        @test _parsesub_tz("FOO+0BAR+0,0/1,1/+1") == ParseNextError("Daylight saving end time should not have a sign", "FOO+0BAR+0,0/1,1/+1", 18)
+
+        @test _parsesub_tz("FOO+0BAR+0,0/-1,1/1") == ParseNextError("Daylight saving start time should not have a sign", "FOO+0BAR+0,0/-1,1/1", 14)
+        @test _parsesub_tz("FOO+0BAR+0,0/1,1/-1") == ParseNextError("Daylight saving end time should not have a sign", "FOO+0BAR+0,0/1,1/-1", 18)
+    end
+
+    # Example found in the `tzset 3` man page
+    @testset "New Zealand example" begin
+        tz, i = _parsesub_tz("NZST-12:00:00NZDT-13:00:00,M10.1.0,M3.3.0")
+        nzst, nzdt = filter(t -> year(t.utc_datetime) == 2020, tz.transitions)
+        @test nzst == Transition(DateTime(2020, 3, 14, 13), FixedTimeZone("NZST", 43200))
+        @test nzdt == Transition(DateTime(2020, 10, 3, 14), FixedTimeZone("NZDT", 43200, 3600))
+        @test i == 42
+    end
+
+    # Daylight saving offset is optional
+    @testset "EST/EDT" begin
+        tz, i = _parsesub_tz("EST5EDT,M3.2.0,M11.1.0")
+        edt, est = filter(t -> year(t.utc_datetime) == 2020, tz.transitions)
+        @test est == Transition(DateTime(2020, 11, 1, 6), FixedTimeZone("EST", -18000))
+        @test edt == Transition(DateTime(2020, 3, 8, 7), FixedTimeZone("EDT", -18000, 3600))
+        @test i == 23
+    end
+
+    # Validate the direct specification by comparing the result with a time zone computed
+    # from tzdata.
+    @testset "equivalent" begin
+        # The tzdata time zone only uses consistent rules on/after 2007
+        wpg = first(compile("America/Winnipeg", tzdata["northamerica"]))
+        consistent_years = t -> year(t.utc_datetime) >= 2007
+
+        tz, i = _parsesub_tz("CST+6CDT+5,M3.2.0/2,M11.1.0/2")
+        @test tz.name == "CST/CDT"
+        @test tz.name != wpg.name
+        @test filter(consistent_years, tz.transitions) == filter(consistent_years, wpg.transitions)
+        @test tz.cutoff == wpg.cutoff
+        @test i == 30
+
+        # Shorthand versions of the direct time zone specification we created
+        expected = tz
+        @test first(_parsesub_tz("CST+6CDT+5,M3.2.0,M11.1.0")) == expected
+        @test first(_parsesub_tz("CST+6CDT+5")) == expected
     end
 end
