@@ -55,22 +55,22 @@ for version in versions
     end
 end
 
-# todo: test how it works since it looks like Artifacts tries to unpack everything
-# and now, add windows xml thingy
-win_urls = ["https://raw.githubusercontent.com/JuliaTime/TimeZones.jl/v1.2.0/deps/local/windowsZones.xml",
-    WINDOWS_ZONE_URL, "https://raw.githubusercontent.com/unicode-org/cldr/master/common/supplemental/windowsZones.xml"]
-win_xml_latest_hash = artifact_hash("tzdata_windowsZones", artifacts_toml)
-# If the name was not bound, or the hash it was bound to does not exist, create it!
-if isnothing(win_xml_latest_hash) || !artifact_exists(win_xml_latest_hash)
-    # create_artifact() returns the content-hash of the artifact directory once we're finished creating it
-    tzfile_hash = create_artifact() do artifact_dir
-        # We create the artifact by simply downloading a few files into the new artifact directory
-        cp(WINDOWS_XML_FILE, joinpath(artifact_dir, basename(WINDOWS_XML_FILE)))
-    end
-
-    # Now bind that hash within our `Artifacts.toml`.  `force = true` means that if it already exists,
-    # just overwrite with the new content-hash.  Unless the source files change, we do not expect
-    # the content hash to change, so this should not cause unnecessary version control churn.
-    download_data = [(url, bytes2hex(sha256(read(download(url))))) for url in win_urls]
-    bind_artifact!(artifacts_toml, "tzdata_windowsZones", tzfile_hash, lazy=true, download_info=download_data)
-end
+# this can not work in current state because Artifacts require tarball, and there is only the direct XML
+# # and now, add windows xml thingy
+# win_urls = ["https://raw.githubusercontent.com/JuliaTime/TimeZones.jl/v1.2.0/deps/local/windowsZones.xml",
+#     WINDOWS_ZONE_URL, "https://raw.githubusercontent.com/unicode-org/cldr/master/common/supplemental/windowsZones.xml"]
+# win_xml_latest_hash = artifact_hash("tzdata_windowsZones", artifacts_toml)
+# # If the name was not bound, or the hash it was bound to does not exist, create it!
+# if isnothing(win_xml_latest_hash) || !artifact_exists(win_xml_latest_hash)
+#     # create_artifact() returns the content-hash of the artifact directory once we're finished creating it
+#     tzfile_hash = create_artifact() do artifact_dir
+#         # We create the artifact by simply downloading a few files into the new artifact directory
+#         cp(WINDOWS_XML_FILE, joinpath(artifact_dir, basename(WINDOWS_XML_FILE)))
+#     end
+#
+#     # Now bind that hash within our `Artifacts.toml`.  `force = true` means that if it already exists,
+#     # just overwrite with the new content-hash.  Unless the source files change, we do not expect
+#     # the content hash to change, so this should not cause unnecessary version control churn.
+#     download_data = [(url, bytes2hex(sha256(read(download(url))))) for url in win_urls]
+#     bind_artifact!(artifacts_toml, "tzdata_windowsZones", tzfile_hash, lazy=true, download_info=download_data)
+# end

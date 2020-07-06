@@ -1949,17 +1949,3 @@ lazy = true
     [[tzdata_latest.download]]
     sha256 = "547161eca24d344e0b5f96aff6a76b454da295dc14ed4ca50c2355043fb899a2"
     url = "https://data.iana.org/time-zones/tzdata-latest.tar.gz"
-
-[tzdata_windowsZones]
-git-tree-sha1 = "28fcc67c4e1e769496d16a8f3b3700679404b3b2"
-lazy = true
-
-    [[tzdata_windowsZones.download]]
-    sha256 = "fb13fc8e80d8bd832a99b0cdebb50c7a6fecef0987effd6716fa500e4196a4b6"
-    url = "https://raw.githubusercontent.com/JuliaTime/TimeZones.jl/v1.2.0/deps/local/windowsZones.xml"
-    [[tzdata_windowsZones.download]]
-    sha256 = "fb13fc8e80d8bd832a99b0cdebb50c7a6fecef0987effd6716fa500e4196a4b6"
-    url = "https://raw.githubusercontent.com/unicode-org/cldr/release-37/common/supplemental/windowsZones.xml"
-    [[tzdata_windowsZones.download]]
-    sha256 = "5a4fc1ffb7b8ffcb70724e72d43f5e667d71e2dc6a2d9591e3b05754d78190d5"
-    url = "https://raw.githubusercontent.com/unicode-org/cldr/master/common/supplemental/windowsZones.xml"

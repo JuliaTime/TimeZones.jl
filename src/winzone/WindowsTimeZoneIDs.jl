@@ -48,7 +48,8 @@ function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
             cp(fallback_xml_file, xml_file)
         else
             @info "Downloading latest Windows to POSIX timezone ID XML"
-            cp(joinpath(artifact"tzdata_windowsZones", "windowsZones.xml"), xml_file)
+            # would be nice to have it as Artifact, but I don't have tarball available
+            download(WINDOWS_ZONE_URL, xml_file)
         end
     end
 
