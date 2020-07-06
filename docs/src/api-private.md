@@ -13,6 +13,7 @@ TimeZones.TZData.tzdata_url
 TimeZones.TZData.tzdata_download
 TimeZones.TZData.tzdata_version_dir
 TimeZones.TZData.read_news
+TimeZones.TZData.active_dir
 TimeZones.TZData.compile!
 TimeZones.TZData.tryparse_dayofmonth_function
 TimeZones.TZData.order_rules

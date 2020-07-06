@@ -1,5 +1,5 @@
 using TimeZones.TZData: TZDATA_VERSION_REGEX, TZDATA_NEWS_REGEX
-using TimeZones.TZData: read_news, tzdata_version_dir, tzdata_version_archive
+using TimeZones.TZData: read_news, tzdata_version_dir
 using TimeZones.TZData: active_version, active_dir
 using Pkg.Artifacts
 using Pkg.Artifacts: artifacts_dirs
@@ -31,8 +31,7 @@ end
 @test match(TZDATA_NEWS_REGEX, "Release 19999") === nothing
 
 
-archive_root = @artifact_str "tzdata_$TZDATA_VERSION"
-archive = joinpath(archive_root, "tzdata$TZDATA_VERSION.tar.gz")
+archive = @artifact_str "tzdata_$TZDATA_VERSION"
 
 mktempdir() do temp_dir
     # Read the first tzdata version
@@ -53,8 +52,8 @@ mktempdir() do temp_dir
     @test_throws ErrorException tzdata_version_dir(dirname(@__FILE__))
 end
 
-@test tzdata_version_archive(archive) == TZDATA_VERSION
-@test_throws Base.IOError tzdata_version_archive(@__FILE__) == TZDATA_VERSION
+@test tzdata_version_dir(archive) == TZDATA_VERSION
+@test_throws Base.IOError tzdata_version_dir(@__FILE__) == TZDATA_VERSION
 
 
 # Active/built tzdata version

@@ -38,8 +38,8 @@ for version in versions
         tzfile_hash = create_artifact() do artifact_dir
             # We create the artifact by simply downloading a few files into the new artifact directory
             @info "Downloading $version tzdata"
-            tzdata_download(version, artifact_dir)
-            extract(joinpath(artifact_dir, "tzdata$version.tar.gz"), artifact_dir)
+            archive_name = tzdata_download(version, artifact_dir)
+            extract(archive_name, artifact_dir)
         end
         download_dir = artifact_path(tzfile_hash)
         content_sha = open(joinpath(download_dir, readdir(download_dir)[1])) do f
@@ -54,6 +54,7 @@ for version in versions
     end
 end
 
+# todo: test how it works since it looks like Artifacts tries to unpack everything
 # and now, add windows xml thingy
 win_urls = ["https://raw.githubusercontent.com/JuliaTime/TimeZones.jl/v1.2.0/deps/local/windowsZones.xml",
     WINDOWS_ZONE_URL, "https://raw.githubusercontent.com/unicode-org/cldr/master/common/supplemental/windowsZones.xml"]

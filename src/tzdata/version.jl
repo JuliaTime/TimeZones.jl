@@ -78,25 +78,6 @@ function tzdata_version_dir(dir::AbstractString)
     end
 end
 
-"""
-    tzdata_version_archive(archive::AbstractString) -> AbstractString
-
-Determines the tzdata version by inspecting the contents within the archive. Useful when
-downloading the latest archive "tzdata-latest.tar.gz".
-"""
-function tzdata_version_archive(archive::AbstractString)
-    # Attempting to extract files that do not exist in the archive will result in an
-    # exception.
-    files = readarchive(archive)
-    available_files = intersect(Set(["NEWS", "version"]), Set(files))
-    isempty(available_files) && error("Unable to determine tzdata release")
-
-    mktempdir() do temp_dir
-        extract(archive, temp_dir, available_files)
-        tzdata_version_dir(temp_dir)
-    end
-end
-
 tzdata_version() = get(ENV, "JULIA_TZ_VERSION", DEFAULT_TZDATA_VERSION)
 
 function active_version()
@@ -106,9 +87,9 @@ function active_version()
     read(ACTIVE_VERSION_FILE, String)
 end
 
-function active_archive()
+function active_dir()
     version = active_version()
-    archive = joinpath(ARCHIVE_DIR, "tzdata$version.tar.gz")
-    !isfile(archive) && error("Missing $version tzdata archive")
+    archive = @artifact_str "tzdata_$version"
+    !isdir(archive) && error("Missing $version tzdata archive")
     return archive
 end

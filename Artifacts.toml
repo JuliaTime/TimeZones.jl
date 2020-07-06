@@ -1,0 +1,1965 @@
+[tzdata_1996l]
+git-tree-sha1 = "0373dfdde9645f98c051e2c944f0a462c9e3ee40"
+lazy = true
+
+    [[tzdata_1996l.download]]
+    sha256 = "a9b33ce102885ddcb068299b189baf5ca8c6ffea52d600d597776394039b3314"
+    url = "https://data.iana.org/time-zones/releases/tzdata1996l.tar.gz"
+
+[tzdata_1996n]
+git-tree-sha1 = "a1cc708130511e89c8babd1d4c3323c0988bcf08"
+lazy = true
+
+    [[tzdata_1996n.download]]
+    sha256 = "8d33816d0429c5f074cbcff065de6d218d9d51d8e155b14615c74ad94caa8f68"
+    url = "https://data.iana.org/time-zones/releases/tzdata1996n.tar.gz"
+
+[tzdata_1997a]
+git-tree-sha1 = "d968f6c5f97c8a2a4a63209498e2385b0288b897"
+lazy = true
+
+    [[tzdata_1997a.download]]
+    sha256 = "8d33816d0429c5f074cbcff065de6d218d9d51d8e155b14615c74ad94caa8f68"
+    url = "https://data.iana.org/time-zones/releases/tzdata1997a.tar.gz"
+
+[tzdata_1997b]
+git-tree-sha1 = "11bfe43297e2280bd1ef146e8872e640aa4cfeb7"
+lazy = true
+
+    [[tzdata_1997b.download]]
+    sha256 = "8d33816d0429c5f074cbcff065de6d218d9d51d8e155b14615c74ad94caa8f68"
+    url = "https://data.iana.org/time-zones/releases/tzdata1997b.tar.gz"
+
+[tzdata_1997c]
+git-tree-sha1 = "b23d78d46b19b9800d5e4281921359065c90e713"
+lazy = true
+
+    [[tzdata_1997c.download]]
+    sha256 = "8d33816d0429c5f074cbcff065de6d218d9d51d8e155b14615c74ad94caa8f68"
+    url = "https://data.iana.org/time-zones/releases/tzdata1997c.tar.gz"
+
+[tzdata_1997d]
+git-tree-sha1 = "a15facdca8aee073528839270cb9cced17c7f9cf"
+lazy = true
+
+    [[tzdata_1997d.download]]
+    sha256 = "8d33816d0429c5f074cbcff065de6d218d9d51d8e155b14615c74ad94caa8f68"
+    url = "https://data.iana.org/time-zones/releases/tzdata1997d.tar.gz"
+
+[tzdata_1997e]
+git-tree-sha1 = "ceae357185357ad1431ea26f8efb00ff520fbc19"
+lazy = true
+
+    [[tzdata_1997e.download]]
+    sha256 = "3e2f7ad1fd13b59396d5707a670154f2dc14fd7ed875dd1300244e7ef165a2d8"
+    url = "https://data.iana.org/time-zones/releases/tzdata1997e.tar.gz"
+
+[tzdata_1997f]
+git-tree-sha1 = "885e08340335380b2a78e652d7f525d7d9273ed1"
+lazy = true
+
+    [[tzdata_1997f.download]]
+    sha256 = "3e2f7ad1fd13b59396d5707a670154f2dc14fd7ed875dd1300244e7ef165a2d8"
+    url = "https://data.iana.org/time-zones/releases/tzdata1997f.tar.gz"
+
+[tzdata_1997g]
+git-tree-sha1 = "6babc9e0e2817fb08e925a1ed737c8e75654ca2e"
+lazy = true
+
+    [[tzdata_1997g.download]]
+    sha256 = "39e1d8bf33fc09bfc41df1d9cd598ebbe59f851dd637f0305788bbd3f56472ec"
+    url = "https://data.iana.org/time-zones/releases/tzdata1997g.tar.gz"
+
+[tzdata_1997h]
+git-tree-sha1 = "876477bff16c7b9f300980f47781b243b61f0564"
+lazy = true
+
+    [[tzdata_1997h.download]]
+    sha256 = "cd1ab2393d99930f7ea128fe648a4e20654d1516efb0cbfb0b9ebe68af16765d"
+    url = "https://data.iana.org/time-zones/releases/tzdata1997h.tar.gz"
+
+[tzdata_1997i]
+git-tree-sha1 = "82f1abeb89cea79bb34972b4e2370b550fce06c6"
+lazy = true
+
+    [[tzdata_1997i.download]]
+    sha256 = "cc5f6a61adb0238a0bb4aa45f47781b048fbebc80848befeffd0970514b649d5"
+    url = "https://data.iana.org/time-zones/releases/tzdata1997i.tar.gz"
+
+[tzdata_1997j]
+git-tree-sha1 = "03dd4c3586f3505ad5a4c3f08522d82541575ab3"
+lazy = true
+
+    [[tzdata_1997j.download]]
+    sha256 = "e8ff0d570b229e2781cd27af4d6a7a758a7f9e59feff1904b01ee730f55cbd15"
+    url = "https://data.iana.org/time-zones/releases/tzdata1997j.tar.gz"
+
+[tzdata_1997k]
+git-tree-sha1 = "98ab673f547e52d6cdd1005dd893f10a16af37a0"
+lazy = true
+
+    [[tzdata_1997k.download]]
+    sha256 = "6f7f06ae7cf122de72f954170f2c3d670fbe723d8ddafeaec2a72a7f77760883"
+    url = "https://data.iana.org/time-zones/releases/tzdata1997k.tar.gz"
+
+[tzdata_1998a]
+git-tree-sha1 = "0108e0be140b1039412f2fc8466012d7318234bb"
+lazy = true
+
+    [[tzdata_1998a.download]]
+    sha256 = "6f7f06ae7cf122de72f954170f2c3d670fbe723d8ddafeaec2a72a7f77760883"
+    url = "https://data.iana.org/time-zones/releases/tzdata1998a.tar.gz"
+
+[tzdata_1998b]
+git-tree-sha1 = "8b644c6587df8d591833737d598f9285e4401858"
+lazy = true
+
+    [[tzdata_1998b.download]]
+    sha256 = "6f7f06ae7cf122de72f954170f2c3d670fbe723d8ddafeaec2a72a7f77760883"
+    url = "https://data.iana.org/time-zones/releases/tzdata1998b.tar.gz"
+
+[tzdata_1998c]
+git-tree-sha1 = "e160e8701ea938072d3491807769b01e520ed976"
+lazy = true
+
+    [[tzdata_1998c.download]]
+    sha256 = "6f7f06ae7cf122de72f954170f2c3d670fbe723d8ddafeaec2a72a7f77760883"
+    url = "https://data.iana.org/time-zones/releases/tzdata1998c.tar.gz"
+
+[tzdata_1998d]
+git-tree-sha1 = "1c7ac419a2f6005304c895be0068f9b16a9c6646"
+lazy = true
+
+    [[tzdata_1998d.download]]
+    sha256 = "6f7f06ae7cf122de72f954170f2c3d670fbe723d8ddafeaec2a72a7f77760883"
+    url = "https://data.iana.org/time-zones/releases/tzdata1998d.tar.gz"
+
+[tzdata_1998e]
+git-tree-sha1 = "bae32f7fdf2d86ee11e1125e863ab2e5b4045f12"
+lazy = true
+
+    [[tzdata_1998e.download]]
+    sha256 = "4c3b97c0fac81d51073656652791cfd6fd393266992b02d49aae0ed7fb30e581"
+    url = "https://data.iana.org/time-zones/releases/tzdata1998e.tar.gz"
+
+[tzdata_1998h]
+git-tree-sha1 = "4f4b8af96fe87527620a9aa535e231811995132e"
+lazy = true
+
+    [[tzdata_1998h.download]]
+    sha256 = "71d704d23c50a227704d6672129515010b6164ba495f2bc2bc68989ec7069c29"
+    url = "https://data.iana.org/time-zones/releases/tzdata1998h.tar.gz"
+
+[tzdata_1998i]
+git-tree-sha1 = "e737f9aae032738f21e960d4cb8f5699a3c24764"
+lazy = true
+
+    [[tzdata_1998i.download]]
+    sha256 = "71d704d23c50a227704d6672129515010b6164ba495f2bc2bc68989ec7069c29"
+    url = "https://data.iana.org/time-zones/releases/tzdata1998i.tar.gz"
+
+[tzdata_1999a]
+git-tree-sha1 = "272563ff74c7a907b3654dee5a0e672353382373"
+lazy = true
+
+    [[tzdata_1999a.download]]
+    sha256 = "71d704d23c50a227704d6672129515010b6164ba495f2bc2bc68989ec7069c29"
+    url = "https://data.iana.org/time-zones/releases/tzdata1999a.tar.gz"
+
+[tzdata_1999b]
+git-tree-sha1 = "e7b16b9aff9ccfde75819d7a02a691a7de659251"
+lazy = true
+
+    [[tzdata_1999b.download]]
+    sha256 = "bf74537dfd935e10bbedde4ab56e18ad2476105fb6e3536d75872284d806b363"
+    url = "https://data.iana.org/time-zones/releases/tzdata1999b.tar.gz"
+
+[tzdata_1999c]
+git-tree-sha1 = "48f84b4f0018a6d0e0bdd264532745bb9ac79161"
+lazy = true
+
+    [[tzdata_1999c.download]]
+    sha256 = "b8309e2a29def03cab1b0c7e045346acad2b7914768018cbd4e3a6ecbba92278"
+    url = "https://data.iana.org/time-zones/releases/tzdata1999c.tar.gz"
+
+[tzdata_1999d]
+git-tree-sha1 = "3120d74d58691218ef4aba94278aaf4bfc750bad"
+lazy = true
+
+    [[tzdata_1999d.download]]
+    sha256 = "2439769d56030e32a3a677a28459c5740a3d2a096d8cafed053073d0931aacb6"
+    url = "https://data.iana.org/time-zones/releases/tzdata1999d.tar.gz"
+
+[tzdata_1999e]
+git-tree-sha1 = "0b8fa30f15bab4b4c10ead1cf8820a16cbf9bc22"
+lazy = true
+
+    [[tzdata_1999e.download]]
+    sha256 = "b525d426a02cf3cb6c88187907061882e0f9f8bd3d6837511dd133c73b842dc6"
+    url = "https://data.iana.org/time-zones/releases/tzdata1999e.tar.gz"
+
+[tzdata_1999f]
+git-tree-sha1 = "4419a1ac73987cd552de4ced4718613488f5899a"
+lazy = true
+
+    [[tzdata_1999f.download]]
+    sha256 = "b525d426a02cf3cb6c88187907061882e0f9f8bd3d6837511dd133c73b842dc6"
+    url = "https://data.iana.org/time-zones/releases/tzdata1999f.tar.gz"
+
+[tzdata_1999g]
+git-tree-sha1 = "4075ab74a51207d198f8559d419c3ae17459ef79"
+lazy = true
+
+    [[tzdata_1999g.download]]
+    sha256 = "67efca0f2f516feb50cea8bc1d0f41822e0aa77b7fd13ff891aa2c6c838e7b87"
+    url = "https://data.iana.org/time-zones/releases/tzdata1999g.tar.gz"
+
+[tzdata_1999h]
+git-tree-sha1 = "f959c87dc2b6c1725e3b148e62a6992982e41e49"
+lazy = true
+
+    [[tzdata_1999h.download]]
+    sha256 = "67efca0f2f516feb50cea8bc1d0f41822e0aa77b7fd13ff891aa2c6c838e7b87"
+    url = "https://data.iana.org/time-zones/releases/tzdata1999h.tar.gz"
+
+[tzdata_1999i]
+git-tree-sha1 = "0aa9df0962dfef9e950e95647d6d0b8690a1f88f"
+lazy = true
+
+    [[tzdata_1999i.download]]
+    sha256 = "beca6d340e48d083ba8505c08af5877960126322c4a5fb24ff1c81350cafcdc5"
+    url = "https://data.iana.org/time-zones/releases/tzdata1999i.tar.gz"
+
+[tzdata_1999j]
+git-tree-sha1 = "8621965e24782da8c29996fdf1b88b99a2e29dad"
+lazy = true
+
+    [[tzdata_1999j.download]]
+    sha256 = "beca6d340e48d083ba8505c08af5877960126322c4a5fb24ff1c81350cafcdc5"
+    url = "https://data.iana.org/time-zones/releases/tzdata1999j.tar.gz"
+
+[tzdata_2000a]
+git-tree-sha1 = "eaa84ff98a7f25488fc9f63c23acc42e61c0371d"
+lazy = true
+
+    [[tzdata_2000a.download]]
+    sha256 = "beca6d340e48d083ba8505c08af5877960126322c4a5fb24ff1c81350cafcdc5"
+    url = "https://data.iana.org/time-zones/releases/tzdata2000a.tar.gz"
+
+[tzdata_2000b]
+git-tree-sha1 = "550387d4a45abbb417a2e6a60cd7f41eaf2187e5"
+lazy = true
+
+    [[tzdata_2000b.download]]
+    sha256 = "beca6d340e48d083ba8505c08af5877960126322c4a5fb24ff1c81350cafcdc5"
+    url = "https://data.iana.org/time-zones/releases/tzdata2000b.tar.gz"
+
+[tzdata_2000c]
+git-tree-sha1 = "d16186d445f58a6f88ddf8d994c70e0408e273af"
+lazy = true
+
+    [[tzdata_2000c.download]]
+    sha256 = "82878156707598cd4a8e9c3c51032932b62dfce98af90e836fd413ce6f8f91d9"
+    url = "https://data.iana.org/time-zones/releases/tzdata2000c.tar.gz"
+
+[tzdata_2000d]
+git-tree-sha1 = "1aaff6de34daf8e29617b6af645bb104fc16c7a9"
+lazy = true
+
+    [[tzdata_2000d.download]]
+    sha256 = "82878156707598cd4a8e9c3c51032932b62dfce98af90e836fd413ce6f8f91d9"
+    url = "https://data.iana.org/time-zones/releases/tzdata2000d.tar.gz"
+
+[tzdata_2000e]
+git-tree-sha1 = "aad74bc3a7e2f9dd6f579586b628d74d2d647225"
+lazy = true
+
+    [[tzdata_2000e.download]]
+    sha256 = "82878156707598cd4a8e9c3c51032932b62dfce98af90e836fd413ce6f8f91d9"
+    url = "https://data.iana.org/time-zones/releases/tzdata2000e.tar.gz"
+
+[tzdata_2000f]
+git-tree-sha1 = "e3c8c02fe98dabbb3ca0a9197e5d4873d5e1a021"
+lazy = true
+
+    [[tzdata_2000f.download]]
+    sha256 = "82878156707598cd4a8e9c3c51032932b62dfce98af90e836fd413ce6f8f91d9"
+    url = "https://data.iana.org/time-zones/releases/tzdata2000f.tar.gz"
+
+[tzdata_2000g]
+git-tree-sha1 = "de6a0c238f101852eb046bad0dd1e69810b6620c"
+lazy = true
+
+    [[tzdata_2000g.download]]
+    sha256 = "fbdb8f96c2a6314bd02d40ab05c16b03571f1487aef12ef4525aaf4024977d49"
+    url = "https://data.iana.org/time-zones/releases/tzdata2000g.tar.gz"
+
+[tzdata_2000h]
+git-tree-sha1 = "565cc3760f6d6743a23f968563456cca52ef3327"
+lazy = true
+
+    [[tzdata_2000h.download]]
+    sha256 = "fbdb8f96c2a6314bd02d40ab05c16b03571f1487aef12ef4525aaf4024977d49"
+    url = "https://data.iana.org/time-zones/releases/tzdata2000h.tar.gz"
+
+[tzdata_2001a]
+git-tree-sha1 = "e812642e6eab6bf3b2a0289b239c55d25a0d4c5e"
+lazy = true
+
+    [[tzdata_2001a.download]]
+    sha256 = "fbdb8f96c2a6314bd02d40ab05c16b03571f1487aef12ef4525aaf4024977d49"
+    url = "https://data.iana.org/time-zones/releases/tzdata2001a.tar.gz"
+
+[tzdata_2001b]
+git-tree-sha1 = "6f0235f5c89960f6c0096a7c2ad4dc7aa2302ba1"
+lazy = true
+
+    [[tzdata_2001b.download]]
+    sha256 = "fbdb8f96c2a6314bd02d40ab05c16b03571f1487aef12ef4525aaf4024977d49"
+    url = "https://data.iana.org/time-zones/releases/tzdata2001b.tar.gz"
+
+[tzdata_2001c]
+git-tree-sha1 = "4e9e33a834cd6539ceb8e857f9225d1e9faae1c3"
+lazy = true
+
+    [[tzdata_2001c.download]]
+    sha256 = "c2d36bfcdcf73d94e463a9ba6bd8fe0ab999ce4ea4791c6a0361ec39e41fec7d"
+    url = "https://data.iana.org/time-zones/releases/tzdata2001c.tar.gz"
+
+[tzdata_2001d]
+git-tree-sha1 = "6d91be3d8105f30c3aaccaead9c67586086d06eb"
+lazy = true
+
+    [[tzdata_2001d.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2001d.tar.gz"
+
+[tzdata_2002b]
+git-tree-sha1 = "f6cd0fd6820146d45704798ab5d20191dbb398f1"
+lazy = true
+
+    [[tzdata_2002b.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2002b.tar.gz"
+
+[tzdata_2002c]
+git-tree-sha1 = "117b9390b270e41b3a4626ee0850e73079493af3"
+lazy = true
+
+    [[tzdata_2002c.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2002c.tar.gz"
+
+[tzdata_2002d]
+git-tree-sha1 = "43ed8254d606c7acf462c374cde26465dbf7dbba"
+lazy = true
+
+    [[tzdata_2002d.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2002d.tar.gz"
+
+[tzdata_2003a]
+git-tree-sha1 = "49b9af980b79f7606466fb10e140ed34b74942a1"
+lazy = true
+
+    [[tzdata_2003a.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2003a.tar.gz"
+
+[tzdata_2003b]
+git-tree-sha1 = "15924b163ffbd9339d5453d4c95e259904573fd5"
+lazy = true
+
+    [[tzdata_2003b.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2003b.tar.gz"
+
+[tzdata_2003c]
+git-tree-sha1 = "6212a9a7a4dbcb20e39b34502445dd28e8e28080"
+lazy = true
+
+    [[tzdata_2003c.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2003c.tar.gz"
+
+[tzdata_2003d]
+git-tree-sha1 = "f2db3f6b032161e4b9491f122331dc1a589e0038"
+lazy = true
+
+    [[tzdata_2003d.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2003d.tar.gz"
+
+[tzdata_2003e]
+git-tree-sha1 = "61942ee9981bd385ac1c94e0eaefe9b78ec091d8"
+lazy = true
+
+    [[tzdata_2003e.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2003e.tar.gz"
+
+[tzdata_2004a]
+git-tree-sha1 = "04f780036507431148414234b98bdc6cebbee2a1"
+lazy = true
+
+    [[tzdata_2004a.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2004a.tar.gz"
+
+[tzdata_2004b]
+git-tree-sha1 = "059daf83b71f64abfa8c38a7806acd72977311ab"
+lazy = true
+
+    [[tzdata_2004b.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2004b.tar.gz"
+
+[tzdata_2004d]
+git-tree-sha1 = "3c2751750e3db9dd38f8e7b07ca4f1dafa2b4bb7"
+lazy = true
+
+    [[tzdata_2004d.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2004d.tar.gz"
+
+[tzdata_2004e]
+git-tree-sha1 = "a9a6f834d4bcbb29e8591fb46e82f31406f105d1"
+lazy = true
+
+    [[tzdata_2004e.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2004e.tar.gz"
+
+[tzdata_2004g]
+git-tree-sha1 = "87b11268da93fc9b93a6172e76d15cac716c597a"
+lazy = true
+
+    [[tzdata_2004g.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2004g.tar.gz"
+
+[tzdata_2005a]
+git-tree-sha1 = "126a74596a8f7992eb56676547332c59eca2f0bf"
+lazy = true
+
+    [[tzdata_2005a.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2005a.tar.gz"
+
+[tzdata_2005b]
+git-tree-sha1 = "5f7e5e08158e86d7f8b5f23577d85b70dc7c862e"
+lazy = true
+
+    [[tzdata_2005b.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2005b.tar.gz"
+
+[tzdata_2005c]
+git-tree-sha1 = "f678b14183432b20184d2f9aacabe09f0071e182"
+lazy = true
+
+    [[tzdata_2005c.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2005c.tar.gz"
+
+[tzdata_2005e]
+git-tree-sha1 = "9c8894f857415d82e91509591cddb5f7f939aabb"
+lazy = true
+
+    [[tzdata_2005e.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2005e.tar.gz"
+
+[tzdata_2005f]
+git-tree-sha1 = "59c93802944db299a6b24e2a0b86a52d0179f53f"
+lazy = true
+
+    [[tzdata_2005f.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2005f.tar.gz"
+
+[tzdata_2005g]
+git-tree-sha1 = "18b71945020796a042d7e55b5673f30ec6bb87b8"
+lazy = true
+
+    [[tzdata_2005g.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2005g.tar.gz"
+
+[tzdata_2005h]
+git-tree-sha1 = "4f6e51431ae46073761b4f89045dfc41b3b43ea3"
+lazy = true
+
+    [[tzdata_2005h.download]]
+    sha256 = "26aa9e7b5e8ad502fa108f720cbec0c415eb3b7d3a081d2a762fb1666df5095a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2005h.tar.gz"
+
+[tzdata_2005i]
+git-tree-sha1 = "565b25db4ff9aa671d06908c9719ac7631c5a242"
+lazy = true
+
+    [[tzdata_2005i.download]]
+    sha256 = "f7a37be1e66ebdb67a602714cd910816636e665a3f008721b0c254f14152bc7c"
+    url = "https://data.iana.org/time-zones/releases/tzdata2005i.tar.gz"
+
+[tzdata_2005j]
+git-tree-sha1 = "8e556ccf90b9eab03fe73f99621b4db1abd6c003"
+lazy = true
+
+    [[tzdata_2005j.download]]
+    sha256 = "f7a37be1e66ebdb67a602714cd910816636e665a3f008721b0c254f14152bc7c"
+    url = "https://data.iana.org/time-zones/releases/tzdata2005j.tar.gz"
+
+[tzdata_2005k]
+git-tree-sha1 = "d25f6f1699fd51e89ac0db801737f10fb48222cf"
+lazy = true
+
+    [[tzdata_2005k.download]]
+    sha256 = "3144cc0452264dfd9ce6f12d711c448ec532e072fde7cf162d0da147226e0a7b"
+    url = "https://data.iana.org/time-zones/releases/tzdata2005k.tar.gz"
+
+[tzdata_2005l]
+git-tree-sha1 = "3e4332894ec7b5ac79d550f7573525897ae6e966"
+lazy = true
+
+    [[tzdata_2005l.download]]
+    sha256 = "f8ab49f9c4f359082acd4530d789e92d4fe1a4e2c947e117a721b100497e2242"
+    url = "https://data.iana.org/time-zones/releases/tzdata2005l.tar.gz"
+
+[tzdata_2005m]
+git-tree-sha1 = "896bc6f95a9a00421c4d1a1d364e13c26f61a84f"
+lazy = true
+
+    [[tzdata_2005m.download]]
+    sha256 = "f8ab49f9c4f359082acd4530d789e92d4fe1a4e2c947e117a721b100497e2242"
+    url = "https://data.iana.org/time-zones/releases/tzdata2005m.tar.gz"
+
+[tzdata_2005n]
+git-tree-sha1 = "27f71d788864110eff228838ca632e44d0d8ef2c"
+lazy = true
+
+    [[tzdata_2005n.download]]
+    sha256 = "f8ab49f9c4f359082acd4530d789e92d4fe1a4e2c947e117a721b100497e2242"
+    url = "https://data.iana.org/time-zones/releases/tzdata2005n.tar.gz"
+
+[tzdata_2005o]
+git-tree-sha1 = "d3ca492f63dfa75267ff6a46aafec50c828f0d32"
+lazy = true
+
+    [[tzdata_2005o.download]]
+    sha256 = "f8ab49f9c4f359082acd4530d789e92d4fe1a4e2c947e117a721b100497e2242"
+    url = "https://data.iana.org/time-zones/releases/tzdata2005o.tar.gz"
+
+[tzdata_2005p]
+git-tree-sha1 = "893c5616496f703bd431a74d5629fa953923d669"
+lazy = true
+
+    [[tzdata_2005p.download]]
+    sha256 = "f8ab49f9c4f359082acd4530d789e92d4fe1a4e2c947e117a721b100497e2242"
+    url = "https://data.iana.org/time-zones/releases/tzdata2005p.tar.gz"
+
+[tzdata_2005q]
+git-tree-sha1 = "13a18587a50880d8aa0909dedf33273c35112979"
+lazy = true
+
+    [[tzdata_2005q.download]]
+    sha256 = "f8ab49f9c4f359082acd4530d789e92d4fe1a4e2c947e117a721b100497e2242"
+    url = "https://data.iana.org/time-zones/releases/tzdata2005q.tar.gz"
+
+[tzdata_2005r]
+git-tree-sha1 = "7fdeb0d31798fcdef39d6ecb08a26ae8df2c0317"
+lazy = true
+
+    [[tzdata_2005r.download]]
+    sha256 = "50ba82102cb60c59b5f4a23a590311d2c2ef86feb0c3e4cbe492a6562f4cb35b"
+    url = "https://data.iana.org/time-zones/releases/tzdata2005r.tar.gz"
+
+[tzdata_2006a]
+git-tree-sha1 = "5094bc13a2f553d640bf8498af471c217d0c49de"
+lazy = true
+
+    [[tzdata_2006a.download]]
+    sha256 = "50ba82102cb60c59b5f4a23a590311d2c2ef86feb0c3e4cbe492a6562f4cb35b"
+    url = "https://data.iana.org/time-zones/releases/tzdata2006a.tar.gz"
+
+[tzdata_2006b]
+git-tree-sha1 = "a7f96f040c2cbc9550bda4601dd6dc1fb0fe7bdb"
+lazy = true
+
+    [[tzdata_2006b.download]]
+    sha256 = "0de941c1e9725d49d9840f958dbcead1995036ce6800e8c91cd1c623f8369fbf"
+    url = "https://data.iana.org/time-zones/releases/tzdata2006b.tar.gz"
+
+[tzdata_2006c]
+git-tree-sha1 = "3a31e62e0fe341c77c996c6a2f00b93f385d020a"
+lazy = true
+
+    [[tzdata_2006c.download]]
+    sha256 = "54ed2ecb6366206d3d1a950e25f810e1efe85cabe1fffb4025fcd887ec11d81e"
+    url = "https://data.iana.org/time-zones/releases/tzdata2006c.tar.gz"
+
+[tzdata_2006d]
+git-tree-sha1 = "c577a3e242fdf59efa0d73ecf1f054345abe974a"
+lazy = true
+
+    [[tzdata_2006d.download]]
+    sha256 = "54ed2ecb6366206d3d1a950e25f810e1efe85cabe1fffb4025fcd887ec11d81e"
+    url = "https://data.iana.org/time-zones/releases/tzdata2006d.tar.gz"
+
+[tzdata_2006f]
+git-tree-sha1 = "64978e7e5a549f83d75021d75219144c7f5feb57"
+lazy = true
+
+    [[tzdata_2006f.download]]
+    sha256 = "54ed2ecb6366206d3d1a950e25f810e1efe85cabe1fffb4025fcd887ec11d81e"
+    url = "https://data.iana.org/time-zones/releases/tzdata2006f.tar.gz"
+
+[tzdata_2006g]
+git-tree-sha1 = "9a2ace6a90409828a408c57c633ec9b78b9d6a96"
+lazy = true
+
+    [[tzdata_2006g.download]]
+    sha256 = "54ed2ecb6366206d3d1a950e25f810e1efe85cabe1fffb4025fcd887ec11d81e"
+    url = "https://data.iana.org/time-zones/releases/tzdata2006g.tar.gz"
+
+[tzdata_2006j]
+git-tree-sha1 = "bb9132e1c864127b28f33ef8e7c6bd9d455e2140"
+lazy = true
+
+    [[tzdata_2006j.download]]
+    sha256 = "54ed2ecb6366206d3d1a950e25f810e1efe85cabe1fffb4025fcd887ec11d81e"
+    url = "https://data.iana.org/time-zones/releases/tzdata2006j.tar.gz"
+
+[tzdata_2006k]
+git-tree-sha1 = "e21c5047be9b5b4c44e274de00a581199b14cb48"
+lazy = true
+
+    [[tzdata_2006k.download]]
+    sha256 = "54ed2ecb6366206d3d1a950e25f810e1efe85cabe1fffb4025fcd887ec11d81e"
+    url = "https://data.iana.org/time-zones/releases/tzdata2006k.tar.gz"
+
+[tzdata_2006l]
+git-tree-sha1 = "46e36a9c01cac8770686828bc14b3d7ecd3a850a"
+lazy = true
+
+    [[tzdata_2006l.download]]
+    sha256 = "c5b86b10ee1801cedfcaa9f365d96cf7bd40049a1a6a8c8ad35fb4ec77db83f9"
+    url = "https://data.iana.org/time-zones/releases/tzdata2006l.tar.gz"
+
+[tzdata_2006m]
+git-tree-sha1 = "033d546c2324688a3aa57e125c1562a191baaa34"
+lazy = true
+
+    [[tzdata_2006m.download]]
+    sha256 = "5faf80b64c82ecc7d104b0fc2e14af1e40d267905aefde9838ec7131d3331718"
+    url = "https://data.iana.org/time-zones/releases/tzdata2006m.tar.gz"
+
+[tzdata_2006n]
+git-tree-sha1 = "0be67441b59d8b9cf0986d600f3af42912f84073"
+lazy = true
+
+    [[tzdata_2006n.download]]
+    sha256 = "5faf80b64c82ecc7d104b0fc2e14af1e40d267905aefde9838ec7131d3331718"
+    url = "https://data.iana.org/time-zones/releases/tzdata2006n.tar.gz"
+
+[tzdata_2006o]
+git-tree-sha1 = "8cb013e7af2618bbeebcd716e2ea8d31eb8756dd"
+lazy = true
+
+    [[tzdata_2006o.download]]
+    sha256 = "5faf80b64c82ecc7d104b0fc2e14af1e40d267905aefde9838ec7131d3331718"
+    url = "https://data.iana.org/time-zones/releases/tzdata2006o.tar.gz"
+
+[tzdata_2006p]
+git-tree-sha1 = "7baddb932a5a316924354acaee06ae3034961069"
+lazy = true
+
+    [[tzdata_2006p.download]]
+    sha256 = "5faf80b64c82ecc7d104b0fc2e14af1e40d267905aefde9838ec7131d3331718"
+    url = "https://data.iana.org/time-zones/releases/tzdata2006p.tar.gz"
+
+[tzdata_2007a]
+git-tree-sha1 = "8f4afff86306fb7d98dc48e2c996b8569cbec93a"
+lazy = true
+
+    [[tzdata_2007a.download]]
+    sha256 = "2f29e4434b704890ea42797108a5598cdb40152e9b9a7b7a2ab9618c2fc201b3"
+    url = "https://data.iana.org/time-zones/releases/tzdata2007a.tar.gz"
+
+[tzdata_2007b]
+git-tree-sha1 = "36ded0765438e9cea675ecfa9134ec90f165f42a"
+lazy = true
+
+    [[tzdata_2007b.download]]
+    sha256 = "2f29e4434b704890ea42797108a5598cdb40152e9b9a7b7a2ab9618c2fc201b3"
+    url = "https://data.iana.org/time-zones/releases/tzdata2007b.tar.gz"
+
+[tzdata_2007c]
+git-tree-sha1 = "e4eea7e8e65b60d3c4b8c0b1fcbde332bd882ed1"
+lazy = true
+
+    [[tzdata_2007c.download]]
+    sha256 = "2f29e4434b704890ea42797108a5598cdb40152e9b9a7b7a2ab9618c2fc201b3"
+    url = "https://data.iana.org/time-zones/releases/tzdata2007c.tar.gz"
+
+[tzdata_2007d]
+git-tree-sha1 = "e7e28bdc1ee94c55062a3aec39de5c03dd1d8bd1"
+lazy = true
+
+    [[tzdata_2007d.download]]
+    sha256 = "2f29e4434b704890ea42797108a5598cdb40152e9b9a7b7a2ab9618c2fc201b3"
+    url = "https://data.iana.org/time-zones/releases/tzdata2007d.tar.gz"
+
+[tzdata_2007e]
+git-tree-sha1 = "000f8a53d50b35dda5a7b5bd57d9e38191b76a1f"
+lazy = true
+
+    [[tzdata_2007e.download]]
+    sha256 = "2f29e4434b704890ea42797108a5598cdb40152e9b9a7b7a2ab9618c2fc201b3"
+    url = "https://data.iana.org/time-zones/releases/tzdata2007e.tar.gz"
+
+[tzdata_2007f]
+git-tree-sha1 = "9483624f56790c47dea713df496e5b51ce9a2110"
+lazy = true
+
+    [[tzdata_2007f.download]]
+    sha256 = "547e9f44c8892a1fbe9d648cbc7893950f5330671dfd81c051e91913a01a3f5c"
+    url = "https://data.iana.org/time-zones/releases/tzdata2007f.tar.gz"
+
+[tzdata_2007g]
+git-tree-sha1 = "5234aae66c4c61b27fb2130663db72b978dd0614"
+lazy = true
+
+    [[tzdata_2007g.download]]
+    sha256 = "c031743c95d57b7c4bf2f7e3b46c46704a97004f2fbce76ae1bbe16e965786db"
+    url = "https://data.iana.org/time-zones/releases/tzdata2007g.tar.gz"
+
+[tzdata_2007h]
+git-tree-sha1 = "9e7b6904457b5131bf86911704e741ac3cee5237"
+lazy = true
+
+    [[tzdata_2007h.download]]
+    sha256 = "ece2fb7f9e40b67b86f5ad948b8589929c02240b3faf25651d927de25276c55a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2007h.tar.gz"
+
+[tzdata_2007i]
+git-tree-sha1 = "586805816c0f5aaa96bc658b6aa13d83756831dc"
+lazy = true
+
+    [[tzdata_2007i.download]]
+    sha256 = "ece2fb7f9e40b67b86f5ad948b8589929c02240b3faf25651d927de25276c55a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2007i.tar.gz"
+
+[tzdata_2007j]
+git-tree-sha1 = "e9af1100bdec248e3a7dad137d3eebcb129e44a5"
+lazy = true
+
+    [[tzdata_2007j.download]]
+    sha256 = "ece2fb7f9e40b67b86f5ad948b8589929c02240b3faf25651d927de25276c55a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2007j.tar.gz"
+
+[tzdata_2007k]
+git-tree-sha1 = "9003bf61656f307bed26ff2036a6a19123a3fbab"
+lazy = true
+
+    [[tzdata_2007k.download]]
+    sha256 = "ece2fb7f9e40b67b86f5ad948b8589929c02240b3faf25651d927de25276c55a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2007k.tar.gz"
+
+[tzdata_2008a]
+git-tree-sha1 = "bd3715c62d7c4c74a3aa05a2f04d3dba7ae759d2"
+lazy = true
+
+    [[tzdata_2008a.download]]
+    sha256 = "ece2fb7f9e40b67b86f5ad948b8589929c02240b3faf25651d927de25276c55a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2008a.tar.gz"
+
+[tzdata_2008b]
+git-tree-sha1 = "d4030b5a428d12c919a95d1ca887051885fa3458"
+lazy = true
+
+    [[tzdata_2008b.download]]
+    sha256 = "ece2fb7f9e40b67b86f5ad948b8589929c02240b3faf25651d927de25276c55a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2008b.tar.gz"
+
+[tzdata_2008c]
+git-tree-sha1 = "0e269b74a22e8430e2780d26ca619cefa1898d4e"
+lazy = true
+
+    [[tzdata_2008c.download]]
+    sha256 = "7fa6766faa2ba287d0b89e1dfb11f2189292faf90922b6d495f321bad2eda01f"
+    url = "https://data.iana.org/time-zones/releases/tzdata2008c.tar.gz"
+
+[tzdata_2008d]
+git-tree-sha1 = "2e6522870df565c82ef8c7d042384880d890993f"
+lazy = true
+
+    [[tzdata_2008d.download]]
+    sha256 = "85c53c9a73683370c6cf440ea9c8c5158068008a298cf0a5236f970245accb94"
+    url = "https://data.iana.org/time-zones/releases/tzdata2008d.tar.gz"
+
+[tzdata_2008e]
+git-tree-sha1 = "2630a29eee3f6d60e0c19f3290edfc08a42c0496"
+lazy = true
+
+    [[tzdata_2008e.download]]
+    sha256 = "eef8c83ea27618833a6d3819ce0b5d680c1fc6ee6ecaeefc6642e41dd6369ea7"
+    url = "https://data.iana.org/time-zones/releases/tzdata2008e.tar.gz"
+
+[tzdata_2008f]
+git-tree-sha1 = "f85775cab4061aa7949cc191f6eca911de94c8e7"
+lazy = true
+
+    [[tzdata_2008f.download]]
+    sha256 = "51dd9520e8838f5e046115348d3aa47bae1c97a2074a802ef439b15f740d313f"
+    url = "https://data.iana.org/time-zones/releases/tzdata2008f.tar.gz"
+
+[tzdata_2008g]
+git-tree-sha1 = "8733e0ce303657e0e1a99c50d6248175dc444544"
+lazy = true
+
+    [[tzdata_2008g.download]]
+    sha256 = "51dd9520e8838f5e046115348d3aa47bae1c97a2074a802ef439b15f740d313f"
+    url = "https://data.iana.org/time-zones/releases/tzdata2008g.tar.gz"
+
+[tzdata_2008h]
+git-tree-sha1 = "78f4aafdcaa3b0b2b24118fd6df165a4b2359152"
+lazy = true
+
+    [[tzdata_2008h.download]]
+    sha256 = "aeac2d079ec042dbc58a41dd27c7d700dca2fcf10314b7ecb0897692edec728a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2008h.tar.gz"
+
+[tzdata_2008i]
+git-tree-sha1 = "03e9e1ffc3e8d172b7fea10d93c0ff5d34fe227a"
+lazy = true
+
+    [[tzdata_2008i.download]]
+    sha256 = "aeac2d079ec042dbc58a41dd27c7d700dca2fcf10314b7ecb0897692edec728a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2008i.tar.gz"
+
+[tzdata_2009a]
+git-tree-sha1 = "dcf4913bde482c886d67198fe74a6a8ec030a6a8"
+lazy = true
+
+    [[tzdata_2009a.download]]
+    sha256 = "aeac2d079ec042dbc58a41dd27c7d700dca2fcf10314b7ecb0897692edec728a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009a.tar.gz"
+
+[tzdata_2009b]
+git-tree-sha1 = "e91be7c8a288f1a31ef39047d7f82ce54f7e6ea0"
+lazy = true
+
+    [[tzdata_2009b.download]]
+    sha256 = "aeac2d079ec042dbc58a41dd27c7d700dca2fcf10314b7ecb0897692edec728a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009b.tar.gz"
+
+[tzdata_2009c]
+git-tree-sha1 = "94b69424e1a98b81657e634fb3e317dc8cbab7d0"
+lazy = true
+
+    [[tzdata_2009c.download]]
+    sha256 = "aeac2d079ec042dbc58a41dd27c7d700dca2fcf10314b7ecb0897692edec728a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009c.tar.gz"
+
+[tzdata_2009d]
+git-tree-sha1 = "cf5524323bebc89e1bcfae110e85e1b6f850d557"
+lazy = true
+
+    [[tzdata_2009d.download]]
+    sha256 = "42b2eaba5727e3e9cf872f9730a273924682c981385e91c023c8e884e3ae9ac6"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009d.tar.gz"
+
+[tzdata_2009e]
+git-tree-sha1 = "526ffc7869c41ddb20a21edf59668211ab2fdd1f"
+lazy = true
+
+    [[tzdata_2009e.download]]
+    sha256 = "42b2eaba5727e3e9cf872f9730a273924682c981385e91c023c8e884e3ae9ac6"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009e.tar.gz"
+
+[tzdata_2009f]
+git-tree-sha1 = "7f8bd67a77f12e5e0f83afaf486e0cd1a15a0afd"
+lazy = true
+
+    [[tzdata_2009f.download]]
+    sha256 = "42b2eaba5727e3e9cf872f9730a273924682c981385e91c023c8e884e3ae9ac6"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009f.tar.gz"
+
+[tzdata_2009g]
+git-tree-sha1 = "cfc6a6188fa7b05c2af045f5dbd369f69776010d"
+lazy = true
+
+    [[tzdata_2009g.download]]
+    sha256 = "222dd01691aa8da229d4572f838a131c8aca62880970fb5d9e35b18ef04090a0"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009g.tar.gz"
+
+[tzdata_2009h]
+git-tree-sha1 = "28a3973857c2175a6786c8eb6ab0313ecf9b4063"
+lazy = true
+
+    [[tzdata_2009h.download]]
+    sha256 = "2b2086ebd8fcf7fc7c462cf87e549ab51ef006dc6ce336fdd8df57cb50355494"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009h.tar.gz"
+
+[tzdata_2009i]
+git-tree-sha1 = "a4519eb41ec0a51f29ed1642804bb50b5e53635e"
+lazy = true
+
+    [[tzdata_2009i.download]]
+    sha256 = "2b2086ebd8fcf7fc7c462cf87e549ab51ef006dc6ce336fdd8df57cb50355494"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009i.tar.gz"
+
+[tzdata_2009j]
+git-tree-sha1 = "cb0d0491529deae9c5a168f97ad55fca10f7337a"
+lazy = true
+
+    [[tzdata_2009j.download]]
+    sha256 = "2b2086ebd8fcf7fc7c462cf87e549ab51ef006dc6ce336fdd8df57cb50355494"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009j.tar.gz"
+
+[tzdata_2009k]
+git-tree-sha1 = "334eebcd1693b396d2c51207729d6a8d3a7ae605"
+lazy = true
+
+    [[tzdata_2009k.download]]
+    sha256 = "ce9d7274a4b77a66892e40d0b678819403747325c8d54eab01f532ef8b94106b"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009k.tar.gz"
+
+[tzdata_2009l]
+git-tree-sha1 = "8e3205b72fc8cf6bcad159cd13c52f16bbcbf695"
+lazy = true
+
+    [[tzdata_2009l.download]]
+    sha256 = "aa76e9a0e9dd8c87227bfa52f9463d931e9bd8fa152307660dee92c83e7749a1"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009l.tar.gz"
+
+[tzdata_2009m]
+git-tree-sha1 = "9938093467a824854af748b6d39920188754307f"
+lazy = true
+
+    [[tzdata_2009m.download]]
+    sha256 = "aa76e9a0e9dd8c87227bfa52f9463d931e9bd8fa152307660dee92c83e7749a1"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009m.tar.gz"
+
+[tzdata_2009n]
+git-tree-sha1 = "9e80d22ac0d560a3a0edf79a9f49834aef6480b1"
+lazy = true
+
+    [[tzdata_2009n.download]]
+    sha256 = "aa76e9a0e9dd8c87227bfa52f9463d931e9bd8fa152307660dee92c83e7749a1"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009n.tar.gz"
+
+[tzdata_2009o]
+git-tree-sha1 = "4a1bea40c97af53f598297b9d64833ce43729adf"
+lazy = true
+
+    [[tzdata_2009o.download]]
+    sha256 = "aa76e9a0e9dd8c87227bfa52f9463d931e9bd8fa152307660dee92c83e7749a1"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009o.tar.gz"
+
+[tzdata_2009p]
+git-tree-sha1 = "c01e96dc8c7d269cb58ba37dcc9ec03b67bf9379"
+lazy = true
+
+    [[tzdata_2009p.download]]
+    sha256 = "aa76e9a0e9dd8c87227bfa52f9463d931e9bd8fa152307660dee92c83e7749a1"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009p.tar.gz"
+
+[tzdata_2009q]
+git-tree-sha1 = "7ecfb389b88f5a816900d62f8c5f3e389f05423f"
+lazy = true
+
+    [[tzdata_2009q.download]]
+    sha256 = "aa76e9a0e9dd8c87227bfa52f9463d931e9bd8fa152307660dee92c83e7749a1"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009q.tar.gz"
+
+[tzdata_2009r]
+git-tree-sha1 = "6bcb4b2f7d01a4a07d4c6f36ce742ce721528208"
+lazy = true
+
+    [[tzdata_2009r.download]]
+    sha256 = "aa76e9a0e9dd8c87227bfa52f9463d931e9bd8fa152307660dee92c83e7749a1"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009r.tar.gz"
+
+[tzdata_2009s]
+git-tree-sha1 = "506c01f66312fed3b0a47932e240f9f108fe73cb"
+lazy = true
+
+    [[tzdata_2009s.download]]
+    sha256 = "aa76e9a0e9dd8c87227bfa52f9463d931e9bd8fa152307660dee92c83e7749a1"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009s.tar.gz"
+
+[tzdata_2009t]
+git-tree-sha1 = "1b8e1e76dee3910a0498cd11695d05c5376198ec"
+lazy = true
+
+    [[tzdata_2009t.download]]
+    sha256 = "aa76e9a0e9dd8c87227bfa52f9463d931e9bd8fa152307660dee92c83e7749a1"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009t.tar.gz"
+
+[tzdata_2009u]
+git-tree-sha1 = "307344410725f98e181f144ba3d5f2e0bf15a992"
+lazy = true
+
+    [[tzdata_2009u.download]]
+    sha256 = "aa76e9a0e9dd8c87227bfa52f9463d931e9bd8fa152307660dee92c83e7749a1"
+    url = "https://data.iana.org/time-zones/releases/tzdata2009u.tar.gz"
+
+[tzdata_2010a]
+git-tree-sha1 = "dc27826e3f58b07c1a8b4505d7246dc876a6215c"
+lazy = true
+
+    [[tzdata_2010a.download]]
+    sha256 = "aa76e9a0e9dd8c87227bfa52f9463d931e9bd8fa152307660dee92c83e7749a1"
+    url = "https://data.iana.org/time-zones/releases/tzdata2010a.tar.gz"
+
+[tzdata_2010b]
+git-tree-sha1 = "aabdf11687f005c44acb9f9b3425150b07e1afc3"
+lazy = true
+
+    [[tzdata_2010b.download]]
+    sha256 = "aa76e9a0e9dd8c87227bfa52f9463d931e9bd8fa152307660dee92c83e7749a1"
+    url = "https://data.iana.org/time-zones/releases/tzdata2010b.tar.gz"
+
+[tzdata_2010c]
+git-tree-sha1 = "a7c372079ee74a06c7d97dc5b6f5f3da9fd4ec4c"
+lazy = true
+
+    [[tzdata_2010c.download]]
+    sha256 = "aa76e9a0e9dd8c87227bfa52f9463d931e9bd8fa152307660dee92c83e7749a1"
+    url = "https://data.iana.org/time-zones/releases/tzdata2010c.tar.gz"
+
+[tzdata_2010d]
+git-tree-sha1 = "cb1546ed0b7d880046adfe46bf59f5e4b3f141f0"
+lazy = true
+
+    [[tzdata_2010d.download]]
+    sha256 = "aa76e9a0e9dd8c87227bfa52f9463d931e9bd8fa152307660dee92c83e7749a1"
+    url = "https://data.iana.org/time-zones/releases/tzdata2010d.tar.gz"
+
+[tzdata_2010e]
+git-tree-sha1 = "e8788b7c6ec8f8cfa824e12007ed0350e795ee0e"
+lazy = true
+
+    [[tzdata_2010e.download]]
+    sha256 = "aa76e9a0e9dd8c87227bfa52f9463d931e9bd8fa152307660dee92c83e7749a1"
+    url = "https://data.iana.org/time-zones/releases/tzdata2010e.tar.gz"
+
+[tzdata_2010f]
+git-tree-sha1 = "386297cf66f8cf098cda3835a0eacbade79936fe"
+lazy = true
+
+    [[tzdata_2010f.download]]
+    sha256 = "aa76e9a0e9dd8c87227bfa52f9463d931e9bd8fa152307660dee92c83e7749a1"
+    url = "https://data.iana.org/time-zones/releases/tzdata2010f.tar.gz"
+
+[tzdata_2010g]
+git-tree-sha1 = "f8ba9361f0c259ebbb434f175ab77db2091c1a8c"
+lazy = true
+
+    [[tzdata_2010g.download]]
+    sha256 = "aa76e9a0e9dd8c87227bfa52f9463d931e9bd8fa152307660dee92c83e7749a1"
+    url = "https://data.iana.org/time-zones/releases/tzdata2010g.tar.gz"
+
+[tzdata_2010h]
+git-tree-sha1 = "a7aced1c7ffb442c6602ee496841312dae42ab6e"
+lazy = true
+
+    [[tzdata_2010h.download]]
+    sha256 = "8f2055dfc94ef64039c7f05f3a4f9634fcd81445da2aa32d54ba65f8e8dfbb01"
+    url = "https://data.iana.org/time-zones/releases/tzdata2010h.tar.gz"
+
+[tzdata_2010i]
+git-tree-sha1 = "929f6c9b169ebcba66135a7ca7db6c7e32ed69a0"
+lazy = true
+
+    [[tzdata_2010i.download]]
+    sha256 = "f3bd1c54b6ecd9e3f2daeb8d2e5d82f66335711725d20504f1b5651393cf49a9"
+    url = "https://data.iana.org/time-zones/releases/tzdata2010i.tar.gz"
+
+[tzdata_2010j]
+git-tree-sha1 = "06ec8d096ebabcde79a4f940918127db8eb4ad23"
+lazy = true
+
+    [[tzdata_2010j.download]]
+    sha256 = "f3bd1c54b6ecd9e3f2daeb8d2e5d82f66335711725d20504f1b5651393cf49a9"
+    url = "https://data.iana.org/time-zones/releases/tzdata2010j.tar.gz"
+
+[tzdata_2010k]
+git-tree-sha1 = "7cedd3066d7c23df0ff4a927b5459f023dd8b130"
+lazy = true
+
+    [[tzdata_2010k.download]]
+    sha256 = "71104a1e7023e14f2b0144075871197814342d3c6aafa32d4409a84a31ed277d"
+    url = "https://data.iana.org/time-zones/releases/tzdata2010k.tar.gz"
+
+[tzdata_2010l]
+git-tree-sha1 = "c27b848df3dbbfafcdddbc9d918cf8afe94c03d8"
+lazy = true
+
+    [[tzdata_2010l.download]]
+    sha256 = "caaf115509be7b52ca6fb3b433e548da2ac629c6768ccef7b376c4f944b4c40a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2010l.tar.gz"
+
+[tzdata_2010m]
+git-tree-sha1 = "33f3b753a838a59f7639292cd85056f16ad50f25"
+lazy = true
+
+    [[tzdata_2010m.download]]
+    sha256 = "caaf115509be7b52ca6fb3b433e548da2ac629c6768ccef7b376c4f944b4c40a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2010m.tar.gz"
+
+[tzdata_2010n]
+git-tree-sha1 = "4c6e8cc0de57de9970db166fd3b251e8dbfc982e"
+lazy = true
+
+    [[tzdata_2010n.download]]
+    sha256 = "caaf115509be7b52ca6fb3b433e548da2ac629c6768ccef7b376c4f944b4c40a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2010n.tar.gz"
+
+[tzdata_2010o]
+git-tree-sha1 = "5949102d35185cdf9a08774e15396e084db71685"
+lazy = true
+
+    [[tzdata_2010o.download]]
+    sha256 = "caaf115509be7b52ca6fb3b433e548da2ac629c6768ccef7b376c4f944b4c40a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2010o.tar.gz"
+
+[tzdata_2011a]
+git-tree-sha1 = "e1812cb16ed1d0b57bff13afd721808f8296f444"
+lazy = true
+
+    [[tzdata_2011a.download]]
+    sha256 = "caaf115509be7b52ca6fb3b433e548da2ac629c6768ccef7b376c4f944b4c40a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2011a.tar.gz"
+
+[tzdata_2011b]
+git-tree-sha1 = "5586cce9f46e860861e11bbd053f677624f2e1ae"
+lazy = true
+
+    [[tzdata_2011b.download]]
+    sha256 = "caaf115509be7b52ca6fb3b433e548da2ac629c6768ccef7b376c4f944b4c40a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2011b.tar.gz"
+
+[tzdata_2011c]
+git-tree-sha1 = "fe079cc9fe937d5152e5e50b21100c17548ddba8"
+lazy = true
+
+    [[tzdata_2011c.download]]
+    sha256 = "caaf115509be7b52ca6fb3b433e548da2ac629c6768ccef7b376c4f944b4c40a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2011c.tar.gz"
+
+[tzdata_2011d]
+git-tree-sha1 = "a26d99713d6a724ed965e90cedf8b14c62fe5883"
+lazy = true
+
+    [[tzdata_2011d.download]]
+    sha256 = "caaf115509be7b52ca6fb3b433e548da2ac629c6768ccef7b376c4f944b4c40a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2011d.tar.gz"
+
+[tzdata_2011e]
+git-tree-sha1 = "c41feacda1167b7a0288883e81bc5ce7d6ecd50d"
+lazy = true
+
+    [[tzdata_2011e.download]]
+    sha256 = "329bde15fffe4ca63a40d5dd1adf1acfad43005bb08b3ca998c1739192bd9e00"
+    url = "https://data.iana.org/time-zones/releases/tzdata2011e.tar.gz"
+
+[tzdata_2011f]
+git-tree-sha1 = "33650c3b64e62d36d7d3cf4be9b3b778971c1e3e"
+lazy = true
+
+    [[tzdata_2011f.download]]
+    sha256 = "329bde15fffe4ca63a40d5dd1adf1acfad43005bb08b3ca998c1739192bd9e00"
+    url = "https://data.iana.org/time-zones/releases/tzdata2011f.tar.gz"
+
+[tzdata_2011g]
+git-tree-sha1 = "80fe02a3857cd0317c30e47556545b2baeef3789"
+lazy = true
+
+    [[tzdata_2011g.download]]
+    sha256 = "24eefa38cd7af2833dd6a832168c0b213d68dc811a4ada2eb904abcacafd8ce8"
+    url = "https://data.iana.org/time-zones/releases/tzdata2011g.tar.gz"
+
+[tzdata_2011h]
+git-tree-sha1 = "0e279e280c95f8aa24c49cd4696e2a9223b81cc2"
+lazy = true
+
+    [[tzdata_2011h.download]]
+    sha256 = "24eefa38cd7af2833dd6a832168c0b213d68dc811a4ada2eb904abcacafd8ce8"
+    url = "https://data.iana.org/time-zones/releases/tzdata2011h.tar.gz"
+
+[tzdata_2011i]
+git-tree-sha1 = "1e092c60380bbc267e30ff488bac63c5f4476245"
+lazy = true
+
+    [[tzdata_2011i.download]]
+    sha256 = "af61a394a946cbc79679ca4f5031a3566600e875f6a511c40b61303bef6c46bb"
+    url = "https://data.iana.org/time-zones/releases/tzdata2011i.tar.gz"
+
+[tzdata_2011j]
+git-tree-sha1 = "b05458c277be11ee05197f696b49c7810d8e7795"
+lazy = true
+
+    [[tzdata_2011j.download]]
+    sha256 = "52f344c8ffdf19af91180ecd889e32850a43135f8de888fccb9b8bca2c3de3a5"
+    url = "https://data.iana.org/time-zones/releases/tzdata2011j.tar.gz"
+
+[tzdata_2011k]
+git-tree-sha1 = "9522a402818be9c73ec3a086cf17f221374fc0aa"
+lazy = true
+
+    [[tzdata_2011k.download]]
+    sha256 = "52f344c8ffdf19af91180ecd889e32850a43135f8de888fccb9b8bca2c3de3a5"
+    url = "https://data.iana.org/time-zones/releases/tzdata2011k.tar.gz"
+
+[tzdata_2011l]
+git-tree-sha1 = "8bb884cbd2fa5900614bce064dc08445c4df48a3"
+lazy = true
+
+    [[tzdata_2011l.download]]
+    sha256 = "52f344c8ffdf19af91180ecd889e32850a43135f8de888fccb9b8bca2c3de3a5"
+    url = "https://data.iana.org/time-zones/releases/tzdata2011l.tar.gz"
+
+[tzdata_2011m]
+git-tree-sha1 = "1381ec9be4773fe7be2cbd0a00f37aaa58ad0b3c"
+lazy = true
+
+    [[tzdata_2011m.download]]
+    sha256 = "52f344c8ffdf19af91180ecd889e32850a43135f8de888fccb9b8bca2c3de3a5"
+    url = "https://data.iana.org/time-zones/releases/tzdata2011m.tar.gz"
+
+[tzdata_2011n]
+git-tree-sha1 = "7afec8c458764ec1fe49be6caf04fbb79f0d8bff"
+lazy = true
+
+    [[tzdata_2011n.download]]
+    sha256 = "52f344c8ffdf19af91180ecd889e32850a43135f8de888fccb9b8bca2c3de3a5"
+    url = "https://data.iana.org/time-zones/releases/tzdata2011n.tar.gz"
+
+[tzdata_2012a]
+git-tree-sha1 = "a1def8ea53faff67ecce62de08cb9c42275ee0da"
+lazy = true
+
+    [[tzdata_2012a.download]]
+    sha256 = "52f344c8ffdf19af91180ecd889e32850a43135f8de888fccb9b8bca2c3de3a5"
+    url = "https://data.iana.org/time-zones/releases/tzdata2012a.tar.gz"
+
+[tzdata_2012b]
+git-tree-sha1 = "a2a191a32a72d10543c30828ff9e665a0fb48819"
+lazy = true
+
+    [[tzdata_2012b.download]]
+    sha256 = "52f344c8ffdf19af91180ecd889e32850a43135f8de888fccb9b8bca2c3de3a5"
+    url = "https://data.iana.org/time-zones/releases/tzdata2012b.tar.gz"
+
+[tzdata_2012c]
+git-tree-sha1 = "4068aaa77fd612a68b73aeb0811847baba955626"
+lazy = true
+
+    [[tzdata_2012c.download]]
+    sha256 = "cbdf3791c1903f6592d803fd83821def39eab62d3800a0dddba79684c1835744"
+    url = "https://data.iana.org/time-zones/releases/tzdata2012c.tar.gz"
+
+[tzdata_2012d]
+git-tree-sha1 = "dedc7a7c2e14066295e02a02e836adfcf00dc1c3"
+lazy = true
+
+    [[tzdata_2012d.download]]
+    sha256 = "12a53ecbbbd62e59d39a1edf70011817b7943bd579c81f08e34031bbd0614ace"
+    url = "https://data.iana.org/time-zones/releases/tzdata2012d.tar.gz"
+
+[tzdata_2012e]
+git-tree-sha1 = "b593f227302d2f2aec8952579fe00c3ac0891664"
+lazy = true
+
+    [[tzdata_2012e.download]]
+    sha256 = "12a53ecbbbd62e59d39a1edf70011817b7943bd579c81f08e34031bbd0614ace"
+    url = "https://data.iana.org/time-zones/releases/tzdata2012e.tar.gz"
+
+[tzdata_2012f]
+git-tree-sha1 = "85cfa26542d7cd551daf2739a74ec3d012394ec4"
+lazy = true
+
+    [[tzdata_2012f.download]]
+    sha256 = "12a53ecbbbd62e59d39a1edf70011817b7943bd579c81f08e34031bbd0614ace"
+    url = "https://data.iana.org/time-zones/releases/tzdata2012f.tar.gz"
+
+[tzdata_2012g]
+git-tree-sha1 = "c29203e48751ba1a45d2d8a196d05915e02b9cfe"
+lazy = true
+
+    [[tzdata_2012g.download]]
+    sha256 = "b9ac5f11574db545f099f8d1ae6b8d975444f4c34fbf2adf07ccc092ae4a073c"
+    url = "https://data.iana.org/time-zones/releases/tzdata2012g.tar.gz"
+
+[tzdata_2012h]
+git-tree-sha1 = "718fbe4091e5321f19cf887672b3158bc3c7f75b"
+lazy = true
+
+    [[tzdata_2012h.download]]
+    sha256 = "0f70071aa39780180b294eaa15b1381ee5a6436bc67ad8984e1834eff8460006"
+    url = "https://data.iana.org/time-zones/releases/tzdata2012h.tar.gz"
+
+[tzdata_2012i]
+git-tree-sha1 = "813dceb98202c56b5b706aa4158bec365c16ac14"
+lazy = true
+
+    [[tzdata_2012i.download]]
+    sha256 = "ed645caedbef7ec9ba3118dac543e6ca5719fb460f8c235e6f92e77f526533c9"
+    url = "https://data.iana.org/time-zones/releases/tzdata2012i.tar.gz"
+
+[tzdata_2012j]
+git-tree-sha1 = "242d0054623239dd17cca2e0cb3dac91f6220df8"
+lazy = true
+
+    [[tzdata_2012j.download]]
+    sha256 = "ae63535b91167a60ac082e6eda983899e254565e29632376d96e9bc17bb15814"
+    url = "https://data.iana.org/time-zones/releases/tzdata2012j.tar.gz"
+
+[tzdata_2013a]
+git-tree-sha1 = "90e441a11f0f99784332d0f883bc96dcab0bfbe6"
+lazy = true
+
+    [[tzdata_2013a.download]]
+    sha256 = "2fd4d28d8fedca323e9065770006d4085120d26a603f9f23774384c4cae2232a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2013a.tar.gz"
+
+[tzdata_2013b]
+git-tree-sha1 = "0fb976fd612ad182b79981a814ad1dc7e8f484e0"
+lazy = true
+
+    [[tzdata_2013b.download]]
+    sha256 = "33ca5809cadc876dd09782e06b899b7c31c73edb060758d24bba6d7cbb96d9e9"
+    url = "https://data.iana.org/time-zones/releases/tzdata2013b.tar.gz"
+
+[tzdata_2013c]
+git-tree-sha1 = "43c6823c057f943635a8038f935118b162202339"
+lazy = true
+
+    [[tzdata_2013c.download]]
+    sha256 = "58357ed1696e2f62d779c6cbc3b156885385a3734b8c54eac7e4089f271244b6"
+    url = "https://data.iana.org/time-zones/releases/tzdata2013c.tar.gz"
+
+[tzdata_2013d]
+git-tree-sha1 = "e5d9bee00cd35a440f695be2940c96d32bc967c9"
+lazy = true
+
+    [[tzdata_2013d.download]]
+    sha256 = "ffa436c939f82e7c71e47b8071ecf07b1b59b748c36bf2616f6c11dbc5aabee4"
+    url = "https://data.iana.org/time-zones/releases/tzdata2013d.tar.gz"
+
+[tzdata_2013e]
+git-tree-sha1 = "8b24f84e2df1d7e2a071f2909683a9b9d2be19b8"
+lazy = true
+
+    [[tzdata_2013e.download]]
+    sha256 = "cf48951af809dacd3e0a7e3c48506646eb74617fa3ba84efe3871aac138e3853"
+    url = "https://data.iana.org/time-zones/releases/tzdata2013e.tar.gz"
+
+[tzdata_2013f]
+git-tree-sha1 = "5e7481570748fb0c4749de04ea81f5150da021b6"
+lazy = true
+
+    [[tzdata_2013f.download]]
+    sha256 = "e54ee1f54a75fb12e9fe21d50cdfd44b32a46f50a50722aa66e05581baccf853"
+    url = "https://data.iana.org/time-zones/releases/tzdata2013f.tar.gz"
+
+[tzdata_2013g]
+git-tree-sha1 = "4aa259e5d6ea11dbbf4b7f8ce188416f31e9a89b"
+lazy = true
+
+    [[tzdata_2013g.download]]
+    sha256 = "550231680f67c16400a9b4d316bb24d18d7794aee2ea5f36ed0ac9cf011dd146"
+    url = "https://data.iana.org/time-zones/releases/tzdata2013g.tar.gz"
+
+[tzdata_2013h]
+git-tree-sha1 = "c863e9cddffa2a8dd61cba22d53c74b6a462528a"
+lazy = true
+
+    [[tzdata_2013h.download]]
+    sha256 = "b55fc1758544ddfb924fd759dc017cfaa260b590577128919d7d7746b439b765"
+    url = "https://data.iana.org/time-zones/releases/tzdata2013h.tar.gz"
+
+[tzdata_2013i]
+git-tree-sha1 = "04d3f35e8c3a33bea6037577c47114e7f0f2c898"
+lazy = true
+
+    [[tzdata_2013i.download]]
+    sha256 = "b67ec6c66efb46989f48ea6766eda76b677fc94eb684fc7d60d4a7f310ad6b2c"
+    url = "https://data.iana.org/time-zones/releases/tzdata2013i.tar.gz"
+
+[tzdata_2014a]
+git-tree-sha1 = "468df4f481510b08c5f02224909afbfcf55504e8"
+lazy = true
+
+    [[tzdata_2014a.download]]
+    sha256 = "eab312d6081841055daa372cd215358b5bb5566fe66fda389047528b7103e335"
+    url = "https://data.iana.org/time-zones/releases/tzdata2014a.tar.gz"
+
+[tzdata_2014b]
+git-tree-sha1 = "a3c29db5cb35b0c1b4a09f5b9e2317acb9873bfc"
+lazy = true
+
+    [[tzdata_2014b.download]]
+    sha256 = "f3b013279cd485605bde4c8ba32f819b03ae548ea6928e32d01018603e0ebad9"
+    url = "https://data.iana.org/time-zones/releases/tzdata2014b.tar.gz"
+
+[tzdata_2014c]
+git-tree-sha1 = "edf9eb4c7073e988255a3926b10a7b47454c4c64"
+lazy = true
+
+    [[tzdata_2014c.download]]
+    sha256 = "5b4477e1ab2bb0470672ae3e3210e77ce1b99a7eb7a3894aa64e1d480bbd0cb5"
+    url = "https://data.iana.org/time-zones/releases/tzdata2014c.tar.gz"
+
+[tzdata_2014d]
+git-tree-sha1 = "093dbcbd93874bec54ac1e4fff4c82c42be000b2"
+lazy = true
+
+    [[tzdata_2014d.download]]
+    sha256 = "ac863070c7e52d11f0955eca1411f623458d7b1cd4496bd3eac4937f3343c1ed"
+    url = "https://data.iana.org/time-zones/releases/tzdata2014d.tar.gz"
+
+[tzdata_2014e]
+git-tree-sha1 = "bcb21f3d901d22ddc6d95f4f5ac7383b61a6e5d7"
+lazy = true
+
+    [[tzdata_2014e.download]]
+    sha256 = "760a42e135493dc3ba05e955325cab5ce845171db297c4b97f63f35a86cb1e55"
+    url = "https://data.iana.org/time-zones/releases/tzdata2014e.tar.gz"
+
+[tzdata_2014f]
+git-tree-sha1 = "65bff9d4876c04f6898638bd4af948d81ec10595"
+lazy = true
+
+    [[tzdata_2014f.download]]
+    sha256 = "1ff5c22074725a2a216870d47b73266f67d2bfaed71306c4fc1dae1d7f4e61be"
+    url = "https://data.iana.org/time-zones/releases/tzdata2014f.tar.gz"
+
+[tzdata_2014g]
+git-tree-sha1 = "a8484db448f2ea6228c1c83642bcf01ce545541f"
+lazy = true
+
+    [[tzdata_2014g.download]]
+    sha256 = "5266fd19651443ed0f651a8ebee58cbbde8d6d5c6c46fad59dea3445440eb2de"
+    url = "https://data.iana.org/time-zones/releases/tzdata2014g.tar.gz"
+
+[tzdata_2014h]
+git-tree-sha1 = "e826ebb215ee1f1dce659d88e27843e966e45400"
+lazy = true
+
+    [[tzdata_2014h.download]]
+    sha256 = "5266fd19651443ed0f651a8ebee58cbbde8d6d5c6c46fad59dea3445440eb2de"
+    url = "https://data.iana.org/time-zones/releases/tzdata2014h.tar.gz"
+
+[tzdata_2014i]
+git-tree-sha1 = "092ea3680c2b33b0ddce5ce87ed8cfd2d356bce5"
+lazy = true
+
+    [[tzdata_2014i.download]]
+    sha256 = "5266fd19651443ed0f651a8ebee58cbbde8d6d5c6c46fad59dea3445440eb2de"
+    url = "https://data.iana.org/time-zones/releases/tzdata2014i.tar.gz"
+
+[tzdata_2014j]
+git-tree-sha1 = "a883f4329f013dfe9180b22ab8ecd3b69303c141"
+lazy = true
+
+    [[tzdata_2014j.download]]
+    sha256 = "5266fd19651443ed0f651a8ebee58cbbde8d6d5c6c46fad59dea3445440eb2de"
+    url = "https://data.iana.org/time-zones/releases/tzdata2014j.tar.gz"
+
+[tzdata_2015a]
+git-tree-sha1 = "5b6a350a2e150bac317e1916ea43947cce67aa8e"
+lazy = true
+
+    [[tzdata_2015a.download]]
+    sha256 = "5266fd19651443ed0f651a8ebee58cbbde8d6d5c6c46fad59dea3445440eb2de"
+    url = "https://data.iana.org/time-zones/releases/tzdata2015a.tar.gz"
+
+[tzdata_2015b]
+git-tree-sha1 = "7b345cab0a44446eabafca3891969d41a57f3db5"
+lazy = true
+
+    [[tzdata_2015b.download]]
+    sha256 = "5266fd19651443ed0f651a8ebee58cbbde8d6d5c6c46fad59dea3445440eb2de"
+    url = "https://data.iana.org/time-zones/releases/tzdata2015b.tar.gz"
+
+[tzdata_2015c]
+git-tree-sha1 = "2c7ba3a2b64421d7515dbc7e209a225620be6f57"
+lazy = true
+
+    [[tzdata_2015c.download]]
+    sha256 = "5266fd19651443ed0f651a8ebee58cbbde8d6d5c6c46fad59dea3445440eb2de"
+    url = "https://data.iana.org/time-zones/releases/tzdata2015c.tar.gz"
+
+[tzdata_2015d]
+git-tree-sha1 = "2f445d7e5321f1e9c90be5d11be71aeb5b37f6d6"
+lazy = true
+
+    [[tzdata_2015d.download]]
+    sha256 = "5266fd19651443ed0f651a8ebee58cbbde8d6d5c6c46fad59dea3445440eb2de"
+    url = "https://data.iana.org/time-zones/releases/tzdata2015d.tar.gz"
+
+[tzdata_2015e]
+git-tree-sha1 = "4946144ee825214be00ba8b32d2e32a33069dc51"
+lazy = true
+
+    [[tzdata_2015e.download]]
+    sha256 = "5266fd19651443ed0f651a8ebee58cbbde8d6d5c6c46fad59dea3445440eb2de"
+    url = "https://data.iana.org/time-zones/releases/tzdata2015e.tar.gz"
+
+[tzdata_2015f]
+git-tree-sha1 = "49804acd99ec589b8fe2487589d73b3374903592"
+lazy = true
+
+    [[tzdata_2015f.download]]
+    sha256 = "5266fd19651443ed0f651a8ebee58cbbde8d6d5c6c46fad59dea3445440eb2de"
+    url = "https://data.iana.org/time-zones/releases/tzdata2015f.tar.gz"
+
+[tzdata_2015g]
+git-tree-sha1 = "c5dd45d9987c530ee19bd0de3ddddf3395488f30"
+lazy = true
+
+    [[tzdata_2015g.download]]
+    sha256 = "5266fd19651443ed0f651a8ebee58cbbde8d6d5c6c46fad59dea3445440eb2de"
+    url = "https://data.iana.org/time-zones/releases/tzdata2015g.tar.gz"
+
+[tzdata_2016a]
+git-tree-sha1 = "17ff8aba423d30e1c5fa23b41590baffa4006fb0"
+lazy = true
+
+    [[tzdata_2016a.download]]
+    sha256 = "892ebc4cbdff8e7f546a0d9ca8269c1941f3d82249d321be00d3b745686da24e"
+    url = "https://data.iana.org/time-zones/releases/tzdata2016a.tar.gz"
+
+[tzdata_2016b]
+git-tree-sha1 = "f017119f8188aa08d7e2682118db4d6bdbc809b6"
+lazy = true
+
+    [[tzdata_2016b.download]]
+    sha256 = "892ebc4cbdff8e7f546a0d9ca8269c1941f3d82249d321be00d3b745686da24e"
+    url = "https://data.iana.org/time-zones/releases/tzdata2016b.tar.gz"
+
+[tzdata_2016c]
+git-tree-sha1 = "56017c15ef73f5c5f6d89ebf1bcb4887182f3aa8"
+lazy = true
+
+    [[tzdata_2016c.download]]
+    sha256 = "892ebc4cbdff8e7f546a0d9ca8269c1941f3d82249d321be00d3b745686da24e"
+    url = "https://data.iana.org/time-zones/releases/tzdata2016c.tar.gz"
+
+[tzdata_2016d]
+git-tree-sha1 = "4c19207f30af257eee6f4962f5c89689ed818739"
+lazy = true
+
+    [[tzdata_2016d.download]]
+    sha256 = "892ebc4cbdff8e7f546a0d9ca8269c1941f3d82249d321be00d3b745686da24e"
+    url = "https://data.iana.org/time-zones/releases/tzdata2016d.tar.gz"
+
+[tzdata_2016e]
+git-tree-sha1 = "af1c6bb9e2d660e96d2c58b438e75ebc3c748863"
+lazy = true
+
+    [[tzdata_2016e.download]]
+    sha256 = "892ebc4cbdff8e7f546a0d9ca8269c1941f3d82249d321be00d3b745686da24e"
+    url = "https://data.iana.org/time-zones/releases/tzdata2016e.tar.gz"
+
+[tzdata_2016f]
+git-tree-sha1 = "b5141ca725c52d96c24f16af96fc1075888bd9e8"
+lazy = true
+
+    [[tzdata_2016f.download]]
+    sha256 = "892ebc4cbdff8e7f546a0d9ca8269c1941f3d82249d321be00d3b745686da24e"
+    url = "https://data.iana.org/time-zones/releases/tzdata2016f.tar.gz"
+
+[tzdata_2016g]
+git-tree-sha1 = "7887a7c46ff30a1b6404df4d6f918709eb2d411d"
+lazy = true
+
+    [[tzdata_2016g.download]]
+    sha256 = "892ebc4cbdff8e7f546a0d9ca8269c1941f3d82249d321be00d3b745686da24e"
+    url = "https://data.iana.org/time-zones/releases/tzdata2016g.tar.gz"
+
+[tzdata_2016h]
+git-tree-sha1 = "b4a82b1263355efd56bbfd6728329b38bd750c0c"
+lazy = true
+
+    [[tzdata_2016h.download]]
+    sha256 = "892ebc4cbdff8e7f546a0d9ca8269c1941f3d82249d321be00d3b745686da24e"
+    url = "https://data.iana.org/time-zones/releases/tzdata2016h.tar.gz"
+
+[tzdata_2016i]
+git-tree-sha1 = "dc13d91eb488a0a1f0d14e2317f7e6ade9c28329"
+lazy = true
+
+    [[tzdata_2016i.download]]
+    sha256 = "892ebc4cbdff8e7f546a0d9ca8269c1941f3d82249d321be00d3b745686da24e"
+    url = "https://data.iana.org/time-zones/releases/tzdata2016i.tar.gz"
+
+[tzdata_2016j]
+git-tree-sha1 = "bda7ebd6253c7fc4482f22f878e780656b73eb30"
+lazy = true
+
+    [[tzdata_2016j.download]]
+    sha256 = "a1baf66edae07fe0efce6a03869ab03954e7da9aee97780d2412bf7d3c37a6a9"
+    url = "https://data.iana.org/time-zones/releases/tzdata2016j.tar.gz"
+
+[tzdata_2017a]
+git-tree-sha1 = "7478da9d128d804afba629ba88e0359ce2637b7f"
+lazy = true
+
+    [[tzdata_2017a.download]]
+    sha256 = "a1baf66edae07fe0efce6a03869ab03954e7da9aee97780d2412bf7d3c37a6a9"
+    url = "https://data.iana.org/time-zones/releases/tzdata2017a.tar.gz"
+
+[tzdata_2017b]
+git-tree-sha1 = "4c46e259a795ddbf8145edd7b11ab7e3fbf0de48"
+lazy = true
+
+    [[tzdata_2017b.download]]
+    sha256 = "a1baf66edae07fe0efce6a03869ab03954e7da9aee97780d2412bf7d3c37a6a9"
+    url = "https://data.iana.org/time-zones/releases/tzdata2017b.tar.gz"
+
+[tzdata_2017c]
+git-tree-sha1 = "634265cf42c3a8d17876a5939b96a50a048e9676"
+lazy = true
+
+    [[tzdata_2017c.download]]
+    sha256 = "d4bc8e8e3a8126f715b752c6baada95fae9d002f46a3aa906142348ff49e9552"
+    url = "https://data.iana.org/time-zones/releases/tzdata2017c.tar.gz"
+
+[tzdata_2018a]
+git-tree-sha1 = "db99d5547f4199c07a23c79e8e71c51d96dfe0bc"
+lazy = true
+
+    [[tzdata_2018a.download]]
+    sha256 = "d4bc8e8e3a8126f715b752c6baada95fae9d002f46a3aa906142348ff49e9552"
+    url = "https://data.iana.org/time-zones/releases/tzdata2018a.tar.gz"
+
+[tzdata_2018b]
+git-tree-sha1 = "1d0dae3004c95806ab07f229d5b3b3c55a61a2dd"
+lazy = true
+
+    [[tzdata_2018b.download]]
+    sha256 = "d4bc8e8e3a8126f715b752c6baada95fae9d002f46a3aa906142348ff49e9552"
+    url = "https://data.iana.org/time-zones/releases/tzdata2018b.tar.gz"
+
+[tzdata_2018c]
+git-tree-sha1 = "55907fd4bdcc498af552470106bf4c959c6df654"
+lazy = true
+
+    [[tzdata_2018c.download]]
+    sha256 = "d4bc8e8e3a8126f715b752c6baada95fae9d002f46a3aa906142348ff49e9552"
+    url = "https://data.iana.org/time-zones/releases/tzdata2018c.tar.gz"
+
+[tzdata_2018d]
+git-tree-sha1 = "d045e1d69c604361b4eca98cd50d4b4e9b1c681a"
+lazy = true
+
+    [[tzdata_2018d.download]]
+    sha256 = "3072ca4d00b78b66e39b7e302b6d2e1ac42ddff3a439a0532e709e3a3378bc63"
+    url = "https://data.iana.org/time-zones/releases/tzdata2018d.tar.gz"
+
+[tzdata_2018e]
+git-tree-sha1 = "fca61603cc7de7c550ffc939918ee52623e20bdd"
+lazy = true
+
+    [[tzdata_2018e.download]]
+    sha256 = "3072ca4d00b78b66e39b7e302b6d2e1ac42ddff3a439a0532e709e3a3378bc63"
+    url = "https://data.iana.org/time-zones/releases/tzdata2018e.tar.gz"
+
+[tzdata_2018f]
+git-tree-sha1 = "ace6ce1ae95eb279f9835fb050f74181936e591a"
+lazy = true
+
+    [[tzdata_2018f.download]]
+    sha256 = "43e9946610ac7612b6e91334164897e6e187ee2ce2d318c85249770ef0b67b8a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2018f.tar.gz"
+
+[tzdata_2018g]
+git-tree-sha1 = "8de2078074e6de5b77b0e50b71aa16ccf17cc800"
+lazy = true
+
+    [[tzdata_2018g.download]]
+    sha256 = "43e9946610ac7612b6e91334164897e6e187ee2ce2d318c85249770ef0b67b8a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2018g.tar.gz"
+
+[tzdata_2018h]
+git-tree-sha1 = "d7006c49f7666de0b705f090bda0e64f132453b1"
+lazy = true
+
+    [[tzdata_2018h.download]]
+    sha256 = "43e9946610ac7612b6e91334164897e6e187ee2ce2d318c85249770ef0b67b8a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2018h.tar.gz"
+
+[tzdata_2018i]
+git-tree-sha1 = "df39f300cc6499ba901bdfde0b139e2f833693ee"
+lazy = true
+
+    [[tzdata_2018i.download]]
+    sha256 = "43e9946610ac7612b6e91334164897e6e187ee2ce2d318c85249770ef0b67b8a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2018i.tar.gz"
+
+[tzdata_2019a]
+git-tree-sha1 = "d32365ab02017b51e610385f1057f1508ac0ca93"
+lazy = true
+
+    [[tzdata_2019a.download]]
+    sha256 = "43e9946610ac7612b6e91334164897e6e187ee2ce2d318c85249770ef0b67b8a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2019a.tar.gz"
+
+[tzdata_2019b]
+git-tree-sha1 = "204e9c7e8e9d92ea41590f1b78f24e837206eec2"
+lazy = true
+
+    [[tzdata_2019b.download]]
+    sha256 = "43e9946610ac7612b6e91334164897e6e187ee2ce2d318c85249770ef0b67b8a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2019b.tar.gz"
+
+[tzdata_2019c]
+git-tree-sha1 = "9025bdcbd536d473ef7084cde814364776d9b3fd"
+lazy = true
+
+    [[tzdata_2019c.download]]
+    sha256 = "43e9946610ac7612b6e91334164897e6e187ee2ce2d318c85249770ef0b67b8a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2019c.tar.gz"
+
+[tzdata_2020a]
+git-tree-sha1 = "b3fd040bda7e6ff29e25d4b1c75b34869b5d7724"
+lazy = true
+
+    [[tzdata_2020a.download]]
+    sha256 = "43e9946610ac7612b6e91334164897e6e187ee2ce2d318c85249770ef0b67b8a"
+    url = "https://data.iana.org/time-zones/releases/tzdata2020a.tar.gz"
+
+[tzdata_93g]
+git-tree-sha1 = "befb506e42a25cfb178171c4e38f0f4850f89c15"
+lazy = true
+
+    [[tzdata_93g.download]]
+    sha256 = "b88f2c729ddcfd433d6f2a487e4614358847c6cdb0e205b9b1b5df5c8af7759a"
+    url = "https://data.iana.org/time-zones/releases/tzdata93g.tar.gz"
+
+[tzdata_94a]
+git-tree-sha1 = "902ee6a9bee672c732d72ef2b8c81013a3913862"
+lazy = true
+
+    [[tzdata_94a.download]]
+    sha256 = "b88f2c729ddcfd433d6f2a487e4614358847c6cdb0e205b9b1b5df5c8af7759a"
+    url = "https://data.iana.org/time-zones/releases/tzdata94a.tar.gz"
+
+[tzdata_94b]
+git-tree-sha1 = "21421a6c2de4f7229b71e42f9a740c7f9124edd6"
+lazy = true
+
+    [[tzdata_94b.download]]
+    sha256 = "d3bc48e9e10b49439e7caee76a8f8f63327aa2fc6d3e23035cee861af0eeeeda"
+    url = "https://data.iana.org/time-zones/releases/tzdata94b.tar.gz"
+
+[tzdata_94d]
+git-tree-sha1 = "4d2ecc97fc38c8d1e1bf5cede94877c2b869ce6a"
+lazy = true
+
+    [[tzdata_94d.download]]
+    sha256 = "d3bc48e9e10b49439e7caee76a8f8f63327aa2fc6d3e23035cee861af0eeeeda"
+    url = "https://data.iana.org/time-zones/releases/tzdata94d.tar.gz"
+
+[tzdata_94e]
+git-tree-sha1 = "d4bb5b7b55b8fda3bbf5f1ebe81e66d6ca4521a3"
+lazy = true
+
+    [[tzdata_94e.download]]
+    sha256 = "d3bc48e9e10b49439e7caee76a8f8f63327aa2fc6d3e23035cee861af0eeeeda"
+    url = "https://data.iana.org/time-zones/releases/tzdata94e.tar.gz"
+
+[tzdata_94f]
+git-tree-sha1 = "4c806fe2a75cd90a10e7d096d493562c98a210fd"
+lazy = true
+
+    [[tzdata_94f.download]]
+    sha256 = "d3bc48e9e10b49439e7caee76a8f8f63327aa2fc6d3e23035cee861af0eeeeda"
+    url = "https://data.iana.org/time-zones/releases/tzdata94f.tar.gz"
+
+[tzdata_94h]
+git-tree-sha1 = "4a4e060c808cbc251302e9375c30651cfdec5a73"
+lazy = true
+
+    [[tzdata_94h.download]]
+    sha256 = "24438723250ed1d2f028ad4a25e133c8bc982260812d368b945904df1e316b2a"
+    url = "https://data.iana.org/time-zones/releases/tzdata94h.tar.gz"
+
+[tzdata_95b]
+git-tree-sha1 = "459c3d43de60acaec7e4738942400b1cb190d9ee"
+lazy = true
+
+    [[tzdata_95b.download]]
+    sha256 = "24438723250ed1d2f028ad4a25e133c8bc982260812d368b945904df1e316b2a"
+    url = "https://data.iana.org/time-zones/releases/tzdata95b.tar.gz"
+
+[tzdata_95c]
+git-tree-sha1 = "83101d9d2a2cbca7fff8160253b6b216c97ce8cb"
+lazy = true
+
+    [[tzdata_95c.download]]
+    sha256 = "24438723250ed1d2f028ad4a25e133c8bc982260812d368b945904df1e316b2a"
+    url = "https://data.iana.org/time-zones/releases/tzdata95c.tar.gz"
+
+[tzdata_95d]
+git-tree-sha1 = "a16f95cf7d158a2eee6319f09c4029ab57bc16a2"
+lazy = true
+
+    [[tzdata_95d.download]]
+    sha256 = "24438723250ed1d2f028ad4a25e133c8bc982260812d368b945904df1e316b2a"
+    url = "https://data.iana.org/time-zones/releases/tzdata95d.tar.gz"
+
+[tzdata_95e]
+git-tree-sha1 = "d6f8e2240d6e33fe906c70a48be6f375b8392338"
+lazy = true
+
+    [[tzdata_95e.download]]
+    sha256 = "24438723250ed1d2f028ad4a25e133c8bc982260812d368b945904df1e316b2a"
+    url = "https://data.iana.org/time-zones/releases/tzdata95e.tar.gz"
+
+[tzdata_95f]
+git-tree-sha1 = "e32727e6f978712b5abba0f755915bd2fd83efea"
+lazy = true
+
+    [[tzdata_95f.download]]
+    sha256 = "24438723250ed1d2f028ad4a25e133c8bc982260812d368b945904df1e316b2a"
+    url = "https://data.iana.org/time-zones/releases/tzdata95f.tar.gz"
+
+[tzdata_95g]
+git-tree-sha1 = "0ab67594f849413bb9fe8162a74735b593b636b4"
+lazy = true
+
+    [[tzdata_95g.download]]
+    sha256 = "24438723250ed1d2f028ad4a25e133c8bc982260812d368b945904df1e316b2a"
+    url = "https://data.iana.org/time-zones/releases/tzdata95g.tar.gz"
+
+[tzdata_95h]
+git-tree-sha1 = "6e7efa8f0f86abbec9836b7aa2a6ccb74d19c64a"
+lazy = true
+
+    [[tzdata_95h.download]]
+    sha256 = "a8695213902b69576e2ff388c44715bbd05c32a9f44bdc0a39bf0d3ec8fdaeea"
+    url = "https://data.iana.org/time-zones/releases/tzdata95h.tar.gz"
+
+[tzdata_95i]
+git-tree-sha1 = "d119d86d1686d24818dd9db2b54a2e67ea32f80b"
+lazy = true
+
+    [[tzdata_95i.download]]
+    sha256 = "a8695213902b69576e2ff388c44715bbd05c32a9f44bdc0a39bf0d3ec8fdaeea"
+    url = "https://data.iana.org/time-zones/releases/tzdata95i.tar.gz"
+
+[tzdata_95k]
+git-tree-sha1 = "340df0c3b1cc7c684212b2f64000c6c5f6eb8b6a"
+lazy = true
+
+    [[tzdata_95k.download]]
+    sha256 = "c0caed7f2dc2fa7f68a9a38e74c0d9037cf478890589403695926281311c47a9"
+    url = "https://data.iana.org/time-zones/releases/tzdata95k.tar.gz"
+
+[tzdata_95l]
+git-tree-sha1 = "4ee6165a8ea5182d1c094f42367bc78abdfa9997"
+lazy = true
+
+    [[tzdata_95l.download]]
+    sha256 = "5426216509f793b3107994e0c06ff9fe1660bf7313655ee3b7f6b804e378f829"
+    url = "https://data.iana.org/time-zones/releases/tzdata95l.tar.gz"
+
+[tzdata_95m]
+git-tree-sha1 = "db0383fb725f0180e4443e7a7a214045cc1b5f6e"
+lazy = true
+
+    [[tzdata_95m.download]]
+    sha256 = "3d77d378af05f6f188741cf3fbfb6d0bf06fa65ed938c7144ccd10e7cd9c9629"
+    url = "https://data.iana.org/time-zones/releases/tzdata95m.tar.gz"
+
+[tzdata_96a]
+git-tree-sha1 = "23fe54afc3cd0649ffd277097d7d476072007e8b"
+lazy = true
+
+    [[tzdata_96a.download]]
+    sha256 = "3d77d378af05f6f188741cf3fbfb6d0bf06fa65ed938c7144ccd10e7cd9c9629"
+    url = "https://data.iana.org/time-zones/releases/tzdata96a.tar.gz"
+
+[tzdata_96b]
+git-tree-sha1 = "6ec352cce29a4a16f1bfd47121b73512bef79b23"
+lazy = true
+
+    [[tzdata_96b.download]]
+    sha256 = "3d77d378af05f6f188741cf3fbfb6d0bf06fa65ed938c7144ccd10e7cd9c9629"
+    url = "https://data.iana.org/time-zones/releases/tzdata96b.tar.gz"
+
+[tzdata_96c]
+git-tree-sha1 = "0bc43f205d05f22029a8999aab5c3d0954dc146b"
+lazy = true
+
+    [[tzdata_96c.download]]
+    sha256 = "3d77d378af05f6f188741cf3fbfb6d0bf06fa65ed938c7144ccd10e7cd9c9629"
+    url = "https://data.iana.org/time-zones/releases/tzdata96c.tar.gz"
+
+[tzdata_96d]
+git-tree-sha1 = "de323111a8172c5f72e9aa82781b1d8a37b9a19c"
+lazy = true
+
+    [[tzdata_96d.download]]
+    sha256 = "3d77d378af05f6f188741cf3fbfb6d0bf06fa65ed938c7144ccd10e7cd9c9629"
+    url = "https://data.iana.org/time-zones/releases/tzdata96d.tar.gz"
+
+[tzdata_96e]
+git-tree-sha1 = "ce51dbac878d19d2b3c7131c1b5c264ab2b0bcf0"
+lazy = true
+
+    [[tzdata_96e.download]]
+    sha256 = "3d77d378af05f6f188741cf3fbfb6d0bf06fa65ed938c7144ccd10e7cd9c9629"
+    url = "https://data.iana.org/time-zones/releases/tzdata96e.tar.gz"
+
+[tzdata_96h]
+git-tree-sha1 = "8e679d7cddc1f85a01399004fcbb27089af0fc73"
+lazy = true
+
+    [[tzdata_96h.download]]
+    sha256 = "206070b3f1a445de538c7f90db3404c4b557591fbfeac4db15799e5161d35b01"
+    url = "https://data.iana.org/time-zones/releases/tzdata96h.tar.gz"
+
+[tzdata_96i]
+git-tree-sha1 = "6345d2aef65f9acdf3e7ee59c8419d930c41d51e"
+lazy = true
+
+    [[tzdata_96i.download]]
+    sha256 = "206070b3f1a445de538c7f90db3404c4b557591fbfeac4db15799e5161d35b01"
+    url = "https://data.iana.org/time-zones/releases/tzdata96i.tar.gz"
+
+[tzdata_96k]
+git-tree-sha1 = "f6bea2433c60997594a4b5a6d9864b44b3ea081a"
+lazy = true
+
+    [[tzdata_96k.download]]
+    sha256 = "f3204f274739f1928f49e990652a14a3aa88c7ea709e95843ede9043f67e8e00"
+    url = "https://data.iana.org/time-zones/releases/tzdata96k.tar.gz"
+
+[tzdata_latest]
+git-tree-sha1 = "b3fd040bda7e6ff29e25d4b1c75b34869b5d7724"
+lazy = true
+
+    [[tzdata_latest.download]]
+    sha256 = "43e9946610ac7612b6e91334164897e6e187ee2ce2d318c85249770ef0b67b8a"
+    url = "https://data.iana.org/time-zones/tzdata-latest.tar.gz"
+
+[tzdata_windowsZones]
+git-tree-sha1 = "28fcc67c4e1e769496d16a8f3b3700679404b3b2"
+lazy = true
+
+    [[tzdata_windowsZones.download]]
+    sha256 = "fb13fc8e80d8bd832a99b0cdebb50c7a6fecef0987effd6716fa500e4196a4b6"
+    url = "https://raw.githubusercontent.com/JuliaTime/TimeZones.jl/v1.2.0/deps/local/windowsZones.xml"
+    [[tzdata_windowsZones.download]]
+    sha256 = "fb13fc8e80d8bd832a99b0cdebb50c7a6fecef0987effd6716fa500e4196a4b6"
+    url = "https://raw.githubusercontent.com/unicode-org/cldr/release-37/common/supplemental/windowsZones.xml"
+    [[tzdata_windowsZones.download]]
+    sha256 = "5a4fc1ffb7b8ffcb70724e72d43f5e667d71e2dc6a2d9591e3b05754d78190d5"
+    url = "https://raw.githubusercontent.com/unicode-org/cldr/master/common/supplemental/windowsZones.xml"
