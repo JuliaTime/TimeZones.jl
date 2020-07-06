@@ -2,6 +2,7 @@ module WindowsTimeZoneIDs
 
 using ...TimeZones: DEPS_DIR
 using EzXML
+using Pkg.Artifacts
 
 # A mapping of Windows timezone names to Olson timezone names.
 # Details on the contents of this file can be found at:
@@ -41,7 +42,7 @@ end
 
 function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
     fallback_xml_file = joinpath(WINDOWS_XML_DIR, "windowsZones2017a.xml")
-    
+
     if !isfile(xml_file)
         if isfile(fallback_xml_file) && !force
             cp(fallback_xml_file, xml_file)

@@ -29,7 +29,6 @@ os:
   - osx
   - windows
 julia:
-  - 1.3  # Earliest release with support of Artifacts
   - 1.4  # Latest stable release
   - 1.5  # Latest release
   - nightly
