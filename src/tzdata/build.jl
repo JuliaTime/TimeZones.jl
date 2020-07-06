@@ -23,7 +23,6 @@ const REGIONS = [STANDARD_REGIONS; LEGACY_REGIONS]
 function build(
     version::AbstractString,
     regions::AbstractVector{<:AbstractString},
-    archive_dir::AbstractString,
     tz_source_dir::AbstractString="",
     compiled_dir::AbstractString="";
     verbose::Bool=false,
@@ -38,8 +37,10 @@ function build(
         end
     end
 
-    artifact_dir = @artifact_str "tzdata_$version"
-
+    artifact_name = "tzdata_$version"
+    artifact_dir = @artifact_str artifact_name
+    archive = joinpath(artifact_dir, "tzdata$version.tar.gz")
+    
     if version == "latest"
         m = match(TZDATA_VERSION_REGEX, "tzdata$version.tar.gz")
         if m !== nothing
@@ -49,10 +50,8 @@ function build(
     end
 
     if !isempty(tz_source_dir)
-        @info "Copying region data from version $version"
-        for region in setdiff(regions, CUSTOM_REGIONS)
-            cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
-        end
+        @info "Extracting $version tzdata archive"
+        extract(archive, tz_source_dir, setdiff(regions, CUSTOM_REGIONS), verbose=verbose)
     end
 
     if !isempty(compiled_dir)
@@ -65,7 +64,6 @@ function build(
 end
 
 function build(version::AbstractString=tzdata_version())
-    isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
     isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)
     isdir(COMPILED_DIR) || mkdir(COMPILED_DIR)
 
@@ -76,7 +74,7 @@ function build(version::AbstractString=tzdata_version())
     end
 
     version = build(
-        version, REGIONS, ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, verbose=true,
+        version, REGIONS, TZ_SOURCE_DIR, COMPILED_DIR, verbose=true,
     )
 
     # Store the version of the compiled tzdata

@@ -1947,7 +1947,7 @@ git-tree-sha1 = "6ee03136ac9296e679bcfc5a4fcfdb12a8d74cd2"
 lazy = true
 
     [[tzdata_latest.download]]
-    sha256 = "43e9946610ac7612b6e91334164897e6e187ee2ce2d318c85249770ef0b67b8a"
+    sha256 = "547161eca24d344e0b5f96aff6a76b454da295dc14ed4ca50c2355043fb899a2"
     url = "https://data.iana.org/time-zones/tzdata-latest.tar.gz"
 
 [tzdata_windowsZones]
