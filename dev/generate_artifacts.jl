@@ -1,6 +1,8 @@
 using Pkg.Artifacts
-using TimeZones.TZData: tzdata_download, tzdata_url
+using TimeZones.TZData: tzdata_url
 using SHA
+
+include(joinpath(@__DIR__, "download.jl"))
 # This is the path to the Artifacts.toml we will manipulate
 artifacts_toml = joinpath(dirname(@__DIR__), "Artifacts.toml")
 
@@ -51,6 +53,3 @@ for version in versions
         bind_artifact!(artifacts_toml, "tzdata_$version", tzfile_hash, lazy=true, download_info=download_data)
     end
 end
-# Get the path of the iris dataset, either newly created or previously generated.
-# this should be something like `~/.julia/artifacts/dbd04e28be047a54fbe9bf67e934be5b5e0d357a`
-iris_dataset_path = artifact_path(tzfile_hash)

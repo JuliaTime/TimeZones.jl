@@ -1,5 +1,5 @@
 using ...TimeZones: Class
-using Pkg.Artifacts
+
 # The default tz source files we care about. See "ftp://ftp.iana.org/tz/data/Makefile"
 # "PRIMARY_YDATA" for listing of tz source files to include.
 const STANDARD_REGIONS = [
@@ -38,31 +38,27 @@ function build(
         end
     end
 
-    archive = joinpath((@artifact_str "tzdata_$version"), "tzdata$version.tar.gz")
-    archive = joinpath(archive_dir, "tzdata$version.tar.gz")
+    artifact_dir = @artifact_str "tzdata_$version"
 
-    # Avoid downloading a tzdata archive if we already have a local copy
-    if version == "latest" || !isfile(archive)
-        @info "Downloading $version tzdata"
-        archive = tzdata_download(version, archive_dir)
-
-        if version == "latest"
-            m = match(TZDATA_VERSION_REGEX, basename(archive))
-            if m !== nothing
-                version = m.match
-                @info "Latest tzdata is $version"
-            end
+    if version == "latest"
+        m = match(TZDATA_VERSION_REGEX, "tzdata$version.tar.gz")
+        if m !== nothing
+            version = m.match
+            @info "Latest tzdata is $version"
         end
     end
+
     if !isempty(tz_source_dir)
-        @info "Extracting $version tzdata archive"
-        extract(archive, tz_source_dir, setdiff(regions, CUSTOM_REGIONS), verbose=verbose)
+        @info "Copying region data from version $version"
+        for region in setdiff(regions, CUSTOM_REGIONS)
+            cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
+        end
     end
 
     if !isempty(compiled_dir)
         @info "Converting tz source files into TimeZone data"
         tz_source = TZSource(joinpath.(tz_source_dir, regions))
-        compile(tz_source, compiled_dir)
+        compile(tz_source_dir, compiled_dir)
     end
 
     return version
