@@ -40,9 +40,10 @@ for version in versions
             @info "Downloading $version tzdata"
             archive_name = tzdata_download(version, artifact_dir)
             extract(archive_name, artifact_dir)
+            rm(archive_name)
         end
         download_dir = artifact_path(tzfile_hash)
-        content_sha = open(joinpath(download_dir, readdir(download_dir)[1])) do f
+        content_sha = open(tzdata_download(version)) do f
            bytes2hex(sha256(f))
         end
 
