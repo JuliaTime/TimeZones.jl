@@ -74,6 +74,7 @@ end
 
 Downloads a tzdata archive from IANA using the specified `version` to the specified
 directory. See `tzdata_url` for details on tzdata version strings.
+Not used during the build, but used when creating the `Artifacts.toml` file.
 """
 function tzdata_download(version::AbstractString="latest", dir::AbstractString=tempdir())
     now_utc = now(Dates.UTC)

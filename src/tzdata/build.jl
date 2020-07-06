@@ -1,5 +1,5 @@
 using ...TimeZones: Class
-
+using Pkg.Artifacts
 # The default tz source files we care about. See "ftp://ftp.iana.org/tz/data/Makefile"
 # "PRIMARY_YDATA" for listing of tz source files to include.
 const STANDARD_REGIONS = [
@@ -38,21 +38,7 @@ function build(
         end
     end
 
-    archive = joinpath(archive_dir, "tzdata$version.tar.gz")
-
-    # Avoid downloading a tzdata archive if we already have a local copy
-    if version == "latest" || !isfile(archive)
-        @info "Downloading $version tzdata"
-        archive = tzdata_download(version, archive_dir)
-
-        if version == "latest"
-            m = match(TZDATA_VERSION_REGEX, basename(archive))
-            if m !== nothing
-                version = m.match
-                @info "Latest tzdata is $version"
-            end
-        end
-    end
+    archive = joinpath((@artifact_str version), "tzdata$version.tar.gz")
 
     if !isempty(tz_source_dir)
         @info "Extracting $version tzdata archive"
