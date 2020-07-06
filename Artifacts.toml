@@ -1603,7 +1603,7 @@ git-tree-sha1 = "c158a54b03c0b61fb098f74714a73044c4b37219"
 lazy = true
 
     [[tzdata_2016j.download]]
-    sha256 = "a1baf66edae07fe0efce6a03869ab03954e7da9aee97780d2412bf7d3c37a6a9"
+    sha256 = "f5ee4e0f115f6c2faee1c4b16193a97338cbd1b503f2cea6c5a768c82ff39dc8"
     url = "https://data.iana.org/time-zones/releases/tzdata2016j.tar.gz"
 
 [tzdata_2017a]
