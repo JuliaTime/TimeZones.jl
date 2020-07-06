@@ -6,7 +6,7 @@ using EzXML
 # A mapping of Windows timezone names to Olson timezone names.
 # Details on the contents of this file can be found at:
 # http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping
-const WINDOWS_ZONE_URL = "http://unicode.org/repos/cldr/trunk/common/supplemental/windowsZones.xml"
+const WINDOWS_ZONE_URL = "https://raw.githubusercontent.com/unicode-org/cldr/release-37/common/supplemental/windowsZones.xml"
 
 const WINDOWS_XML_DIR = joinpath(DEPS_DIR, "local")
 const WINDOWS_XML_FILE = joinpath(WINDOWS_XML_DIR, "windowsZones.xml")
@@ -41,13 +41,13 @@ end
 
 function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
     fallback_xml_file = joinpath(WINDOWS_XML_DIR, "windowsZones2017a.xml")
-
+    
     if !isfile(xml_file)
         if isfile(fallback_xml_file) && !force
             cp(fallback_xml_file, xml_file)
         else
             @info "Downloading latest Windows to POSIX timezone ID XML"
-            download(WINDOWS_ZONE_URL, xml_file)
+            cp(joinpath(artifact"tzdata_windowsZones", "windowsZones.xml"), xml_file)
         end
     end
 

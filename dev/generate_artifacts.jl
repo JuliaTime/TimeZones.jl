@@ -1,5 +1,6 @@
 using Pkg.Artifacts
 using TimeZones.TZData: tzdata_url
+using TimeZones.WindowsTimeZoneIDs: WINDOWS_ZONE_URL, WINDOWS_XML_FILE
 using SHA
 
 include(joinpath(@__DIR__, "download.jl"))
@@ -28,14 +29,13 @@ versions = ["latest", "1996l", "1996n", "1997a", "1997b", "1997c", "1997d", "199
 # version = first(versions)
 # todo: add windows downloading
 for version in versions
-    # Query the `Artifacts.toml` file for the hash bound to the name "iris"
+    # Query the `Artifacts.toml` file for the hash bound to the specific version
     # (returns `nothing` if no such binding exists)
-    tzarchive_latest_hash = artifact_hash(version, artifacts_toml)
+    tzarchive_latest_hash = artifact_hash("tzdata_$version", artifacts_toml)
 
     # If the name was not bound, or the hash it was bound to does not exist, create it!
-    if tzarchive_latest_hash == nothing || !artifact_exists(tzarchive_latest_hash)
+    if isnothing(tzarchive_latest_hash) || !artifact_exists(tzarchive_latest_hash)
         # create_artifact() returns the content-hash of the artifact directory once we're finished creating it
-        content_sha = ""
         tzfile_hash = create_artifact() do artifact_dir
             # We create the artifact by simply downloading a few files into the new artifact directory
             @info "Downloading $version tzdata"
@@ -43,7 +43,7 @@ for version in versions
         end
         download_dir = artifact_path(tzfile_hash)
         content_sha = open(joinpath(download_dir, readdir(download_dir)[1])) do f
-           bytes2hex(sha2_256(f))
+           bytes2hex(sha256(f))
         end
 
         # Now bind that hash within our `Artifacts.toml`.  `force = true` means that if it already exists,
@@ -52,4 +52,23 @@ for version in versions
         download_data = [(tzdata_url(version), content_sha)]
         bind_artifact!(artifacts_toml, "tzdata_$version", tzfile_hash, lazy=true, download_info=download_data)
     end
+end
+
+# and now, add windows xml thingy
+win_urls = ["https://raw.githubusercontent.com/JuliaTime/TimeZones.jl/v1.2.0/deps/local/windowsZones.xml",
+    WINDOWS_ZONE_URL, "https://raw.githubusercontent.com/unicode-org/cldr/master/common/supplemental/windowsZones.xml"]
+win_xml_latest_hash = artifact_hash("tzdata_windowsZones", artifacts_toml)
+# If the name was not bound, or the hash it was bound to does not exist, create it!
+if isnothing(win_xml_latest_hash) || !artifact_exists(win_xml_latest_hash)
+    # create_artifact() returns the content-hash of the artifact directory once we're finished creating it
+    tzfile_hash = create_artifact() do artifact_dir
+        # We create the artifact by simply downloading a few files into the new artifact directory
+        cp(WINDOWS_XML_FILE, joinpath(artifact_dir, basename(WINDOWS_XML_FILE)))
+    end
+
+    # Now bind that hash within our `Artifacts.toml`.  `force = true` means that if it already exists,
+    # just overwrite with the new content-hash.  Unless the source files change, we do not expect
+    # the content hash to change, so this should not cause unnecessary version control churn.
+    download_data = [(url, bytes2hex(sha256(read(download(url))))) for url in win_urls]
+    bind_artifact!(artifacts_toml, "tzdata_windowsZones", tzfile_hash, lazy=true, download_info=download_data)
 end
