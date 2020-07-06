@@ -11,8 +11,8 @@ end
 ```@docs
 TimeZones.TZData.tzdata_url
 TimeZones.TZData.tzdata_download
-TimeZones.TZData.isarchive	
-TimeZones.TZData.readarchive	
+TimeZones.TZData.isarchive
+TimeZones.TZData.readarchive
 TimeZones.TZData.extract
 TimeZones.TZData.tzdata_version_dir
 TimeZones.TZData.tzdata_version_archive

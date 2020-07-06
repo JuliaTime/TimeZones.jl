@@ -40,7 +40,7 @@ function build(
     artifact_name = "tzdata_$version"
     artifact_dir = @artifact_str artifact_name
     archive = joinpath(artifact_dir, "tzdata$version.tar.gz")
-    
+
     if version == "latest"
         m = match(TZDATA_VERSION_REGEX, "tzdata$version.tar.gz")
         if m !== nothing
@@ -57,7 +57,7 @@ function build(
     if !isempty(compiled_dir)
         @info "Converting tz source files into TimeZone data"
         tz_source = TZSource(joinpath.(tz_source_dir, regions))
-        compile(tz_source_dir, compiled_dir)
+        compile(tz_source, compiled_dir)
     end
 
     return version
