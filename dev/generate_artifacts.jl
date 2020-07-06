@@ -20,10 +20,11 @@ versions = ["latest", "1996l", "1996n", "1997a", "1997b", "1997c", "1997d", "199
 "2013c", "2013d", "2013e", "2013f", "2013g", "2013h", "2013i", "2014a", "2014b", "2014c", "2014d", "2014e", "2014f",
 "2014g", "2014h", "2014i", "2014j", "2015a", "2015b", "2015c", "2015d", "2015e", "2015f", "2015g", "2016a", "2016b",
 "2016c", "2016d", "2016e", "2016f", "2016g", "2016h", "2016i", "2016j", "2017a", "2017b", "2017c", "2018a", "2018b",
-"2018c", "2018d", "2018e", "2018f", "2018g", "2018h", "2018i", "2019a", "2019b", "2019c", "2020a", "2020a", "93g",
-"94a", "94b", "94d", "94e", "94f", "94h", "95b", "95c", "95d", "95e", "95f", "95g", "95h", "95i", "95k", "95l", "95m",
-"96a", "96b", "96c", "96d", "96e", "96h", "96i", "96k"]
-version = first(versions)
+"2018c", "2018d", "2018e", "2018f", "2018g", "2018h", "2018i", "2019a", "2019b", "2019c", "2020a", "93g", "94a", "94b",
+"94d", "94e", "94f", "94h", "95b", "95c", "95d", "95e", "95f", "95g", "95h", "95i", "95k", "95l", "95m", "96a", "96b",
+"96c", "96d", "96e", "96h", "96i", "96k"]
+# version = first(versions)
+# todo: add windows downloading
 for version in versions
     # Query the `Artifacts.toml` file for the hash bound to the name "iris"
     # (returns `nothing` if no such binding exists)
@@ -47,7 +48,7 @@ for version in versions
         # just overwrite with the new content-hash.  Unless the source files change, we do not expect
         # the content hash to change, so this should not cause unnecessary version control churn.
         download_data = [(tzdata_url(version), content_sha)]
-        bind_artifact!(artifacts_toml, version, tzfile_hash, lazy=true, download_info=download_data)
+        bind_artifact!(artifacts_toml, "tzdata_$version", tzfile_hash, lazy=true, download_info=download_data)
     end
 end
 # Get the path of the iris dataset, either newly created or previously generated.

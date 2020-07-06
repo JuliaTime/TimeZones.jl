@@ -38,8 +38,22 @@ function build(
         end
     end
 
-    archive = joinpath((@artifact_str version), "tzdata$version.tar.gz")
+    archive = joinpath((@artifact_str "tzdata_$version"), "tzdata$version.tar.gz")
+    archive = joinpath(archive_dir, "tzdata$version.tar.gz")
 
+    # Avoid downloading a tzdata archive if we already have a local copy
+    if version == "latest" || !isfile(archive)
+        @info "Downloading $version tzdata"
+        archive = tzdata_download(version, archive_dir)
+
+        if version == "latest"
+            m = match(TZDATA_VERSION_REGEX, basename(archive))
+            if m !== nothing
+                version = m.match
+                @info "Latest tzdata is $version"
+            end
+        end
+    end
     if !isempty(tz_source_dir)
         @info "Extracting $version tzdata archive"
         extract(archive, tz_source_dir, setdiff(regions, CUSTOM_REGIONS), verbose=verbose)
