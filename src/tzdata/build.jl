@@ -50,8 +50,10 @@ function build(
     end
 
     if !isempty(tz_source_dir)
-        @info "Extracting $version tzdata archive to $tz_source_dir"
-        extract(archive, tz_source_dir, setdiff(regions, CUSTOM_REGIONS), verbose=verbose)
+        @info "Copying region data from version $version"
+        for region in setdiff(regions, CUSTOM_REGIONS)
+            cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
+        end
     end
 
     if !isempty(compiled_dir)
