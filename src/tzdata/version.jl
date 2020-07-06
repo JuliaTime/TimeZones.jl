@@ -78,25 +78,9 @@ function tzdata_version_dir(dir::AbstractString)
     end
 end
 
-tzdata_version() = get(ENV, "JULIA_TZ_VERSION", DEFAULT_TZDATA_VERSION)
-
-function active_version()
-    if !isfile(ACTIVE_VERSION_FILE)
-        error("No active tzdata version. Try re-building TimeZones")
-    end
-    read(ACTIVE_VERSION_FILE, String)
-end
-
-function active_dir()
-    version = active_version()
-
-    archive = @artifact_str "tzdata_$version"
-    !isdir(archive) && error("Missing $version tzdata archive")
-    return archive
-end
-
 """
     tzdata_version_archive(archive::AbstractString) -> AbstractString
+
 Determines the tzdata version by inspecting the contents within the archive. Useful when
 downloading the latest archive "tzdata-latest.tar.gz".
 """
@@ -111,4 +95,20 @@ function tzdata_version_archive(archive::AbstractString)
         extract(archive, temp_dir, available_files)
         tzdata_version_dir(temp_dir)
     end
+end
+
+tzdata_version() = get(ENV, "JULIA_TZ_VERSION", DEFAULT_TZDATA_VERSION)
+
+function active_version()
+    if !isfile(ACTIVE_VERSION_FILE)
+        error("No active tzdata version. Try re-building TimeZones")
+    end
+    read(ACTIVE_VERSION_FILE, String)
+end
+
+function active_archive()
+    version = active_version()
+    archive = joinpath(ARCHIVE_DIR, "tzdata$version.tar.gz")
+    !isfile(archive) && error("Missing $version tzdata archive")
+    return archive
 end

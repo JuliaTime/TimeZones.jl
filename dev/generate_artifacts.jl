@@ -26,8 +26,7 @@ versions = ["latest", "1996l", "1996n", "1997a", "1997b", "1997c", "1997d", "199
 "2018c", "2018d", "2018e", "2018f", "2018g", "2018h", "2018i", "2019a", "2019b", "2019c", "2020a", "93g", "94a", "94b",
 "94d", "94e", "94f", "94h", "95b", "95c", "95d", "95e", "95f", "95g", "95h", "95i", "95k", "95l", "95m", "96a", "96b",
 "96c", "96d", "96e", "96h", "96i", "96k"]
-# version = first(versions)
-# todo: add windows downloading
+
 for version in versions
     # Query the `Artifacts.toml` file for the hash bound to the specific version
     # (returns `nothing` if no such binding exists)
