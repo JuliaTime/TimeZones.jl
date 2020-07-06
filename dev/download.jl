@@ -1,6 +1,48 @@
 using Dates
 using TimeZones: DEPS_DIR
-using TimeZones.TZData: LATEST_FILE, LATEST_DELAY, latest_version, tzdata_version_dir, set_latest, isarchive, extract
+using TimeZones.TZData: LATEST_FILE, LATEST_DELAY, latest_version, tzdata_version_dir, set_latest
+
+if Sys.iswindows()
+    if isdefined(Base, :LIBEXECDIR)
+        const exe7z = joinpath(Sys.BINDIR, Base.LIBEXECDIR, "7z.exe")
+    else
+        const exe7z = joinpath(Sys.BINDIR, "7z.exe")
+    end
+end
+
+"""
+    extract(archive, directory, [files]; [verbose=false]) -> Nothing
+
+Extracts files from a compressed tar `archive` to the specified `directory`. If `files` is
+specified only the files given will be extracted. The `verbose` flag can be used to display
+additional information to STDOUT.
+"""
+function extract(archive, directory, files=AbstractString[]; verbose::Bool=false)
+    @static if Sys.iswindows()
+        cmd = pipeline(`$exe7z x $archive -y -so`, `$exe7z x -si -y -ttar -o$directory $files`)
+    else
+        cmd = `tar xvf $archive --directory=$directory $files`
+    end
+
+    if !verbose
+        cmd = pipeline(cmd, stdout=devnull, stderr=devnull)
+    end
+
+    run(cmd)
+end
+
+"""
+    isarchive(path) -> Bool
+
+Determines if the given `path` is an archive.
+"""
+function isarchive(path)
+    @static if Sys.iswindows()
+        success(`$exe7z t $path -y`)
+    else
+        success(`tar tf $path`)
+    end
+end
 
 """
     tzdata_download(version="latest", dir=tempdir()) -> AbstractString

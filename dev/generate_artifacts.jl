@@ -39,6 +39,7 @@ for version in versions
             # We create the artifact by simply downloading a few files into the new artifact directory
             @info "Downloading $version tzdata"
             tzdata_download(version, artifact_dir)
+            extract(joinpath(artifact_dir, "tzdata$version.tar.gz"), artifact_dir)
         end
         download_dir = artifact_path(tzfile_hash)
         content_sha = open(joinpath(download_dir, readdir(download_dir)[1])) do f

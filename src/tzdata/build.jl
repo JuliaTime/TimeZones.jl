@@ -50,7 +50,7 @@ function build(
     end
 
     if !isempty(tz_source_dir)
-        @info "Extracting $version tzdata archive"
+        @info "Extracting $version tzdata archive to $tz_source_dir"
         extract(archive, tz_source_dir, setdiff(regions, CUSTOM_REGIONS), verbose=verbose)
     end
 

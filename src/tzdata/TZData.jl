@@ -13,16 +13,7 @@ const COMPILED_DIR = joinpath(DEPS_DIR, "compiled")
 
 export TZ_SOURCE_DIR, COMPILED_DIR, REGIONS, LEGACY_REGIONS
 
-if Sys.iswindows()
-    if isdefined(Base, :LIBEXECDIR)
-        const exe7z = joinpath(Sys.BINDIR, Base.LIBEXECDIR, "7z.exe")
-    else
-        const exe7z = joinpath(Sys.BINDIR, "7z.exe")
-    end
-end
-
 include("timeoffset.jl")
-include("archive.jl")
 include("version.jl")
 include("download.jl")
 include("compile.jl")
