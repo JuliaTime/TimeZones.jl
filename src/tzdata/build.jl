@@ -27,6 +27,7 @@ function build(
     compiled_dir::AbstractString="";
     verbose::Bool=false,
 )
+    now_utc = now(Dates.UTC)
     # Avoids spamming remote servers requesting the latest version
     if version == "latest"
         v = latest_version()
@@ -39,7 +40,6 @@ function build(
 
     artifact_name = "tzdata_$version"
     artifact_dir = @artifact_str artifact_name
-    archive = joinpath(artifact_dir, "tzdata$version.tar.gz")
 
     if version == "latest"
         m = match(TZDATA_VERSION_REGEX, "tzdata$version.tar.gz")
@@ -47,6 +47,13 @@ function build(
             version = m.match
             @info "Latest tzdata is $version"
         end
+
+        version = tzdata_version_dir(artifact_dir)
+        # originally there is mv, now it's just downloading new artifact
+        artifact_name = "tzdata_$version"
+        @artifact_str artifact_name
+
+        set_latest(version, now_utc)
     end
 
     if !isempty(tz_source_dir)
