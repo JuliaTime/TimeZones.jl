@@ -2,6 +2,7 @@ using Pkg.Artifacts
 using TimeZones.TZData: tzdata_url
 using TimeZones.WindowsTimeZoneIDs: WINDOWS_ZONE_URL, WINDOWS_XML_FILE
 using SHA
+using Pkg.BinaryPlatforms
 
 include(joinpath(@__DIR__, "download.jl"))
 # This is the path to the Artifacts.toml we will manipulate
@@ -51,7 +52,7 @@ for version in versions
         # just overwrite with the new content-hash.  Unless the source files change, we do not expect
         # the content hash to change, so this should not cause unnecessary version control churn.
         download_data = [(tzdata_url(version), content_sha)]
-        bind_artifact!(artifacts_toml, "tzdata_$version", tzfile_hash, lazy=true, download_info=download_data)
+        bind_artifact!(artifacts_toml, "tzdata_$version", tzfile_hash, lazy=true, download_info=download_data, platform=platform_key_abi())
     end
 end
 
@@ -74,3 +75,8 @@ end
 #     download_data = [(url, bytes2hex(sha256(read(download(url))))) for url in win_urls]
 #     bind_artifact!(artifacts_toml, "tzdata_windowsZones", tzfile_hash, lazy=true, download_info=download_data)
 # end
+
+# using Pkg.BinaryPlatforms
+# platform_key_abi()
+# typeof(platform_key_abi())
+# typeof(platform_key_abi())
