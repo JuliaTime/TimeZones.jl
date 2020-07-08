@@ -35,17 +35,13 @@ julia:
 arch:
   - x64
   - x86
-jobs:
-#  fast_finish: true
 
+matrix:
   allow_failures:
     - julia: nightly
-      os: windows
-    - julia: nightly
-      os: linux
-    - julia: nightly
-      os: osx
+  fast_finish: true
 
+jobs:
   # Test 32-bit only on Linux
   exclude:
     - arch: x86
