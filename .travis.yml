@@ -7,7 +7,7 @@ stages:
 .doc_test: &doc_test
   stage: "Documentation (Test)"
   os: linux
-  julia: 1.0
+  julia: 1.4
   script:
     - julia --project=docs/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd())); Pkg.build("TimeZones")'
     - julia --project=docs/ docs/make.jl
@@ -16,7 +16,7 @@ stages:
 .doc_deploy: &doc_deploy
   stage: "Documentation (Deploy)"
   os: linux
-  julia: 1.0
+  julia: 1.4
   script:
     - julia --project=docs/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd())); Pkg.build("TimeZones")'
     - julia --project=docs/ docs/deploy.jl
@@ -36,12 +36,11 @@ arch:
   - x64
   - x86
 
-matrix:
+jobs:
   allow_failures:
     - julia: nightly
   fast_finish: true
 
-jobs:
   # Test 32-bit only on Linux
   exclude:
     - arch: x86
