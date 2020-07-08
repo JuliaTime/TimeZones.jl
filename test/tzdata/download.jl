@@ -1,4 +1,4 @@
-using TimeZones.TZData: tzdata_url, LATEST_FILE, read_latest
+using TimeZones.TZData: tzdata_url, LATEST_FILE, read_latest, REGIONS
 using Pkg.Artifacts
 
 @test tzdata_url("2016j") == "https://data.iana.org/time-zones/releases/tzdata2016j.tar.gz"
@@ -17,7 +17,8 @@ mktempdir() do temp_dir
 
     # No need to ignore output as this should never trigger a download
     file_path = artifact"tzdata_latest"
-
+    build("latest", REGIONS)
+    
     @test file_path == last_file_path
     @test mtime(file_path) == last_modified
 
