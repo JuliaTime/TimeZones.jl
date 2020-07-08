@@ -1,4 +1,5 @@
 [[tzdata_1996l]]
+arch = "x86_64"
 git-tree-sha1 = "835e88b3b0a560e79dfc0a2a6c350adeaa4ef907"
 lazy = true
 os = "windows"
@@ -8,6 +9,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1996l.tar.gz"
 
 [[tzdata_1996n]]
+arch = "x86_64"
 git-tree-sha1 = "41df1c2e7f1ab4ae8e9c3ed1904c807238a11e16"
 lazy = true
 os = "windows"
@@ -17,6 +19,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1996n.tar.gz"
 
 [[tzdata_1997a]]
+arch = "x86_64"
 git-tree-sha1 = "96f3d0c18031ba923b5599815aa55b96aa563a56"
 lazy = true
 os = "windows"
@@ -26,6 +29,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1997a.tar.gz"
 
 [[tzdata_1997b]]
+arch = "x86_64"
 git-tree-sha1 = "00af50ba7c66b49ad97fdf7a529e476aec5039ad"
 lazy = true
 os = "windows"
@@ -35,6 +39,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1997b.tar.gz"
 
 [[tzdata_1997c]]
+arch = "x86_64"
 git-tree-sha1 = "191a315cdfccae9f67c584f39c7341182fef2d7d"
 lazy = true
 os = "windows"
@@ -44,6 +49,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1997c.tar.gz"
 
 [[tzdata_1997d]]
+arch = "x86_64"
 git-tree-sha1 = "191a315cdfccae9f67c584f39c7341182fef2d7d"
 lazy = true
 os = "windows"
@@ -53,6 +59,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1997d.tar.gz"
 
 [[tzdata_1997e]]
+arch = "x86_64"
 git-tree-sha1 = "2fb6063591916dc30e7663adc314a23f86d72793"
 lazy = true
 os = "windows"
@@ -62,6 +69,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1997e.tar.gz"
 
 [[tzdata_1997f]]
+arch = "x86_64"
 git-tree-sha1 = "d18f39d3c92f216c3229f733572c72a87778b74c"
 lazy = true
 os = "windows"
@@ -71,6 +79,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1997f.tar.gz"
 
 [[tzdata_1997g]]
+arch = "x86_64"
 git-tree-sha1 = "1ad1a3f95648f825590f3766d24d2178ef759eeb"
 lazy = true
 os = "windows"
@@ -80,6 +89,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1997g.tar.gz"
 
 [[tzdata_1997h]]
+arch = "x86_64"
 git-tree-sha1 = "27b5676af22c37a5a99ba78ce516c16639644c03"
 lazy = true
 os = "windows"
@@ -89,6 +99,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1997h.tar.gz"
 
 [[tzdata_1997i]]
+arch = "x86_64"
 git-tree-sha1 = "43ddd29e6f7efca9f917412beb5285189e3d4254"
 lazy = true
 os = "windows"
@@ -98,6 +109,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1997i.tar.gz"
 
 [[tzdata_1997j]]
+arch = "x86_64"
 git-tree-sha1 = "b2a758d41cee560ab9778e8978910661d637a6eb"
 lazy = true
 os = "windows"
@@ -107,6 +119,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1997j.tar.gz"
 
 [[tzdata_1997k]]
+arch = "x86_64"
 git-tree-sha1 = "9c4dc8d866cf286e5ccedd64c85617e23b82c0fc"
 lazy = true
 os = "windows"
@@ -116,6 +129,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1997k.tar.gz"
 
 [[tzdata_1998a]]
+arch = "x86_64"
 git-tree-sha1 = "db72b938d2cfb3fe354af8f6842300c8d6208da6"
 lazy = true
 os = "windows"
@@ -125,6 +139,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1998a.tar.gz"
 
 [[tzdata_1998b]]
+arch = "x86_64"
 git-tree-sha1 = "bd903db705630d9671a37262d344f54ac5acf12f"
 lazy = true
 os = "windows"
@@ -134,6 +149,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1998b.tar.gz"
 
 [[tzdata_1998c]]
+arch = "x86_64"
 git-tree-sha1 = "f8e0116f6deda1b223f843658effb45b48163116"
 lazy = true
 os = "windows"
@@ -143,6 +159,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1998c.tar.gz"
 
 [[tzdata_1998d]]
+arch = "x86_64"
 git-tree-sha1 = "5614016e3724d1ed8998394a6126b4661358de44"
 lazy = true
 os = "windows"
@@ -152,6 +169,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1998d.tar.gz"
 
 [[tzdata_1998e]]
+arch = "x86_64"
 git-tree-sha1 = "2ed0eb26e4a2af5633cb0bc731ae163c9fab28f2"
 lazy = true
 os = "windows"
@@ -161,6 +179,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1998e.tar.gz"
 
 [[tzdata_1998h]]
+arch = "x86_64"
 git-tree-sha1 = "95cf198cf7786b9bd01c473acef97a83df3c568f"
 lazy = true
 os = "windows"
@@ -170,6 +189,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1998h.tar.gz"
 
 [[tzdata_1998i]]
+arch = "x86_64"
 git-tree-sha1 = "20780fe7a8774baffbeecc2f9a7367d4e8162500"
 lazy = true
 os = "windows"
@@ -179,6 +199,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1998i.tar.gz"
 
 [[tzdata_1999a]]
+arch = "x86_64"
 git-tree-sha1 = "20780fe7a8774baffbeecc2f9a7367d4e8162500"
 lazy = true
 os = "windows"
@@ -188,6 +209,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1999a.tar.gz"
 
 [[tzdata_1999b]]
+arch = "x86_64"
 git-tree-sha1 = "e9c33069a661dfae70aa6054ffa41acfbc6755ea"
 lazy = true
 os = "windows"
@@ -197,6 +219,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1999b.tar.gz"
 
 [[tzdata_1999c]]
+arch = "x86_64"
 git-tree-sha1 = "b4d095b8742cd706d4b4d4025f28462c82d68067"
 lazy = true
 os = "windows"
@@ -206,6 +229,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1999c.tar.gz"
 
 [[tzdata_1999d]]
+arch = "x86_64"
 git-tree-sha1 = "f0f2360afc47afe32557f639ab19e8f1323cb330"
 lazy = true
 os = "windows"
@@ -215,6 +239,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1999d.tar.gz"
 
 [[tzdata_1999e]]
+arch = "x86_64"
 git-tree-sha1 = "232ead96202bafd93c01c3ecc7d3304ab560105d"
 lazy = true
 os = "windows"
@@ -224,6 +249,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1999e.tar.gz"
 
 [[tzdata_1999f]]
+arch = "x86_64"
 git-tree-sha1 = "02232194ac597e358d30e1f7da36e8ef2ecea1ca"
 lazy = true
 os = "windows"
@@ -233,6 +259,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1999f.tar.gz"
 
 [[tzdata_1999g]]
+arch = "x86_64"
 git-tree-sha1 = "d21e24382e4f5f62b11ef48b54d92c2a98fc1761"
 lazy = true
 os = "windows"
@@ -242,6 +269,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1999g.tar.gz"
 
 [[tzdata_1999h]]
+arch = "x86_64"
 git-tree-sha1 = "127445424481c738a13513ec8416ae4d9f8e89db"
 lazy = true
 os = "windows"
@@ -251,6 +279,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1999h.tar.gz"
 
 [[tzdata_1999i]]
+arch = "x86_64"
 git-tree-sha1 = "f70f34e93ba2a198f18939d025cfb779526ff06c"
 lazy = true
 os = "windows"
@@ -260,6 +289,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1999i.tar.gz"
 
 [[tzdata_1999j]]
+arch = "x86_64"
 git-tree-sha1 = "c0241ac58a3d4615d3cc20c0825323ab03781983"
 lazy = true
 os = "windows"
@@ -269,6 +299,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata1999j.tar.gz"
 
 [[tzdata_2000a]]
+arch = "x86_64"
 git-tree-sha1 = "e7a30b675eaac813b7dc3e749d8d4a4684e14e94"
 lazy = true
 os = "windows"
@@ -278,6 +309,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2000a.tar.gz"
 
 [[tzdata_2000b]]
+arch = "x86_64"
 git-tree-sha1 = "e1454e5128d1692a0ceee0c5dab015fef66cc79c"
 lazy = true
 os = "windows"
@@ -287,6 +319,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2000b.tar.gz"
 
 [[tzdata_2000c]]
+arch = "x86_64"
 git-tree-sha1 = "7b115993cbb9bf173c5ba9dbdf0bc74d5beccda2"
 lazy = true
 os = "windows"
@@ -296,6 +329,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2000c.tar.gz"
 
 [[tzdata_2000d]]
+arch = "x86_64"
 git-tree-sha1 = "e36937a9d04159b13130710c56e98f7ca47e3e93"
 lazy = true
 os = "windows"
@@ -305,6 +339,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2000d.tar.gz"
 
 [[tzdata_2000e]]
+arch = "x86_64"
 git-tree-sha1 = "4ae48399d3ffcceddbbe0e364dac9fc3b8e7fd36"
 lazy = true
 os = "windows"
@@ -314,6 +349,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2000e.tar.gz"
 
 [[tzdata_2000f]]
+arch = "x86_64"
 git-tree-sha1 = "7c99b04697ed5d56d11cbc10f8fecfaa3a385d4e"
 lazy = true
 os = "windows"
@@ -323,6 +359,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2000f.tar.gz"
 
 [[tzdata_2000g]]
+arch = "x86_64"
 git-tree-sha1 = "ca401f65a295565ce881c9dab1cdeab64bb5c183"
 lazy = true
 os = "windows"
@@ -332,6 +369,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2000g.tar.gz"
 
 [[tzdata_2000h]]
+arch = "x86_64"
 git-tree-sha1 = "4dc1e88d7a3760cc96bc9c4757b925df83ac47d7"
 lazy = true
 os = "windows"
@@ -341,6 +379,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2000h.tar.gz"
 
 [[tzdata_2001a]]
+arch = "x86_64"
 git-tree-sha1 = "004eafdccbb9f9bd68b9c3a01a25312d2126fc8f"
 lazy = true
 os = "windows"
@@ -350,6 +389,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2001a.tar.gz"
 
 [[tzdata_2001b]]
+arch = "x86_64"
 git-tree-sha1 = "71a35d7b783a5e821aedb72fd77c8d7557ed9475"
 lazy = true
 os = "windows"
@@ -359,6 +399,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2001b.tar.gz"
 
 [[tzdata_2001c]]
+arch = "x86_64"
 git-tree-sha1 = "17321bcd802497dc4f56c4465d0905caa470066b"
 lazy = true
 os = "windows"
@@ -368,6 +409,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2001c.tar.gz"
 
 [[tzdata_2001d]]
+arch = "x86_64"
 git-tree-sha1 = "2bb1cab747342b51710b417290dade36b7c2f752"
 lazy = true
 os = "windows"
@@ -377,6 +419,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2001d.tar.gz"
 
 [[tzdata_2002b]]
+arch = "x86_64"
 git-tree-sha1 = "0c104e1a84371860973049404d9550eaea1ec363"
 lazy = true
 os = "windows"
@@ -386,6 +429,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2002b.tar.gz"
 
 [[tzdata_2002c]]
+arch = "x86_64"
 git-tree-sha1 = "3665c7afaab6a1f06dee60021b4d2eedb01a9cc7"
 lazy = true
 os = "windows"
@@ -395,6 +439,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2002c.tar.gz"
 
 [[tzdata_2002d]]
+arch = "x86_64"
 git-tree-sha1 = "41cf88f7b28ae614dfe8e4cf2d0f976cdf5cadbe"
 lazy = true
 os = "windows"
@@ -404,6 +449,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2002d.tar.gz"
 
 [[tzdata_2003a]]
+arch = "x86_64"
 git-tree-sha1 = "505173c636d3daf410d3efcf5466d2080f40d187"
 lazy = true
 os = "windows"
@@ -413,6 +459,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2003a.tar.gz"
 
 [[tzdata_2003b]]
+arch = "x86_64"
 git-tree-sha1 = "9019d1e894cfddcb8aa3ff37592320941d743e10"
 lazy = true
 os = "windows"
@@ -422,6 +469,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2003b.tar.gz"
 
 [[tzdata_2003c]]
+arch = "x86_64"
 git-tree-sha1 = "9019d1e894cfddcb8aa3ff37592320941d743e10"
 lazy = true
 os = "windows"
@@ -431,6 +479,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2003c.tar.gz"
 
 [[tzdata_2003d]]
+arch = "x86_64"
 git-tree-sha1 = "c29930b9aa9daf238f29ff3e4c0c034cb8d79e8d"
 lazy = true
 os = "windows"
@@ -440,6 +489,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2003d.tar.gz"
 
 [[tzdata_2003e]]
+arch = "x86_64"
 git-tree-sha1 = "b12b5ac230ccc80abb7fcafecf5291a893bbe66b"
 lazy = true
 os = "windows"
@@ -449,6 +499,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2003e.tar.gz"
 
 [[tzdata_2004a]]
+arch = "x86_64"
 git-tree-sha1 = "7007a0cd1a2193c994245082bf54cf50533e7d17"
 lazy = true
 os = "windows"
@@ -458,6 +509,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2004a.tar.gz"
 
 [[tzdata_2004b]]
+arch = "x86_64"
 git-tree-sha1 = "31285cab8eea6dce31e35c4773eeb0c40e2d4d08"
 lazy = true
 os = "windows"
@@ -467,6 +519,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2004b.tar.gz"
 
 [[tzdata_2004d]]
+arch = "x86_64"
 git-tree-sha1 = "8c53ae59c082b63c7ed0261ac99eb2bd30675aa4"
 lazy = true
 os = "windows"
@@ -476,6 +529,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2004d.tar.gz"
 
 [[tzdata_2004e]]
+arch = "x86_64"
 git-tree-sha1 = "a6e571519d7f510b2e1ebaa49db74e92e07a7d3b"
 lazy = true
 os = "windows"
@@ -485,6 +539,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2004e.tar.gz"
 
 [[tzdata_2004g]]
+arch = "x86_64"
 git-tree-sha1 = "d92d3e2b8cd9c1973d30d9b1a35d6888d23a03c3"
 lazy = true
 os = "windows"
@@ -494,6 +549,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2004g.tar.gz"
 
 [[tzdata_2005a]]
+arch = "x86_64"
 git-tree-sha1 = "d92d3e2b8cd9c1973d30d9b1a35d6888d23a03c3"
 lazy = true
 os = "windows"
@@ -503,6 +559,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2005a.tar.gz"
 
 [[tzdata_2005b]]
+arch = "x86_64"
 git-tree-sha1 = "4dcd67504bc1d9b7ea201b4709a3695ec276f8b8"
 lazy = true
 os = "windows"
@@ -512,6 +569,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2005b.tar.gz"
 
 [[tzdata_2005c]]
+arch = "x86_64"
 git-tree-sha1 = "d6e40575c974dc69fe359462a242f19a113814e3"
 lazy = true
 os = "windows"
@@ -521,6 +579,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2005c.tar.gz"
 
 [[tzdata_2005e]]
+arch = "x86_64"
 git-tree-sha1 = "276c761771ee0e9b0005960d073ff7e92d1134a2"
 lazy = true
 os = "windows"
@@ -530,6 +589,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2005e.tar.gz"
 
 [[tzdata_2005f]]
+arch = "x86_64"
 git-tree-sha1 = "bd457274ad54c27ed0b413fc9fac9305b3f6c56c"
 lazy = true
 os = "windows"
@@ -539,6 +599,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2005f.tar.gz"
 
 [[tzdata_2005g]]
+arch = "x86_64"
 git-tree-sha1 = "eb7ed525a9ada80055e1100174b68335b48f1e1f"
 lazy = true
 os = "windows"
@@ -548,6 +609,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2005g.tar.gz"
 
 [[tzdata_2005h]]
+arch = "x86_64"
 git-tree-sha1 = "4d9088654728df3e80820989aee0600722c05c92"
 lazy = true
 os = "windows"
@@ -557,6 +619,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2005h.tar.gz"
 
 [[tzdata_2005i]]
+arch = "x86_64"
 git-tree-sha1 = "9b0435894c57daa25578d4437524b4b9d37f0c24"
 lazy = true
 os = "windows"
@@ -566,6 +629,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2005i.tar.gz"
 
 [[tzdata_2005j]]
+arch = "x86_64"
 git-tree-sha1 = "256fcacc2297a699c532ab70eed6f6b4c2acdeee"
 lazy = true
 os = "windows"
@@ -575,6 +639,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2005j.tar.gz"
 
 [[tzdata_2005k]]
+arch = "x86_64"
 git-tree-sha1 = "64f37180776f8cb700eb34fb0177fb7f5edd0a7f"
 lazy = true
 os = "windows"
@@ -584,6 +649,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2005k.tar.gz"
 
 [[tzdata_2005l]]
+arch = "x86_64"
 git-tree-sha1 = "9b99f20e11aa8f57b27403ab496eb43833ef675b"
 lazy = true
 os = "windows"
@@ -593,6 +659,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2005l.tar.gz"
 
 [[tzdata_2005m]]
+arch = "x86_64"
 git-tree-sha1 = "d81a8327ecf60f04c5b0b2e052d7b8088ceb31fb"
 lazy = true
 os = "windows"
@@ -602,6 +669,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2005m.tar.gz"
 
 [[tzdata_2005n]]
+arch = "x86_64"
 git-tree-sha1 = "3c7318fb6f8b54dbd0b536cf8341a9367174e6e8"
 lazy = true
 os = "windows"
@@ -611,6 +679,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2005n.tar.gz"
 
 [[tzdata_2005o]]
+arch = "x86_64"
 git-tree-sha1 = "0dd8db7853a6f776b478e465ac45bca646278245"
 lazy = true
 os = "windows"
@@ -620,6 +689,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2005o.tar.gz"
 
 [[tzdata_2005p]]
+arch = "x86_64"
 git-tree-sha1 = "f6615351c754a9458dffdcca196e0ae970a5a731"
 lazy = true
 os = "windows"
@@ -629,6 +699,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2005p.tar.gz"
 
 [[tzdata_2005q]]
+arch = "x86_64"
 git-tree-sha1 = "7bf009d1354c839b04424fb830c70dc41dd74be1"
 lazy = true
 os = "windows"
@@ -638,6 +709,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2005q.tar.gz"
 
 [[tzdata_2005r]]
+arch = "x86_64"
 git-tree-sha1 = "b042f5b9f046b1051d99b73516d2c7cccfff2869"
 lazy = true
 os = "windows"
@@ -647,6 +719,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2005r.tar.gz"
 
 [[tzdata_2006a]]
+arch = "x86_64"
 git-tree-sha1 = "f8f8bfa1687b4698005cd64db1ff57ae21b17261"
 lazy = true
 os = "windows"
@@ -656,6 +729,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2006a.tar.gz"
 
 [[tzdata_2006b]]
+arch = "x86_64"
 git-tree-sha1 = "1c85fdc740aef2bf4d24e327a4b1168736b56c0d"
 lazy = true
 os = "windows"
@@ -665,6 +739,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2006b.tar.gz"
 
 [[tzdata_2006c]]
+arch = "x86_64"
 git-tree-sha1 = "6118d6f353572bf308cbdef2cd0a6b7bd29fcc26"
 lazy = true
 os = "windows"
@@ -674,6 +749,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2006c.tar.gz"
 
 [[tzdata_2006d]]
+arch = "x86_64"
 git-tree-sha1 = "db6499a675a5b0a29a09435db680de34aa4409de"
 lazy = true
 os = "windows"
@@ -683,6 +759,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2006d.tar.gz"
 
 [[tzdata_2006f]]
+arch = "x86_64"
 git-tree-sha1 = "237b36be50ceefe169041b91c80e3e98c7b28b44"
 lazy = true
 os = "windows"
@@ -692,6 +769,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2006f.tar.gz"
 
 [[tzdata_2006g]]
+arch = "x86_64"
 git-tree-sha1 = "cda12ceaf5011117f92b3c2fe493fc093ccb3fa2"
 lazy = true
 os = "windows"
@@ -701,6 +779,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2006g.tar.gz"
 
 [[tzdata_2006j]]
+arch = "x86_64"
 git-tree-sha1 = "cf0a1e6c32af07f93ddeb9ecbaf13a97cacdd630"
 lazy = true
 os = "windows"
@@ -710,6 +789,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2006j.tar.gz"
 
 [[tzdata_2006k]]
+arch = "x86_64"
 git-tree-sha1 = "cdf33c168106f747d96cd2e540f971cc9d45bfb0"
 lazy = true
 os = "windows"
@@ -719,6 +799,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2006k.tar.gz"
 
 [[tzdata_2006l]]
+arch = "x86_64"
 git-tree-sha1 = "139d31d9fc6ea75882b1975a94a9380dcad96fbb"
 lazy = true
 os = "windows"
@@ -728,6 +809,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2006l.tar.gz"
 
 [[tzdata_2006m]]
+arch = "x86_64"
 git-tree-sha1 = "ab7ad828525be554c36380e06ecb112be2df67f2"
 lazy = true
 os = "windows"
@@ -737,6 +819,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2006m.tar.gz"
 
 [[tzdata_2006n]]
+arch = "x86_64"
 git-tree-sha1 = "d1e51661456d09635672072e7247985c134bfe4f"
 lazy = true
 os = "windows"
@@ -746,6 +829,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2006n.tar.gz"
 
 [[tzdata_2006o]]
+arch = "x86_64"
 git-tree-sha1 = "91a0e3720eed47131f3607a5a4b409d16b99c24b"
 lazy = true
 os = "windows"
@@ -755,6 +839,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2006o.tar.gz"
 
 [[tzdata_2006p]]
+arch = "x86_64"
 git-tree-sha1 = "6969154dde2c75adacf99c64af0ad8292b35fca5"
 lazy = true
 os = "windows"
@@ -764,6 +849,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2006p.tar.gz"
 
 [[tzdata_2007a]]
+arch = "x86_64"
 git-tree-sha1 = "6f0e322b00c80197a3477b47397955e94a0ad5c0"
 lazy = true
 os = "windows"
@@ -773,6 +859,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2007a.tar.gz"
 
 [[tzdata_2007b]]
+arch = "x86_64"
 git-tree-sha1 = "ddae6fd0e44ad5e8b5088072a4a03fd2c3b67fcb"
 lazy = true
 os = "windows"
@@ -782,6 +869,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2007b.tar.gz"
 
 [[tzdata_2007c]]
+arch = "x86_64"
 git-tree-sha1 = "28c8af4e53b63eef3c98b279170875dc0449598b"
 lazy = true
 os = "windows"
@@ -791,6 +879,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2007c.tar.gz"
 
 [[tzdata_2007d]]
+arch = "x86_64"
 git-tree-sha1 = "f0c2ec1a9f4f35b55e8b3a2bbf1dde988d3319d0"
 lazy = true
 os = "windows"
@@ -800,6 +889,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2007d.tar.gz"
 
 [[tzdata_2007e]]
+arch = "x86_64"
 git-tree-sha1 = "1be0ada460ed4f4907c4ed480d615a2cc5c99b0c"
 lazy = true
 os = "windows"
@@ -809,6 +899,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2007e.tar.gz"
 
 [[tzdata_2007f]]
+arch = "x86_64"
 git-tree-sha1 = "6b5d95e7e14d78660dd6daceeb134147ae281ba1"
 lazy = true
 os = "windows"
@@ -818,6 +909,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2007f.tar.gz"
 
 [[tzdata_2007g]]
+arch = "x86_64"
 git-tree-sha1 = "da5486252cd73bc05cb7c4625f84353cd07b60b7"
 lazy = true
 os = "windows"
@@ -827,6 +919,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2007g.tar.gz"
 
 [[tzdata_2007h]]
+arch = "x86_64"
 git-tree-sha1 = "a7cafb0f0a64faf3a997bb6365bf12da1f0fcd1a"
 lazy = true
 os = "windows"
@@ -836,6 +929,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2007h.tar.gz"
 
 [[tzdata_2007i]]
+arch = "x86_64"
 git-tree-sha1 = "64fc7257e66321f4e71620d4ddeeefad277d437e"
 lazy = true
 os = "windows"
@@ -845,6 +939,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2007i.tar.gz"
 
 [[tzdata_2007j]]
+arch = "x86_64"
 git-tree-sha1 = "c2195a5dcf2c70dba634c35a008ef300508cb6e7"
 lazy = true
 os = "windows"
@@ -854,6 +949,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2007j.tar.gz"
 
 [[tzdata_2007k]]
+arch = "x86_64"
 git-tree-sha1 = "b41f9f08304c5c309b8d3304b573699f57cb36b7"
 lazy = true
 os = "windows"
@@ -863,6 +959,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2007k.tar.gz"
 
 [[tzdata_2008a]]
+arch = "x86_64"
 git-tree-sha1 = "c6fb0ae3f5d8e2684cf3635222e3b636fc324cd1"
 lazy = true
 os = "windows"
@@ -872,6 +969,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2008a.tar.gz"
 
 [[tzdata_2008b]]
+arch = "x86_64"
 git-tree-sha1 = "43f3b86f92af2ba91b6442bce417feb05c9ede85"
 lazy = true
 os = "windows"
@@ -881,6 +979,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2008b.tar.gz"
 
 [[tzdata_2008c]]
+arch = "x86_64"
 git-tree-sha1 = "43b1e749971f5fa0a1fb39161c35f7825a368aed"
 lazy = true
 os = "windows"
@@ -890,6 +989,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2008c.tar.gz"
 
 [[tzdata_2008d]]
+arch = "x86_64"
 git-tree-sha1 = "709cee3e17d5888f872e2544595690a5ae92ad3a"
 lazy = true
 os = "windows"
@@ -899,6 +999,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2008d.tar.gz"
 
 [[tzdata_2008e]]
+arch = "x86_64"
 git-tree-sha1 = "26b5a67abaf0279400cea663658bc776ef880d6d"
 lazy = true
 os = "windows"
@@ -908,6 +1009,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2008e.tar.gz"
 
 [[tzdata_2008f]]
+arch = "x86_64"
 git-tree-sha1 = "ec27ba702b29ecb10abba5ad02b936da38eb8640"
 lazy = true
 os = "windows"
@@ -917,6 +1019,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2008f.tar.gz"
 
 [[tzdata_2008g]]
+arch = "x86_64"
 git-tree-sha1 = "7fc663380f8c8e80136786da7239a9c5cac6c774"
 lazy = true
 os = "windows"
@@ -926,6 +1029,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2008g.tar.gz"
 
 [[tzdata_2008h]]
+arch = "x86_64"
 git-tree-sha1 = "0779712241bffbd77e9639b67d2d4372777b969a"
 lazy = true
 os = "windows"
@@ -935,6 +1039,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2008h.tar.gz"
 
 [[tzdata_2008i]]
+arch = "x86_64"
 git-tree-sha1 = "fad57e12815a91684070858d9c34edc58a952846"
 lazy = true
 os = "windows"
@@ -944,6 +1049,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2008i.tar.gz"
 
 [[tzdata_2009a]]
+arch = "x86_64"
 git-tree-sha1 = "bf0d4ff5506df515f443d8bdacffe10f8f04bc35"
 lazy = true
 os = "windows"
@@ -953,6 +1059,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009a.tar.gz"
 
 [[tzdata_2009b]]
+arch = "x86_64"
 git-tree-sha1 = "09eb5721b745bbc8021d64fe7d70ddfaa2871067"
 lazy = true
 os = "windows"
@@ -962,6 +1069,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009b.tar.gz"
 
 [[tzdata_2009c]]
+arch = "x86_64"
 git-tree-sha1 = "503e142d64b2c092828af30571e8528044c2bb7e"
 lazy = true
 os = "windows"
@@ -971,6 +1079,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009c.tar.gz"
 
 [[tzdata_2009d]]
+arch = "x86_64"
 git-tree-sha1 = "e224dead63f2362679e775cc8c9c92e41d8c8ada"
 lazy = true
 os = "windows"
@@ -980,6 +1089,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009d.tar.gz"
 
 [[tzdata_2009e]]
+arch = "x86_64"
 git-tree-sha1 = "ca14bdd73df939e23b617bfc0233b6b4e9098253"
 lazy = true
 os = "windows"
@@ -989,6 +1099,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009e.tar.gz"
 
 [[tzdata_2009f]]
+arch = "x86_64"
 git-tree-sha1 = "e8be8dd48e75c8de6596190dd8e4e61f796d34e6"
 lazy = true
 os = "windows"
@@ -998,6 +1109,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009f.tar.gz"
 
 [[tzdata_2009g]]
+arch = "x86_64"
 git-tree-sha1 = "bc85ddfdfaa94045cdbbb27e73059e302ade763c"
 lazy = true
 os = "windows"
@@ -1007,6 +1119,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009g.tar.gz"
 
 [[tzdata_2009h]]
+arch = "x86_64"
 git-tree-sha1 = "c9fe5f15341dc73b8cbf332fc932b6d1ecfa70df"
 lazy = true
 os = "windows"
@@ -1016,6 +1129,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009h.tar.gz"
 
 [[tzdata_2009i]]
+arch = "x86_64"
 git-tree-sha1 = "c833ad3be0ba34cf91e05889bb43145b44dbb09b"
 lazy = true
 os = "windows"
@@ -1025,6 +1139,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009i.tar.gz"
 
 [[tzdata_2009j]]
+arch = "x86_64"
 git-tree-sha1 = "d81472e3667e5b97ec190a015ba78c69d5155dd3"
 lazy = true
 os = "windows"
@@ -1034,6 +1149,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009j.tar.gz"
 
 [[tzdata_2009k]]
+arch = "x86_64"
 git-tree-sha1 = "dcc448b9dfbe2df610cabea89ac31c2c79d944b9"
 lazy = true
 os = "windows"
@@ -1043,6 +1159,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009k.tar.gz"
 
 [[tzdata_2009l]]
+arch = "x86_64"
 git-tree-sha1 = "8fcc7370d049d05b8b1ca872b49060c3536be2f3"
 lazy = true
 os = "windows"
@@ -1052,6 +1169,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009l.tar.gz"
 
 [[tzdata_2009m]]
+arch = "x86_64"
 git-tree-sha1 = "db6d3129149358ce6fde1c1a642a06b1ec5ddf61"
 lazy = true
 os = "windows"
@@ -1061,6 +1179,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009m.tar.gz"
 
 [[tzdata_2009n]]
+arch = "x86_64"
 git-tree-sha1 = "293ce4ca6ace46bf3ce152f86665c9398a2bc99a"
 lazy = true
 os = "windows"
@@ -1070,6 +1189,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009n.tar.gz"
 
 [[tzdata_2009o]]
+arch = "x86_64"
 git-tree-sha1 = "916b8d04fae4f987a90380ac7743d03f1ab7fab2"
 lazy = true
 os = "windows"
@@ -1079,6 +1199,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009o.tar.gz"
 
 [[tzdata_2009p]]
+arch = "x86_64"
 git-tree-sha1 = "3067e95a7ceebc5b9c6b9a8bda89f84f66894ed4"
 lazy = true
 os = "windows"
@@ -1088,6 +1209,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009p.tar.gz"
 
 [[tzdata_2009q]]
+arch = "x86_64"
 git-tree-sha1 = "9a48f5c5461744bc122cc7f8fa12a5f9c28a13f8"
 lazy = true
 os = "windows"
@@ -1097,6 +1219,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009q.tar.gz"
 
 [[tzdata_2009r]]
+arch = "x86_64"
 git-tree-sha1 = "b049e5ca923113cf5fbd59acb9e10ef78173735f"
 lazy = true
 os = "windows"
@@ -1106,6 +1229,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009r.tar.gz"
 
 [[tzdata_2009s]]
+arch = "x86_64"
 git-tree-sha1 = "35d2496619ee14a17f269fd0fb9a4c14a5ebc746"
 lazy = true
 os = "windows"
@@ -1115,6 +1239,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009s.tar.gz"
 
 [[tzdata_2009t]]
+arch = "x86_64"
 git-tree-sha1 = "532f4b15f6e758737886ddd06c5ab1729db4b187"
 lazy = true
 os = "windows"
@@ -1124,6 +1249,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009t.tar.gz"
 
 [[tzdata_2009u]]
+arch = "x86_64"
 git-tree-sha1 = "7b6c645aa38fe80d9ab522b45ad05fdaece40c48"
 lazy = true
 os = "windows"
@@ -1133,6 +1259,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2009u.tar.gz"
 
 [[tzdata_2010a]]
+arch = "x86_64"
 git-tree-sha1 = "ab1fdbdcdf5c8c57c66cfe27b0640ae76e6660a0"
 lazy = true
 os = "windows"
@@ -1142,6 +1269,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2010a.tar.gz"
 
 [[tzdata_2010b]]
+arch = "x86_64"
 git-tree-sha1 = "5700a4ad8ec7d43962914e568bf7bcf603b90ea5"
 lazy = true
 os = "windows"
@@ -1151,6 +1279,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2010b.tar.gz"
 
 [[tzdata_2010c]]
+arch = "x86_64"
 git-tree-sha1 = "f2b45547673a59012429b67701a2eb1de7d3feaf"
 lazy = true
 os = "windows"
@@ -1160,6 +1289,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2010c.tar.gz"
 
 [[tzdata_2010d]]
+arch = "x86_64"
 git-tree-sha1 = "0ec11f957dd8a61142f48e15f13a063490c04484"
 lazy = true
 os = "windows"
@@ -1169,6 +1299,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2010d.tar.gz"
 
 [[tzdata_2010e]]
+arch = "x86_64"
 git-tree-sha1 = "0050463a62ae4b3d4c682f489d322ffab3deffe5"
 lazy = true
 os = "windows"
@@ -1178,6 +1309,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2010e.tar.gz"
 
 [[tzdata_2010f]]
+arch = "x86_64"
 git-tree-sha1 = "a925467928d61950a085ba9c4e8203517acb8a57"
 lazy = true
 os = "windows"
@@ -1187,6 +1319,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2010f.tar.gz"
 
 [[tzdata_2010g]]
+arch = "x86_64"
 git-tree-sha1 = "224a8021b537b72eaf90775b3ee3c076bad26cc1"
 lazy = true
 os = "windows"
@@ -1196,6 +1329,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2010g.tar.gz"
 
 [[tzdata_2010h]]
+arch = "x86_64"
 git-tree-sha1 = "711ec1643b290c625cab8697f2716d7633830ff5"
 lazy = true
 os = "windows"
@@ -1205,6 +1339,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2010h.tar.gz"
 
 [[tzdata_2010i]]
+arch = "x86_64"
 git-tree-sha1 = "201c1199b6c813036cacbf10738e0bc77ba296a1"
 lazy = true
 os = "windows"
@@ -1214,6 +1349,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2010i.tar.gz"
 
 [[tzdata_2010j]]
+arch = "x86_64"
 git-tree-sha1 = "853437e5ce5056745b00375a26a2a34d843acae0"
 lazy = true
 os = "windows"
@@ -1223,6 +1359,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2010j.tar.gz"
 
 [[tzdata_2010k]]
+arch = "x86_64"
 git-tree-sha1 = "ba2f93c0ab0060979f7a0ad4a9bad6cbf84cd091"
 lazy = true
 os = "windows"
@@ -1232,6 +1369,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2010k.tar.gz"
 
 [[tzdata_2010l]]
+arch = "x86_64"
 git-tree-sha1 = "51e2040d0f52458d3177e5ec16f36c23f1cbbbd4"
 lazy = true
 os = "windows"
@@ -1241,6 +1379,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2010l.tar.gz"
 
 [[tzdata_2010m]]
+arch = "x86_64"
 git-tree-sha1 = "db3c52afca438555adc49b5ef6b42e66b747fa73"
 lazy = true
 os = "windows"
@@ -1250,6 +1389,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2010m.tar.gz"
 
 [[tzdata_2010n]]
+arch = "x86_64"
 git-tree-sha1 = "aae2aa1c4adca2691342d0381e5fbcb223322419"
 lazy = true
 os = "windows"
@@ -1259,6 +1399,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2010n.tar.gz"
 
 [[tzdata_2010o]]
+arch = "x86_64"
 git-tree-sha1 = "e455c906578d147be45bdfb24333ef1f4883eeaf"
 lazy = true
 os = "windows"
@@ -1268,6 +1409,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2010o.tar.gz"
 
 [[tzdata_2011a]]
+arch = "x86_64"
 git-tree-sha1 = "4d36dca233d62c44e861af9ee674e4f785b2e046"
 lazy = true
 os = "windows"
@@ -1277,6 +1419,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2011a.tar.gz"
 
 [[tzdata_2011b]]
+arch = "x86_64"
 git-tree-sha1 = "978ca11bd0b05d32c2f11ddfb88ea97b9ef20a6b"
 lazy = true
 os = "windows"
@@ -1286,6 +1429,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2011b.tar.gz"
 
 [[tzdata_2011c]]
+arch = "x86_64"
 git-tree-sha1 = "555a8eac2d62bb7816bd20dfedccd91d748e587f"
 lazy = true
 os = "windows"
@@ -1295,6 +1439,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2011c.tar.gz"
 
 [[tzdata_2011d]]
+arch = "x86_64"
 git-tree-sha1 = "c8bc147b13f6ad58cbf4a00837449acc70b10583"
 lazy = true
 os = "windows"
@@ -1304,6 +1449,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2011d.tar.gz"
 
 [[tzdata_2011e]]
+arch = "x86_64"
 git-tree-sha1 = "fa03174c614d5ad1c2a53450da004d2e12294c8a"
 lazy = true
 os = "windows"
@@ -1313,6 +1459,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2011e.tar.gz"
 
 [[tzdata_2011f]]
+arch = "x86_64"
 git-tree-sha1 = "1297e8df94ee949425959c71f3e7a414e9332f0b"
 lazy = true
 os = "windows"
@@ -1322,6 +1469,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2011f.tar.gz"
 
 [[tzdata_2011g]]
+arch = "x86_64"
 git-tree-sha1 = "0ba32e0ebe914a327893a7d1bf77cf319ef395a8"
 lazy = true
 os = "windows"
@@ -1331,6 +1479,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2011g.tar.gz"
 
 [[tzdata_2011h]]
+arch = "x86_64"
 git-tree-sha1 = "4a92eadfac2fe62912d0772769d0ef38d8ef4923"
 lazy = true
 os = "windows"
@@ -1340,6 +1489,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2011h.tar.gz"
 
 [[tzdata_2011i]]
+arch = "x86_64"
 git-tree-sha1 = "1609767fd9881858d3339747368ce55c2e43f465"
 lazy = true
 os = "windows"
@@ -1349,6 +1499,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2011i.tar.gz"
 
 [[tzdata_2011j]]
+arch = "x86_64"
 git-tree-sha1 = "f52ac2309b28b8d79776bbc014c63b9501a4caac"
 lazy = true
 os = "windows"
@@ -1358,6 +1509,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2011j.tar.gz"
 
 [[tzdata_2011k]]
+arch = "x86_64"
 git-tree-sha1 = "dc0ced3040dcbc03630e65d2417945b814cb1608"
 lazy = true
 os = "windows"
@@ -1367,6 +1519,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2011k.tar.gz"
 
 [[tzdata_2011l]]
+arch = "x86_64"
 git-tree-sha1 = "a891850a4a2a9ff8bedd6d2736dac077bf8309c9"
 lazy = true
 os = "windows"
@@ -1376,6 +1529,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2011l.tar.gz"
 
 [[tzdata_2011m]]
+arch = "x86_64"
 git-tree-sha1 = "cf7def70f6f91cb73b8db6db6692575724993cf2"
 lazy = true
 os = "windows"
@@ -1385,6 +1539,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2011m.tar.gz"
 
 [[tzdata_2011n]]
+arch = "x86_64"
 git-tree-sha1 = "506825ef0f22a6bdfe8cea991aacf483d455ddb8"
 lazy = true
 os = "windows"
@@ -1394,6 +1549,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2011n.tar.gz"
 
 [[tzdata_2012a]]
+arch = "x86_64"
 git-tree-sha1 = "9759fc435e0fed2e5b6dc65e34da0ab5a6406711"
 lazy = true
 os = "windows"
@@ -1403,6 +1559,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2012a.tar.gz"
 
 [[tzdata_2012b]]
+arch = "x86_64"
 git-tree-sha1 = "9719cf7f1bc1a795249ff4c530a98dce586ea0ac"
 lazy = true
 os = "windows"
@@ -1412,6 +1569,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2012b.tar.gz"
 
 [[tzdata_2012c]]
+arch = "x86_64"
 git-tree-sha1 = "ed5094090a386b0046403e2ec8a245a85398de68"
 lazy = true
 os = "windows"
@@ -1421,6 +1579,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2012c.tar.gz"
 
 [[tzdata_2012d]]
+arch = "x86_64"
 git-tree-sha1 = "b39d2ae205385ad6124a82d15e772741dc63585f"
 lazy = true
 os = "windows"
@@ -1430,6 +1589,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2012d.tar.gz"
 
 [[tzdata_2012e]]
+arch = "x86_64"
 git-tree-sha1 = "febe69ddec72e7040ebe21fa643f05e01b1661d8"
 lazy = true
 os = "windows"
@@ -1439,6 +1599,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2012e.tar.gz"
 
 [[tzdata_2012f]]
+arch = "x86_64"
 git-tree-sha1 = "b1cc2250912bf1b61c6687d6a5e360ee0ce906d0"
 lazy = true
 os = "windows"
@@ -1448,6 +1609,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2012f.tar.gz"
 
 [[tzdata_2012g]]
+arch = "x86_64"
 git-tree-sha1 = "335980e19adeb026ab139b51b593d4e75312346d"
 lazy = true
 os = "windows"
@@ -1457,6 +1619,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2012g.tar.gz"
 
 [[tzdata_2012h]]
+arch = "x86_64"
 git-tree-sha1 = "97790ee1282b4a87ba73c6fccacce8d3e652e5eb"
 lazy = true
 os = "windows"
@@ -1466,6 +1629,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2012h.tar.gz"
 
 [[tzdata_2012i]]
+arch = "x86_64"
 git-tree-sha1 = "7140f27bd72fd97f927b666a6188c42b478c993a"
 lazy = true
 os = "windows"
@@ -1475,6 +1639,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2012i.tar.gz"
 
 [[tzdata_2012j]]
+arch = "x86_64"
 git-tree-sha1 = "e4216ad2e271c770f21e3e3c035a1814c2117779"
 lazy = true
 os = "windows"
@@ -1484,6 +1649,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2012j.tar.gz"
 
 [[tzdata_2013a]]
+arch = "x86_64"
 git-tree-sha1 = "a6c3d71f651ce2bbb77391993c8bec4bb6ce8410"
 lazy = true
 os = "windows"
@@ -1493,6 +1659,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2013a.tar.gz"
 
 [[tzdata_2013b]]
+arch = "x86_64"
 git-tree-sha1 = "31f27c304b7716bc02791ccdfa7e565bac220ac0"
 lazy = true
 os = "windows"
@@ -1502,6 +1669,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2013b.tar.gz"
 
 [[tzdata_2013c]]
+arch = "x86_64"
 git-tree-sha1 = "d05faca96ef7a35480b3bf36756a75756ea084d2"
 lazy = true
 os = "windows"
@@ -1511,6 +1679,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2013c.tar.gz"
 
 [[tzdata_2013d]]
+arch = "x86_64"
 git-tree-sha1 = "38ba2b6de800879f0c0e9da98e724422ff381738"
 lazy = true
 os = "windows"
@@ -1520,6 +1689,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2013d.tar.gz"
 
 [[tzdata_2013e]]
+arch = "x86_64"
 git-tree-sha1 = "3dfbdb3d218c10d26dcdd381f846b26f9f728fab"
 lazy = true
 os = "windows"
@@ -1529,6 +1699,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2013e.tar.gz"
 
 [[tzdata_2013f]]
+arch = "x86_64"
 git-tree-sha1 = "12b5d2c7390549c88eb48c7d5ebbaa99144bd869"
 lazy = true
 os = "windows"
@@ -1538,6 +1709,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2013f.tar.gz"
 
 [[tzdata_2013g]]
+arch = "x86_64"
 git-tree-sha1 = "9c858b9af8c0d15139ab246d2bb70cc3f5d9ebf3"
 lazy = true
 os = "windows"
@@ -1547,6 +1719,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2013g.tar.gz"
 
 [[tzdata_2013h]]
+arch = "x86_64"
 git-tree-sha1 = "9fadafb63216a8590909eb5b47931b74ea890b4d"
 lazy = true
 os = "windows"
@@ -1556,6 +1729,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2013h.tar.gz"
 
 [[tzdata_2013i]]
+arch = "x86_64"
 git-tree-sha1 = "dc8c5c0eb7bd707d2adc55407cf624063e34f8e4"
 lazy = true
 os = "windows"
@@ -1565,6 +1739,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2013i.tar.gz"
 
 [[tzdata_2014a]]
+arch = "x86_64"
 git-tree-sha1 = "b360806993f1b54cf96dcaf7a0485f2f6e6bf235"
 lazy = true
 os = "windows"
@@ -1574,6 +1749,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2014a.tar.gz"
 
 [[tzdata_2014b]]
+arch = "x86_64"
 git-tree-sha1 = "0496f08c097b93e8acf041198aa5c1e9a20409c8"
 lazy = true
 os = "windows"
@@ -1583,6 +1759,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2014b.tar.gz"
 
 [[tzdata_2014c]]
+arch = "x86_64"
 git-tree-sha1 = "95e97c9112af6c4a00e6eb2c12ed0009d4a8b815"
 lazy = true
 os = "windows"
@@ -1592,6 +1769,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2014c.tar.gz"
 
 [[tzdata_2014d]]
+arch = "x86_64"
 git-tree-sha1 = "3c40cfdb415c547de15eba0498d960715cfefe37"
 lazy = true
 os = "windows"
@@ -1601,6 +1779,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2014d.tar.gz"
 
 [[tzdata_2014e]]
+arch = "x86_64"
 git-tree-sha1 = "5b8ef0a6c63a6d860528daf448c88582976708ae"
 lazy = true
 os = "windows"
@@ -1610,6 +1789,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2014e.tar.gz"
 
 [[tzdata_2014f]]
+arch = "x86_64"
 git-tree-sha1 = "f170492ed2f8ba4dd32185720ee2f5b91af781c2"
 lazy = true
 os = "windows"
@@ -1619,6 +1799,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2014f.tar.gz"
 
 [[tzdata_2014g]]
+arch = "x86_64"
 git-tree-sha1 = "efdbcc4d65717e064fbfcba1dc53878467e08034"
 lazy = true
 os = "windows"
@@ -1628,6 +1809,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2014g.tar.gz"
 
 [[tzdata_2014h]]
+arch = "x86_64"
 git-tree-sha1 = "1e8d45462739aabfd907b1a4702e1e6393ced326"
 lazy = true
 os = "windows"
@@ -1637,6 +1819,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2014h.tar.gz"
 
 [[tzdata_2014i]]
+arch = "x86_64"
 git-tree-sha1 = "b829d7ebb964b9a0368e08752399a31098f2ce00"
 lazy = true
 os = "windows"
@@ -1646,6 +1829,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2014i.tar.gz"
 
 [[tzdata_2014j]]
+arch = "x86_64"
 git-tree-sha1 = "6ae6a76ab44c6e716c58934beb42ab209a57f40d"
 lazy = true
 os = "windows"
@@ -1655,6 +1839,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2014j.tar.gz"
 
 [[tzdata_2015a]]
+arch = "x86_64"
 git-tree-sha1 = "adee01b773e2f7d281a9efebdebf06133cb9bbb7"
 lazy = true
 os = "windows"
@@ -1664,6 +1849,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2015a.tar.gz"
 
 [[tzdata_2015b]]
+arch = "x86_64"
 git-tree-sha1 = "cba90b9c4c721a37fd141426ba7015db7e69b17f"
 lazy = true
 os = "windows"
@@ -1673,6 +1859,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2015b.tar.gz"
 
 [[tzdata_2015c]]
+arch = "x86_64"
 git-tree-sha1 = "25431aa833089dcc643fa9b687f9307d56e90344"
 lazy = true
 os = "windows"
@@ -1682,6 +1869,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2015c.tar.gz"
 
 [[tzdata_2015d]]
+arch = "x86_64"
 git-tree-sha1 = "8e61a8fc52a79a045d073c580e0f764044f7932d"
 lazy = true
 os = "windows"
@@ -1691,6 +1879,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2015d.tar.gz"
 
 [[tzdata_2015e]]
+arch = "x86_64"
 git-tree-sha1 = "94a81fc3e074f7805ac9aaf5af16e77ea2b154ea"
 lazy = true
 os = "windows"
@@ -1700,6 +1889,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2015e.tar.gz"
 
 [[tzdata_2015f]]
+arch = "x86_64"
 git-tree-sha1 = "d870b70237121670928885e6865d4db94c5ed483"
 lazy = true
 os = "windows"
@@ -1709,6 +1899,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2015f.tar.gz"
 
 [[tzdata_2015g]]
+arch = "x86_64"
 git-tree-sha1 = "c1b363dfc4639e16c42a2e5dc379598945e7f9d0"
 lazy = true
 os = "windows"
@@ -1718,6 +1909,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2015g.tar.gz"
 
 [[tzdata_2016a]]
+arch = "x86_64"
 git-tree-sha1 = "b7b34e2985e69420d01578a8d174adb4b3303266"
 lazy = true
 os = "windows"
@@ -1727,6 +1919,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2016a.tar.gz"
 
 [[tzdata_2016b]]
+arch = "x86_64"
 git-tree-sha1 = "0f6d45257c7a02a831e7c5d74ef054034c2ed266"
 lazy = true
 os = "windows"
@@ -1736,6 +1929,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2016b.tar.gz"
 
 [[tzdata_2016c]]
+arch = "x86_64"
 git-tree-sha1 = "3559aa380ab421e7f622d57c20ce356acb689932"
 lazy = true
 os = "windows"
@@ -1745,6 +1939,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2016c.tar.gz"
 
 [[tzdata_2016d]]
+arch = "x86_64"
 git-tree-sha1 = "3a9597f51cd7afbd703b794d2665c3d380802673"
 lazy = true
 os = "windows"
@@ -1754,6 +1949,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2016d.tar.gz"
 
 [[tzdata_2016e]]
+arch = "x86_64"
 git-tree-sha1 = "d527fc207d381868fb61e910578c98e784723e87"
 lazy = true
 os = "windows"
@@ -1763,6 +1959,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2016e.tar.gz"
 
 [[tzdata_2016f]]
+arch = "x86_64"
 git-tree-sha1 = "2a03ec9740b8a49863c6b19d594dc76689601ebb"
 lazy = true
 os = "windows"
@@ -1772,6 +1969,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2016f.tar.gz"
 
 [[tzdata_2016g]]
+arch = "x86_64"
 git-tree-sha1 = "ea1ff0fbc65415a073702b1a3e040e21d3cb2266"
 lazy = true
 os = "windows"
@@ -1781,6 +1979,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2016g.tar.gz"
 
 [[tzdata_2016h]]
+arch = "x86_64"
 git-tree-sha1 = "214c1f99ee5cbc45ae0f163085211c899e1f94a1"
 lazy = true
 os = "windows"
@@ -1790,6 +1989,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2016h.tar.gz"
 
 [[tzdata_2016i]]
+arch = "x86_64"
 git-tree-sha1 = "c1d95977b98480535d4473e48edf4fa653a9fb64"
 lazy = true
 os = "windows"
@@ -1799,6 +1999,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2016i.tar.gz"
 
 [[tzdata_2016j]]
+arch = "x86_64"
 git-tree-sha1 = "cae342ed5640427089e8d00f7cb4a235aa6a3738"
 lazy = true
 os = "windows"
@@ -1808,6 +2009,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2016j.tar.gz"
 
 [[tzdata_2017a]]
+arch = "x86_64"
 git-tree-sha1 = "b843c2188f8b79766852771b92b815474d2fbf86"
 lazy = true
 os = "windows"
@@ -1817,6 +2019,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2017a.tar.gz"
 
 [[tzdata_2017b]]
+arch = "x86_64"
 git-tree-sha1 = "5489e8958f8cee7efd5db72e7fecdf05d2211b55"
 lazy = true
 os = "windows"
@@ -1826,6 +2029,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2017b.tar.gz"
 
 [[tzdata_2017c]]
+arch = "x86_64"
 git-tree-sha1 = "28fc6eaf16964a7b347999003df8136f7b646692"
 lazy = true
 os = "windows"
@@ -1835,6 +2039,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2017c.tar.gz"
 
 [[tzdata_2018a]]
+arch = "x86_64"
 git-tree-sha1 = "22fbf3f654c6f46836c585ec4a28d93428f65a2b"
 lazy = true
 os = "windows"
@@ -1844,6 +2049,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2018a.tar.gz"
 
 [[tzdata_2018b]]
+arch = "x86_64"
 git-tree-sha1 = "185bc6a27555319dd780f32c881bae97afc705be"
 lazy = true
 os = "windows"
@@ -1853,6 +2059,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2018b.tar.gz"
 
 [[tzdata_2018c]]
+arch = "x86_64"
 git-tree-sha1 = "c1f8f0537e1ee2be943a33f85b69393a250ecaa9"
 lazy = true
 os = "windows"
@@ -1862,6 +2069,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2018c.tar.gz"
 
 [[tzdata_2018d]]
+arch = "x86_64"
 git-tree-sha1 = "4725645038c103a7b5eef9b0b0c9ae385f30dbc5"
 lazy = true
 os = "windows"
@@ -1871,6 +2079,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2018d.tar.gz"
 
 [[tzdata_2018e]]
+arch = "x86_64"
 git-tree-sha1 = "8c165f20fa060325a5c25d2d858f4e876a1f33e6"
 lazy = true
 os = "windows"
@@ -1880,6 +2089,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2018e.tar.gz"
 
 [[tzdata_2018f]]
+arch = "x86_64"
 git-tree-sha1 = "0ff8e19a37a9322917e60359c774ef2939bf7865"
 lazy = true
 os = "windows"
@@ -1889,6 +2099,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2018f.tar.gz"
 
 [[tzdata_2018g]]
+arch = "x86_64"
 git-tree-sha1 = "a8585eb874f3189bfecff315976b24ef17171ad8"
 lazy = true
 os = "windows"
@@ -1898,6 +2109,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2018g.tar.gz"
 
 [[tzdata_2018h]]
+arch = "x86_64"
 git-tree-sha1 = "23aaa0de331269537c5e26f221fcbf33330a87a4"
 lazy = true
 os = "windows"
@@ -1907,6 +2119,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2018h.tar.gz"
 
 [[tzdata_2018i]]
+arch = "x86_64"
 git-tree-sha1 = "203f8b45c89cde448b05c5b22e9b1dca067d78d4"
 lazy = true
 os = "windows"
@@ -1916,6 +2129,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2018i.tar.gz"
 
 [[tzdata_2019a]]
+arch = "x86_64"
 git-tree-sha1 = "ea6fc93b3e8f53e6d09456e2a99723eef7a01c38"
 lazy = true
 os = "windows"
@@ -1925,6 +2139,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2019a.tar.gz"
 
 [[tzdata_2019b]]
+arch = "x86_64"
 git-tree-sha1 = "f5baf10aa9ec3a537432e064ad5920b2c4acdffd"
 lazy = true
 os = "windows"
@@ -1934,6 +2149,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2019b.tar.gz"
 
 [[tzdata_2019c]]
+arch = "x86_64"
 git-tree-sha1 = "b41b03d6261818bf7ae1cd848d5e189d3a356955"
 lazy = true
 os = "windows"
@@ -1943,6 +2159,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2019c.tar.gz"
 
 [[tzdata_2020a]]
+arch = "x86_64"
 git-tree-sha1 = "74ba2f3a4a8859e42bd67b3a8e1c4447bcdf9108"
 lazy = true
 os = "windows"
@@ -1952,6 +2169,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata2020a.tar.gz"
 
 [[tzdata_93g]]
+arch = "x86_64"
 git-tree-sha1 = "e7ddeb4a45080afa6dbdd7c38df81bcf8b9d8f1a"
 lazy = true
 os = "windows"
@@ -1961,6 +2179,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata93g.tar.gz"
 
 [[tzdata_94a]]
+arch = "x86_64"
 git-tree-sha1 = "3792c6bcf2dd410edabc0de920b3262e9bcf08b9"
 lazy = true
 os = "windows"
@@ -1970,6 +2189,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata94a.tar.gz"
 
 [[tzdata_94b]]
+arch = "x86_64"
 git-tree-sha1 = "ff665b96f7d50272d0a8e0e321d530c8b09380a5"
 lazy = true
 os = "windows"
@@ -1979,6 +2199,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata94b.tar.gz"
 
 [[tzdata_94d]]
+arch = "x86_64"
 git-tree-sha1 = "ae7b60dc0c96fc76c945b5f95b464c2672a1f12b"
 lazy = true
 os = "windows"
@@ -1988,6 +2209,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata94d.tar.gz"
 
 [[tzdata_94e]]
+arch = "x86_64"
 git-tree-sha1 = "90b27ec406fbe1e30a7b486edde037c7fa475c27"
 lazy = true
 os = "windows"
@@ -1997,6 +2219,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata94e.tar.gz"
 
 [[tzdata_94f]]
+arch = "x86_64"
 git-tree-sha1 = "120dc3d384840054741fa6d3b1d4bb8eba2396b6"
 lazy = true
 os = "windows"
@@ -2006,6 +2229,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata94f.tar.gz"
 
 [[tzdata_94h]]
+arch = "x86_64"
 git-tree-sha1 = "a7192b7b16d072863839ee24cc68cb944f942fa4"
 lazy = true
 os = "windows"
@@ -2015,6 +2239,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata94h.tar.gz"
 
 [[tzdata_95b]]
+arch = "x86_64"
 git-tree-sha1 = "5cee98fd13b7cc03af48b926534759f515d2c1b6"
 lazy = true
 os = "windows"
@@ -2024,6 +2249,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata95b.tar.gz"
 
 [[tzdata_95c]]
+arch = "x86_64"
 git-tree-sha1 = "b973690beafaad07f8fe8172a664e3995665d510"
 lazy = true
 os = "windows"
@@ -2033,6 +2259,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata95c.tar.gz"
 
 [[tzdata_95d]]
+arch = "x86_64"
 git-tree-sha1 = "4181abd2be1fc8f2964c0681d8bc3ff7d38c299a"
 lazy = true
 os = "windows"
@@ -2042,6 +2269,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata95d.tar.gz"
 
 [[tzdata_95e]]
+arch = "x86_64"
 git-tree-sha1 = "6ac70b261703c39615f2e7797aa3662f57e97a9a"
 lazy = true
 os = "windows"
@@ -2051,6 +2279,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata95e.tar.gz"
 
 [[tzdata_95f]]
+arch = "x86_64"
 git-tree-sha1 = "f052bec9396067db314ae37cba669e1fdb528742"
 lazy = true
 os = "windows"
@@ -2060,6 +2289,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata95f.tar.gz"
 
 [[tzdata_95g]]
+arch = "x86_64"
 git-tree-sha1 = "2ad4eaf2fd0db4fd756019cca85d1139303e0c6f"
 lazy = true
 os = "windows"
@@ -2069,6 +2299,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata95g.tar.gz"
 
 [[tzdata_95h]]
+arch = "x86_64"
 git-tree-sha1 = "ab0e8405a16af3653a5610979ab2a7392ec4fbba"
 lazy = true
 os = "windows"
@@ -2078,6 +2309,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata95h.tar.gz"
 
 [[tzdata_95i]]
+arch = "x86_64"
 git-tree-sha1 = "d5506bf9dc54bddf87ce34e54075f1bdb8e1e01c"
 lazy = true
 os = "windows"
@@ -2087,6 +2319,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata95i.tar.gz"
 
 [[tzdata_95k]]
+arch = "x86_64"
 git-tree-sha1 = "4641d762bdfd45005ffe23a21bace16fb2e5c50a"
 lazy = true
 os = "windows"
@@ -2096,6 +2329,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata95k.tar.gz"
 
 [[tzdata_95l]]
+arch = "x86_64"
 git-tree-sha1 = "64afaaed2b88c38a29f9fb4198f22662323d3ceb"
 lazy = true
 os = "windows"
@@ -2105,6 +2339,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata95l.tar.gz"
 
 [[tzdata_95m]]
+arch = "x86_64"
 git-tree-sha1 = "f7b20d08ea0fae0f43fce023421032eb9c839f27"
 lazy = true
 os = "windows"
@@ -2114,6 +2349,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata95m.tar.gz"
 
 [[tzdata_96a]]
+arch = "x86_64"
 git-tree-sha1 = "d979d12f0912737480e554e2915459b905220779"
 lazy = true
 os = "windows"
@@ -2123,6 +2359,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata96a.tar.gz"
 
 [[tzdata_96b]]
+arch = "x86_64"
 git-tree-sha1 = "214e8413b5da90d6e5d9f6d916be43b48a9f0669"
 lazy = true
 os = "windows"
@@ -2132,6 +2369,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata96b.tar.gz"
 
 [[tzdata_96c]]
+arch = "x86_64"
 git-tree-sha1 = "0098bd8f0a47871e728d40fca476b7c42f988894"
 lazy = true
 os = "windows"
@@ -2141,6 +2379,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata96c.tar.gz"
 
 [[tzdata_96d]]
+arch = "x86_64"
 git-tree-sha1 = "c3abe4165d88d36b015eb341b65ff5c5a4c98bf4"
 lazy = true
 os = "windows"
@@ -2150,6 +2389,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata96d.tar.gz"
 
 [[tzdata_96e]]
+arch = "x86_64"
 git-tree-sha1 = "d34c0c6aeb16e0a4e1b4b06573459df0f4c86122"
 lazy = true
 os = "windows"
@@ -2159,6 +2399,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata96e.tar.gz"
 
 [[tzdata_96h]]
+arch = "x86_64"
 git-tree-sha1 = "463561ed73c004096d46613a9c94af2b635c4ebf"
 lazy = true
 os = "windows"
@@ -2168,6 +2409,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata96h.tar.gz"
 
 [[tzdata_96i]]
+arch = "x86_64"
 git-tree-sha1 = "33143e05ac18f5c2618df3b30ade30b488ecbc83"
 lazy = true
 os = "windows"
@@ -2177,6 +2419,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata96i.tar.gz"
 
 [[tzdata_96k]]
+arch = "x86_64"
 git-tree-sha1 = "7960910282bef13f94763d0c9782c6a905297f0f"
 lazy = true
 os = "windows"
@@ -2186,6 +2429,7 @@ os = "windows"
     url = "https://data.iana.org/time-zones/releases/tzdata96k.tar.gz"
 
 [[tzdata_latest]]
+arch = "x86_64"
 git-tree-sha1 = "74ba2f3a4a8859e42bd67b3a8e1c4447bcdf9108"
 lazy = true
 os = "windows"
