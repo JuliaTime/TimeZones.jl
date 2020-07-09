@@ -16,7 +16,7 @@ stages:
 .doc_deploy: &doc_deploy
   stage: "Documentation (Deploy)"
   os: linux
-  julia: 1.4
+  julia: 1
   script:
     - julia --project=docs/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd())); Pkg.build("TimeZones")'
     - julia --project=docs/ docs/deploy.jl
