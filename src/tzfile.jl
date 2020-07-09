@@ -1,5 +1,5 @@
 # Parsing tzfiles references:
-# - http://man7.org/linux/man-pages/man5/tzfile.5.html
+# - https://man7.org/linux/man-pages/man5/tzfile.5.html
 # - ftp://ftp.iana.org/tz/code/tzfile.5.txt
 
 const TZFILE_MAX = unix2datetime(typemax(Int32))
@@ -18,7 +18,7 @@ end
     read_tzfile(io::IO, name::AbstractString) -> TimeZone
 
 Read the content of an I/O stream and process it as a
-[POSIX tzfile](http://man7.org/linux/man-pages/man5/tzfile.5.html). The returned
+[POSIX tzfile](https://man7.org/linux/man-pages/man5/tzfile.5.html). The returned
 `TimeZone` will be given the supplied name `name` unless a `FixedTimeZone` is returned.
 """
 function read_tzfile(io::IO, name::AbstractString)
