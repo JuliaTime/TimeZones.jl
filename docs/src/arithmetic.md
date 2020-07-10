@@ -52,7 +52,7 @@ julia> spring + Day(1) + Hour(24)
 [Query](https://docs.julialang.org/en/v1/stdlib/Dates/#Query-Functions-1) and [adjuster functions](https://docs.julialang.org/en/v1/stdlib/Dates/#Adjuster-Functions-1) can be used as with `Date` and `DateTime`.
 We can use `filter` to apply a predicate to a `StepRange` of `TimeType`s to produce a vector of dates that fit certain inclusion criteria (for example, "every fifth Wednesday of the month in 2014 at 09:00"):
 
-```jldoctest spring
+```jldoctest spring; filter = r"Array\{ZonedDateTime,1\}|Vector\{ZonedDateTime\}"
 julia> warsaw = tz"Europe/Warsaw"
 Europe/Warsaw (UTC+1/UTC+2)
 
@@ -79,7 +79,7 @@ Note the transition from standard time to daylight saving time (and back again).
 
 It is possible to define a range `start:step:stop` such that `start` and `stop` have different time zones. In this case the resulting `ZonedDateTime`s will all share a time zone with `start` but the range will stop at the instant that corresponds to `stop` in `start`'s time zone. For example:
 
-```jldoctest spring
+```jldoctest spring; filter = r"Array\{ZonedDateTime,1\}|Vector\{ZonedDateTime\}"
 julia> start = ZonedDateTime(2016, 1, 1, 12, tz"UTC")
 2016-01-01T12:00:00+00:00
 
