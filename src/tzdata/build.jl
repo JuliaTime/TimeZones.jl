@@ -53,9 +53,10 @@ function build(
             set_latest(version, now_utc)
         end
         artifact_dir = @artifact_str "tzdata_$version"
-        if !isfile(LATEST_FILE)
-            set_latest(version, now_utc)
-        end
+        set_latest(version, now_utc)
+        #if !isfile(LATEST_FILE)
+        #    set_latest(version, now_utc)
+        #end
 
         if !isempty(tz_source_dir)
             @info "Copying region data from version $version"
