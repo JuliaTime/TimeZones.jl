@@ -40,8 +40,7 @@ function build(
 
     if VERSION >= v"1.4"
         now_utc = now(Dates.UTC)
-        artifact_name = "tzdata_$version"
-        artifact_dir = @artifact_str artifact_name
+        # todo: I don't have latest here and it should not be used as latest
         if version == "latest"
             m = match(TZDATA_VERSION_REGEX, "tzdata$version.tar.gz")
             if m !== nothing
@@ -49,13 +48,12 @@ function build(
                 @info "Latest tzdata is $version"
             end
 
-            version = tzdata_version_dir(artifact_dir)
-            # originally there is mv, now it's just downloading new artifact
             artifact_name = "tzdata_$version"
-            @artifact_str artifact_name
-
+            artifact_dir = @artifact_str artifact_name
+            version = tzdata_version_dir(artifact_dir)
             set_latest(version, now_utc)
         end
+        artifact_dir = @artifact_str artifact_name
 
         if !isempty(tz_source_dir)
             @info "Copying region data from version $version"

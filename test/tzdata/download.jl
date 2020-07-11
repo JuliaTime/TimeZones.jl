@@ -1,4 +1,6 @@
 using TimeZones.TZData: tzdata_url, tzdata_download, isarchive, LATEST_FILE, read_latest, REGIONS, latest_version
+using TimeZones.TZData: LATEST
+using Dates
 if VERSION >= v"1.4"
     using Pkg.Artifacts
 end
@@ -13,6 +15,7 @@ mktempdir() do temp_dir
         if VERSION >= v"1.4"
             build("latest", REGIONS, "")
             latest_tzdata = "tzdata_$(latest_version())"
+            @info "tzdata" latest_tzdata LATEST_FILE LATEST[] now(Dates.UTC)
             @artifact_str latest_tzdata
         else
             tzdata_download("latest", temp_dir)
