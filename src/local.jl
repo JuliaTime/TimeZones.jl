@@ -175,7 +175,7 @@ end
 
 Parse the time zone format typically provided via the "TZ" environment variable. Details on
 the format can be found under the man page for
-[tzset](https://man7.org/linux/man-pages/man3/tzset.3.html).
+[tzset](http://man7.org/linux/man-pages/man3/tzset.3.html).
 """
 function parse_tz_format(str::AbstractString)
     x = _parsesub_tz(str)

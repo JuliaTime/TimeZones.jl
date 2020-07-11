@@ -1,24 +1,41 @@
-using TimeZones.TZData: tzdata_url, LATEST_FILE, read_latest, REGIONS, latest_version
-using Pkg.Artifacts
+using TimeZones.TZData: tzdata_url, tzdata_download, isarchive, LATEST_FILE, read_latest, REGIONS, latest_version
+if VERSION >= v"1.4"
+    using Pkg.Artifacts
+end
+
 
 @test tzdata_url("2016j") == "https://data.iana.org/time-zones/releases/tzdata2016j.tar.gz"
 @test tzdata_url("latest") == "https://data.iana.org/time-zones/tzdata-latest.tar.gz"
 
+# Note: Try to keep the number of `tzdata_download` calls low to avoid unnecessary network traffic
 mktempdir() do temp_dir
     file_path = ignore_output() do
-        @artifact_str "tzdata_$(latest_version())"
+        if VERSION >= v"1.4"
+            @artifact_str "tzdata_$(latest_version())"
+        else
+            tzdata_download("latest", temp_dir)
+        end
     end
 
-    @test isdir(file_path)
+    if VERSION >= v"1.4"
+        @test isdir(file_path)
+    else
+        @test isfile(file_path)
+        @test isarchive(file_path)
+    end
     @test basename(file_path) != basename(tzdata_url("latest"))
 
     last_modified = mtime(file_path)
     last_file_path = file_path
 
     # No need to ignore output as this should never trigger a download
-    file_path = @artifact_str "tzdata_$(latest_version())"
-    build("latest", REGIONS)
-    
+    if VERSION >= v"1.4"
+        file_path = @artifact_str "tzdata_$(latest_version())"
+        build("latest", REGIONS)
+    else
+        file_path = tzdata_download("latest", temp_dir)
+    end
+
     @test file_path == last_file_path
     @test mtime(file_path) == last_modified
 

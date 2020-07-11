@@ -2,7 +2,9 @@ module WindowsTimeZoneIDs
 
 using ...TimeZones: DEPS_DIR
 using EzXML
-using Pkg.Artifacts
+if VERSION >= v"1.4"
+    using Pkg.Artifacts
+end
 
 # A mapping of Windows timezone names to Olson timezone names.
 # Details on the contents of this file can be found at:
@@ -48,7 +50,7 @@ function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
             cp(fallback_xml_file, xml_file)
         else
             @info "Downloading latest Windows to POSIX timezone ID XML"
-            # would be nice to have it as Artifact, but I don't have tarball available
+            # todo: instead of this, add the whole repo as a tarball
             download(WINDOWS_ZONE_URL, xml_file)
         end
     end

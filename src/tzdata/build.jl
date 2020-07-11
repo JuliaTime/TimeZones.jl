@@ -23,11 +23,11 @@ const REGIONS = [STANDARD_REGIONS; LEGACY_REGIONS]
 function build(
     version::AbstractString,
     regions::AbstractVector{<:AbstractString},
+    archive_dir::AbstractString,
     tz_source_dir::AbstractString="",
     compiled_dir::AbstractString="";
     verbose::Bool=false,
 )
-    now_utc = now(Dates.UTC)
     # Avoids spamming remote servers requesting the latest version
     if version == "latest"
         v = latest_version()
@@ -38,28 +38,51 @@ function build(
         end
     end
 
-    artifact_name = "tzdata_$version"
-    artifact_dir = @artifact_str artifact_name
+    if VERSION >= v"1.4"
+        now_utc = now(Dates.UTC)
+        artifact_name = "tzdata_$version"
+        artifact_dir = @artifact_str artifact_name
+        if version == "latest"
+            m = match(TZDATA_VERSION_REGEX, "tzdata$version.tar.gz")
+            if m !== nothing
+                version = m.match
+                @info "Latest tzdata is $version"
+            end
 
-    if version == "latest"
-        m = match(TZDATA_VERSION_REGEX, "tzdata$version.tar.gz")
-        if m !== nothing
-            version = m.match
-            @info "Latest tzdata is $version"
+            version = tzdata_version_dir(artifact_dir)
+            # originally there is mv, now it's just downloading new artifact
+            artifact_name = "tzdata_$version"
+            @artifact_str artifact_name
+
+            set_latest(version, now_utc)
         end
 
-        version = tzdata_version_dir(artifact_dir)
-        # originally there is mv, now it's just downloading new artifact
-        artifact_name = "tzdata_$version"
-        @artifact_str artifact_name
+        if !isempty(tz_source_dir)
+            @info "Copying region data from version $version"
+            for region in setdiff(regions, CUSTOM_REGIONS)
+                cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
+            end
+        end
+    else
+        archive = joinpath(archive_dir, "tzdata$version.tar.gz")
 
-        set_latest(version, now_utc)
-    end
+        # Avoid downloading a tzdata archive if we already have a local copy
+        if version == "latest" || !isfile(archive)
+            @info "Downloading $version tzdata"
+            archive = tzdata_download(version, archive_dir)
 
-    if !isempty(tz_source_dir)
-        @info "Copying region data from version $version"
-        for region in setdiff(regions, CUSTOM_REGIONS)
-            cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
+            if version == "latest"
+                m = match(TZDATA_VERSION_REGEX, basename(archive))
+                if m !== nothing
+                    version = m.match
+                    @info "Latest tzdata is $version"
+                end
+            end
+        end
+
+        if !isempty(tz_source_dir)
+            @info "Extracting $version tzdata archive"
+            extract(archive, tz_source_dir, setdiff(regions, CUSTOM_REGIONS), verbose=verbose)
         end
     end
 
@@ -73,6 +96,9 @@ function build(
 end
 
 function build(version::AbstractString=tzdata_version())
+    if VERSION < v"1.4"
+        isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
+    end
     isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)
     isdir(COMPILED_DIR) || mkdir(COMPILED_DIR)
 
@@ -83,7 +109,7 @@ function build(version::AbstractString=tzdata_version())
     end
 
     version = build(
-        version, REGIONS, TZ_SOURCE_DIR, COMPILED_DIR, verbose=true,
+        version, REGIONS, ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, verbose=true,
     )
 
     # Store the version of the compiled tzdata
