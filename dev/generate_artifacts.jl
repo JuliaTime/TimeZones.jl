@@ -3,8 +3,8 @@ using TimeZones.TZData: tzdata_url
 #using TimeZones.WindowsTimeZoneIDs: WINDOWS_ZONE_URL, WINDOWS_XML_FILE
 using SHA
 using Pkg.BinaryPlatforms
+using TimeZones.TZData: extract, tzdata_download
 
-include(joinpath(@__DIR__, "download.jl"))
 # This is the path to the Artifacts.toml we will manipulate
 artifacts_toml = joinpath(dirname(@__DIR__), "Artifacts.toml")
 
@@ -44,10 +44,10 @@ for version in VERSIONS
     end
 end
 
-# this can not work in current state because Artifacts require tarball, and there is only the direct XML
+# todo: finish it
+# # this can not work in current state because Artifacts require tarball, and there is only the direct XML
 # # and now, add windows xml thingy
-# win_urls = ["https://raw.githubusercontent.com/JuliaTime/TimeZones.jl/v1.2.0/deps/local/windowsZones.xml",
-#     WINDOWS_ZONE_URL, "https://raw.githubusercontent.com/unicode-org/cldr/master/common/supplemental/windowsZones.xml"]
+# win_xml_archive_url = "https://github.com/unicode-org/cldr/archive/release-37.tar.gz"
 # win_xml_latest_hash = artifact_hash("tzdata_windowsZones", artifacts_toml)
 # # If the name was not bound, or the hash it was bound to does not exist, create it!
 # if isnothing(win_xml_latest_hash) || !artifact_exists(win_xml_latest_hash)
@@ -55,6 +55,12 @@ end
 #     tzfile_hash = create_artifact() do artifact_dir
 #         # We create the artifact by simply downloading a few files into the new artifact directory
 #         cp(WINDOWS_XML_FILE, joinpath(artifact_dir, basename(WINDOWS_XML_FILE)))
+#         @info "Downloading $version tzdata"
+#         archive_name = tzdata_download(version, artifact_dir)
+#         # todo: download it from github here, the base download?
+#         win_xml_archive_url
+#         extract(archive_name, artifact_dir)
+#         rm(archive_name)
 #     end
 #
 #     # Now bind that hash within our `Artifacts.toml`.  `force = true` means that if it already exists,
@@ -63,8 +69,8 @@ end
 #     download_data = [(url, bytes2hex(sha256(read(download(url))))) for url in win_urls]
 #     bind_artifact!(artifacts_toml, "tzdata_windowsZones", tzfile_hash, lazy=true, download_info=download_data)
 # end
-
-# using Pkg.BinaryPlatforms
-# platform_key_abi()
-# typeof(platform_key_abi())
-# typeof(platform_key_abi())
+#
+# # using Pkg.BinaryPlatforms
+# # platform_key_abi()
+# # typeof(platform_key_abi())
+# # typeof(platform_key_abi())
