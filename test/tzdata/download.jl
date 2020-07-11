@@ -11,7 +11,9 @@ end
 mktempdir() do temp_dir
     file_path = ignore_output() do
         if VERSION >= v"1.4"
-            @artifact_str "tzdata_$(latest_version())"
+            build("latest", REGIONS, "")
+            latest_tzdata = "tzdata_$(latest_version())"
+            @artifact_str latest_tzdata
         else
             tzdata_download("latest", temp_dir)
         end
@@ -31,7 +33,6 @@ mktempdir() do temp_dir
     # No need to ignore output as this should never trigger a download
     if VERSION >= v"1.4"
         file_path = @artifact_str "tzdata_$(latest_version())"
-        build("latest", REGIONS)
     else
         file_path = tzdata_download("latest", temp_dir)
     end
