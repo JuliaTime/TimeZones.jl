@@ -120,4 +120,8 @@ if VERSION >= v"1.4"
         !isdir(archive) && error("Missing $version tzdata archive")
         return archive
     end
+else
+    function active_dir()
+        throw("this should never bee called")
+    end
 end
