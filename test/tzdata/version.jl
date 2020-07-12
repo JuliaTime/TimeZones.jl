@@ -5,6 +5,9 @@ if VERSION >= v"1.4"
     using Pkg.Artifacts
     using Pkg.Artifacts: artifacts_dirs
 end
+if VERSION < v"1.3"
+    import TimeZones.TZData: @artifact_str
+end
 
 for year = ("12", "1234"), letter = ("", "z")
     version = year * letter
