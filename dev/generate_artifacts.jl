@@ -44,33 +44,33 @@ for version in VERSIONS
     end
 end
 
-# todo: finish it
-# # this can not work in current state because Artifacts require tarball, and there is only the direct XML
-# # and now, add windows xml thingy
-# win_xml_archive_url = "https://github.com/unicode-org/cldr/archive/release-37.tar.gz"
-# win_xml_latest_hash = artifact_hash("tzdata_windowsZones", artifacts_toml)
-# # If the name was not bound, or the hash it was bound to does not exist, create it!
-# if isnothing(win_xml_latest_hash) || !artifact_exists(win_xml_latest_hash)
-#     # create_artifact() returns the content-hash of the artifact directory once we're finished creating it
-#     tzfile_hash = create_artifact() do artifact_dir
-#         # We create the artifact by simply downloading a few files into the new artifact directory
-#         cp(WINDOWS_XML_FILE, joinpath(artifact_dir, basename(WINDOWS_XML_FILE)))
-#         @info "Downloading $version tzdata"
-#         archive_name = tzdata_download(version, artifact_dir)
-#         # todo: download it from github here, the base download?
-#         win_xml_archive_url
-#         extract(archive_name, artifact_dir)
-#         rm(archive_name)
-#     end
-#
-#     # Now bind that hash within our `Artifacts.toml`.  `force = true` means that if it already exists,
-#     # just overwrite with the new content-hash.  Unless the source files change, we do not expect
-#     # the content hash to change, so this should not cause unnecessary version control churn.
-#     download_data = [(url, bytes2hex(sha256(read(download(url))))) for url in win_urls]
-#     bind_artifact!(artifacts_toml, "tzdata_windowsZones", tzfile_hash, lazy=true, download_info=download_data)
-# end
-#
-# # using Pkg.BinaryPlatforms
-# # platform_key_abi()
-# # typeof(platform_key_abi())
-# # typeof(platform_key_abi())
+# and now, add windows xml thingy, but as the whole tarball of github release
+win_xml_archive_url = "https://github.com/unicode-org/cldr/archive/release-37.tar.gz"
+win_xml_latest_hash = artifact_hash("tzdata_windowsZones", artifacts_toml)
+# If the name was not bound, or the hash it was bound to does not exist, create it!
+if isnothing(win_xml_latest_hash) || !artifact_exists(win_xml_latest_hash)
+    # create_artifact() returns the content-hash of the artifact directory once we're finished creating it
+    tzfile_hash = create_artifact() do artifact_dir
+        # We create the artifact by simply downloading a few files into the new artifact directory
+        archive_name = download(win_xml_archive_url, joinpath(artifact_dir, basename(win_xml_archive_url)))
+        # @info "Downloading to $artifact_dir" a
+        # archive_name = tzdata_download(version, artifact_dir)
+        extract(archive_name, artifact_dir)
+        rm(archive_name)
+    end
+    download_dir = artifact_path(tzfile_hash)
+    content_sha = open(download(win_xml_archive_url)) do f
+       bytes2hex(sha256(f))
+    end
+
+    # Now bind that hash within our `Artifacts.toml`.  `force = true` means that if it already exists,
+    # just overwrite with the new content-hash.  Unless the source files change, we do not expect
+    # the content hash to change, so this should not cause unnecessary version control churn.
+    download_data = [(win_xml_archive_url, content_sha)]
+    bind_artifact!(artifacts_toml, "tzdata_windowsZones", tzfile_hash, lazy=true, download_info=download_data)
+end
+
+# using Pkg.BinaryPlatforms
+# platform_key_abi()
+# typeof(platform_key_abi())
+# typeof(platform_key_abi())
