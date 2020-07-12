@@ -4,8 +4,7 @@ using TimeZones.TZData: active_version, active_archive, active_dir
 if VERSION >= v"1.4"
     using Pkg.Artifacts
     using Pkg.Artifacts: artifacts_dirs
-end
-if VERSION < v"1.3"
+else
     import TimeZones.TZData: @artifact_str
 end
 
