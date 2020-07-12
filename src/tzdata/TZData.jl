@@ -4,10 +4,8 @@ using Printf
 using ...TimeZones: DEPS_DIR
 if VERSION >= v"1.4"
     using Pkg.Artifacts
-end
-
-# to avoid fail when Julia tried to precompile even non-compatible code
-if VERSION < v"1.3"
+else
+    # to avoid fail when Julia tried to precompile even non-compatible code
     macro artifact_str(name)
         :(throw("this should never bee called"))
     end
