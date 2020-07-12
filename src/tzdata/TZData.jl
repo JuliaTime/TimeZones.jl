@@ -6,6 +6,13 @@ if VERSION >= v"1.4"
     using Pkg.Artifacts
 end
 
+# to avoid fail when Julia tried to precompile even non-compatible code
+if VERSION < v"1.3"
+    macro artifact_str(name)
+        :(throw("this should never bee called"))
+    end
+end
+
 # Note: The tz database is made up of two parts: code and data. TimeZones.jl only requires
 # the "tzdata" archive or more specifically the "tz source" files within the archive
 # (africa, australasia, ...)
