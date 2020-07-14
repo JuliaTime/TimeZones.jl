@@ -35,16 +35,18 @@ end
 @test match(TZDATA_NEWS_REGEX, "Release 19999") === nothing
 
 
-if VERSION >= v"1.4"
-    archive = @artifact_str "tzdata_$TZDATA_VERSION"
+use_artifacts = VERSION >= v"1.4"
+
+if use_artifacts
+    artifact_dir = @artifact_str "tzdata_$TZDATA_VERSION"
 else
     archive = joinpath(ARCHIVE_DIR, "tzdata$TZDATA_VERSION.tar.gz")
 end
 
 mktempdir() do temp_dir
     # Read the first tzdata version
-    if VERSION >= v"1.4"
-        temp_dir = archive  # so I don't need to have too many ifs
+    if use_artifacts
+        cp(joinpath(artifact_dir, "NEWS"), temp_dir)
     else
         extract(archive, temp_dir, "NEWS")
     end
@@ -66,10 +68,7 @@ mktempdir() do temp_dir
     @test_throws ErrorException tzdata_version_dir(dirname(@__FILE__))
 end
 
-if VERSION >= v"1.4"
-    @test tzdata_version_dir(archive) == TZDATA_VERSION
-    @test_throws Base.IOError tzdata_version_dir(@__FILE__) == TZDATA_VERSION
-else
+if !use_artifacts
     @test tzdata_version_archive(archive) == TZDATA_VERSION
     @test_throws ProcessFailedException tzdata_version_archive(@__FILE__) == TZDATA_VERSION
 end
@@ -80,11 +79,7 @@ version = active_version()
 @test version != "latest"  # Could happen if the logic to resolve the version fails
 @test match(TZDATA_VERSION_REGEX, version) !== nothing
 
-if VERSION >= v"1.4"
-    archive = active_dir()
-    @test isdir(archive)
-    @test dirname(archive) ∈ artifacts_dirs()
-else
+if !use_artifacts
     archive = active_archive()
     @test isfile(archive)
     @test dirname(archive) == ARCHIVE_DIR

@@ -38,7 +38,7 @@ function build(
         end
     end
 
-    if VERSION >= v"1.4"
+    @static if VERSION >= v"1.4"
         now_utc = now(Dates.UTC)
         # todo: I don't have latest here and it should not be used as latest
         if version == "latest"
@@ -61,7 +61,7 @@ function build(
         if !isempty(tz_source_dir)
             @info "Copying region data from version $version"
             for region in setdiff(regions, CUSTOM_REGIONS)
-                cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
+                cp(joinpath(artifact_dir, region), tz_source_dir, force=true)
             end
         end
     else
