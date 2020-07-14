@@ -32,9 +32,7 @@ end
 @test match(TZDATA_NEWS_REGEX, "Release 19999") === nothing
 
 
-use_artifacts = VERSION >= v"1.4"
-
-if use_artifacts
+@static if VERSION >= v"1.4"
     artifact_dir = @artifact_str "tzdata_$TZDATA_VERSION"
 else
     archive = joinpath(ARCHIVE_DIR, "tzdata$TZDATA_VERSION.tar.gz")
@@ -42,7 +40,7 @@ end
 
 mktempdir() do temp_dir
     # Read the first tzdata version
-    if use_artifacts
+    @static if VERSION >= v"1.4"
         cp(joinpath(artifact_dir, "NEWS"), temp_dir)
     else
         extract(archive, temp_dir, "NEWS")
@@ -64,6 +62,8 @@ mktempdir() do temp_dir
     @test tzdata_version_dir(temp_dir) == TZDATA_VERSION
     @test_throws ErrorException tzdata_version_dir(dirname(@__FILE__))
 end
+
+use_artifacts = VERSION >= v"1.4"
 
 if !use_artifacts
     @test tzdata_version_archive(archive) == TZDATA_VERSION
