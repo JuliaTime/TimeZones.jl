@@ -1,11 +1,8 @@
 using TimeZones.TZData: ARCHIVE_DIR, TZDATA_VERSION_REGEX, TZDATA_NEWS_REGEX
 using TimeZones.TZData: read_news, extract, tzdata_version_dir, tzdata_version_archive
 using TimeZones.TZData: active_version, active_archive, active_dir
-if VERSION >= v"1.4"
+@static if VERSION >= v"1.4"
     using Pkg.Artifacts
-    using Pkg.Artifacts: artifacts_dirs
-else
-    import TimeZones.TZData: @artifact_str
 end
 
 for year = ("12", "1234"), letter = ("", "z")

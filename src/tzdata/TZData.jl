@@ -2,13 +2,8 @@ module TZData
 
 using Printf
 using ...TimeZones: DEPS_DIR
-if VERSION >= v"1.4"
+@static VERSION >= v"1.4"
     using Pkg.Artifacts
-else
-    # to avoid fail when Julia tried to precompile even non-compatible code
-    macro artifact_str(name)
-        :(throw("this should never bee called"))
-    end
 end
 
 # Note: The tz database is made up of two parts: code and data. TimeZones.jl only requires
