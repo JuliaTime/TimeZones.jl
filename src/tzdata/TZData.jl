@@ -1,6 +1,7 @@
 module TZData
 
 using Printf
+using Base
 using ...TimeZones: DEPS_DIR
 @static VERSION >= v"1.4"
     using Pkg.Artifacts
