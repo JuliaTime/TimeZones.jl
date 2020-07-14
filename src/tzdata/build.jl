@@ -58,10 +58,14 @@ function build(
             end
         end
 
-        if !isempty(tz_source_dir) && version != "latest"
-            @info "Copying region data from version $version"
-            for region in setdiff(regions, CUSTOM_REGIONS)
-                cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
+        if version != "latest"
+            artifact_dir = @artifact_str "tzdata_$version"
+
+            if !isempty(tz_source_dir)
+                @info "Copying region data from version $version"
+                for region in setdiff(regions, CUSTOM_REGIONS)
+                    cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
+                end
             end
         end
     else
