@@ -61,7 +61,7 @@ function build(
         if !isempty(tz_source_dir)
             @info "Copying region data from version $version"
             for region in setdiff(regions, CUSTOM_REGIONS)
-                cp(joinpath(artifact_dir, region), tz_source_dir, force=true)
+                cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
             end
         end
     else
