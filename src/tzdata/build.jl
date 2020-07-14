@@ -46,19 +46,19 @@ function build(
             if m !== nothing
                 version = m.match
                 @info "Latest tzdata is $version"
+                artifact_dir = @artifact_str "tzdata_$version"
+                version = tzdata_version_dir(artifact_dir)
+                set_latest(version, now_utc)
+            else
+                archive = tzdata_download(version, archive_dir)
+                if !isempty(tz_source_dir)
+                    @info "Extracting $version tzdata archive"
+                    extract(archive, tz_source_dir, setdiff(regions, CUSTOM_REGIONS), verbose=verbose)
+                end
             end
-
-            artifact_dir = @artifact_str "tzdata_$version"
-            version = tzdata_version_dir(artifact_dir)
-            set_latest(version, now_utc)
         end
-        artifact_dir = @artifact_str "tzdata_$version"
-        set_latest(version, now_utc)
-        #if !isfile(LATEST_FILE)
-        #    set_latest(version, now_utc)
-        #end
 
-        if !isempty(tz_source_dir)
+        if !isempty(tz_source_dir) && version != "latest"
             @info "Copying region data from version $version"
             for region in setdiff(regions, CUSTOM_REGIONS)
                 cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
