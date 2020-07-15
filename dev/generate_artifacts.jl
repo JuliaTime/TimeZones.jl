@@ -40,7 +40,7 @@ for version in VERSIONS
         # the content hash to change, so this should not cause unnecessary version control churn.
         download_data = [(tzdata_url(version), content_sha)]
         #bind_artifact!(artifacts_toml, "tzdata_$version", tzfile_hash, lazy=true, download_info=download_data, platform=platform_key_abi())
-        bind_artifact!(artifacts_toml, "tzdata_$version", tzfile_hash, lazy=true, download_info=download_data)
+        bind_artifact!(artifacts_toml, "tzdata$version", tzfile_hash, lazy=true, download_info=download_data)
     end
 end
 
