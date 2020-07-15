@@ -4,11 +4,6 @@ using ...TimeZones: DEPS_DIR
 using EzXML
 if VERSION >= v"1.4"
     using Pkg.Artifacts
-else
-    # to avoid fail when Julia tried to precompile even non-compatible code
-    macro artifact_str(name)
-        :(throw("this should never bee called"))
-    end
 end
 
 # A mapping of Windows timezone names to Olson timezone names.
