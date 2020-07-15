@@ -23,8 +23,9 @@ function write_latest(io::IO, version::AbstractString, retrieved_utc::DateTime)
     write(io, Dates.format(retrieved_utc, LATEST_FORMAT))
 end
 
-T = Tuple{AbstractString, DateTime}
-const LATEST = isfile(LATEST_FILE) ? Ref{T}(read_latest(LATEST_FILE)) : Ref{T}()
+const LATEST = let T = Tuple{AbstractString, DateTime}
+    isfile(LATEST_FILE) ? Ref{T}(read_latest(LATEST_FILE)) : Ref{T}()
+end
 
 function set_latest(version::AbstractString, retrieved_utc::DateTime)
     LATEST[] = version, retrieved_utc
