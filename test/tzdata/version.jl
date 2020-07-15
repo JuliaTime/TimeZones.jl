@@ -5,6 +5,8 @@ using TimeZones.TZData: active_version, active_archive
     using Pkg.Artifacts
 end
 
+use_artifacts = VERSION >= v"1.4"
+
 for year = ("12", "1234"), letter = ("", "z")
     version = year * letter
     @test match(TZDATA_VERSION_REGEX, version).match == version
@@ -62,8 +64,6 @@ mktempdir() do temp_dir
     @test tzdata_version_dir(temp_dir) == TZDATA_VERSION
     @test_throws ErrorException tzdata_version_dir(dirname(@__FILE__))
 end
-
-use_artifacts = VERSION >= v"1.4"
 
 if !use_artifacts
     @test tzdata_version_archive(archive) == TZDATA_VERSION
