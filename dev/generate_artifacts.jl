@@ -68,8 +68,3 @@ if isnothing(win_xml_latest_hash) || !artifact_exists(win_xml_latest_hash)
     download_data = [(win_xml_archive_url, content_sha)]
     bind_artifact!(artifacts_toml, "tzdata_windowsZones", tzfile_hash, lazy=true, download_info=download_data)
 end
-
-# using Pkg.BinaryPlatforms
-# platform_key_abi()
-# typeof(platform_key_abi())
-# typeof(platform_key_abi())
