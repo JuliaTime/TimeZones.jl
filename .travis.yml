@@ -53,7 +53,7 @@ jobs:
   include:
     - <<: *doc_test
       os: linux
-      julia: 1
+      julia: 1.0
     - <<: *doc_test
       os: linux
       julia: nightly
