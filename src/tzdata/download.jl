@@ -17,7 +17,7 @@ function read_latest(filename::AbstractString)
     end
 end
 
-function write_latest(io::IO, version::AbstractString, retrieved_utc::DateTime)
+function write_latest(io::IO, version::AbstractString, retrieved_utc::DateTime=now(Dates.UTC))
     write(io, version)
     write(io, "\n")
     write(io, Dates.format(retrieved_utc, LATEST_FORMAT))
@@ -27,7 +27,7 @@ const LATEST = let T = Tuple{AbstractString, DateTime}
     isfile(LATEST_FILE) ? Ref{T}(read_latest(LATEST_FILE)) : Ref{T}()
 end
 
-function set_latest_cached(version::AbstractString, retrieved_utc::DateTime)
+function set_latest_cached(version::AbstractString, retrieved_utc::DateTime=now(Dates.UTC))
     LATEST[] = version, retrieved_utc
     open(LATEST_FILE, "w") do io
         write_latest(io, version, retrieved_utc)
