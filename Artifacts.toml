@@ -1942,10 +1942,10 @@ lazy = true
     sha256 = "02f8321a3236105338a2a071f9f9ef98dadeb8f939cbe3dc2dd53e1931015604"
     url = "https://data.iana.org/time-zones/releases/tzdata96k.tar.gz"
 
-[tzdatawindowsZones]
+[unicode-cldr-release-37]
 git-tree-sha1 = "614e10267d8173c9d75167149cae0f5da9f6b68e"
 lazy = true
 
-    [[tzdatawindowsZones.download]]
+    [[unicode-cldr-release-37.download]]
     sha256 = "28e1617f70f18cd96162972b1deeb3f2bacc5b9fe02a1494b6dbfcff79ea0f7a"
     url = "https://github.com/unicode-org/cldr/archive/release-37.tar.gz"
