@@ -34,7 +34,7 @@ end
 @test match(TZDATA_NEWS_REGEX, "Release 19999") === nothing
 
 
-@static if VERSION >= v"1.4"
+@static if use_artifacts
     artifact_dir = @artifact_str "tzdata$TZDATA_VERSION"
 else
     archive = joinpath(ARCHIVE_DIR, "tzdata$TZDATA_VERSION.tar.gz")
