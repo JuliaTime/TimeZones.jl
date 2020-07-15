@@ -2,19 +2,12 @@ using Pkg.Artifacts
 using TimeZones.TZData: tzdata_url
 using SHA
 using Pkg.BinaryPlatforms
-using TimeZones.TZData: extract, tzdata_download
+using TimeZones.TZData: extract, tzdata_download, tzdata_versions
 
 # This is the path to the Artifacts.toml we will manipulate
 artifacts_toml = joinpath(dirname(@__DIR__), "Artifacts.toml")
 
-const VERSIONS = let
-    file = download("https://data.iana.org/time-zones/releases/")
-    html = read(file, String)
-    rm(file)
-    [m[:version] for m in eachmatch(r"href=\"tzdata(?<version>(?:\d{2}){1,2}[a-z]?).tar.gz\"", html)]
-end
-
-for version in VERSIONS
+for version in tzdata_versions()
     # Query the `Artifacts.toml` file for the hash bound to the specific version
     # (returns `nothing` if no such binding exists)
     tzarchive_latest_hash = artifact_hash("tzdata$version", artifacts_toml)

@@ -46,6 +46,38 @@ function latest_version(now_utc::DateTime=now(Dates.UTC))
 end
 
 """
+    tzdata_versions() -> Vector{String}
+
+Retrieves all of the currently available tzdata versions from IANA. The version list is
+ordered from earliest to latest.
+
+# Examples
+```julia
+julia> last(tzdata_versions())  # Current latest available tzdata version
+"2020a"
+```
+"""
+function tzdata_versions()
+    releases_file = Base.download("https://data.iana.org/time-zones/releases/")
+
+    html = try
+        read(releases_file, String)
+    finally
+        rm(releases_file)
+    end
+
+    versions = [
+        m[:version]
+        for m in eachmatch(r"href=\"tzdata(?<version>(?:\d{2}){1,2}[a-z]?).tar.gz\"", html)
+    ]
+
+    # Correctly order releases which include 2-digit years (e.g. "96")
+    sort!(versions, by=v -> length(v) < 5 ? "19$v" : v)
+
+    return versions
+end
+
+"""
     tzdata_url(version="latest") -> AbstractString
 
 Generates a HTTPS URL for the specified tzdata version. Typical version strings are

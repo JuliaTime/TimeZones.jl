@@ -1,7 +1,12 @@
-using TimeZones.TZData: tzdata_url, tzdata_download, isarchive, LATEST_FILE, read_latest
+using TimeZones.TZData: LATEST_FILE, isarchive, read_latest
+using TimeZones.TZData: tzdata_download, tzdata_url, tzdata_versions
 
 @test tzdata_url("2016j") == "https://data.iana.org/time-zones/releases/tzdata2016j.tar.gz"
 @test tzdata_url("latest") == "https://data.iana.org/time-zones/tzdata-latest.tar.gz"
+
+versions = tzdata_versions()
+@test first(versions) == "93g"  # Earliest release
+@test "2016j" in versions
 
 # Note: Try to keep the number of `tzdata_download` calls low to avoid unnecessary network traffic
 mktempdir() do temp_dir
