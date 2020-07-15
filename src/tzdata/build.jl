@@ -48,7 +48,7 @@ function build(
                 @info "Latest tzdata is $version"
                 artifact_dir = @artifact_str "tzdata$version"
                 version = tzdata_version_dir(artifact_dir)
-                set_latest(version, now_utc)
+                set_latest_cached(version, now_utc)
             else
                 archive = tzdata_download(version, archive_dir)
                 if !isempty(tz_source_dir)

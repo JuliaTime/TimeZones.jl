@@ -27,14 +27,14 @@ const LATEST = let T = Tuple{AbstractString, DateTime}
     isfile(LATEST_FILE) ? Ref{T}(read_latest(LATEST_FILE)) : Ref{T}()
 end
 
-function set_latest(version::AbstractString, retrieved_utc::DateTime)
+function set_latest_cached(version::AbstractString, retrieved_utc::DateTime)
     LATEST[] = version, retrieved_utc
     open(LATEST_FILE, "w") do io
         write_latest(io, version, retrieved_utc)
     end
 end
 
-function latest_version(now_utc::DateTime=now(Dates.UTC))
+function latest_cached(now_utc::DateTime=now(Dates.UTC))
     if isassigned(LATEST)
         latest_version, latest_retrieved_utc = LATEST[]
 
@@ -111,9 +111,9 @@ directory. See `tzdata_url` for details on tzdata version strings.
 function tzdata_download(version::AbstractString="latest", dir::AbstractString=tempdir())
     now_utc = now(Dates.UTC)
     if version == "latest"
-        v = latest_version(now_utc)
-        if v !== nothing
-            archive = joinpath(dir, "tzdata$(v).tar.gz")
+        latest_version = latest_cached(now_utc)
+        if latest_version !== nothing
+            archive = joinpath(dir, "tzdata$(latest_version).tar.gz")
             isfile(archive) && return archive
         end
     end
@@ -136,7 +136,7 @@ function tzdata_download(version::AbstractString="latest", dir::AbstractString=t
         mv(archive, archive_versioned, force=true)
         archive = archive_versioned
 
-        set_latest(version, now_utc)
+        set_latest_cached(version, now_utc)
     end
 
     return archive
