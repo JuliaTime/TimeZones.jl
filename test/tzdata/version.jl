@@ -1,6 +1,11 @@
 using TimeZones.TZData: ARCHIVE_DIR, TZDATA_VERSION_REGEX, TZDATA_NEWS_REGEX
 using TimeZones.TZData: read_news, extract, tzdata_version_dir, tzdata_version_archive
 using TimeZones.TZData: active_version, active_archive
+@static if VERSION >= v"1.4"
+    using Pkg.Artifacts
+end
+
+use_artifacts = VERSION >= v"1.4"
 
 for year = ("12", "1234"), letter = ("", "z")
     version = year * letter
@@ -29,11 +34,20 @@ end
 @test match(TZDATA_NEWS_REGEX, "Release 19999") === nothing
 
 
-archive = joinpath(ARCHIVE_DIR, "tzdata$TZDATA_VERSION.tar.gz")
+@static if use_artifacts
+    artifact_dir = @artifact_str "tzdata$TZDATA_VERSION"
+else
+    archive = joinpath(ARCHIVE_DIR, "tzdata$TZDATA_VERSION.tar.gz")
+end
 
 mktempdir() do temp_dir
     # Read the first tzdata version
-    extract(archive, temp_dir, "NEWS")
+    if use_artifacts
+        cp(joinpath(artifact_dir, "NEWS"), joinpath(temp_dir, "NEWS"))
+    else
+        extract(archive, temp_dir, "NEWS")
+    end
+
     versions = read_news(joinpath(temp_dir, "NEWS"), 1)
     @test versions == [TZDATA_VERSION]
 
@@ -51,8 +65,10 @@ mktempdir() do temp_dir
     @test_throws ErrorException tzdata_version_dir(dirname(@__FILE__))
 end
 
-@test tzdata_version_archive(archive) == TZDATA_VERSION
-@test_throws ProcessFailedException tzdata_version_archive(@__FILE__) == TZDATA_VERSION
+if !use_artifacts
+    @test tzdata_version_archive(archive) == TZDATA_VERSION
+    @test_throws ProcessFailedException tzdata_version_archive(@__FILE__) == TZDATA_VERSION
+end
 
 
 # Active/built tzdata version
@@ -60,7 +76,9 @@ version = active_version()
 @test version != "latest"  # Could happen if the logic to resolve the version fails
 @test match(TZDATA_VERSION_REGEX, version) !== nothing
 
-archive = active_archive()
-@test isfile(archive)
-@test dirname(archive) == ARCHIVE_DIR
-@test basename(archive) == "tzdata$version.tar.gz"
+if !use_artifacts
+    archive = active_archive()
+    @test isfile(archive)
+    @test dirname(archive) == ARCHIVE_DIR
+    @test basename(archive) == "tzdata$version.tar.gz"
+end

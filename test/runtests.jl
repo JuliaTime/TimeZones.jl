@@ -20,7 +20,9 @@ if VERSION < v"1.2.0-DEV.642"
     const ProcessFailedException = ErrorException
 end
 
-isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
+if VERSION < v"1.4"
+    isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
+end
 isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)
 
 # By default use a specific version of the tz database so we just testing for TimeZones.jl
@@ -44,7 +46,7 @@ include("helpers.jl")
     include("utils.jl")
     include("class.jl")
     include(joinpath("tzdata", "timeoffset.jl"))
-    include(joinpath("tzdata", "archive.jl"))
+    VERSION < v"1.4" && include(joinpath("tzdata", "archive.jl"))
     include(joinpath("tzdata", "version.jl"))
     include(joinpath("tzdata", "download.jl"))
     include(joinpath("tzdata", "compile.jl"))
