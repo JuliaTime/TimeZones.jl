@@ -6,7 +6,7 @@ using EzXML
 # A mapping of Windows timezone names to Olson timezone names.
 # Details on the contents of this file can be found at:
 # http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping
-const WINDOWS_ZONE_URL = "http://unicode.org/repos/cldr/trunk/common/supplemental/windowsZones.xml"
+const WINDOWS_ZONE_URL = "https://raw.githubusercontent.com/unicode-org/cldr/master/common/supplemental/windowsZones.xml"
 
 const WINDOWS_XML_DIR = joinpath(DEPS_DIR, "local")
 const WINDOWS_XML_FILE = joinpath(WINDOWS_XML_DIR, "windowsZones.xml")

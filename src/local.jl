@@ -21,7 +21,7 @@ function localzone()
         name = ""
 
         # Try getting the time zone from the "TZ" environment variable
-        # http://linux.die.net/man/3/tzset
+        # https://linux.die.net/man/3/tzset
         #
         # Note: The macOS man page tzset(3) states some additional information about the
         # colon being optional:
