@@ -2,8 +2,9 @@ module WindowsTimeZoneIDs
 
 using ...TimeZones: DEPS_DIR
 using EzXML
-if VERSION >= v"1.4"
-    using Pkg.Artifacts
+
+if VERSION >= v"1.3"
+    using ...TimeZones: @artifact_str
 end
 
 # A mapping of Windows timezone names to Olson timezone names.
@@ -49,7 +50,7 @@ function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
         if isfile(fallback_xml_file) && !force
             cp(fallback_xml_file, xml_file)
         else
-            @static if VERSION >= v"1.4"
+            @static if VERSION >= v"1.3"
                 @info "Downloading Windows to POSIX timezone ID XML from unicode-org/cldr repo, version 37"
                 xml_dir = artifact"tzdata_windowsZones"
                 # no version specified in the repo so I could grep it and print it here

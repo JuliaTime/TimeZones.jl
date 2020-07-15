@@ -38,7 +38,7 @@ function build(
         end
     end
 
-    @static if VERSION >= v"1.4"
+    @static if VERSION >= v"1.3"
         now_utc = now(Dates.UTC)
         # todo: I don't have latest here and it should not be used as latest
         if version == "latest"
@@ -101,7 +101,7 @@ function build(
 end
 
 function build(version::AbstractString=tzdata_version())
-    if VERSION < v"1.4"
+    if VERSION < v"1.3"
         isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
     end
     isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)

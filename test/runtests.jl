@@ -20,7 +20,7 @@ if VERSION < v"1.2.0-DEV.642"
     const ProcessFailedException = ErrorException
 end
 
-if VERSION < v"1.4"
+if VERSION < v"1.3"
     isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
 end
 isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)
@@ -46,7 +46,7 @@ include("helpers.jl")
     include("utils.jl")
     include("class.jl")
     include(joinpath("tzdata", "timeoffset.jl"))
-    VERSION < v"1.4" && include(joinpath("tzdata", "archive.jl"))
+    VERSION < v"1.3" && include(joinpath("tzdata", "archive.jl"))
     include(joinpath("tzdata", "version.jl"))
     include(joinpath("tzdata", "download.jl"))
     include(joinpath("tzdata", "compile.jl"))

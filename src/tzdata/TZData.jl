@@ -3,8 +3,9 @@ module TZData
 using Printf
 using Base
 using ...TimeZones: DEPS_DIR
-@static if VERSION >= v"1.4"
-    using Pkg.Artifacts
+
+if VERSION >= v"1.3"
+    using ...TimeZones: @artifact_str
 end
 
 # Note: The tz database is made up of two parts: code and data. TimeZones.jl only requires
