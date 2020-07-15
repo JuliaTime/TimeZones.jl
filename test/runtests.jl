@@ -20,9 +20,7 @@ if VERSION < v"1.2.0-DEV.642"
     const ProcessFailedException = ErrorException
 end
 
-if VERSION < v"1.3"
-    isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
-end
+isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
 isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)
 
 # By default use a specific version of the tz database so we just testing for TimeZones.jl
