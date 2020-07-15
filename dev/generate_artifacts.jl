@@ -1,6 +1,5 @@
 using Pkg.Artifacts
 using TimeZones.TZData: tzdata_url
-#using TimeZones.WindowsTimeZoneIDs: WINDOWS_ZONE_URL, WINDOWS_XML_FILE
 using SHA
 using Pkg.BinaryPlatforms
 using TimeZones.TZData: extract, tzdata_download
