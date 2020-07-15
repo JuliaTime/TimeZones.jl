@@ -42,7 +42,7 @@ end
 
 mktempdir() do temp_dir
     # Read the first tzdata version
-    @static if VERSION >= v"1.4"
+    if use_artifacts
         cp(joinpath(artifact_dir, "NEWS"), joinpath(temp_dir, "NEWS"))
     else
         extract(archive, temp_dir, "NEWS")
