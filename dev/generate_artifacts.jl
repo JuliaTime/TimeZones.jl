@@ -18,7 +18,7 @@ end
 for version in VERSIONS
     # Query the `Artifacts.toml` file for the hash bound to the specific version
     # (returns `nothing` if no such binding exists)
-    tzarchive_latest_hash = artifact_hash("tzdata_$version", artifacts_toml)
+    tzarchive_latest_hash = artifact_hash("tzdata$version", artifacts_toml)
 
     # If the name was not bound, or the hash it was bound to does not exist, create it!
     if isnothing(tzarchive_latest_hash) || !artifact_exists(tzarchive_latest_hash)
@@ -39,7 +39,6 @@ for version in VERSIONS
         # just overwrite with the new content-hash.  Unless the source files change, we do not expect
         # the content hash to change, so this should not cause unnecessary version control churn.
         download_data = [(tzdata_url(version), content_sha)]
-        #bind_artifact!(artifacts_toml, "tzdata_$version", tzfile_hash, lazy=true, download_info=download_data, platform=platform_key_abi())
         bind_artifact!(artifacts_toml, "tzdata$version", tzfile_hash, lazy=true, download_info=download_data)
     end
 end

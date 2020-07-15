@@ -33,7 +33,7 @@ end
 
 
 @static if VERSION >= v"1.4"
-    artifact_dir = @artifact_str "tzdata_$TZDATA_VERSION"
+    artifact_dir = @artifact_str "tzdata$TZDATA_VERSION"
 else
     archive = joinpath(ARCHIVE_DIR, "tzdata$TZDATA_VERSION.tar.gz")
 end

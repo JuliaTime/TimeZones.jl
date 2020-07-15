@@ -46,7 +46,7 @@ function build(
             if m !== nothing
                 version = m.match
                 @info "Latest tzdata is $version"
-                artifact_dir = @artifact_str "tzdata_$version"
+                artifact_dir = @artifact_str "tzdata$version"
                 version = tzdata_version_dir(artifact_dir)
                 set_latest(version, now_utc)
             else
@@ -59,7 +59,7 @@ function build(
         end
 
         if version != "latest"
-            artifact_dir = @artifact_str "tzdata_$version"
+            artifact_dir = @artifact_str "tzdata$version"
 
             if !isempty(tz_source_dir)
                 @info "Copying region data from version $version"
