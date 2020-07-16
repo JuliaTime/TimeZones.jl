@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Types · TimeZones.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>TimeZones.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../">Introduction</a></li><li class="current"><a class="toctext" href>Types</a><ul class="internal"><li><a class="toctext" href="#TimeZone-1">TimeZone</a></li><li><a class="toctext" href="#ZonedDateTime-1">ZonedDateTime</a></li><li><a class="toctext" href="#VariableTimeZone-1">VariableTimeZone</a></li><li><a class="toctext" href="#FixedTimeZone-1">FixedTimeZone</a></li></ul></li><li><a class="toctext" href="../conversions/">Converting</a></li><li><a class="toctext" href="../arithmetic/">Arithmetic</a></li><li><a class="toctext" href="../rounding/">Rounding</a></li><li><a class="toctext" href="../current/">Current Time</a></li><li><a class="toctext" href="../faq/">Frequently Asked Questions</a></li><li><a class="toctext" href="../api-public/">API – Public</a></li><li><a class="toctext" href="../api-private/">API – Private</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href>Types</a></li></ul><a class="edit-page" href="https://github.com/JuliaTime/TimeZones.jl/blob/master/docs/src/types.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Types</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Time-Zone-Types-1" href="#Time-Zone-Types-1">Time Zone Types</a></h1><div></div><h2><a class="nav-anchor" id="TimeZone-1" href="#TimeZone-1">TimeZone</a></h2><p>A <code>TimeZone</code> is an abstract type that represents information regarding a specific time zone. Typically you will create an instance of a <code>TimeZone</code> by passing in a zone name to the convenience constructor <code>TimeZone</code>:</p><pre><code class="language-julia-repl">julia&gt; TimeZone(&quot;Europe/Warsaw&quot;)
+Europe/Warsaw (UTC+1/UTC+2)</code></pre><p>You can also create a <code>TimeZone</code> by using a <code>tz</code> string macro:</p><pre><code class="language-julia-repl">julia&gt; tz&quot;Europe/Warsaw&quot;
+Europe/Warsaw (UTC+1/UTC+2)</code></pre><p>To see all of the <a href="../faq/#etc_tzs-1">currently available</a> time zone names:</p><pre><code class="language-julia">timezone_names()</code></pre><h2><a class="nav-anchor" id="ZonedDateTime-1" href="#ZonedDateTime-1">ZonedDateTime</a></h2><p>A <code>ZonedDateTime</code> is a <em>time zone aware</em> version of a <code>DateTime</code> (in Python parlance). Note that all <code>ZonedDateTime</code> instances will always be in the correct zone without requiring manual normalization (unlike Python&#39;s <a href="https://pypi.org/project/pytz/">pytz</a> module).</p><p>To construct a <code>ZonedDateTime</code> instance you just need a <code>DateTime</code> and a <code>TimeZone</code>:</p><pre><code class="language-julia-repl">julia&gt; ZonedDateTime(DateTime(2014, 1, 1), tz&quot;Europe/Warsaw&quot;)
+2014-01-01T00:00:00+01:00
+
+julia&gt; ZonedDateTime(2014, 1, 1, tz&quot;Europe/Warsaw&quot;)
+2014-01-01T00:00:00+01:00</code></pre><h2><a class="nav-anchor" id="VariableTimeZone-1" href="#VariableTimeZone-1">VariableTimeZone</a></h2><p>A <code>VariableTimeZone</code> is a concrete type that is a subtype of <code>TimeZone</code> that has offsets that change depending on the specified time. We&#39;ve already seen an example of a <code>VariableTimeZone</code>: &quot;Europe/Warsaw&quot;</p><pre><code class="language-julia-repl">julia&gt; warsaw = tz&quot;Europe/Warsaw&quot;
+Europe/Warsaw (UTC+1/UTC+2)
+
+julia&gt; typeof(warsaw)
+VariableTimeZone
+
+julia&gt; ZonedDateTime(DateTime(2014, 1, 1), warsaw)
+2014-01-01T00:00:00+01:00
+
+julia&gt; ZonedDateTime(DateTime(2014, 6, 1), warsaw)
+2014-06-01T00:00:00+02:00</code></pre><p>From the above example you can see that the offset for this time zone differed based upon the <code>DateTime</code> provided. An unfortunate side effect of having the offset change over time results in some difficulties in working with dates near the transitions. For example when working with a <code>DateTime</code> that occurs during the &quot;spring forward&quot; transition will result in a <code>NonExistentTimeError</code>:</p><pre><code class="language-julia-repl">julia&gt; ZonedDateTime(DateTime(2014, 3, 30, 1), warsaw)
+2014-03-30T01:00:00+01:00
+
+julia&gt; ZonedDateTime(DateTime(2014, 3, 30, 2), warsaw)
+ERROR: NonExistentTimeError: Local DateTime 2014-03-30T02:00:00 does not exist within Europe/Warsaw
+
+julia&gt; ZonedDateTime(DateTime(2014, 3, 30, 3), warsaw)
+2014-03-30T03:00:00+02:00</code></pre><p>Alternatively, working with a <code>DateTime</code> that occurs during the &quot;fall back&quot; transition results in a <code>AmbiguousTimeError</code>. Providing additional parameters can deal with the ambiguity:</p><pre><code class="language-julia-repl">julia&gt; dt = DateTime(2014,10,26,2)
+2014-10-26T02:00:00
+
+julia&gt; ZonedDateTime(dt, warsaw)
+ERROR: AmbiguousTimeError: Local DateTime 2014-10-26T02:00:00 is ambiguous within Europe/Warsaw
+
+julia&gt; ZonedDateTime(dt, warsaw, 1)  # first occurrence of the duplicate hour
+2014-10-26T02:00:00+02:00
+
+julia&gt; ZonedDateTime(dt, warsaw, 2)  # second occurrence of the duplicate hour
+2014-10-26T02:00:00+01:00
+
+julia&gt; ZonedDateTime(dt, warsaw, true)  # use the hour which is in daylight saving time
+2014-10-26T02:00:00+02:00
+
+julia&gt; ZonedDateTime(dt, warsaw, false)  # use the hour which is not in daylight saving time
+2014-10-26T02:00:00+01:00</code></pre><p>When working with dates prior to the year 1900 you may notice that the time zone offset includes minutes or even seconds. These kind of offsets are normal:</p><pre><code class="language-julia-repl">julia&gt; ZonedDateTime(1879, 1, 1, warsaw)
+1879-01-01T00:00:00+01:24</code></pre><p>Alternatively, when using future dates past the year 2038 will result in an error:</p><pre><code class="language-julia-repl">julia&gt; ZonedDateTime(2039, warsaw)
+ERROR: UnhandledTimeError: TimeZone Europe/Warsaw does not handle dates on or after 2038-03-28T01:00:00 UTC</code></pre><p>It is possible to have <a href="../faq/#future_tzs-1">timezones that work beyond 2038</a> but it since these dates are in the future it is possible the timezone rules may change and will not be accurate.</p><h2><a class="nav-anchor" id="FixedTimeZone-1" href="#FixedTimeZone-1">FixedTimeZone</a></h2><p>A <code>FixedTimeZone</code> is a concrete type that is a subtype of <code>TimeZone</code> that has a single offset for all of time. An example of this kind of time zone is: &quot;UTC&quot;</p><pre><code class="language-julia-repl">julia&gt; typeof(TimeZone(&quot;UTC&quot;))
+FixedTimeZone</code></pre><p>Unlike a <code>VariableTimeZone</code> there are no issues with offsets changing over time because with a <code>FixedTimeZone</code> the offset never changes. If you need a <code>FixedTimeZone</code> that is not provided by the tz database you can manually construct one:</p><pre><code class="language-julia">FixedTimeZone(&quot;UTC+6&quot;)
+FixedTimeZone(&quot;-0800&quot;)
+FixedTimeZone(&quot;-04:30&quot;)
+FixedTimeZone(&quot;+12:34:56&quot;)
+FixedTimeZone(&quot;FOO&quot;, -6 * 3600)  # 6 hours in seconds</code></pre><p>Constructing a <code>ZonedDateTime</code> works similarly to <code>VariableTimeZone</code>:</p><pre><code class="language-julia-repl">julia&gt; ZonedDateTime(1960, 1, 1, tz&quot;UTC&quot;)
+1960-01-01T00:00:00+00:00</code></pre><footer><hr/><a class="previous" href="../"><span class="direction">Previous</span><span class="title">Introduction</span></a><a class="next" href="../conversions/"><span class="direction">Next</span><span class="title">Converting</span></a></footer></article></body></html>
