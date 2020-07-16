@@ -17,23 +17,24 @@ function read_latest(filename::AbstractString)
     end
 end
 
-function write_latest(io::IO, version::AbstractString, retrieved_utc::DateTime)
+function write_latest(io::IO, version::AbstractString, retrieved_utc::DateTime=now(Dates.UTC))
     write(io, version)
     write(io, "\n")
     write(io, Dates.format(retrieved_utc, LATEST_FORMAT))
 end
 
-T = Tuple{AbstractString, DateTime}
-const LATEST = isfile(LATEST_FILE) ? Ref{T}(read_latest(LATEST_FILE)) : Ref{T}()
+const LATEST = let T = Tuple{AbstractString, DateTime}
+    isfile(LATEST_FILE) ? Ref{T}(read_latest(LATEST_FILE)) : Ref{T}()
+end
 
-function set_latest(version::AbstractString, retrieved_utc::DateTime)
+function set_latest_cached(version::AbstractString, retrieved_utc::DateTime=now(Dates.UTC))
     LATEST[] = version, retrieved_utc
     open(LATEST_FILE, "w") do io
         write_latest(io, version, retrieved_utc)
     end
 end
 
-function latest_version(now_utc::DateTime=now(Dates.UTC))
+function latest_cached(now_utc::DateTime=now(Dates.UTC))
     if isassigned(LATEST)
         latest_version, latest_retrieved_utc = LATEST[]
 
@@ -43,6 +44,38 @@ function latest_version(now_utc::DateTime=now(Dates.UTC))
     end
 
     return nothing
+end
+
+"""
+    tzdata_versions() -> Vector{String}
+
+Retrieves all of the currently available tzdata versions from IANA. The version list is
+ordered from earliest to latest.
+
+# Examples
+```julia
+julia> last(tzdata_versions())  # Current latest available tzdata version
+"2020a"
+```
+"""
+function tzdata_versions()
+    releases_file = Base.download("https://data.iana.org/time-zones/releases/")
+
+    html = try
+        read(releases_file, String)
+    finally
+        rm(releases_file)
+    end
+
+    versions = [
+        m[:version]
+        for m in eachmatch(r"href=\"tzdata(?<version>(?:\d{2}){1,2}[a-z]?).tar.gz\"", html)
+    ]
+
+    # Correctly order releases which include 2-digit years (e.g. "96")
+    sort!(versions, by=v -> length(v) < 5 ? "19$v" : v)
+
+    return versions
 end
 
 """
@@ -78,9 +111,9 @@ directory. See `tzdata_url` for details on tzdata version strings.
 function tzdata_download(version::AbstractString="latest", dir::AbstractString=tempdir())
     now_utc = now(Dates.UTC)
     if version == "latest"
-        v = latest_version(now_utc)
-        if v !== nothing
-            archive = joinpath(dir, "tzdata$(v).tar.gz")
+        latest_version = latest_cached(now_utc)
+        if latest_version !== nothing
+            archive = joinpath(dir, "tzdata$(latest_version).tar.gz")
             isfile(archive) && return archive
         end
     end
@@ -103,7 +136,7 @@ function tzdata_download(version::AbstractString="latest", dir::AbstractString=t
         mv(archive, archive_versioned, force=true)
         archive = archive_versioned
 
-        set_latest(version, now_utc)
+        set_latest_cached(version, now_utc)
     end
 
     return archive

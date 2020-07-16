@@ -1,9 +1,15 @@
-using TimeZones.TZData: ARCHIVE_DIR, isarchive, readarchive, extract
+using TimeZones.TZData: ARCHIVE_DIR, isarchive, readarchive, extract, tzdata_download
 
 const ARCHIVE_PATH = let
-    archives = filter(file -> endswith(file, "tar.gz"), readdir(ARCHIVE_DIR))
-    isempty(archives) && error("Unable to run archive tests without first running Pkg.build(\"TimeZones\")")
-    joinpath(ARCHIVE_DIR, first(archives))
+    if VERSION < v"1.3"
+        archives = filter(file -> endswith(file, "tar.gz"), readdir(ARCHIVE_DIR))
+        isempty(archives) && error("Unable to run archive tests without first running Pkg.build(\"TimeZones\")")
+        joinpath(ARCHIVE_DIR, first(archives))
+    else
+        # For Julia versions that use artifacts we'll need to retrieve an archive only for
+        # testing purposes.
+        tzdata_download(TZDATA_VERSION, ARCHIVE_DIR)
+    end
 end
 
 @test isarchive(ARCHIVE_PATH)

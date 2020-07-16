@@ -46,6 +46,7 @@ function __init__()
 end
 
 include("utils.jl")
+include("compat.jl")
 include("class.jl")
 include("utcoffset.jl")
 include(joinpath("types", "timezone.jl"))

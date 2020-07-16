@@ -1,11 +1,12 @@
 using TimeZones.TZData: ARCHIVE_DIR, TZDATA_VERSION_REGEX, TZDATA_NEWS_REGEX
 using TimeZones.TZData: read_news, extract, tzdata_version_dir, tzdata_version_archive
 using TimeZones.TZData: active_version, active_archive
-@static if VERSION >= v"1.4"
-    using Pkg.Artifacts
-end
 
-use_artifacts = VERSION >= v"1.4"
+use_artifacts = VERSION >= v"1.3"
+
+if use_artifacts
+    using TimeZones: @artifact_str
+end
 
 for year = ("12", "1234"), letter = ("", "z")
     version = year * letter
@@ -69,7 +70,6 @@ if !use_artifacts
     @test tzdata_version_archive(archive) == TZDATA_VERSION
     @test_throws ProcessFailedException tzdata_version_archive(@__FILE__) == TZDATA_VERSION
 end
-
 
 # Active/built tzdata version
 version = active_version()

@@ -1,10 +1,11 @@
 module TZData
 
 using Printf
-using Base
 using ...TimeZones: DEPS_DIR
-@static if VERSION >= v"1.4"
-    using Pkg.Artifacts
+
+if VERSION >= v"1.3"
+    using ...TimeZones: @artifact_str
+    using Pkg.Artifacts: artifact_hash
 end
 
 # Note: The tz database is made up of two parts: code and data. TimeZones.jl only requires
@@ -14,6 +15,8 @@ end
 const ARCHIVE_DIR = joinpath(DEPS_DIR, "tzarchive")
 const TZ_SOURCE_DIR = joinpath(DEPS_DIR, "tzsource")
 const COMPILED_DIR = joinpath(DEPS_DIR, "compiled")
+
+const ARTIFACT_TOML = joinpath(@__DIR__, "..", "..", "Artifacts.toml")
 
 export ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, REGIONS, LEGACY_REGIONS
 
