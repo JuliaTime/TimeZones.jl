@@ -1,9 +1,8 @@
-if VERSION >= v"1.4"
-    using Pkg.Artifacts: @artifact_str
-elseif VERSION >= v"1.3"
+if VERSION == v"1.3.1"
     using Pkg.Artifacts: do_artifact_str, find_artifacts_toml, load_artifacts_toml
 
-    # A copy of `Pkg.Artifacts.@artifact_str` where `name` is properly escaped on Julia 1.3
+    # A copy of `Pkg.Artifacts.@artifact_str` where `name` is properly escaped on
+    # Julia 1.3.1
     # https://github.com/JuliaLang/Pkg.jl/issues/1912
     # https://github.com/JuliaLang/Pkg.jl/pull/1580
     macro artifact_str(name)
@@ -31,4 +30,8 @@ elseif VERSION >= v"1.3"
             Base.invokelatest(do_artifact_str, $(esc(name)), $(artifact_dict), $(artifacts_toml), $__module__)
         end
     end
+elseif VERSION >= v"1.3.0"
+    # Issue does not exist in 1.3.0, and >= 1.4.0. Also, assume that the issue would also be
+    # fixed on >= 1.3.2
+    using Pkg.Artifacts: @artifact_str
 end
