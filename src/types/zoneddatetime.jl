@@ -1,5 +1,7 @@
 using Dates: AbstractDateTime, argerror, validargs
 
+const ZDT_TZS = Dict{UInt,Tuple{TimeZone,FixedTimeZone}}()
+
 # """
 #     ZonedDateTime
 
@@ -8,11 +10,10 @@ using Dates: AbstractDateTime, argerror, validargs
 
 struct ZonedDateTime <: AbstractDateTime
     utc_datetime::DateTime
-    timezone::TimeZone
-    zone::FixedTimeZone  # The current zone for the utc_datetime.
+    tz_hash::UInt
 
     function ZonedDateTime(utc_datetime::DateTime, timezone::TimeZone, zone::FixedTimeZone)
-        return new(utc_datetime, timezone, zone)
+        return new(utc_datetime, gen_tz_hash(timezone, zone))
     end
 
     function ZonedDateTime(utc_datetime::DateTime, timezone::VariableTimeZone, zone::FixedTimeZone)
@@ -20,8 +21,23 @@ struct ZonedDateTime <: AbstractDateTime
             throw(UnhandledTimeError(timezone))
         end
 
-        return new(utc_datetime, timezone, zone)
+        return new(utc_datetime,  gen_tz_hash(timezone, zone))
     end
+end
+
+function gen_tz_hash(tz::TimeZone, zone::FixedTimeZone)
+    h = hash(tz)
+    h = hash(zone, h)
+
+    if haskey(ZDT_TZS, h)
+        stored_tz, stored_zone = ZDT_TZS[h]
+        @assert tz == stored_tz
+        @assert zone == stored_zone
+    else
+        ZDT_TZS[h] = (tz, zone)
+    end
+
+    return h
 end
 
 """
@@ -152,6 +168,15 @@ end
 
 function ZonedDateTime(date::Date, args...; kwargs...)
     return ZonedDateTime(DateTime(date), args...; kwargs...)
+end
+
+function Base.getproperty(zdt::ZonedDateTime, field::Symbol)
+    if field === :timezone || field === :zone
+        tz, zone = ZDT_TZS[getfield(zdt, :tz_hash)]
+        return field === :timezone ? tz : zone
+    else
+        return getfield(zdt, field)
+    end
 end
 
 # Promotion

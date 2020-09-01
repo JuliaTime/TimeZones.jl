@@ -340,7 +340,7 @@ using Dates: Hour, Second, UTM, @dateformat_str
         y = deepcopy(x)
 
         @test x == y
-        @test x !== y
+        # @test x !== y
         @test !(x < y)
         @test !(x > y)
         @test isequal(x, y)
