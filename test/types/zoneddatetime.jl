@@ -430,4 +430,14 @@ using Dates: Hour, Second, UTM, @dateformat_str
         @test typemin(ZonedDateTime) <= ZonedDateTime(typemin(DateTime), utc)
         @test typemax(ZonedDateTime) >= ZonedDateTime(typemax(DateTime), utc)
     end
+
+    @testset "serialization" begin
+        zdt = ZonedDateTime(2020, 9, 1, warsaw)
+
+        b = IOBuffer()
+        serialize(Serializer(b), zdt)
+        seekstart(b)
+
+        @test deserialize(Serializer(b)) == zdt
+    end
 end

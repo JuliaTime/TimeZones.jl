@@ -216,3 +216,20 @@ function Dates.validargs(::Type{ZonedDateTime}, y::Int64, m::Union{Int64, Int32}
     istimezone(tz) || return argerror("TimeZone: \"$tz\" is not a recognized time zone")
     return argerror()
 end
+
+# Overload serialization to ensure timezone information is transferred correctly
+
+function Serialization.serialize(s::AbstractSerializer, zdt::ZonedDateTime)
+    Serialization.serialize_type(s, typeof(zdt))
+    serialize(s, zdt.utc_datetime)
+    serialize(s, zdt.timezone)
+    serialize(s, zdt.zone)
+end
+
+function Serialization.deserialize(s::AbstractSerializer, ::Type{ZonedDateTime})
+    utc_datetime = deserialize(s)
+    timezone = deserialize(s)
+    zone = deserialize(s)
+
+    return ZonedDateTime(utc_datetime, timezone, zone)
+end
