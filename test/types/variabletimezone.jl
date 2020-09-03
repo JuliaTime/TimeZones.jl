@@ -44,6 +44,6 @@
         @test a == b
         @test a !== b
         @test !isequal(a, b)
-        @test hash(a) != hash(b)
+        @test hash(a) == hash(b)
     end
 end
