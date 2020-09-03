@@ -38,9 +38,4 @@ function Base.isequal(a::VariableTimeZone, b::VariableTimeZone)
     )
 end
 
-function Base.hash(tz::VariableTimeZone, h::UInt)
-    h = hash(tz.name, h)
-    h = hash(tz.transitions, h)
-    h = hash(tz.cutoff, h)
-    return h
-end
+Base.hash(tz::VariableTimeZone, h::UInt) = hash(tz.name, h)
