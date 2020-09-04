@@ -44,6 +44,18 @@
         @test a == b
         @test a !== b
         @test !isequal(a, b)
-        @test hash(a) != hash(b)
+        @test hash(a) == hash(b)
+    end
+    
+    @testset "hash using name" begin
+        a = first(compile("Europe/Warsaw", tzdata["europe"]))
+        b = VariableTimeZone("Europe/Warsaw", a.transitions[1:1], nothing)
+
+        # To be fast the `hash` function only uses the name. However, when a hash collision
+        # does occur it should be disambiguated by the `isequal` check which also considers
+        # the transition and the cutoff.
+        @test hash(a) == hash(b)
+        @test !isequal(a, b)
+        @test length(keys(Dict(a => :a, b => :b))) == 2  # Time zones use different keys
     end
 end
