@@ -2,7 +2,7 @@ using Dates: DateFormat, DatePart, min_width, max_width, tryparsenext_base10
 using TimeZones.TZData: MIN_YEAR, MAX_YEAR
 
 function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
-    i == len && str[i] == 'Z' && return ("Z", i+1)
+    i == len && str[i] === 'Z' && return ("Z", i+1)
 
     tz_start, tz_end = i, 0
     min_pos = min_width <= 0 ? i : i + min_width - 1
@@ -10,13 +10,13 @@ function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
     state = 1
     @inbounds while i <= max_pos
         c, ii = iterate(str, i)::Tuple{Char, Int}
-        if state == 1 && (c == '-' || c == '+')
+        if state == 1 && (c === '-' || c === '+')
             state = 2
             tz_end = i
         elseif (state == 1 || state == 2) && '0' <= c <= '9'
             state = 3
             tz_end = i
-        elseif state == 3 && c == ':'
+        elseif state == 3 && c === ':'
             state = 4
             tz_end = i
         elseif (state == 3 || state == 4) && '0' <= c <= '9'
@@ -41,7 +41,7 @@ function tryparsenext_tz(str, i, len, min_width::Int=1, max_width::Int=0)
     max_pos = max_width <= 0 ? len : min(chr2ind(str, ind2chr(str,i) + max_width - 1), len)
     @inbounds while i <= max_pos
         c, ii = iterate(str, i)::Tuple{Char, Int}
-        if c == '/' || c == '_' || isletter(c)
+        if c === '/' || c === '_' || isletter(c)
             tz_end = i
         else
             break
@@ -138,14 +138,14 @@ function _parsesub_tzabbr(
             name_end = i
         elseif state == :expanded && (isletter(c) || isdigit(c) || c in ('+', '-'))
             name_end = i
-        elseif state == :started && c == '<'
+        elseif state == :started && c === '<'
             name_start = ii
             name_end = i
             state = :expanded
         elseif state == :started && isletter(c)
             name_end = i
             state = :simple
-        elseif state == :expanded && c == '>'
+        elseif state == :expanded && c === '>'
             i = ii
             state = :closed
             break
@@ -206,7 +206,7 @@ function _parsesub_offset(
     # Optional sign
     c, ii = iterate(str, i)::Tuple{Char, Int}
     if c in ('+', '-')
-        coefficient = c == '-' ? -1 : 1
+        coefficient = c === '-' ? -1 : 1
         if ii > len
             return ParseNextError("$(uppercasefirst(name)) sign ($c) is not followed by a value", str, i)
         end
@@ -226,7 +226,7 @@ function _parsesub_offset(
     i > len && @goto done
 
     c, ii = iterate(str, i)::Tuple{Char, Int}
-    c != ':' && @goto done
+    c !== ':' && @goto done
     i = ii
 
     # Minutes
@@ -242,7 +242,7 @@ function _parsesub_offset(
     i > len && @goto done
 
     c, ii = iterate(str, i)::Tuple{Char, Int}
-    c != ':' && @goto done
+    c !== ':' && @goto done
     i = ii
 
     # Seconds
@@ -313,7 +313,7 @@ function _parsesub_tzdate(
     # Detect prefix
     c, ii = iterate(str, i)::Tuple{Char, Int}
 
-    if c == 'J'
+    if c === 'J'
         i = ii
 
         val = tryparsenext_base10(str, i, len)
@@ -335,7 +335,7 @@ function _parsesub_tzdate(
         end
         return f, i
 
-    elseif c == 'M'
+    elseif c === 'M'
         i = ii
 
         # Month
@@ -350,7 +350,7 @@ function _parsesub_tzdate(
         i = ii
 
         c, ii = iterate(str, i)::Tuple{Char, Int}
-        (c != '.' || ii > len) && return ParseNextError("Expected to find delimiter (.)", str, i)
+        (c !== '.' || ii > len) && return ParseNextError("Expected to find delimiter (.)", str, i)
         i = ii
 
         # Week of month
@@ -365,7 +365,7 @@ function _parsesub_tzdate(
         i = ii
 
         c, ii = iterate(str, i)::Tuple{Char, Int}
-        (c != '.' || ii > len) && return ParseNextError("Expected to find delimiter (.)", str, i)
+        (c !== '.' || ii > len) && return ParseNextError("Expected to find delimiter (.)", str, i)
         i = ii
 
         # Day of week
@@ -494,7 +494,7 @@ function _parsesub_tz(
     dst_offset = nothing
     if dst_name !== nothing
         iter = iterate(str, i)
-        if iter !== nothing && first(iter) != ','
+        if iter !== nothing && first(iter) !== ','
             x = _parsesub_offset(str, i, len; name="daylight saving offset")
             if x isa Tuple
                 dst_offset, i = x
@@ -512,7 +512,7 @@ function _parsesub_tz(
     start_time = end_time = Hour(2)  # 02:00
     if i <= len
         c, ii = iterate(str, i)::Tuple{Char, Int}
-        if c != ','
+        if c !== ','
             return ParseNextError("Expected to find delimiter (,)", str, i)
         end
         i = ii
@@ -530,12 +530,12 @@ function _parsesub_tz(
         i > len && return ParseNextError("Expected to find daylight saving end and instead found end of string", str, i)
 
         c, ii = iterate(str, i)::Tuple{Char, Int}
-        if c != '/' && c != ','
+        if c !== '/' && c !== ','
             return ParseNextError("Expected to find delimiter (,) or (/)", str, i)
         end
         i = ii
 
-        if c == '/'
+        if c === '/'
             x = _parsesub_time(str, i, len; name="daylight saving start time")
             if x isa Tuple
                 start_time, i = x
@@ -546,7 +546,7 @@ function _parsesub_tz(
             i > len && return ParseNextError("Expected to find daylight saving end and instead found end of string", str, i)
 
             c, ii = iterate(str, i)::Tuple{Char, Int}
-            if c != ','
+            if c !== ','
                 return ParseNextError("Expected to find delimiter (,)", str, i)
             end
             i = ii
@@ -564,7 +564,7 @@ function _parsesub_tz(
 
         if i <= len
             c, ii = iterate(str, i)::Tuple{Char, Int}
-            if c != '/'
+            if c !== '/'
                 return ParseNextError("Expected to find delimiter (/)", str, i)
             end
             i = ii
