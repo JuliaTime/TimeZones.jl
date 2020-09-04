@@ -136,7 +136,7 @@ function _parsesub_tzabbr(
 
         if state == :simple && isletter(c)
             name_end = i
-        elseif state == :expanded && (isletter(c) || isdigit(c) || c in ('+', '-'))
+        elseif state == :expanded && (isletter(c) || isdigit(c) || c === '+' || c === '-'
             name_end = i
         elseif state == :started && c === '<'
             name_start = ii
@@ -205,7 +205,7 @@ function _parsesub_offset(
 
     # Optional sign
     c, ii = iterate(str, i)::Tuple{Char, Int}
-    if c in ('+', '-')
+    if c === '+' || c === '-'
         coefficient = c === '-' ? -1 : 1
         if ii > len
             return ParseNextError("$(uppercasefirst(name)) sign ($c) is not followed by a value", str, i)
@@ -436,7 +436,7 @@ function _parsesub_time(
 
     # Require time does not start with a sign.
     c, ii = iterate(str, i)::Tuple{Char, Int}
-    if c in ('+', '-')
+    if c === '+' || c === '-'
         return ParseNextError("$(uppercasefirst(name)) should not have a sign", str, i)
     end
 
