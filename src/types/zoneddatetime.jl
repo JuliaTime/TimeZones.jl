@@ -1,6 +1,11 @@
 using Dates: AbstractDateTime, argerror, validargs
 
-const ZDT_TZS = Dict{UInt,Tuple{TimeZone,FixedTimeZone}}()
+# Stores non-bits data outside of the `ZonedDateTime` structure
+const _ZDT_FIELDS = Vector{Tuple{TimeZone,FixedTimeZone}}()
+
+# Stored indexes into `_ZDT_FIELDS`
+const _TZ_INDEX = Dict{Tuple{TimeZone,FixedTimeZone},Int}()
+
 
 # """
 #     ZonedDateTime
@@ -10,10 +15,10 @@ const ZDT_TZS = Dict{UInt,Tuple{TimeZone,FixedTimeZone}}()
 
 struct ZonedDateTime <: AbstractDateTime
     utc_datetime::DateTime
-    tz_hash::UInt
+    _tz_index::Int
 
     function ZonedDateTime(utc_datetime::DateTime, timezone::TimeZone, zone::FixedTimeZone)
-        return new(utc_datetime, gen_tz_hash(timezone, zone))
+        return new(utc_datetime, _tz_index(timezone, zone))
     end
 
     function ZonedDateTime(utc_datetime::DateTime, timezone::VariableTimeZone, zone::FixedTimeZone)
@@ -21,24 +26,50 @@ struct ZonedDateTime <: AbstractDateTime
             throw(UnhandledTimeError(timezone))
         end
 
-        return new(utc_datetime,  gen_tz_hash(timezone, zone))
+        return new(utc_datetime, _tz_index(timezone, zone))
     end
 end
 
-function gen_tz_hash(tz::TimeZone, zone::FixedTimeZone)
-    h = hash(tz)
-    h = hash(zone, h)
+function _tz_index(tz::TimeZone, zone::FixedTimeZone)
+    t = (tz, zone)
 
-    if haskey(ZDT_TZS, h)
-        stored_tz, stored_zone = ZDT_TZS[h]
-        @assert tz == stored_tz
-        @assert zone == stored_zone
+    i = get!(_TZ_INDEX, t) do
+        push!(_ZDT_FIELDS, t)
+        lastindex(_ZDT_FIELDS)
+    end
+
+    return i
+end
+
+function Base.getproperty(zdt::ZonedDateTime, field::Symbol)
+    if field === :zone
+        tz, zone = _ZDT_FIELDS[getfield(zdt, :_tz_index)]
+        return zone
+    elseif field === :timezone
+        tz, zone = _ZDT_FIELDS[getfield(zdt, :_tz_index)]
+        return tz
     else
-        ZDT_TZS[h] = (tz, zone)
+        return getfield(zdt, field)
     end
-
-    return h
 end
+
+# Overload serialization to ensure that `ZonedDateTime` serialization doesn't transfer
+# state information which is specific to the current Julia process.
+function Serialization.serialize(s::AbstractSerializer, zdt::ZonedDateTime)
+    Serialization.serialize_type(s, typeof(zdt))
+    serialize(s, zdt.utc_datetime)
+    serialize(s, zdt.timezone)
+    serialize(s, zdt.zone)
+end
+
+function Serialization.deserialize(s::AbstractSerializer, ::Type{ZonedDateTime})
+    utc_datetime = deserialize(s)
+    timezone = deserialize(s)
+    zone = deserialize(s)
+
+    return ZonedDateTime(utc_datetime, timezone, zone)
+end
+
 
 """
     ZonedDateTime(dt::DateTime, tz::TimeZone; from_utc=false) -> ZonedDateTime
@@ -170,15 +201,6 @@ function ZonedDateTime(date::Date, args...; kwargs...)
     return ZonedDateTime(DateTime(date), args...; kwargs...)
 end
 
-function Base.getproperty(zdt::ZonedDateTime, field::Symbol)
-    if field === :timezone || field === :zone
-        tz, zone = ZDT_TZS[getfield(zdt, :tz_hash)]
-        return field === :timezone ? tz : zone
-    else
-        return getfield(zdt, field)
-    end
-end
-
 # Promotion
 
 # Because of the promoting fallback definitions for TimeType, we need a special case for
@@ -215,21 +237,4 @@ function Dates.validargs(::Type{ZonedDateTime}, y::Int64, m::Union{Int64, Int32}
     err === nothing || return err
     istimezone(tz) || return argerror("TimeZone: \"$tz\" is not a recognized time zone")
     return argerror()
-end
-
-# Overload serialization to ensure timezone information is transferred correctly
-
-function Serialization.serialize(s::AbstractSerializer, zdt::ZonedDateTime)
-    Serialization.serialize_type(s, typeof(zdt))
-    serialize(s, zdt.utc_datetime)
-    serialize(s, zdt.timezone)
-    serialize(s, zdt.zone)
-end
-
-function Serialization.deserialize(s::AbstractSerializer, ::Type{ZonedDateTime})
-    utc_datetime = deserialize(s)
-    timezone = deserialize(s)
-    zone = deserialize(s)
-
-    return ZonedDateTime(utc_datetime, timezone, zone)
 end
