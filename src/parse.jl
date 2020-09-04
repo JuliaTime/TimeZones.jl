@@ -57,7 +57,7 @@ function tryparsenext_tz(str, i, len, min_width::Int=1, max_width::Int=0)
         # If the time zone is recognized make sure that it is well-defined. For our
         # purposes we'll treat all abbreviations except for UTC and GMT as ambiguous.
         # e.g. "MST": "Mountain Standard Time" (UTC-7) or "Moscow Summer Time" (UTC+3:31).
-        if occursin("/", name) || name in ("UTC", "GMT")
+        if in('/', name) || name in ("UTC", "GMT")
             return name, i
         else
             return nothing
