@@ -57,21 +57,12 @@ function tryparsenext_tz(str, i, len, min_width::Int=1, max_width::Int=0)
         # If the time zone is recognized make sure that it is well-defined. For our
         # purposes we'll treat all abbreviations except for UTC and GMT as ambiguous.
         # e.g. "MST": "Mountain Standard Time" (UTC-7) or "Moscow Summer Time" (UTC+3:31).
-        if is_UTC_or_GMT(name) || '/' in name
+        if name == "UTC" || name == "GMT" || '/' in name
             return name, i
         else
             return nothing
         end
     end
-end
-
-function is_UTC_or_GMT(name::AbstractString)
-    # This is an optimized version of `name in ("UTC", "GMT").
-    # See benchmarks in https://github.com/JuliaTime/TimeZones.jl/issues/282
-    return length(name) === 3 && @inbounds(
-       (name[1]==='U' && name[2]==='T' && name[3]==='C') ||
-       (name[1]==='G' && name[2]==='M' && name[3]==='T')
-    );
 end
 
 function Dates.tryparsenext(d::DatePart{'z'}, str, i, len)
