@@ -71,7 +71,7 @@ function is_UTC_or_GMT(name::AbstractString)
     return length(name) === 3 && @inbounds(
        (name[1]==='U' && name[2]==='T' && name[3]==='C') ||
        (name[1]==='G' && name[2]==='M' && name[3]==='T')
-   );
+    );
 end
 
 function Dates.tryparsenext(d::DatePart{'z'}, str, i, len)
