@@ -136,7 +136,7 @@ function _parsesub_tzabbr(
 
         if state == :simple && isletter(c)
             name_end = i
-        elseif state == :expanded && (isletter(c) || isdigit(c) || c === '+' || c === '-'
+        elseif state == :expanded && (isletter(c) || isdigit(c) || c === '+' || c === '-')
             name_end = i
         elseif state == :started && c === '<'
             name_start = ii
