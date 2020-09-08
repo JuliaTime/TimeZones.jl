@@ -1,14 +1,6 @@
 using Dates: DateFormat, DatePart, min_width, max_width, tryparsenext_base10
 using TimeZones.TZData: MIN_YEAR, MAX_YEAR
 
-# https://github.com/JuliaLang/julia/pull/35973
-if v"1.3.0" <= VERSION < v"1.6.0-DEV.84"
-    function Base.:(==)(a::Union{String, SubString{String}}, b::Union{String, SubString{String}})
-        s = sizeof(a)
-        s == sizeof(b) && 0 == Base._memcmp(a, b, s)
-    end
-end
-
 function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
     i == len && str[i] === 'Z' && return ("Z", i+1)
 
