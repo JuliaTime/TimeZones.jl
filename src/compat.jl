@@ -1,3 +1,15 @@
+# https://github.com/JuliaLang/julia/pull/35973
+if v"1.3.0" <= VERSION < v"1.6.0-DEV.84"
+    # Declare a new `==` function to avoid type piracy
+    function == end
+    @inline ==(a, b) = Base.:(==)(a, b)
+
+    function ==(a::Union{String, SubString{String}}, b::Union{String, SubString{String}})
+        s = sizeof(a)
+        s == sizeof(b) && 0 == Base._memcmp(a, b, s)
+    end
+end
+
 if VERSION == v"1.3.1"
     using Pkg.Artifacts: do_artifact_str, find_artifacts_toml, load_artifacts_toml
 
