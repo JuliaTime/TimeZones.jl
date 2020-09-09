@@ -1,6 +1,6 @@
 # https://github.com/JuliaLang/julia/pull/35973
 if v"1.3.0" <= VERSION < v"1.6.0-DEV.84"
-    # Declare a new `==` function to avoid type piracy
+    # Declare a new `==` function to avoid type piracy & triggeing of loads of invalidations
     function == end
     @inline ==(a, b) = Base.:(==)(a, b)
 
