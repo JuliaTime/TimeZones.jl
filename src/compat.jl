@@ -10,7 +10,7 @@ if v"1.3.0" <= VERSION < v"1.6.0-DEV.84"
     end
 end
 
-if VERSION == v"1.3.1"
+if v"1.3.1-pre.18" <= VERSION < v"1.3.2"
     using Pkg.Artifacts: do_artifact_str, find_artifacts_toml, load_artifacts_toml
 
     # A copy of `Pkg.Artifacts.@artifact_str` where `name` is properly escaped on
