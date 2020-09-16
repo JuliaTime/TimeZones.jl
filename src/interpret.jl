@@ -1,30 +1,49 @@
-using TimeZones.TZData: MIN_OFFSET, MAX_OFFSET
-
 # TimeZone concepts used to disambiguate context of DateTimes
 # abstract type UTC <: TimeZone end # Defined in Dates
 abstract type Local <: TimeZone end
 
+# Compare a local instant to a UTC transition instant by using the offset to make them both
+# into local time. We could just as easily convert both of them into UTC time.
+lt_local(local_dt::DateTime, t::Transition) = isless(local_dt, t.utc_datetime + t.zone.offset)
+lt_local(t::Transition, local_dt::DateTime) = isless(t.utc_datetime + t.zone.offset, local_dt)
+
+lt_utc(utc_dt::DateTime, t::Transition) = isless(utc_dt, t.utc_datetime)
+lt_utc(t::Transition, utc_dt::DateTime) = isless(t.utc_datetime, utc_dt)
+
 function transition_range(local_dt::DateTime, tz::VariableTimeZone, ::Type{Local})
-    transitions = tz.transitions
+    # To understand the logic in this function some background on transitions is needed:
+    #
+    # A transition (`t[i]`) is applicable to a given UTC instant that occurs on or after the
+    # transition start (`t[i].utc_datetime`). The transition (`t[i]`) ends at the start of
+    # the next transition in the list (`t[i + 1].utc_datetime`).
+    #
+    # Any UTC instant that occurs prior to the first transition (`t[1].utc_datetime`) has no
+    # associated transitions. Any UTC instant that occurs on or after the last transition
+    # (`t[end].utc_datetime`) is associated, at a minimum, with the last transition.
 
-    # Determine the earliest and latest possible UTC DateTime
-    # that this local DateTime could be.
-    # TODO: Alternatively we should only look at the range of offsets available within
-    # this TimeZone.
-    earliest = local_dt + MIN_OFFSET
-    latest = local_dt + MAX_OFFSET
+    # Determine the latest transition that applies to `local_dt`. If the `local_dt`
+    # preceeds all transitions `finish` will be zero and produce the empty range `1:0`.
+    finish = searchsortedlast(tz.transitions, local_dt, lt=lt_local)
 
-    # Determine the earliest transition the local DateTime could
-    # occur within.
-    start = searchsortedlast(
-        transitions, earliest,
-        by=el -> isa(el, Transition) ? el.utc_datetime : el,
-    )
-    start = max(start, 1)
-    finish = length(transitions)
-    for i in start:finish
-        if transitions[i].utc_datetime > latest
-            finish = i - 1
+    # Usually we'll begin by having `start` be larger than `finish` to create an empty
+    # range by default. In the scenario where last transition applies to the `local_dt` we
+    # can avoid a bounds by setting `start = finish`.
+    start = finish < length(tz.transitions) ? finish + 1 : finish
+
+    # To determine the first transition that applies to the `local_dt` we will work
+    # backwards. Typically, this loop will only use single iteration as multiple iterations
+    # only occur when local times are ambiguous.
+    @inbounds for i in (start - 1):-1:1
+        # Compute the end of the transition in local time. Note that this instant is not
+        # included in the implicitly defined transition interval (known as right-open in
+        # interval parlance).
+        transition_end = tz.transitions[i + 1].utc_datetime + tz.transitions[i].zone.offset
+
+        # If the end of the transition occurs after the `local_dt` then this transition
+        # applies to the `local_dt`.
+        if transition_end > local_dt
+            start = i
+        else
             break
         end
     end
@@ -33,12 +52,9 @@ function transition_range(local_dt::DateTime, tz::VariableTimeZone, ::Type{Local
 end
 
 function transition_range(utc_dt::DateTime, tz::VariableTimeZone, ::Type{UTC})
-    index = searchsortedlast(
-        tz.transitions, utc_dt,
-        by=el -> isa(el, Transition) ? el.utc_datetime : el,
-    )
-    index = max(index, 1)
-    return index:index
+    finish = searchsortedlast(tz.transitions, utc_dt, lt=lt_utc)
+    start = max(finish, 1)
+    return start:finish
 end
 
 """
