@@ -99,66 +99,29 @@ context typically return 0-2 results while the UTC context will always return 1 
 interpret(::DateTime, ::VariableTimeZone, ::Type{Union{Local,UTC}})
 
 """
-    shift_gap(local_dt::DateTime, tz::VariableTimeZone) -> Array{ZonedDateTime}
+    shift_gap(local_dt::DateTime, tz::VariableTimeZone) -> Tuple
 
-Given a non-existent local `DateTime` in a `TimeZone` produces two valid `ZonedDateTime`s
-that span the gap. Providing a valid local `DateTime` returns an empty array. Note that this
-function does not support passing in a UTC `DateTime` since there are no non-existent UTC
-`DateTime`s.
+Given a non-existent local `DateTime` in a `TimeZone` produces a tuple containing two valid
+`ZonedDateTime`s that span the gap. Providing a valid local `DateTime` returns an empty
+tuple. Note that this function does not support passing in a UTC `DateTime` since there are
+no non-existent UTC `DateTime`s.
 
 Aside: the function name refers to a period of invalid local time (gap) caused by daylight
 saving time or offset changes (shift).
 """
 function shift_gap(local_dt::DateTime, tz::VariableTimeZone)
-    boundaries = ZonedDateTime[]
-    t = tz.transitions
-    n = length(t)
-    delta = eps(local_dt)
-    for i in transition_range(local_dt, tz, Local)
-        # Convert the local DateTime into UTC
-        utc_dt = local_dt - t[i].zone.offset
-
-        # Essentially: t[i].utc_datetime <= utc_dt < t[i + 1].utc_datetime
-        starts_after = utc_dt >= t[i].utc_datetime
-        ends_before = i == n || utc_dt < t[i + 1].utc_datetime
-
-        # No boundaries should be produced when the given UTC DateTime exists
-        if starts_after && ends_before
-            empty!(boundaries)
-            break
-
-        # UTC DateTime proceeds the end of the transition range
-        elseif !ends_before
-            push!(boundaries, ZonedDateTime(t[i + 1].utc_datetime - delta, tz, t[i].zone))
-
-        # UTC DateTime preceeds the start of the transition range
-        elseif !starts_after
-            push!(boundaries, ZonedDateTime(t[i].utc_datetime, tz, t[i].zone))
-        end
-
-        # A slower but much easier to understand version of the above code:
-        #
-        # if starts_after && ends_before
-        #     empty!(boundaries)
-        #     break
-        # elseif !starts_after
-        #     push!(
-        #         boundaries,
-        #         ZonedDateTime(t[i].utc_datetime - eps(t[i].utc_datetime), tz, from_utc=true),
-        #         ZonedDateTime(t[i].utc_datetime, tz, from_utc=true),
-        #     )
-        # end
+    r = transition_range(local_dt, tz, Local)
+    boundaries = if isempty(r) && last(r) > 0
+        t = tz.transitions
+        i, j = last(r), first(r)  # Empty range has the indices we want but backwards
+        tuple(
+            ZonedDateTime(t[i + 1].utc_datetime - eps(local_dt), tz, t[i].zone),
+            ZonedDateTime(t[j].utc_datetime, tz, t[j].zone),
+        )
+    else
+        tuple()
     end
 
-    # In time zones with hidden transitions we could end up with more than two "bounds".
-    # Note this is more of a theoretical issue and would probably only ever occur with hand-
-    # crafted VariableTimeZones.
-    if length(boundaries) > 2
-        boundaries = [first(boundaries), last(boundaries)]
-    end
-
-    # Although we are using an array the only valid output from this function should be an
-    # empty array or a 2-element array.
     return boundaries
 end
 

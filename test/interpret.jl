@@ -92,23 +92,23 @@ non_existent_neg = DateTime(2012,9,30,3)
 @test_throws AmbiguousTimeError ZonedDateTime(ambiguous_neg, apia)
 @test_throws NonExistentTimeError ZonedDateTime(non_existent_neg, apia)
 
-@test TimeZones.shift_gap(ambiguous_pos, apia) == ZonedDateTime[]
-@test TimeZones.shift_gap(non_existent_pos, apia) == [
+@test isempty(TimeZones.shift_gap(ambiguous_pos, apia))
+@test TimeZones.shift_gap(non_existent_pos, apia) == (
     ZonedDateTime(2011, 9, 24, 2, 59, 59, 999, apia),
     ZonedDateTime(2011, 9, 24, 4, apia),
-]
-@test TimeZones.shift_gap(ambiguous_neg, apia) == ZonedDateTime[]
-@test TimeZones.shift_gap(non_existent_neg, apia) == [
+)
+@test isempty(TimeZones.shift_gap(ambiguous_neg, apia))
+@test TimeZones.shift_gap(non_existent_neg, apia) == (
     ZonedDateTime(2012, 9, 30, 2, 59, 59, 999, apia),
     ZonedDateTime(2012, 9, 30, 4, apia),
-]
+)
 
 # Valid local datetimes close to the non-existent hour should have no boundaries as are
 # already valid.
-@test TimeZones.shift_gap(non_existent_pos - Second(1), apia) == ZonedDateTime[]
-@test TimeZones.shift_gap(non_existent_pos + Hour(1), apia) == ZonedDateTime[]
-@test TimeZones.shift_gap(non_existent_neg - Second(1), apia) == ZonedDateTime[]
-@test TimeZones.shift_gap(non_existent_neg + Hour(1), apia) == ZonedDateTime[]
+@test isempty(TimeZones.shift_gap(non_existent_pos - Second(1), apia))
+@test isempty(TimeZones.shift_gap(non_existent_pos + Hour(1), apia))
+@test isempty(TimeZones.shift_gap(non_existent_neg - Second(1), apia))
+@test isempty(TimeZones.shift_gap(non_existent_neg + Hour(1), apia))
 
 
 # Create custom VariableTimeZones to test corner cases
@@ -138,13 +138,17 @@ non_existent_2 = DateTime(1935,4,1,3)
 # Both "long" and "hidden" are identical for the following tests
 for tz in (long, hidden)
     local tz
-    boundaries = [
+    boundaries = (
         ZonedDateTime(1935, 4, 1, 1, 59, 59, 999, tz),
         ZonedDateTime(1935, 4, 1, 4, tz),
-    ]
+    )
 
+    @test_throws NonExistentTimeError ZonedDateTime(DateTime(0), tz)
     @test_throws NonExistentTimeError ZonedDateTime(non_existent_1, tz)
     @test_throws NonExistentTimeError ZonedDateTime(non_existent_2, tz)
+
+    # Unhandled datetimes should not be treated as a gap
+    @test isempty(TimeZones.shift_gap(DateTime(0), tz))
 
     @test TimeZones.shift_gap(non_existent_1, tz) == boundaries
     @test TimeZones.shift_gap(non_existent_2, tz) == boundaries
