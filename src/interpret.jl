@@ -67,27 +67,21 @@ that UTC context will always return a range of length one.
 transition_range(::DateTime, ::VariableTimeZone, ::Type{Union{Local,UTC}})
 
 function interpret(local_dt::DateTime, tz::VariableTimeZone, ::Type{Local})
-    interpretations = ZonedDateTime[]
     t = tz.transitions
-    n = length(t)
-    for i in transition_range(local_dt, tz, Local)
-        # Convert the local DateTime into UTC
-        utc_dt = local_dt - t[i].zone.offset
-
-        if utc_dt >= t[i].utc_datetime && (i == n || utc_dt < t[i + 1].utc_datetime)
-            push!(interpretations, ZonedDateTime(utc_dt, tz, t[i].zone))
-        end
-    end
-
-    return interpretations
+    r = transition_range(local_dt, tz, Local)
+    return (ZonedDateTime(local_dt - t[i].zone.offset, tz, t[i].zone) for i in r)
 end
 
 function interpret(utc_dt::DateTime, tz::VariableTimeZone, ::Type{UTC})
-    range = transition_range(utc_dt, tz, UTC)
-    length(range) == 1 || error("Internal TimeZones error: A UTC DateTime should only have a single interpretation")
-    i = first(range)
-    return [ZonedDateTime(utc_dt, tz, tz.transitions[i].zone)]
+    t = tz.transitions
+    r = transition_range(utc_dt, tz, UTC)
+    length(r) == 1 || error("Internal TimeZones error: A UTC DateTime should only have a single interpretation")
+    return (ZonedDateTime(utc_dt, tz, t[i].zone) for i in r)
 end
+
+# TODO: Temporary type-piracy to make generators indexable
+Base.getindex(g::Base.Generator, i::Integer) = g.f(g.iter[i])
+Base.lastindex(g::Base.Generator) = lastindex(g.iter)
 
 """
     interpret(dt::DateTime, tz::VariableTimeZone, context::Type{Union{Local,UTC}}) -> Array{ZonedDateTime}
