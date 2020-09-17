@@ -1,7 +1,3 @@
-# TimeZone concepts used to disambiguate context of DateTimes
-# abstract type UTC <: TimeZone end # Defined in Dates
-abstract type Local <: TimeZone end
-
 # Compare a local instant to a UTC transition instant by using the offset to make them both
 # into local time. We could just as easily convert both of them into UTC time.
 lt_local(local_dt::DateTime, t::Transition) = isless(local_dt, t.utc_datetime + t.zone.offset)
