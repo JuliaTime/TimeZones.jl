@@ -69,19 +69,19 @@ transition_range(::DateTime, ::VariableTimeZone, ::Type{Union{Local,UTC}})
 function interpret(local_dt::DateTime, tz::VariableTimeZone, ::Type{Local})
     t = tz.transitions
     r = transition_range(local_dt, tz, Local)
-    return (ZonedDateTime(local_dt - t[i].zone.offset, tz, t[i].zone) for i in r)
+
+    possible = (ZonedDateTime(local_dt - t[i].zone.offset, tz, t[i].zone) for i in r)
+    return IndexableGenerator(possible)
 end
 
 function interpret(utc_dt::DateTime, tz::VariableTimeZone, ::Type{UTC})
     t = tz.transitions
     r = transition_range(utc_dt, tz, UTC)
     length(r) == 1 || error("Internal TimeZones error: A UTC DateTime should only have a single interpretation")
-    return (ZonedDateTime(utc_dt, tz, t[i].zone) for i in r)
-end
 
-# TODO: Temporary type-piracy to make generators indexable
-Base.getindex(g::Base.Generator, i::Integer) = g.f(g.iter[i])
-Base.lastindex(g::Base.Generator) = lastindex(g.iter)
+    possible = (ZonedDateTime(utc_dt, tz, t[i].zone) for i in r)
+    return IndexableGenerator(possible)
+end
 
 """
     interpret(dt::DateTime, tz::VariableTimeZone, context::Type{Union{Local,UTC}}) -> Array{ZonedDateTime}

@@ -45,8 +45,10 @@ function __init__()
     global ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
 end
 
-include("utils.jl")
 include("compat.jl")
+include("utils.jl")
+include("indexable_generator.jl")
+
 include("class.jl")
 include("utcoffset.jl")
 include(joinpath("types", "timezone.jl"))
