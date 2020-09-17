@@ -32,8 +32,12 @@ keyword is true the given `DateTime` is assumed to be in UTC instead of in local
 converted to the specified `TimeZone`.  Note that when `from_utc` is true the given
 `DateTime` will always exists and is never ambiguous.
 """
-function ZonedDateTime(dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
-    possible = interpret(dt, tz, from_utc ? UTC : Local)
+function ZonedDateTime(dt::DateTime, tz::TimeZone; from_utc::Bool=false)
+    _ZonedDateTime(dt, tz, from_utc ? UTC : Local)
+end
+
+function _ZonedDateTime(dt::DateTime, tz::VariableTimeZone, T::Type{<:Union{Local,UTC}})
+    possible = interpret(dt, tz, T)
 
     num = length(possible)
     if num == 1
@@ -45,8 +49,12 @@ function ZonedDateTime(dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
     end
 end
 
-function ZonedDateTime(dt::DateTime, tz::FixedTimeZone; from_utc::Bool=false)
-    utc_dt = from_utc ? dt : dt - tz.offset
+function _ZonedDateTime(local_dt::DateTime, tz::FixedTimeZone, ::Type{Local})
+    utc_dt = local_dt - tz.offset
+    return ZonedDateTime(utc_dt, tz, tz)
+end
+
+function _ZonedDateTime(utc_dt::DateTime, tz::FixedTimeZone, ::Type{UTC})
     return ZonedDateTime(utc_dt, tz, tz)
 end
 
