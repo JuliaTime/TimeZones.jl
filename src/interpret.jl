@@ -24,7 +24,8 @@ function transition_range(local_dt::DateTime, tz::VariableTimeZone, ::Type{Local
     # Usually we'll begin by having `start` be larger than `finish` to create an empty
     # range by default. In the scenario where last transition applies to the `local_dt` we
     # can avoid a bounds by setting `start = finish`.
-    start = finish < length(tz.transitions) ? finish + 1 : finish
+    len = length(tz.transitions)
+    start = finish < len ? finish + 1 : len
 
     # To determine the first transition that applies to the `local_dt` we will work
     # backwards. Typically, this loop will only use single iteration as multiple iterations
