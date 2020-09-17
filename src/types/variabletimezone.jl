@@ -3,7 +3,7 @@ struct Transition
     zone::FixedTimeZone
 end
 
-Base.isless(x::Transition,y::Transition) = isless(x.utc_datetime,y.utc_datetime)
+Base.isless(a::Transition, b::Transition) = isless(a.utc_datetime, b.utc_datetime)
 
 """
     VariableTimeZone
