@@ -5,4 +5,5 @@ using TimeZones.TZData: parse_components
 
 const SUITE = BenchmarkGroup()
 
+include("tzdata.jl")
 include("parse.jl")
