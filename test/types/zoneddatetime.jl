@@ -78,6 +78,7 @@ using Dates: Hour, Second, UTM, @dateformat_str
 
         # Disambiguating parameters ignored when there is no ambiguity.
         @test ZonedDateTime(local_dt, warsaw).zone.name == "CET"
+        @test ZonedDateTime(local_dt, warsaw, 0).zone.name == "CET"
         @test ZonedDateTime(local_dt, warsaw, 1).zone.name == "CET"
         @test ZonedDateTime(local_dt, warsaw, 2).zone.name == "CET"
         @test ZonedDateTime(local_dt, warsaw, true).zone.name == "CET"
@@ -85,6 +86,7 @@ using Dates: Hour, Second, UTM, @dateformat_str
         @test ZonedDateTime(utc_dt, warsaw, from_utc=true).zone.name == "CET"
 
         @test ZonedDateTime(local_dt, warsaw).utc_datetime == utc_dt
+        @test ZonedDateTime(local_dt, warsaw, 0).utc_datetime == utc_dt
         @test ZonedDateTime(local_dt, warsaw, 1).utc_datetime == utc_dt
         @test ZonedDateTime(local_dt, warsaw, 2).utc_datetime == utc_dt
         @test ZonedDateTime(local_dt, warsaw, true).utc_datetime == utc_dt
@@ -98,6 +100,7 @@ using Dates: Hour, Second, UTM, @dateformat_str
 
         # Disambiguating parameters ignored when there is no ambiguity.
         @test ZonedDateTime(local_dt, warsaw).zone.name == "CEST"
+        @test ZonedDateTime(local_dt, warsaw, 0).zone.name == "CEST"
         @test ZonedDateTime(local_dt, warsaw, 1).zone.name == "CEST"
         @test ZonedDateTime(local_dt, warsaw, 2).zone.name == "CEST"
         @test ZonedDateTime(local_dt, warsaw, true).zone.name == "CEST"
@@ -105,6 +108,7 @@ using Dates: Hour, Second, UTM, @dateformat_str
         @test ZonedDateTime(utc_dt, warsaw, from_utc=true).zone.name == "CEST"
 
         @test ZonedDateTime(local_dt, warsaw).utc_datetime == utc_dt
+        @test ZonedDateTime(local_dt, warsaw, 0).utc_datetime == utc_dt
         @test ZonedDateTime(local_dt, warsaw, 1).utc_datetime == utc_dt
         @test ZonedDateTime(local_dt, warsaw, 2).utc_datetime == utc_dt
         @test ZonedDateTime(local_dt, warsaw, true).utc_datetime == utc_dt
@@ -123,6 +127,7 @@ using Dates: Hour, Second, UTM, @dateformat_str
             DateTime(1916,4,30,22),
         )
         @test_throws NonExistentTimeError ZonedDateTime(local_dts[2], warsaw)
+        @test_throws NonExistentTimeError ZonedDateTime(local_dts[2], warsaw, 0)
         @test_throws NonExistentTimeError ZonedDateTime(local_dts[2], warsaw, 1)
         @test_throws NonExistentTimeError ZonedDateTime(local_dts[2], warsaw, 2)
         @test_throws NonExistentTimeError ZonedDateTime(local_dts[2], warsaw, true)
@@ -142,7 +147,9 @@ using Dates: Hour, Second, UTM, @dateformat_str
     @testset "fall-back" begin
         local_dt = DateTime(1916, 10, 1, 0)
         utc_dts = (DateTime(1916, 9, 30, 22), DateTime(1916, 9, 30, 23))
+
         @test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw)
+        @test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw, 0)
 
         @test ZonedDateTime(local_dt, warsaw, 1).zone.name == "CEST"
         @test ZonedDateTime(local_dt, warsaw, 2).zone.name == "CET"
