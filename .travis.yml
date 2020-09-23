@@ -22,6 +22,17 @@ stages:
     - julia --project=docs/ docs/deploy.jl
   after_success: skip
 
+.benchmarks: &benchmarks
+  stage: "test"
+  name: "Benchmarks"
+  os: linux
+  julia: 1
+  script:
+    - git fetch origin +:refs/remotes/origin/HEAD
+    - julia --project=benchmark/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd()))'
+    - julia --project=benchmark/ -e 'using PkgBenchmark, TimeZones; export_markdown(stdout, judge(TimeZones, "origin/HEAD", verbose=false))'
+  after_success: skip
+
 # Note: At the moment `codecov: true` and `coveralls: true` are not working.
 language: julia
 os:
@@ -49,8 +60,9 @@ jobs:
     - arch: x86
       os: windows
 
-  # Documentation tests and deployment
+  # Benchmarking, doctests, and documentation deployment
   include:
+    - <<: *benchmarks
     - <<: *doc_test
       os: linux
       julia: 1.0
