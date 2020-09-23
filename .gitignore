@@ -13,8 +13,8 @@ test/tzsource
 docs/build
 
 # PkgBenchmark
-benchmark/.results
-benchmark/.tune.jld
+benchmark/Manifest.toml
+benchmark/tune.json
 
 # Pkg
 deps/build.log
