@@ -1,7 +1,8 @@
 using BenchmarkTools
-using Dates: Day, Hour, DateFormat
+using Dates: Day, Hour, DateFormat, @dateformat_str
 using TimeZones
 using TimeZones.TZData: parse_components
+using Test: GenericString
 
 const SUITE = BenchmarkGroup()
 
