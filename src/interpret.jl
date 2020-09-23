@@ -1,30 +1,46 @@
-using TimeZones.TZData: MIN_OFFSET, MAX_OFFSET
+# Compare a local instant to a UTC transition instant by using the offset to make them both
+# into local time. We could just as easily convert both of them into UTC time.
+lt_local(local_dt::DateTime, t::Transition) = isless(local_dt, t.utc_datetime + t.zone.offset)
+lt_local(t::Transition, local_dt::DateTime) = isless(t.utc_datetime + t.zone.offset, local_dt)
 
-# TimeZone concepts used to disambiguate context of DateTimes
-# abstract type UTC <: TimeZone end # Defined in Dates
-abstract type Local <: TimeZone end
+lt_utc(utc_dt::DateTime, t::Transition) = isless(utc_dt, t.utc_datetime)
+lt_utc(t::Transition, utc_dt::DateTime) = isless(t.utc_datetime, utc_dt)
 
 function transition_range(local_dt::DateTime, tz::VariableTimeZone, ::Type{Local})
-    transitions = tz.transitions
+    # To understand the logic in this function some background on transitions is needed:
+    #
+    # A transition (`t[i]`) is applicable to a given UTC instant that occurs on or after the
+    # transition start (`t[i].utc_datetime`). The transition (`t[i]`) ends at the start of
+    # the next transition in the list (`t[i + 1].utc_datetime`).
+    #
+    # Any UTC instant that occurs prior to the first transition (`t[1].utc_datetime`) has no
+    # associated transitions. Any UTC instant that occurs on or after the last transition
+    # (`t[end].utc_datetime`) is associated, at a minimum, with the last transition.
 
-    # Determine the earliest and latest possible UTC DateTime
-    # that this local DateTime could be.
-    # TODO: Alternatively we should only look at the range of offsets available within
-    # this TimeZone.
-    earliest = local_dt + MIN_OFFSET
-    latest = local_dt + MAX_OFFSET
+    # Determine the latest transition that applies to `local_dt`. If the `local_dt`
+    # preceeds all transitions `finish` will be zero and produce the empty range `1:0`.
+    finish = searchsortedlast(tz.transitions, local_dt, lt=lt_local)
 
-    # Determine the earliest transition the local DateTime could
-    # occur within.
-    start = searchsortedlast(
-        transitions, earliest,
-        by=el -> isa(el, Transition) ? el.utc_datetime : el,
-    )
-    start = max(start, 1)
-    finish = length(transitions)
-    for i in start:finish
-        if transitions[i].utc_datetime > latest
-            finish = i - 1
+    # Usually we'll begin by having `start` be larger than `finish` to create an empty
+    # range by default. In the scenario where last transition applies to the `local_dt` we
+    # can avoid a bounds by setting `start = finish`.
+    len = length(tz.transitions)
+    start = finish < len ? finish + 1 : len
+
+    # To determine the first transition that applies to the `local_dt` we will work
+    # backwards. Typically, this loop will only use single iteration as multiple iterations
+    # only occur when local times are ambiguous.
+    @inbounds for i in (start - 1):-1:1
+        # Compute the end of the transition in local time. Note that this instant is not
+        # included in the implicitly defined transition interval (known as right-open in
+        # interval parlance).
+        transition_end = tz.transitions[i + 1].utc_datetime + tz.transitions[i].zone.offset
+
+        # If the end of the transition occurs after the `local_dt` then this transition
+        # applies to the `local_dt`.
+        if transition_end > local_dt
+            start = i
+        else
             break
         end
     end
@@ -33,12 +49,9 @@ function transition_range(local_dt::DateTime, tz::VariableTimeZone, ::Type{Local
 end
 
 function transition_range(utc_dt::DateTime, tz::VariableTimeZone, ::Type{UTC})
-    index = searchsortedlast(
-        tz.transitions, utc_dt,
-        by=el -> isa(el, Transition) ? el.utc_datetime : el,
-    )
-    index = max(index, 1)
-    return index:index
+    finish = searchsortedlast(tz.transitions, utc_dt, lt=lt_utc)
+    start = max(finish, 1)
+    return start:finish
 end
 
 """
@@ -51,26 +64,20 @@ that UTC context will always return a range of length one.
 transition_range(::DateTime, ::VariableTimeZone, ::Type{Union{Local,UTC}})
 
 function interpret(local_dt::DateTime, tz::VariableTimeZone, ::Type{Local})
-    interpretations = ZonedDateTime[]
     t = tz.transitions
-    n = length(t)
-    for i in transition_range(local_dt, tz, Local)
-        # Convert the local DateTime into UTC
-        utc_dt = local_dt - t[i].zone.offset
+    r = transition_range(local_dt, tz, Local)
 
-        if utc_dt >= t[i].utc_datetime && (i == n || utc_dt < t[i + 1].utc_datetime)
-            push!(interpretations, ZonedDateTime(utc_dt, tz, t[i].zone))
-        end
-    end
-
-    return interpretations
+    possible = (ZonedDateTime(local_dt - t[i].zone.offset, tz, t[i].zone) for i in r)
+    return IndexableGenerator(possible)
 end
 
 function interpret(utc_dt::DateTime, tz::VariableTimeZone, ::Type{UTC})
-    range = transition_range(utc_dt, tz, UTC)
-    length(range) == 1 || error("Internal TimeZones error: A UTC DateTime should only have a single interpretation")
-    i = first(range)
-    return [ZonedDateTime(utc_dt, tz, tz.transitions[i].zone)]
+    t = tz.transitions
+    r = transition_range(utc_dt, tz, UTC)
+    length(r) == 1 || error("Internal TimeZones error: A UTC DateTime should only have a single interpretation")
+
+    possible = (ZonedDateTime(utc_dt, tz, t[i].zone) for i in r)
+    return IndexableGenerator(possible)
 end
 
 """
@@ -83,66 +90,29 @@ context typically return 0-2 results while the UTC context will always return 1 
 interpret(::DateTime, ::VariableTimeZone, ::Type{Union{Local,UTC}})
 
 """
-    shift_gap(local_dt::DateTime, tz::VariableTimeZone) -> Array{ZonedDateTime}
+    shift_gap(local_dt::DateTime, tz::VariableTimeZone) -> Tuple
 
-Given a non-existent local `DateTime` in a `TimeZone` produces two valid `ZonedDateTime`s
-that span the gap. Providing a valid local `DateTime` returns an empty array. Note that this
-function does not support passing in a UTC `DateTime` since there are no non-existent UTC
-`DateTime`s.
+Given a non-existent local `DateTime` in a `TimeZone` produces a tuple containing two valid
+`ZonedDateTime`s that span the gap. Providing a valid local `DateTime` returns an empty
+tuple. Note that this function does not support passing in a UTC `DateTime` since there are
+no non-existent UTC `DateTime`s.
 
 Aside: the function name refers to a period of invalid local time (gap) caused by daylight
 saving time or offset changes (shift).
 """
 function shift_gap(local_dt::DateTime, tz::VariableTimeZone)
-    boundaries = ZonedDateTime[]
-    t = tz.transitions
-    n = length(t)
-    delta = eps(local_dt)
-    for i in transition_range(local_dt, tz, Local)
-        # Convert the local DateTime into UTC
-        utc_dt = local_dt - t[i].zone.offset
-
-        # Essentially: t[i].utc_datetime <= utc_dt < t[i + 1].utc_datetime
-        starts_after = utc_dt >= t[i].utc_datetime
-        ends_before = i == n || utc_dt < t[i + 1].utc_datetime
-
-        # No boundaries should be produced when the given UTC DateTime exists
-        if starts_after && ends_before
-            empty!(boundaries)
-            break
-
-        # UTC DateTime proceeds the end of the transition range
-        elseif !ends_before
-            push!(boundaries, ZonedDateTime(t[i + 1].utc_datetime - delta, tz, t[i].zone))
-
-        # UTC DateTime preceeds the start of the transition range
-        elseif !starts_after
-            push!(boundaries, ZonedDateTime(t[i].utc_datetime, tz, t[i].zone))
-        end
-
-        # A slower but much easier to understand version of the above code:
-        #
-        # if starts_after && ends_before
-        #     empty!(boundaries)
-        #     break
-        # elseif !starts_after
-        #     push!(
-        #         boundaries,
-        #         ZonedDateTime(t[i].utc_datetime - eps(t[i].utc_datetime), tz, from_utc=true),
-        #         ZonedDateTime(t[i].utc_datetime, tz, from_utc=true),
-        #     )
-        # end
+    r = transition_range(local_dt, tz, Local)
+    boundaries = if isempty(r) && last(r) > 0
+        t = tz.transitions
+        i, j = last(r), first(r)  # Empty range has the indices we want but backwards
+        tuple(
+            ZonedDateTime(t[i + 1].utc_datetime - eps(local_dt), tz, t[i].zone),
+            ZonedDateTime(t[j].utc_datetime, tz, t[j].zone),
+        )
+    else
+        tuple()
     end
 
-    # In time zones with hidden transitions we could end up with more than two "bounds".
-    # Note this is more of a theoretical issue and would probably only ever occur with hand-
-    # crafted VariableTimeZones.
-    if length(boundaries) > 2
-        boundaries = [first(boundaries), last(boundaries)]
-    end
-
-    # Although we are using an array the only valid output from this function should be an
-    # empty array or a 2-element array.
     return boundaries
 end
 

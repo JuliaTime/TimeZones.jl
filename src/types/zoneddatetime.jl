@@ -33,16 +33,21 @@ converted to the specified `TimeZone`.  Note that when `from_utc` is true the gi
 `DateTime` will always exists and is never ambiguous.
 """
 function ZonedDateTime(dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
-    possible = interpret(dt, tz, from_utc ? UTC : Local)
+    # Note: Using a function barrier which reduces allocations
+    function construct(T::Type{<:Union{Local,UTC}})
+        possible = interpret(dt, tz, T)
 
-    num = length(possible)
-    if num == 1
-        return first(possible)
-    elseif num == 0
-        throw(NonExistentTimeError(dt, tz))
-    else
-        throw(AmbiguousTimeError(dt, tz))
+        num = length(possible)
+        if num == 1
+            return first(possible)
+        elseif num == 0
+            throw(NonExistentTimeError(dt, tz))
+        else
+            throw(AmbiguousTimeError(dt, tz))
+        end
     end
+
+    return construct(from_utc ? UTC : Local)
 end
 
 function ZonedDateTime(dt::DateTime, tz::FixedTimeZone; from_utc::Bool=false)
