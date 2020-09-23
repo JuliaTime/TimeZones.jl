@@ -18,3 +18,9 @@ end
 SUITE["ZonedDateTime"]["date-period-range"] = begin
     @benchmarkable collect($(ZonedDateTime(2020, tz"America/Winnipeg"):Day(1):ZonedDateTime(2021, tz"America/Winnipeg")))
 end
+
+# https://github.com/JuliaTime/TimeZones.jl/pull/287#issuecomment-687358202
+SUITE["ZonedDateTime"]["fill"] = begin
+    f(zdt) = fill(zdt, 100)[end]
+    @benchmarkable f($(ZonedDateTime(2000, 1, 2, tz"America/Winnipeg")))
+end
