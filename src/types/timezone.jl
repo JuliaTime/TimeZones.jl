@@ -1,4 +1,5 @@
 const TIME_ZONE_CACHE = Dict{String,Tuple{TimeZone,Class}}()
+const _TIME_ZONES = ExternalField{TimeZone}()
 
 """
     TimeZone(str::AbstractString) -> TimeZone
