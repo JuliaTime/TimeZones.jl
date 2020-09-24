@@ -44,18 +44,8 @@ function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
     # Note: If the class `mask` does not match the time zone we'll still load the
     # information into the cache to ensure the result is consistent.
     tz, class = get!(TIME_ZONE_CACHE, str) do
-        tz_path = joinpath(TZData.COMPILED_DIR, split(str, "/")...)
-
-        if isfile(tz_path)
-            open(deserialize, tz_path, "r")
-        elseif occursin(FIXED_TIME_ZONE_REGEX, str)
+        if occursin(FIXED_TIME_ZONE_REGEX, str)
             FixedTimeZone(str), Class(:FIXED)
-        elseif !isdir(TZData.COMPILED_DIR) || isempty(readdir(TZData.COMPILED_DIR))
-            # Note: Julia 1.0 supresses the build logs which can hide issues in time zone
-            # compliation which result in no tzdata time zones being available.
-            throw(ArgumentError(
-                "Unable to find time zone \"$str\". Try running `TimeZones.build()`."
-            ))
         else
             throw(ArgumentError("Unknown time zone \"$str\""))
         end
