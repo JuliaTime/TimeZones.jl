@@ -1,12 +1,5 @@
 using Dates: AbstractDateTime, argerror, validargs
 
-# Stores non-bits data outside of the `ZonedDateTime` structure
-const _ZDT_FIELDS = Vector{Tuple{TimeZone,FixedTimeZone}}()
-
-# Stored indexes into `_ZDT_FIELDS`
-const _TZ_INDEX = Dict{Tuple{TimeZone,FixedTimeZone},Int}()
-
-
 # """
 #     ZonedDateTime
 
@@ -16,9 +9,10 @@ const _TZ_INDEX = Dict{Tuple{TimeZone,FixedTimeZone},Int}()
 struct ZonedDateTime <: AbstractDateTime
     utc_datetime::DateTime
     _tz_index::Int
+    _zone_index::Int
 
     function ZonedDateTime(utc_datetime::DateTime, timezone::TimeZone, zone::FixedTimeZone)
-        return new(utc_datetime, _tz_index(timezone, zone))
+        return new(utc_datetime, timezone.index, zone.index)
     end
 
     function ZonedDateTime(utc_datetime::DateTime, timezone::VariableTimeZone, zone::FixedTimeZone)
@@ -26,28 +20,15 @@ struct ZonedDateTime <: AbstractDateTime
             throw(UnhandledTimeError(timezone))
         end
 
-        return new(utc_datetime, _tz_index(timezone, zone))
+        return new(utc_datetime, timezone.index, zone.index)
     end
-end
-
-function _tz_index(tz::TimeZone, zone::FixedTimeZone)
-    t = (tz, zone)
-
-    i = get!(_TZ_INDEX, t) do
-        push!(_ZDT_FIELDS, t)
-        lastindex(_ZDT_FIELDS)
-    end
-
-    return i
 end
 
 function Base.getproperty(zdt::ZonedDateTime, field::Symbol)
     if field === :zone
-        tz, zone = _ZDT_FIELDS[getfield(zdt, :_tz_index)]
-        return zone
+        return _TIME_ZONES[getfield(zdt, :_zone_index)]::FixedTimeZone
     elseif field === :timezone
-        tz, zone = _ZDT_FIELDS[getfield(zdt, :_tz_index)]
-        return tz
+        return _TIME_ZONES[getfield(zdt, :_tz_index)]::TimeZone
     else
         return getfield(zdt, field)
     end
