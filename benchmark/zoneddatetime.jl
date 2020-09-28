@@ -12,11 +12,20 @@ SUITE["ZonedDateTime"]["utc"] = begin
     @benchmarkable ZonedDateTime($(DateTime(2015,1,1)), $(tz"America/Winnipeg"), from_utc=true)
 end
 
-SUITE["ZonedDateTime"]["time-period-range"] = begin
-    @benchmarkable collect($(ZonedDateTime(2020, tz"America/Winnipeg"):Hour(1):ZonedDateTime(2021, tz"America/Winnipeg")))
+
+SUITE["ZonedDateTime"]["range"] = BenchmarkGroup()
+
+SUITE["ZonedDateTime"]["range"]["VariableTimeZone/TimePeriod"] = begin
+    @benchmarkable collect($(gen_range(Hour(100), tz"America/Winnipeg")))
 end
-SUITE["ZonedDateTime"]["date-period-range"] = begin
-    @benchmarkable collect($(ZonedDateTime(2020, tz"America/Winnipeg"):Day(1):ZonedDateTime(2021, tz"America/Winnipeg")))
+SUITE["ZonedDateTime"]["range"]["VariableTimeZone/DatePeriod"] = begin
+    @benchmarkable collect($(gen_range(Day(100), tz"America/Winnipeg")))
+end
+SUITE["ZonedDateTime"]["range"]["FixedTimeZone/TimePeriod"] = begin
+    @benchmarkable collect($(gen_range(Hour(100), tz"UTC")))
+end
+SUITE["ZonedDateTime"]["range"]["FixedTimeZone/DatePeriod"] = begin
+    @benchmarkable collect($(gen_range(Day(100), tz"UTC")))
 end
 
 # https://github.com/JuliaTime/TimeZones.jl/pull/287#issuecomment-687358202
