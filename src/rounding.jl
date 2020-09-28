@@ -1,18 +1,18 @@
 using Dates: Period, DatePeriod, TimePeriod
 
 function Base.floor(zdt::ZonedDateTime, p::DatePeriod)
-    return ZonedDateTime(floor(DateTime(zdt, Local), p), timezone(zdt))
+    return ZonedDateTime(floor(DateTime(zdt), p), timezone(zdt))
 end
 
 function Base.floor(zdt::ZonedDateTime, p::TimePeriod)
     # Rounding is done using the current fixed offset to avoid transitional ambiguities.
-    dt = floor(DateTime(zdt, Local), p)
+    dt = floor(DateTime(zdt), p)
     utc_dt = dt - zdt.zone.offset
     return ZonedDateTime(utc_dt, timezone(zdt); from_utc=true)
 end
 
 function Base.ceil(zdt::ZonedDateTime, p::DatePeriod)
-    return ZonedDateTime(ceil(DateTime(zdt, Local), p), timezone(zdt))
+    return ZonedDateTime(ceil(DateTime(zdt), p), timezone(zdt))
 end
 
 #function Dates.floorceil(zdt::ZonedDateTime, p::Dates.DatePeriod)

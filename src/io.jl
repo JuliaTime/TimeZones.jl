@@ -50,7 +50,7 @@ function Base.print(io::IO, t::Transition)
     !isempty(t.zone.name) && print(io, " (", t.zone.name, ")")
 end
 
-Base.print(io::IO, zdt::ZonedDateTime) = print(io, DateTime(zdt, Local), zdt.zone.offset)
+Base.print(io::IO, zdt::ZonedDateTime) = print(io, DateTime(zdt), zdt.zone.offset)
 
 
 function Base.show(io::IO, tz::FixedTimeZone)

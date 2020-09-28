@@ -143,7 +143,7 @@ julia> today(tz"Pacific/Midway"), today(tz"Pacific/Apia")
 (2017-11-09, 2017-11-10)
 ```
 """
-Dates.today(tz::TimeZone) = Date(now(tz), Local)
+Dates.today(tz::TimeZone) = Date(now(tz))
 
 """
     todayat(tod::Time, tz::TimeZone, [amb]) -> ZonedDateTime
@@ -182,7 +182,7 @@ function astimezone(zdt::ZonedDateTime, tz::VariableTimeZone)
     )
 
     if i == 0
-        throw(NonExistentTimeError(DateTime(zdt, Local), tz))
+        throw(NonExistentTimeError(DateTime(zdt), tz))
     end
 
     zone = tz.transitions[i].zone
