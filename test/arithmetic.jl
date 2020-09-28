@@ -55,17 +55,104 @@ spring_zdt = ZonedDateTime(spring, warsaw)
 
 # Arithmetic with a StepRange should always work even when the start/stop lands on
 # ambiguous or non-existent DateTimes.
-ambiguous = DateTime(2015, 10, 25, 2)   # Ambiguous hour in Warsaw
-nonexistent = DateTime(2014, 3, 30, 2)  # Non-existent hour in Warsaw
+@testset "StepRange{ZonedDateTime}" begin
+    @testset "time-period" begin
+        dt = DateTime(2015, 6, 1)
 
-range = ZonedDateTime(ambiguous - Day(1), warsaw):Hour(1):ZonedDateTime(ambiguous - Day(1) + Hour(1), warsaw)
-@test range .+ Day(1) == ZonedDateTime(ambiguous, warsaw, 1):Hour(1):ZonedDateTime(ambiguous + Hour(1), warsaw)
+        results = Hour(1) .+ StepRange(
+            ZonedDateTime(dt - Hour(1), warsaw),
+            Hour(1),
+            ZonedDateTime(dt - Hour(0), warsaw),
+        )
+        expected = StepRange(
+            ZonedDateTime(dt + Hour(0), warsaw),
+            Hour(1),
+            ZonedDateTime(dt + Hour(1), warsaw),
+        )
+        @test results == expected
+        @test length(results) == 2
+        @test results isa StepRange{ZonedDateTime}
+    end
 
-range = ZonedDateTime(ambiguous - Day(1) - Hour(1), warsaw):Hour(1):ZonedDateTime(ambiguous - Day(1), warsaw)
-@test range .+ Day(1) == ZonedDateTime(ambiguous - Hour(1), warsaw, 1):Hour(1):ZonedDateTime(ambiguous, warsaw, 2)
+    @testset "date-period" begin
+        dt = DateTime(2015, 6, 1)
 
-range = ZonedDateTime(nonexistent - Day(1), warsaw):Hour(1):ZonedDateTime(nonexistent - Day(1) + Hour(1), warsaw)
-@test range .+ Day(1) == ZonedDateTime(nonexistent + Hour(1), warsaw):Hour(1):ZonedDateTime(nonexistent + Hour(1), warsaw)
+        results =  Day(1) .- StepRange(
+            ZonedDateTime(dt + Day(1), warsaw),
+            Hour(1),
+            ZonedDateTime(dt + Day(1) + Hour(1), warsaw),
+        )
+        expected = StepRange(
+            ZonedDateTime(dt, warsaw),
+            Hour(1),
+            ZonedDateTime(dt + Hour(1), warsaw),
+        )
+        @test results == expected
+        @test length(results) == 2
+        @test results isa StepRange{ZonedDateTime}
+    end
 
-range = ZonedDateTime(nonexistent - Day(1) - Hour(1), warsaw):Hour(1):ZonedDateTime(nonexistent - Day(1), warsaw)
-@test range .+ Day(1) == ZonedDateTime(nonexistent - Hour(1), warsaw):Hour(1):ZonedDateTime(nonexistent - Hour(1), warsaw)
+    @testset "ambiguous" begin
+        ambiguous = DateTime(2015, 10, 25, 2)   # Ambiguous hour in Warsaw
+
+        results = Day(1) .+ StepRange(
+            ZonedDateTime(ambiguous - Day(1) - Hour(1), warsaw),
+            Hour(1),
+            ZonedDateTime(ambiguous - Day(1), warsaw),
+        )
+        expected = StepRange(
+            ZonedDateTime(ambiguous - Hour(1), warsaw, 1),
+            Hour(1),
+            ZonedDateTime(ambiguous, warsaw, 2),
+        )
+        @test results == expected
+        @test length(results) == 3
+        @test results isa StepRange
+
+        results = Day(1) .+ StepRange(
+            ZonedDateTime(ambiguous - Day(1), warsaw),
+            Hour(1),
+            ZonedDateTime(ambiguous - Day(1) + Hour(1), warsaw),
+        )
+        expected = StepRange(
+            ZonedDateTime(ambiguous, warsaw, 1),
+            Hour(1),
+            ZonedDateTime(ambiguous + Hour(1), warsaw),
+        )
+        @test results == expected
+        @test length(results) == 3
+        @test results isa StepRange
+    end
+
+    @testset "non-existent" begin
+        nonexistent = DateTime(2014, 3, 30, 2)  # Non-existent hour in Warsaw
+
+        results = Day(1) .+ StepRange(
+            ZonedDateTime(nonexistent - Day(1) - Hour(1), warsaw),
+            Hour(1),
+            ZonedDateTime(nonexistent - Day(1), warsaw),
+        )
+        expected = StepRange(
+            ZonedDateTime(nonexistent - Hour(1), warsaw),
+            Hour(1),
+            ZonedDateTime(nonexistent - Hour(1), warsaw),
+        )
+        @test results == expected
+        @test length(results) == 1
+        @test results isa StepRange
+
+        results = Day(1) .+ StepRange(
+            ZonedDateTime(nonexistent - Day(1), warsaw),
+            Hour(1),
+            ZonedDateTime(nonexistent - Day(1) + Hour(1), warsaw),
+        )
+        expected = StepRange(
+            ZonedDateTime(nonexistent + Hour(1), warsaw),
+            Hour(1),
+            ZonedDateTime(nonexistent + Hour(1), warsaw),
+        )
+        @test results == expected
+        @test length(results) == 1
+        @test results isa StepRange
+    end
+end
