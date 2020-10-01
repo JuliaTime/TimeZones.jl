@@ -10,7 +10,7 @@ midway = first(compile("Pacific/Midway", tzdata["australasia"]))
     # Constructing a ZonedDateTime from a DateTime and the reverse
     dt = DateTime(2019, 4, 11, 0)
     zdt = ZonedDateTime(dt, warsaw)
-    @test DateTime(zdt, Local) == DateTime(2019, 4, 11, 0)
+    @test DateTime(zdt) == DateTime(2019, 4, 11, 0)
     @test DateTime(zdt, UTC) == DateTime(2019, 4, 10, 22)
 
     # Converting between ZonedDateTime and DateTime isn't possible as it isn't lossless.
@@ -21,7 +21,7 @@ end
 @testset "Construct Date / ZonedDateTime" begin
     date = Date(2018, 6, 14)
     zdt = ZonedDateTime(date, warsaw)
-    @test Date(zdt, Local) == Date(2018, 6, 14)
+    @test Date(zdt) == Date(2018, 6, 14)
     @test Date(zdt, UTC) == Date(2018, 6, 13)
 
     # Converting between ZonedDateTime and Date isn't possible as it isn't lossless.
@@ -31,7 +31,7 @@ end
 
 @testset "Construct Time" begin
     zdt = ZonedDateTime(2017, 8, 21, 0, 12, warsaw)
-    @test Time(zdt, Local) == Time(0, 12)
+    @test Time(zdt) == Time(0, 12)
     @test Time(zdt, UTC) == Time(22, 12)
 
     # Converting between ZonedDateTime and Time isn't possible as it isn't lossless.
@@ -53,7 +53,7 @@ end
 @testset "todayat" begin
     @testset "current time" begin
         local zdt = now(warsaw)
-        now_time = Time(zdt, Local)
+        now_time = Time(zdt)
         @test todayat(now_time, warsaw) == zdt
     end
 

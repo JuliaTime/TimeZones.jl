@@ -10,7 +10,7 @@ for details on the options and their tradeoffs.
 @recipe function f(xs::AbstractVector{<:ZonedDateTime}, ys)
     if !isempty(xs)
         tz = timezone(first(xs))  # convert all to same timezone as first one
-        new_xs = DateTime.(astimezone.(xs, tz), Local)
+        new_xs = DateTime.(astimezone.(xs, tz))
 
         # xguide is the proper name for xlabel
         label = get(plotattributes, :xguide, "")

@@ -8,7 +8,7 @@
     zoned_dates = start_zdt:Hour(1):end_zdt
 
     # what the point should be after recipe is applied
-    expected_dates = DateTime.(zoned_dates, Local)
+    expected_dates = DateTime.(zoned_dates)
 
     @testset "No label (should now say the Timezone)" begin
         # The below use of `apply_recipe` is equivelent to:
