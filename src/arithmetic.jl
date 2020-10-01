@@ -41,4 +41,10 @@ function broadcasted(::typeof(+), r::StepRange{ZonedDateTime}, p::DatePeriod)
     return StepRange(start, step, stop)
 end
 
-broadcasted(::typeof(-), r::StepRange{ZonedDateTime}, p::DatePeriod) = broadcast(+, r, -p)
+function broadcasted(::typeof(+), r::StepRange{ZonedDateTime}, p::TimePeriod)
+    return StepRange(r.start + p, r.step, r.stop + p)
+end
+
+broadcasted(::typeof(+), p::Period, r::StepRange{ZonedDateTime}) = broadcasted(+, r, p)
+broadcasted(::typeof(-), r::StepRange{ZonedDateTime}, p::Period) = broadcasted(+, r, -p)
+broadcasted(::typeof(-), p::Period, r::StepRange{ZonedDateTime}) = broadcasted(-, r, p)
