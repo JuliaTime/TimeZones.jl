@@ -60,7 +60,7 @@ function build(
     else
         # Avoids spamming remote servers requesting the latest version
         if version == "latest"
-            v = latest_version()
+            v = latest_cached()
 
             if v !== nothing
                 version = v
