@@ -1734,6 +1734,30 @@ lazy = true
     sha256 = "547161eca24d344e0b5f96aff6a76b454da295dc14ed4ca50c2355043fb899a2"
     url = "https://data.iana.org/time-zones/releases/tzdata2020a.tar.gz"
 
+[tzdata2020b]
+git-tree-sha1 = "4bab760da0fc9a851df15d4a49b04f2fde77e9bc"
+lazy = true
+
+    [[tzdata2020b.download]]
+    sha256 = "9b053f951d245ce89d850b96ee4711d82d833559b1fc96ba19f90bc4d745e809"
+    url = "https://data.iana.org/time-zones/releases/tzdata2020b.tar.gz"
+
+[tzdata2020c]
+git-tree-sha1 = "1cdce5cb827eb36655e4ac3bae4c179f68b00ab6"
+lazy = true
+
+    [[tzdata2020c.download]]
+    sha256 = "7890ac105f1aa4a5d15c5be2409580af401ee2f3fffe2a1e4748af589e194bd9"
+    url = "https://data.iana.org/time-zones/releases/tzdata2020c.tar.gz"
+
+[tzdata2020d]
+git-tree-sha1 = "3bb4442c51d88ef5c319dd2080b5e778327ab8cc"
+lazy = true
+
+    [[tzdata2020d.download]]
+    sha256 = "8d813957de363387696f05af8a8889afa282ab5016a764c701a20758d39cbaf3"
+    url = "https://data.iana.org/time-zones/releases/tzdata2020d.tar.gz"
+
 [tzdata93g]
 git-tree-sha1 = "e7ddeb4a45080afa6dbdd7c38df81bcf8b9d8f1a"
 lazy = true

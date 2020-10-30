@@ -2,7 +2,7 @@
 # We want to use a specific version here to ensure that specific revisions of the
 # TimeZones.jl package always use the same revision of tzdata. Doing so ensure that we can
 # always use older revisions of this package and always reproduce the same results.
-const DEFAULT_TZDATA_VERSION = "2020a"  # Do not use floating revision "latest" here
+const DEFAULT_TZDATA_VERSION = "2020d"  # Do not use floating revision "latest" here
 
 
 # Note: A tz code or data version consists of a year and letter while a release consists of
