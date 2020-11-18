@@ -53,7 +53,7 @@ function build(
 
         if !isempty(tz_source_dir)
             @info "Installing $version tzdata region data"
-            regions = intersect(regions, readdir(artifact_dir))
+            regions = union!(intersect(regions, readdir(artifact_dir)), CUSTOM_REGIONS)
             for region in setdiff(regions, CUSTOM_REGIONS)
                 cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
             end
@@ -87,7 +87,7 @@ function build(
 
         if !isempty(tz_source_dir)
             @info "Extracting $version tzdata archive"
-            regions = intersect(regions, readarchive(archive))
+            regions = union!(intersect(regions, readarchive(archive)), CUSTOM_REGIONS)
             extract(archive, tz_source_dir, setdiff(regions, CUSTOM_REGIONS), verbose=verbose)
         end
     end
