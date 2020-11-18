@@ -87,7 +87,7 @@ function build(
 
         if !isempty(tz_source_dir)
             @info "Extracting $version tzdata archive"
-            regions = union!(intersect(regions, readdir(artifact_dir)), CUSTOM_REGIONS)
+            regions = union!(intersect(regions, readarchive(archive)), CUSTOM_REGIONS)
             extract(archive, tz_source_dir, setdiff(regions, CUSTOM_REGIONS), verbose=verbose)
         end
     end
