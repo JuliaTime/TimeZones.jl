@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Converting · TimeZones.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>TimeZones.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../">Introduction</a></li><li><a class="toctext" href="../types/">Types</a></li><li class="current"><a class="toctext" href>Converting</a><ul class="internal"><li><a class="toctext" href="#Converting-Date/Time-without-time-zone-information-1">Converting Date/Time without time zone information</a></li><li><a class="toctext" href="#Switching-Time-Zones-1">Switching Time Zones</a></li><li><a class="toctext" href="#Parsing-strings-1">Parsing strings</a></li><li><a class="toctext" href="#Formatting-strings-1">Formatting strings</a></li></ul></li><li><a class="toctext" href="../arithmetic/">Arithmetic</a></li><li><a class="toctext" href="../rounding/">Rounding</a></li><li><a class="toctext" href="../current/">Current Time</a></li><li><a class="toctext" href="../faq/">Frequently Asked Questions</a></li><li><a class="toctext" href="../api-public/">API – Public</a></li><li><a class="toctext" href="../api-private/">API – Private</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href>Converting</a></li></ul><a class="edit-page" href="https://github.com/JuliaTime/TimeZones.jl/blob/master/docs/src/conversions.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Converting</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Conversions-1" href="#Conversions-1">Conversions</a></h1><h2><a class="nav-anchor" id="Converting-Date/Time-without-time-zone-information-1" href="#Converting-Date/Time-without-time-zone-information-1">Converting Date/Time without time zone information</a></h2><p>To convert from a <code>ZonedDateTime</code> into a vanilla <code>DateTime</code>, one can use the <code>DateTime</code> constructor. Just passing in the <code>ZonedDateTime</code> will directly drop the time zone, and passing in <code>UTC</code> as the second argument will extract the time as UTC instead. Note: The canonical way to represent datetimes is generally in <code>UTC</code>, as this is a requirement to correctly compute the <a href="https://en.wikipedia.org/wiki/Unix_time">Unix Timestamp</a>.</p><pre><code class="language-julia-repl">julia&gt; zdt = ZonedDateTime(2014, 5, 30, 21, tz&quot;UTC-4&quot;)
+2014-05-30T21:00:00-04:00
+
+julia&gt; DateTime(zdt)
+2014-05-30T21:00:00
+
+julia&gt; DateTime(zdt, UTC)
+2014-05-31T01:00:00</code></pre><p>Similar can be done for <code>Date</code> and <code>Time</code>:</p><pre><code class="language-julia-repl">julia&gt; zdt = ZonedDateTime(2014, 5, 30, 21, tz&quot;UTC-4&quot;)
+2014-05-30T21:00:00-04:00
+
+julia&gt; Date(zdt)
+2014-05-30
+
+julia&gt; Date(zdt, UTC)
+2014-05-31
+
+julia&gt; Time(zdt)
+21:00:00
+
+julia&gt; Time(zdt, UTC)
+01:00:00</code></pre><h2><a class="nav-anchor" id="Switching-Time-Zones-1" href="#Switching-Time-Zones-1">Switching Time Zones</a></h2><p>Switching an existing <code>ZonedDateTime</code> from one <code>TimeZone</code> to another can be done with the function <code>astimezone</code>:</p><pre><code class="language-julia-repl">julia&gt; zdt = ZonedDateTime(2014, 1, 1, tz&quot;UTC&quot;)
+2014-01-01T00:00:00+00:00
+
+julia&gt; astimezone(zdt, tz&quot;Asia/Tokyo&quot;)
+2014-01-01T09:00:00+09:00</code></pre><h2><a class="nav-anchor" id="Parsing-strings-1" href="#Parsing-strings-1">Parsing strings</a></h2><p><code>ZonedDateTime</code> parsing extends the functionality provided by <code>Dates</code>. If you haven&#39;t already it is recommended that you first read the official Julia manual on <a href="https://docs.julialang.org/en/v1/stdlib/Dates/#Constructors-1">Date and DateTime</a>. The <code>TimeZones</code> package adds <code>z</code> and <code>Z</code> to the list of available <a href="https://docs.julialang.org/en/v1/stdlib/Dates/#Dates.DateFormat">parsing character codes</a>:</p><table><tr><th style="text-align: left">Code</th><th style="text-align: left">Matches</th><th style="text-align: left">Comment</th></tr><tr><td style="text-align: left"><code>z</code></td><td style="text-align: left">+04:00, +0400, UTC+4</td><td style="text-align: left">Matches a numeric UTC offset</td></tr><tr><td style="text-align: left"><code>Z</code></td><td style="text-align: left">Asia/Dubai, UTC</td><td style="text-align: left">Matches names of time zones from the TZ database</td></tr></table><p>Note that with the exception of &quot;UTC&quot; and &quot;GMT&quot; time zone abbrevations cannot be parsed using the <code>Z</code> character code since most abbreviations are ambiguous. For example abbreviation &quot;MST&quot; could be interpreted as &quot;Mountain Standard Time&quot; (UTC-7) or &quot;Moscow Summer Time&quot; (UTC+3:31).</p><p>Parsing a <code>ZonedDateTime</code> just requires the text to parse and a format string:</p><pre><code class="language-julia-repl">julia&gt; ZonedDateTime(&quot;20150101-0700&quot;, &quot;yyyymmddzzzz&quot;)
+2015-01-01T00:00:00-07:00
+
+julia&gt; ZonedDateTime(&quot;2015-08-06T22:25:31+07:00&quot;, &quot;yyyy-mm-ddTHH:MM:SSzzzz&quot;)
+2015-08-06T22:25:31+07:00</code></pre><p>When parsing several <code>ZonedDateTime</code> strings which use the same format you will see better performance if you first create a <code>Dates.DateFormat</code> instead of passing in a raw format string.</p><pre><code class="language-julia-repl">julia&gt; df = Dates.DateFormat(&quot;yy-mm-ddz&quot;);
+
+julia&gt; ZonedDateTime(&quot;2015-03-29+01:00&quot;, df)
+2015-03-29T00:00:00+01:00
+
+julia&gt; ZonedDateTime(&quot;2015-03-30+02:00&quot;, df)
+2015-03-30T00:00:00+02:00</code></pre><h2><a class="nav-anchor" id="Formatting-strings-1" href="#Formatting-strings-1">Formatting strings</a></h2><p>Formatting a <code>ZonedDateTime</code> as a string also extends the functionality provided by <code>Base.Dates</code>. The <code>TimeZones</code> package adds the new formatting character codes <code>z</code> and <code>Z</code> to the list of available <a href="https://docs.julialang.org/en/v1/stdlib/Dates/#Dates.DateFormat">formatting character codes</a>:</p><table><tr><th style="text-align: left">Code</th><th style="text-align: left">Examples</th><th style="text-align: left">Comment</th></tr><tr><td style="text-align: left"><code>z</code></td><td style="text-align: left">+04:00</td><td style="text-align: left">Numeric UTC offset</td></tr><tr><td style="text-align: left"><code>Z</code></td><td style="text-align: left">GST, UTC</td><td style="text-align: left">Time zone abbreviation</td></tr></table><p>It is recommended that you prefer the use of the <code>z</code> character code over <code>Z</code> time zone abbreviations can be interpreted in different ways.</p><p>Formatting uses the <code>Dates.format</code> function with a <code>ZonedDateTime</code> and a format string:</p><pre><code class="language-julia-repl">julia&gt; zdt = ZonedDateTime(2015, 8, 6, 22, 25, tz&quot;Europe/Warsaw&quot;)
+2015-08-06T22:25:00+02:00
+
+julia&gt; Dates.format(zdt, &quot;yyyymmddzzzz&quot;)
+&quot;20150806+02:00&quot;
+
+julia&gt; Dates.format(zdt, &quot;yyyy-mm-dd HH:MM ZZZ&quot;)
+&quot;2015-08-06 22:25 CEST&quot;</code></pre><footer><hr/><a class="previous" href="../types/"><span class="direction">Previous</span><span class="title">Types</span></a><a class="next" href="../arithmetic/"><span class="direction">Next</span><span class="title">Arithmetic</span></a></footer></article></body></html>
