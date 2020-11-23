@@ -4,8 +4,10 @@ authors = ["Curtis Vogt <curtis.vogt@gmail.com>"]
 version = "1.5.1"
 
 [deps]
+Artifacts = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
+LazyArtifacts = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 Mocking = "78c3b35d-d492-501b-9361-3d52fe80e533"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
