@@ -1,6 +1,8 @@
 module TimeZones
 
+using Artifacts
 using Dates
+using LazyArtifacts
 using Printf
 using Serialization
 using RecipesBase: RecipesBase, @recipe
