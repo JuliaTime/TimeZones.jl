@@ -3,6 +3,8 @@ module TZData
 using Printf
 using ...TimeZones: DEPS_DIR
 
+import Pkg
+
 if VERSION >= v"1.3"
     using ...TimeZones: @artifact_str
     using Pkg.Artifacts: artifact_hash
