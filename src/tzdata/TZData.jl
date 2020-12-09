@@ -16,7 +16,7 @@ end
 
 const ARCHIVE_DIR = joinpath(DEPS_DIR, "tzarchive")
 const TZ_SOURCE_DIR = joinpath(DEPS_DIR, "tzsource")
-const COMPILED_DIR = joinpath(DEPS_DIR, "compiled")
+const COMPILED_DIR = joinpath(DEPS_DIR, "compiled", string(VERSION))
 
 const ARTIFACT_TOML = joinpath(@__DIR__, "..", "..", "Artifacts.toml")
 

@@ -102,9 +102,9 @@ function build(
 end
 
 function build(version::AbstractString=tzdata_version())
-    isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
-    isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)
-    isdir(COMPILED_DIR) || mkdir(COMPILED_DIR)
+    isdir(ARCHIVE_DIR) || mkpath(ARCHIVE_DIR)
+    isdir(TZ_SOURCE_DIR) || mkpath(TZ_SOURCE_DIR)
+    isdir(COMPILED_DIR) || mkpath(COMPILED_DIR)
 
     # Empty the compile directory in case to handle different versions not overriding all
     # files.
