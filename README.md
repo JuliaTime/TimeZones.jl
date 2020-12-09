@@ -1,7 +1,7 @@
 TimeZones.jl
 ============
 
-[![Travis CI](https://travis-ci.com/JuliaTime/TimeZones.jl.svg?branch=master)](https://travis-ci.com/JuliaTime/TimeZones.jl)
+[![CI](https://github.com/JuliaTime/TimeZones.jl/workflows/CI/badge.svg)](https://github.com/JuliaTime/TimeZones.jl/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/JuliaTime/TimeZones.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaTime/TimeZones.jl)
 <br/>
 [![Stable Documentation](https://img.shields.io/badge/docs-stable-blue.svg)](https://juliatime.github.io/TimeZones.jl/stable)
