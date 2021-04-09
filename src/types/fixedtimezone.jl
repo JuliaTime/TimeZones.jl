@@ -29,9 +29,20 @@ const FIXED_TIME_ZONE_REGEX = r"""
 
 A `TimeZone` with a constant offset for all of time.
 """
-struct FixedTimeZone <: TimeZone
+mutable struct FixedTimeZone <: TimeZone
     name::String
     offset::UTCOffset
+    index::Int
+
+    function FixedTimeZone(name::String, utc_offset::UTCOffset)
+        tz = new(name, utc_offset)
+        tz.index = add!(_TIME_ZONES, tz)
+        return tz
+    end
+end
+
+function FixedTimeZone(name::AbstractString, utc_offset::UTCOffset)
+    FixedTimeZone(convert(String, name), utc_offset)
 end
 
 """
@@ -46,6 +57,21 @@ end
 
 function FixedTimeZone(name::AbstractString, utc_offset::Second, dst_offset::Second=Second(0))
     FixedTimeZone(name, UTCOffset(utc_offset, dst_offset))
+end
+
+# Overload serialization to ensure that `FixedTimeZone` serialization doesn't transfer
+# state information which is specific to the current Julia process.
+function Serialization.serialize(s::AbstractSerializer, tz::FixedTimeZone)
+    Serialization.serialize_type(s, typeof(tz))
+    serialize(s, tz.name)
+    serialize(s, tz.offset)
+end
+
+function Serialization.deserialize(s::AbstractSerializer, ::Type{FixedTimeZone})
+    name = deserialize(s)
+    offset = deserialize(s)
+
+    return FixedTimeZone(name, offset)
 end
 
 # https://en.wikipedia.org/wiki/ISO_8601#Coordinated_Universal_Time_(UTC)
@@ -95,3 +121,17 @@ end
 
 name(tz::FixedTimeZone) = tz.name
 rename(tz::FixedTimeZone, name::AbstractString) = FixedTimeZone(name, tz.offset)
+
+function Base.:(==)(a::FixedTimeZone, b::FixedTimeZone)
+    return a.name == b.name && a.offset == b.offset
+end
+
+function Base.hash(tz::FixedTimeZone, h::UInt)
+    h = hash(:timezone, h)
+    h = hash(tz.name, h)
+    return h
+end
+
+function Base.isequal(a::FixedTimeZone, b::FixedTimeZone)
+    return isequal(a.name, b.name) && isequal(a.offset, b.offset)
+end

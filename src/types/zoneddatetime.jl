@@ -8,11 +8,11 @@ using Dates: AbstractDateTime, argerror, validargs
 
 struct ZonedDateTime <: AbstractDateTime
     utc_datetime::DateTime
-    timezone::TimeZone
-    zone::FixedTimeZone  # The current zone for the utc_datetime.
+    _tz_index::Int
+    _zone_index::Int
 
     function ZonedDateTime(utc_datetime::DateTime, timezone::TimeZone, zone::FixedTimeZone)
-        return new(utc_datetime, timezone, zone)
+        return new(utc_datetime, timezone.index, zone.index)
     end
 
     function ZonedDateTime(utc_datetime::DateTime, timezone::VariableTimeZone, zone::FixedTimeZone)
@@ -20,9 +20,37 @@ struct ZonedDateTime <: AbstractDateTime
             throw(UnhandledTimeError(timezone))
         end
 
-        return new(utc_datetime, timezone, zone)
+        return new(utc_datetime, timezone.index, zone.index)
     end
 end
+
+function Base.getproperty(zdt::ZonedDateTime, field::Symbol)
+    if field === :zone
+        return _TIME_ZONES[getfield(zdt, :_zone_index)]::FixedTimeZone
+    elseif field === :timezone
+        return _TIME_ZONES[getfield(zdt, :_tz_index)]::TimeZone
+    else
+        return getfield(zdt, field)
+    end
+end
+
+# Overload serialization to ensure that `ZonedDateTime` serialization doesn't transfer
+# state information which is specific to the current Julia process.
+function Serialization.serialize(s::AbstractSerializer, zdt::ZonedDateTime)
+    Serialization.serialize_type(s, typeof(zdt))
+    serialize(s, zdt.utc_datetime)
+    serialize(s, zdt.timezone)
+    serialize(s, zdt.zone)
+end
+
+function Serialization.deserialize(s::AbstractSerializer, ::Type{ZonedDateTime})
+    utc_datetime = deserialize(s)
+    timezone = deserialize(s)
+    zone = deserialize(s)
+
+    return ZonedDateTime(utc_datetime, timezone, zone)
+end
+
 
 """
     ZonedDateTime(dt::DateTime, tz::TimeZone; from_utc=false) -> ZonedDateTime

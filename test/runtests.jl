@@ -1,6 +1,7 @@
 using Mocking
 
 using RecipesBase
+using Serialization
 using Test
 using TimeZones
 using TimeZones: PKG_DIR
