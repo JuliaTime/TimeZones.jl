@@ -77,13 +77,13 @@ using Dates: Hour, Second, UTM, @dateformat_str
         utc_dt = DateTime(1916, 1, 31, 23)
 
         # Disambiguating parameters ignored when there is no ambiguity.
-        @test ZonedDateTime(local_dt, warsaw).zone.name == "CET"
-        @test ZonedDateTime(local_dt, warsaw, 0).zone.name == "CET"
-        @test ZonedDateTime(local_dt, warsaw, 1).zone.name == "CET"
-        @test ZonedDateTime(local_dt, warsaw, 2).zone.name == "CET"
-        @test ZonedDateTime(local_dt, warsaw, true).zone.name == "CET"
-        @test ZonedDateTime(local_dt, warsaw, false).zone.name == "CET"
-        @test ZonedDateTime(utc_dt, warsaw, from_utc=true).zone.name == "CET"
+        @test string(ZonedDateTime(local_dt, warsaw).zone.name) == "CET"
+        @test string(ZonedDateTime(local_dt, warsaw, 0).zone.name) == "CET"
+        @test string(ZonedDateTime(local_dt, warsaw, 1).zone.name) == "CET"
+        @test string(ZonedDateTime(local_dt, warsaw, 2).zone.name) == "CET"
+        @test string(ZonedDateTime(local_dt, warsaw, true).zone.name) == "CET"
+        @test string(ZonedDateTime(local_dt, warsaw, false).zone.name) == "CET"
+        @test string(ZonedDateTime(utc_dt, warsaw, from_utc=true).zone.name) == "CET"
 
         @test ZonedDateTime(local_dt, warsaw).utc_datetime == utc_dt
         @test ZonedDateTime(local_dt, warsaw, 0).utc_datetime == utc_dt
@@ -99,13 +99,13 @@ using Dates: Hour, Second, UTM, @dateformat_str
         utc_dt = DateTime(1916, 5, 31, 22)
 
         # Disambiguating parameters ignored when there is no ambiguity.
-        @test ZonedDateTime(local_dt, warsaw).zone.name == "CEST"
-        @test ZonedDateTime(local_dt, warsaw, 0).zone.name == "CEST"
-        @test ZonedDateTime(local_dt, warsaw, 1).zone.name == "CEST"
-        @test ZonedDateTime(local_dt, warsaw, 2).zone.name == "CEST"
-        @test ZonedDateTime(local_dt, warsaw, true).zone.name == "CEST"
-        @test ZonedDateTime(local_dt, warsaw, false).zone.name == "CEST"
-        @test ZonedDateTime(utc_dt, warsaw, from_utc=true).zone.name == "CEST"
+        @test string(ZonedDateTime(local_dt, warsaw).zone.name) == "CEST"
+        @test string(ZonedDateTime(local_dt, warsaw, 0).zone.name) == "CEST"
+        @test string(ZonedDateTime(local_dt, warsaw, 1).zone.name) == "CEST"
+        @test string(ZonedDateTime(local_dt, warsaw, 2).zone.name) == "CEST"
+        @test string(ZonedDateTime(local_dt, warsaw, true).zone.name) == "CEST"
+        @test string(ZonedDateTime(local_dt, warsaw, false).zone.name) == "CEST"
+        @test string(ZonedDateTime(utc_dt, warsaw, from_utc=true).zone.name) == "CEST"
 
         @test ZonedDateTime(local_dt, warsaw).utc_datetime == utc_dt
         @test ZonedDateTime(local_dt, warsaw, 0).utc_datetime == utc_dt
@@ -133,10 +133,10 @@ using Dates: Hour, Second, UTM, @dateformat_str
         @test_throws NonExistentTimeError ZonedDateTime(local_dts[2], warsaw, true)
         @test_throws NonExistentTimeError ZonedDateTime(local_dts[2], warsaw, false)
 
-        @test ZonedDateTime(local_dts[1], warsaw).zone.name == "CET"
-        @test ZonedDateTime(local_dts[3], warsaw).zone.name == "CEST"
-        @test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).zone.name == "CET"
-        @test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).zone.name == "CEST"
+        @test string(ZonedDateTime(local_dts[1], warsaw).zone.name) == "CET"
+        @test string(ZonedDateTime(local_dts[3], warsaw).zone.name) == "CEST"
+        @test string(ZonedDateTime(utc_dts[1], warsaw, from_utc=true).zone.name) == "CET"
+        @test string(ZonedDateTime(utc_dts[2], warsaw, from_utc=true).zone.name) == "CEST"
 
         @test ZonedDateTime(local_dts[1], warsaw).utc_datetime == utc_dts[1]
         @test ZonedDateTime(local_dts[3], warsaw).utc_datetime == utc_dts[2]
@@ -151,12 +151,12 @@ using Dates: Hour, Second, UTM, @dateformat_str
         @test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw)
         @test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw, 0)
 
-        @test ZonedDateTime(local_dt, warsaw, 1).zone.name == "CEST"
-        @test ZonedDateTime(local_dt, warsaw, 2).zone.name == "CET"
-        @test ZonedDateTime(local_dt, warsaw, true).zone.name == "CEST"
-        @test ZonedDateTime(local_dt, warsaw, false).zone.name == "CET"
-        @test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).zone.name == "CEST"
-        @test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).zone.name == "CET"
+        @test string(ZonedDateTime(local_dt, warsaw, 1).zone.name) == "CEST"
+        @test string(ZonedDateTime(local_dt, warsaw, 2).zone.name) == "CET"
+        @test string(ZonedDateTime(local_dt, warsaw, true).zone.name) == "CEST"
+        @test string(ZonedDateTime(local_dt, warsaw, false).zone.name) == "CET"
+        @test string(ZonedDateTime(utc_dts[1], warsaw, from_utc=true).zone.name) == "CEST"
+        @test string(ZonedDateTime(utc_dts[2], warsaw, from_utc=true).zone.name) == "CET"
 
         @test ZonedDateTime(local_dt, warsaw, 1).utc_datetime == utc_dts[1]
         @test ZonedDateTime(local_dt, warsaw, 2).utc_datetime == utc_dts[2]
@@ -172,12 +172,12 @@ using Dates: Hour, Second, UTM, @dateformat_str
         utc_dts = (DateTime(1922, 5, 31, 21), DateTime(1922, 5, 31, 22))
         @test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw)
 
-        @test ZonedDateTime(local_dt, warsaw, 1).zone.name == "EET"
-        @test ZonedDateTime(local_dt, warsaw, 2).zone.name == "CET"
+        @test string(ZonedDateTime(local_dt, warsaw, 1).zone.name) == "EET"
+        @test string(ZonedDateTime(local_dt, warsaw, 2).zone.name) == "CET"
         @test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw, true)
         @test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw, false)
-        @test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).zone.name == "EET"
-        @test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).zone.name == "CET"
+        @test string(ZonedDateTime(utc_dts[1], warsaw, from_utc=true).zone.name) == "EET"
+        @test string(ZonedDateTime(utc_dts[2], warsaw, from_utc=true).zone.name) == "CET"
 
         @test ZonedDateTime(local_dt, warsaw, 1).utc_datetime == utc_dts[1]
         @test ZonedDateTime(local_dt, warsaw, 2).utc_datetime == utc_dts[2]
@@ -283,14 +283,14 @@ using Dates: Hour, Second, UTM, @dateformat_str
 
         # Make sure that the duplicated hour only doesn't contain an additional entry.
         @test_throws AmbiguousTimeError ZonedDateTime(DateTime(1935,9,1), dup)
-        @test ZonedDateTime(DateTime(1935,9,1), dup, 1).zone.name == "DTDT-2"
-        @test ZonedDateTime(DateTime(1935,9,1), dup, 2).zone.name == "DTST"
+        @test string(ZonedDateTime(DateTime(1935,9,1), dup, 1).zone.name) == "DTDT-2"
+        @test string(ZonedDateTime(DateTime(1935,9,1), dup, 2).zone.name) == "DTST"
         @test_throws BoundsError ZonedDateTime(DateTime(1935,9,1), dup, 3)
 
         # Ensure that DTDT-1 is completely ignored.
         @test_throws NonExistentTimeError ZonedDateTime(DateTime(1935,4,1), dup)
-        @test ZonedDateTime(DateTime(1935,4,1,1), dup).zone.name == "DTDT-2"
-        @test ZonedDateTime(DateTime(1935,8,31,23), dup).zone.name == "DTDT-2"
+        @test string(ZonedDateTime(DateTime(1935,4,1,1), dup).zone.name) == "DTDT-2"
+        @test string(ZonedDateTime(DateTime(1935,8,31,23), dup).zone.name) == "DTDT-2"
     end
 
     @testset "equality" begin
@@ -429,5 +429,21 @@ using Dates: Hour, Second, UTM, @dateformat_str
     @testset "extrema" begin
         @test typemin(ZonedDateTime) <= ZonedDateTime(typemin(DateTime), utc)
         @test typemax(ZonedDateTime) >= ZonedDateTime(typemax(DateTime), utc)
+    end
+
+    # TODO: isbits is not working on 32 bit because of not using SName type, because of
+    # https://github.com/JuliaString/MurmurHash3.jl/issues/12
+    Int==Int64 && @testset "isbits" begin
+        utc_zdt = ZonedDateTime(1, 2, 3, 4, 5, 6, 7, utc)
+        @test isbits(utc)
+
+        var_zdt = ZonedDateTime(Date(2011, 6, 1), tz"America/Winnipeg")
+        @test !isbits(var_zdt)  # we might like this, but we don't have it.
+        @test isbits(var_zdt.utc_datetime)
+        @test isbits(var_zdt.zone)
+        @test isbits(var_zdt.utc_datetime)
+        @test isbits(var_zdt.timezone.cutoff)
+        @test isbits(var_zdt.timezone.name)
+        @test isbitstype(eltype(var_zdt.timezone.transitions))
     end
 end

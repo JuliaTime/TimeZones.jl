@@ -6,22 +6,20 @@ using Dates: AbstractDateTime, argerror, validargs
 # A `DateTime` that includes `TimeZone` information.
 # """
 
-struct ZonedDateTime <: AbstractDateTime
+struct ZonedDateTime{T<:TimeZone} <: AbstractDateTime
     utc_datetime::DateTime
-    timezone::TimeZone
+    timezone::T
     zone::FixedTimeZone  # The current zone for the utc_datetime.
+end
 
-    function ZonedDateTime(utc_datetime::DateTime, timezone::TimeZone, zone::FixedTimeZone)
-        return new(utc_datetime, timezone, zone)
+function ZonedDateTime(
+    utc_datetime::DateTime, timezone::VariableTimeZone, zone::FixedTimeZone
+)
+    if timezone.cutoff !== nothing && utc_datetime >= timezone.cutoff
+        throw(UnhandledTimeError(timezone))
     end
 
-    function ZonedDateTime(utc_datetime::DateTime, timezone::VariableTimeZone, zone::FixedTimeZone)
-        if timezone.cutoff !== nothing && utc_datetime >= timezone.cutoff
-            throw(UnhandledTimeError(timezone))
-        end
-
-        return new(utc_datetime, timezone, zone)
-    end
+    return ZonedDateTime{VariableTimeZone}(utc_datetime, timezone, zone)
 end
 
 """

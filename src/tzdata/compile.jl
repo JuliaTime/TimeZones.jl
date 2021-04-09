@@ -4,7 +4,7 @@ using Dates: parse_components
 
 using ...TimeZones: TIME_ZONE_CACHE
 using ...TimeZones: TimeZones, TimeZone, FixedTimeZone, VariableTimeZone, Transition, Class
-using ...TimeZones: rename
+using ...TimeZones: name_parts, rename
 using ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET, MIN_SAVE, MAX_SAVE,
     ABS_DIFF_OFFSET
 
@@ -697,7 +697,7 @@ function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
     empty!(TIME_ZONE_CACHE)
 
     for (tz, class) in results
-        parts = split(TimeZones.name(tz), '/')
+        parts = name_parts(TimeZones.name(tz))
         tz_path = joinpath(dest_dir, parts...)
         tz_dir = dirname(tz_path)
 

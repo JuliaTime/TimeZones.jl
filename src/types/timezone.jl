@@ -1,4 +1,4 @@
-const TIME_ZONE_CACHE = Dict{String,Tuple{TimeZone,Class}}()
+const TIME_ZONE_CACHE = Dict{Name,Tuple{TimeZone,Class}}()
 
 """
     TimeZone(str::AbstractString) -> TimeZone
@@ -41,11 +41,15 @@ US/Pacific (UTC-8/UTC-7)
 TimeZone(::AbstractString, ::Class)
 
 function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
+    return TimeZone(convert(Name, str), mask)
+end
+
+function TimeZone(name::Name, mask::Class=Class(:DEFAULT))
+    str = string(name)
     # Note: If the class `mask` does not match the time zone we'll still load the
     # information into the cache to ensure the result is consistent.
-    tz, class = get!(TIME_ZONE_CACHE, str) do
-        tz_path = joinpath(TZData.COMPILED_DIR, split(str, "/")...)
-
+    tz, class = get!(TIME_ZONE_CACHE, name) do
+        tz_path = joinpath(TZData.COMPILED_DIR, name_parts(name)...)
         if isfile(tz_path)
             open(deserialize, tz_path, "r")
         elseif occursin(FIXED_TIME_ZONE_REGEX, str)
@@ -91,19 +95,20 @@ end
 
 Check whether a string is a valid for constructing a `TimeZone` with the provided `mask`.
 """
-function istimezone(str::AbstractString, mask::Class=Class(:DEFAULT))
+function istimezone(str::Union{AbstractString, Name}, mask::Class=Class(:DEFAULT))
     # Start by performing quick FIXED class test
-    if mask & Class(:FIXED) != Class(:NONE) && occursin(FIXED_TIME_ZONE_REGEX, str)
+    if mask & Class(:FIXED) != Class(:NONE) && occursin(FIXED_TIME_ZONE_REGEX, string(str))
         return true
     end
+    name = convert(Name, str)
 
     # Perform more expensive checks against pre-compiled time zones
     tz, class = get(TIME_ZONE_CACHE, str) do
-        tz_path = joinpath(TZData.COMPILED_DIR, split(str, "/")...)
+        tz_path = joinpath(TZData.COMPILED_DIR, name_parts(name)...)
 
         if isfile(tz_path)
             # Cache the data since we're already performing the deserialization
-            TIME_ZONE_CACHE[str] = open(deserialize, tz_path, "r")
+            TIME_ZONE_CACHE[name] = open(deserialize, tz_path, "r")
         else
             nothing, Class(:NONE)
         end

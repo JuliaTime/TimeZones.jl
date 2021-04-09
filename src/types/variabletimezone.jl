@@ -11,13 +11,12 @@ Base.isless(a::Transition, b::Transition) = isless(a.utc_datetime, b.utc_datetim
 A `TimeZone` with an offset that changes over time.
 """
 struct VariableTimeZone <: TimeZone
-    name::String
+    name::Name
     transitions::Vector{Transition}
     cutoff::Union{DateTime,Nothing}
-
-    function VariableTimeZone(name::AbstractString, transitions::Vector{Transition}, cutoff::Union{DateTime,Nothing}=nothing)
-        new(name, transitions, cutoff)
-    end
+end
+function VariableTimeZone(name::AbstractString, transitions::Vector{Transition})
+    VariableTimeZone(name, transitions, nothing)
 end
 
 name(tz::VariableTimeZone) = tz.name

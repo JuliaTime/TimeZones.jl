@@ -71,7 +71,7 @@ spring_zdt = ZonedDateTime(spring, warsaw)
         )
         @test results == expected
         @test length(results) == 2
-        @test results isa StepRange{ZonedDateTime}
+        @test results isa StepRange{<:ZonedDateTime}
     end
 
     @testset "date-period" begin
@@ -89,7 +89,7 @@ spring_zdt = ZonedDateTime(spring, warsaw)
         )
         @test results == expected
         @test length(results) == 2
-        @test results isa StepRange{ZonedDateTime}
+        @test results isa StepRange{<:ZonedDateTime}
     end
 
     @testset "ambiguous" begin

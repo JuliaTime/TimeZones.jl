@@ -2,6 +2,7 @@ module TimeZones
 
 using Dates
 using Printf
+using ShortStrings
 using Serialization
 using RecipesBase: RecipesBase, @recipe
 using Unicode
@@ -55,6 +56,7 @@ include("indexable_generator.jl")
 
 include("class.jl")
 include("utcoffset.jl")
+include(joinpath("types", "name.jl"))
 include(joinpath("types", "timezone.jl"))
 include(joinpath("types", "fixedtimezone.jl"))
 include(joinpath("types", "variabletimezone.jl"))

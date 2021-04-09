@@ -125,7 +125,7 @@ long = VariableTimeZone("Test/LongGap", [
 ])
 
 # A time zone with an unnecessary transition that typically is hidden to the user
-hidden = VariableTimeZone("Test/HiddenTransition", [
+hidden = VariableTimeZone("Test/Hidden", [
     Transition(DateTime(1800,1,1,0), zone["T+1"])
     Transition(DateTime(1900,1,1,0), zone["T+0"])
     Transition(DateTime(1935,4,1,2), zone["T+1"])  # The hidden transition
