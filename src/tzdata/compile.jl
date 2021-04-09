@@ -4,7 +4,7 @@ using Dates: parse_components
 
 using ...TimeZones: TIME_ZONE_CACHE
 using ...TimeZones: TimeZones, TimeZone, FixedTimeZone, VariableTimeZone, Transition, Class
-using ...TimeZones: name_parts, rename
+using ...TimeZones: name_parts, rename, try_convert
 using ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET, MIN_SAVE, MAX_SAVE,
     ABS_DIFF_OFFSET
 

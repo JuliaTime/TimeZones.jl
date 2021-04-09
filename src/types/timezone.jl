@@ -100,7 +100,8 @@ function istimezone(str::Union{AbstractString, Name}, mask::Class=Class(:DEFAULT
     if mask & Class(:FIXED) != Class(:NONE) && occursin(FIXED_TIME_ZONE_REGEX, string(str))
         return true
     end
-    name = convert(Name, str)
+    name = try_convert(Name, str)
+    name isa Nothing && return false
 
     # Perform more expensive checks against pre-compiled time zones
     tz, class = get(TIME_ZONE_CACHE, str) do
