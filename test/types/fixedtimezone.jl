@@ -43,8 +43,8 @@
     end
 
     @testset "isbits" begin
-        # We are not using ShortStrings on 32 bit due to hash being broken on it.
-        # see https://github.com/JuliaString/MurmurHash3.jl/issues/12
+        # We are not using ShortStrings on 32-bit due to hash being broken on 32-bit.
+        # See https://github.com/JuliaString/MurmurHash3.jl/issues/12
         if Int === Int64
             @test isbits FixedTimeZone("0123")
         else
