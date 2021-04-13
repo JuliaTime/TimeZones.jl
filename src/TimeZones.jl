@@ -5,6 +5,7 @@ using Printf
 using ShortStrings
 using Serialization
 using RecipesBase: RecipesBase, @recipe
+using ShortStrings: ShortString15
 using Unicode
 
 import Dates: TimeZone, UTC
