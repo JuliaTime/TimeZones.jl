@@ -327,7 +327,7 @@ end
         consistent_years = t -> year(t.utc_datetime) >= 2007
 
         tz, i = _parsesub_tz("CST+6CDT+5,M3.2.0/2,M11.1.0/2")
-        @test tz.name == "CST/CDT"
+        @test string(tz.name) == "CST/CDT"
         @test tz.name != wpg.name
         @test filter(consistent_years, tz.transitions) == filter(consistent_years, wpg.transitions)
         @test tz.cutoff == wpg.cutoff
