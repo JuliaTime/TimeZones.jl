@@ -697,7 +697,9 @@ function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
     empty!(TIME_ZONE_CACHE)
 
     for (tz, class) in results
-        parts = split(TimeZones.name(tz), '/')
+        # Need to convert all abstract strings to `String`s because ShortString's don't
+        # support split.
+        parts = split(String(TimeZones.name(tz)), '/')
         tz_path = joinpath(dest_dir, parts...)
         tz_dir = dirname(tz_path)
 
