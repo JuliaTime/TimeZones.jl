@@ -17,15 +17,18 @@ end
 Base.convert(::Type{String}, name::SName) = string(name)
 function Base.convert(::Type{SName}, str::AbstractString)
     name = try_convert(SName, str)
-    name isa Nothing && DomainError(str, "All timezone name parts must have length < 16")
+    if name isa Nothing
+        throw(DomainError(str, "Timezone must have 3 or fewer parts, all with length < 16"))
+    end
     return name
 end
 
 try_convert(::Type{SName}, name::SName) = name
 try_convert(::Type{String}, name::String) = name
 function try_convert(::Type{SName}, str::AbstractString)
-    parts = split(str, "/"; limit=3)
-    all(length(parts) < 16) ||return nothing
+    parts = split(str, "/")
+    (length(parts) <= 3) || return nothing
+    all(length(part)<16 for part in parts) || return nothing
     return if length(parts) == 3
         SName(parts[1], parts[2], parts[3])
     elseif length(parts) == 2
