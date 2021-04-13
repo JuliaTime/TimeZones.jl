@@ -73,17 +73,17 @@ function Base.show(io::IO, tz::VariableTimeZone)
 
     # Compact printing of a custom time zone which is non-constructable
     elseif get(io, :compact, false)
-        print(io, VariableTimeZone, "(")
-        show(io, tz.name)
-        print(io, ", ...)")
+        print(io, VariableTimeZone, "(\"")
+        print(io, tz.name)
+        print(io, "\", ...)")
 
     # Verbose printing which should print a fully constructable `VariableTimeZone`.
     else
         # Force `:compact => false` to make the force the transition vector printing into
         # long form.
-        print(io, VariableTimeZone, "(")
-        show(io, tz.name)
-        print(io, ", ")
+        print(io, VariableTimeZone, "(\"")
+        print(io, tz.name)
+        print(io, "\", ")
         show(IOContext(io, :compact => false), tz.transitions)
         print(io, ", ")
         show(io, tz.cutoff)
@@ -128,7 +128,7 @@ Base.show(io::IO, ::MIME"text/plain", zdt::ZonedDateTime) = print(io, zdt)
 
 # https://github.com/JuliaLang/julia/pull/33290
 if VERSION >= v"1.5.0-DEV.224"
-    Base.typeinfo_implicit(::Type{ZonedDateTime}) = true
+    Base.typeinfo_implicit(::Type{<:ZonedDateTime}) = true
 end
 
 # Use compact printing on certain element types for Julia versions before:
