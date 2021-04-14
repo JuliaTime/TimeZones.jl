@@ -1,7 +1,6 @@
 module WindowsTimeZoneIDs
 
 using ...TimeZones: DEPS_DIR
-using EzXML
 
 if VERSION >= v"1.3"
     using ...TimeZones: @artifact_str
@@ -21,22 +20,16 @@ const WINDOWS_XML_FILE = joinpath(WINDOWS_XML_DIR, "windowsZones.xml")
 isdir(WINDOWS_XML_DIR) || mkdir(WINDOWS_XML_DIR)
 
 function compile(xml_file::AbstractString)
-    # Get the timezone conversions from the file
-    doc = readxml(xml_file)
 
-    # Territory "001" is the global default
-    map_zones = findall("//mapZone[@territory='001']", doc)
-
-    # TODO: Eliminate the Etc/* POSIX names here? See Windows section of `localzone`
-
-    # Dictionary to store the windows to time zone conversions
     translation = Dict{String,String}()
-    for map_zone in map_zones
-        win_name = map_zone["other"]
-        posix_name = map_zone["type"]
+
+    # Get the timezone conversions from the file
+    for line in readlines(xml_file)
+        occursin("001",line) || continue
+        win_name = match(r"other=\"(.+?)\"",line)[1]
+        posix_name = match(r"type=\"(.+?)\"",line)[1]
         translation[win_name] = posix_name
     end
-
     return translation
 end
 
