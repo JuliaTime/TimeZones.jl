@@ -24,6 +24,11 @@ function compile(xml_file::AbstractString)
     translation = Dict{String,String}()
 
     # Get the timezone conversions from the file
+    #
+    # Note: Since the XML file is simplistic enough that we can parse what we need via a
+    # regex we can avoid having an XML package dependency. Additionally, since this XML file
+    # is included as part of the this package we can correct any parsing issues before a
+    # TimeZones.jl release occurs.
     for line in readlines(xml_file)
         # Territory "001" is the global default
         occursin("territory=\"001\"", line) || continue
