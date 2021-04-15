@@ -131,8 +131,10 @@ function Base.getproperty(tz::IANATimeZone, s::Symbol)
         return getfield(tz, s)
     end
 end
-function Base.hasproperty(tz::IANATimeZone, s::Symbol)
-    return s === :name || s === :transitions || hasfield(IANATimeZone, s)
+if isdefined(Base, :hasproperty)
+    function Base.hasproperty(tz::IANATimeZone, s::Symbol)
+        return s === :name || s === :transitions || hasfield(IANATimeZone, s)
+    end
 end
 
 
