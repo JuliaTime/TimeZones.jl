@@ -52,7 +52,7 @@ const IANA_NAMES = Vector{String}(undef, IANA_TABLE_SIZE)
 function init_IANA_NAMES!()  # this is run by __init__ (at least for now)
     for name in timezone_names()
         id = perfect_hash(name)
-        # Important: this line make's sure our hash is indeed perfect
+        # Important: this line makes sure our hash is indeed perfect
         isassigned(IANA_NAMES, id) && error("hash collision for $tz, at $id")
         IANA_NAMES[id] = name
     end
