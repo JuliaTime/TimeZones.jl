@@ -44,7 +44,6 @@ function get_iana_timezone!(str::AbstractString)
     else
         tz_path = joinpath(TZData.COMPILED_DIR, split(str, "/")...)
         tz, class = deserialize(tz_path)
-        # TODO: maybe here is where we check if it is a FixedTimeZone, and if so don't remember it?
         if tz isa VariableTimeZone
             IANA_TIMEZONES[mod_id] = tz
             return IANATimeZone(perfect_hash(str))
