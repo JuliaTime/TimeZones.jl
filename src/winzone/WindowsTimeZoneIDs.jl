@@ -32,8 +32,8 @@ function compile(xml_file::AbstractString)
     for line in readlines(xml_file)
         # Territory "001" is the global default
         occursin("territory=\"001\"", line) || continue
-        win_name = match(r"other=\"(.+?)\"",line)[1]
-        posix_name = match(r"type=\"(.+?)\"",line)[1]
+        win_name = match(r"other=\"(.*?)\"", line)[1]
+        posix_name = match(r"type=\"(.*?)\"", line)[1]
         translation[win_name] = posix_name
     end
 
