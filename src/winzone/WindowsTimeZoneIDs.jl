@@ -31,6 +31,7 @@ function compile(xml_file::AbstractString)
         posix_name = match(r"type=\"(.+?)\"",line)[1]
         translation[win_name] = posix_name
     end
+
     return translation
 end
 
