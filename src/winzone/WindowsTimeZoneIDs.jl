@@ -25,7 +25,8 @@ function compile(xml_file::AbstractString)
 
     # Get the timezone conversions from the file
     for line in readlines(xml_file)
-        occursin("001",line) || continue
+        # Territory "001" is the global default
+        occursin("territory=\"001\"", line) || continue
         win_name = match(r"other=\"(.+?)\"",line)[1]
         posix_name = match(r"type=\"(.+?)\"",line)[1]
         translation[win_name] = posix_name
