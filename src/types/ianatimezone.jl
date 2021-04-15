@@ -48,13 +48,11 @@ end
 const IANA_TIMEZONES = Vector{VariableTimeZone}(undef, IANA_TABLE_SIZE)
 
 # TODO: maybe fill this during build(), probably by generating a julia file.
-# That way we can avoid actually instantitating every timezone til it is needed.
 const IANA_NAMES = Vector{String}(undef, IANA_TABLE_SIZE)
 function init_IANA_NAMES!()  # this is run by __init__ (at least for now)
     for name in timezone_names()
-        # TODO: we should workout how to filter out FixedTimeZones here
         id = perfect_hash(name)
-        # Important: Make sure our hash is perfect (even module the table size)
+        # Important: this line make's sure our hash is indeed perfect
         isassigned(IANA_NAMES, id) && error("hash collision for $tz, at $id")
         IANA_NAMES[id] = name
     end
