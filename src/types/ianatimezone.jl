@@ -117,7 +117,7 @@ Base.:(==)(a::IANATimeZone, b::IANATimeZone) = a.id == b.id
 Base.:(==)(a::IANATimeZone, b::TimeZone) = backing_timezone(a) == b
 Base.:(==)(b::TimeZone, a::IANATimeZone) = backing_timezone(a) == b
 
-# TODO: we have the hash, it seems like we should be able to use that to get seeded hash
+# We can't use our perfect hash is as won't agree with the hash of the backing_timezone
 Base.hash(a::IANATimeZone, seed::UInt) = hash(backing_timezone(a), seed)
 
 name(a::IANATimeZone) = name(backing_timezone(a))
