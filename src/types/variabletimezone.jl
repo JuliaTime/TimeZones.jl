@@ -55,4 +55,8 @@ function Base.isequal(a::VariableTimeZone, b::VariableTimeZone)
     )
 end
 
-Base.hash(tz::VariableTimeZone, h::UInt) = perfect_hash(tz, h)
+function Base.hash(tz::VariableTimeZone, h::UInt)
+    h = hash(:timezone, h)
+    h = hash(tz.name, h)
+    return h
+end

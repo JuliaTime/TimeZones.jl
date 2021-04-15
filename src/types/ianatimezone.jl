@@ -1,9 +1,49 @@
+const IANA_TABLE_SIZE = 1680
 
-# This is extremely redundant but still only about 8MB for each of our 2 tables
-# and it avoids any need to write a smarter but more CPU time expensive perfect hash
-# This needs to be big enough to avoid any collisions
-# also extra size is useful because it means we are probably safe if new timezones are added
-const IANA_TABLE_SIZE = 2^20
+perfect_hash(tz::VariableTimeZone) = perfect_hash(tz.name)
+function perfect_hash(str::AbstractString)
+    # This was generated via `gperf` and translated by hand.
+    # in case of collisions from new keys being added you must *not* regenerate it or
+    # change the assoc table, as that will change existing hashes and break any serialized
+    # data. Instead add special cases from the exact string via adding special cases. e.g.
+    #`name=="New/Timezone" && return 1681` (after adjusting `IANA_TABLE_SIZE`)
+    # The code below will (for all timezones in the 2021a release of tzdata) generate a
+    # value between 29 and 1680 inclusive. So any new keys that need to be added
+    # manually  to resolve collisions can freely use anything outside that range.
+
+    asso_values = (
+      1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681,
+      1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681,
+      1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681,
+      1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681,
+      1681, 1681, 1681,    4, 1681,    1,    3,    3,  241,   48,
+         1,   22,   10,    9,   61,   18,   74,    9,   30, 1681,
+      1681, 1681, 1681, 1681, 1681,    4,    2,   18,  167,   48,
+       547,  691,  532,  446,  574,  466,  211,  452,    8,  387,
+       110,  475,  601,  262,   83,  124,  580,  536,   60,    1,
+       719,    2, 1681, 1681, 1681,  291,    1,    1,   27,  424,
+        13,    5,   43,    3,  355,   12,  168,  148,   90,  179,
+         4,    1,  315,    3,    3,    3,    2,   37,    5,   65,
+        22,  320,  245,    1, 1681, 1681, 1681,
+    )
+
+    units = codeunits(str)
+    len = length(units)
+    hval = len
+
+    len >= 19 && (hval += asso_values[units[19]])
+    len >= 12 && (hval += asso_values[units[12]])
+    len >= 11 && (hval += asso_values[units[11]])
+    len >= 9 && (hval += asso_values[units[9] + 1])
+    len >= 8 && (hval += asso_values[units[8]])
+    len >= 6 && (hval += asso_values[units[6] + 1])
+    len >= 4 && (hval += asso_values[units[4]])
+    len >= 2 && (hval += asso_values[units[2] + 1])
+    len >= 1 && (hval += asso_values[units[1]])
+    len > 0 && (hval += asso_values[units[end]])  # add the last
+    return hval
+end
+
 
 const IANA_TIMEZONES = Vector{VariableTimeZone}(undef, IANA_TABLE_SIZE)
 
@@ -13,39 +53,28 @@ const IANA_NAMES = Vector{String}(undef, IANA_TABLE_SIZE)
 function init_IANA_NAMES!()  # this is run by __init__ (at least for now)
     for name in timezone_names()
         # TODO: we should workout how to filter out FixedTimeZones here
-        mod_id = iana_mod_id(name)
+        id = perfect_hash(name)
         # Important: Make sure our hash is perfect (even module the table size)
-        isassigned(IANA_NAMES, mod_id) && error("hash collision for $tz, at $mod_id")
-        IANA_NAMES[mod_id] = name
+        isassigned(IANA_NAMES, id) && error("hash collision for $tz, at $id")
+        IANA_NAMES[id] = name
     end
     return IANA_NAMES
 end
 
-# have checked that this is perfect
-perfect_hash(tz::VariableTimeZone, h=zero(UInt)) = perfect_hash(tz.name, h)
-function perfect_hash(name::AbstractString, h=zero(UInt))
-    h = hash(:timezone, h)
-    h = hash(name, h)
-    return h
-end
-
-iana_mod_id(str_or_var_tz) = iana_mod_id(perfect_hash(str_or_var_tz))
-iana_mod_id(id::UInt) = mod1(id, IANA_TABLE_SIZE)
-
 function is_standard_iana(str::AbstractString)
-    mod_id = iana_mod_id(str)
-    return isassigned(IANA_NAMES, mod_id) && IANA_NAMES[mod_id] == str
+    id = perfect_hash(str)
+    return isassigned(IANA_NAMES, id) && IANA_NAMES[id] == str
 end
 
 function get_iana_timezone!(str::AbstractString)
-    mod_id = iana_mod_id(str)
-    if isassigned(IANA_TIMEZONES, mod_id)
-        IANA_TIMEZONES[mod_id]
+    id = perfect_hash(str)
+    if isassigned(IANA_TIMEZONES, id)
+        IANA_TIMEZONES[id]
     else
         tz_path = joinpath(TZData.COMPILED_DIR, split(str, "/")...)
         tz, class = deserialize(tz_path)
         if tz isa VariableTimeZone
-            IANA_TIMEZONES[mod_id] = tz
+            IANA_TIMEZONES[id] = tz
             return IANATimeZone(perfect_hash(str))
         else
             # it is a FixedTimeZone, we are not going to use a IANATimeZone
@@ -55,9 +84,8 @@ function get_iana_timezone!(str::AbstractString)
 end
 
 function get_iana_timezone!(id::UInt)
-    mod_id = iana_mod_id(id)
-    if isassigned(IANA_NAMES, mod_id)
-        name = IANA_NAMES[mod_id]
+    if isassigned(IANA_NAMES, id)
+        name = IANA_NAMES[id]
         return get_iana_timezone!(name)
     else
         error(
@@ -75,11 +103,7 @@ A type for representing a standard variable IANA TimeZome from the tzdata.
 Under-the-hood it stores only a unique integer identifier.
 """
 struct IANATimeZone <: TimeZone
-    # id must be a hash of the corresponding Variable/FixedTimeZone
-    # and it is only possible if `hash` on all timezones in tzdata happens to be perfect
-    # This is the real hash, not the hash modulo IANA_TABLE_SIZE
-    # because that way we can in the future change IANA_TABLE_SIZE and not invalidate old
-    # serialized data.
+    # id must be a prefect_hash of the corresponding timezone name
     id::UInt
 end
 
@@ -87,7 +111,7 @@ function IANATimeZone(name::AbstractString)
     return IANATimeZone(perfect_hash(name))
 end
 
-backing_timezone(itz::IANATimeZone) = get_iana_timezone!(itz.id)
+backing_timezone(itz::IANATimeZone) = get_iana_timezone!(itz.id)::VariableTimeZone
 
 Base.:(==)(a::IANATimeZone, b::IANATimeZone) = a.id == b.id
 Base.:(==)(a::IANATimeZone, b::TimeZone) = backing_timezone(a) == b
