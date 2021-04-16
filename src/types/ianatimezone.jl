@@ -12,6 +12,8 @@ function perfect_hash(str::AbstractString)
     # manually  to resolve collisions can freely use anything outside that range.
 
     asso_values = (
+      # this contains exactly 127 (ie. 0x7F) values. this is important for speed and for
+      # the inbounds checking after
       1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681,
       1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681,
       1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681, 1681,
@@ -24,23 +26,33 @@ function perfect_hash(str::AbstractString)
        719,    2, 1681, 1681, 1681,  291,    1,    1,   27,  424,
         13,    5,   43,    3,  355,   12,  168,  148,   90,  179,
          4,    1,  315,    3,    3,    3,    2,   37,    5,   65,
-        22,  320,  245,    1, 1681, 1681, 1681,
+        22,  320,  245,    1, 1681, 1681, 1681, 1681,
     )
 
     units = codeunits(str)
     len = length(units)
-    hval = len
 
-    len >= 19 && (hval += asso_values[units[19]])
-    len >= 12 && (hval += asso_values[units[12]])
-    len >= 11 && (hval += asso_values[units[11]])
-    len >= 9 && (hval += asso_values[units[9] + 1])
-    len >= 8 && (hval += asso_values[units[8]])
-    len >= 6 && (hval += asso_values[units[6] + 1])
-    len >= 4 && (hval += asso_values[units[4]])
-    len >= 2 && (hval += asso_values[units[2] + 1])
-    len >= 1 && (hval += asso_values[units[1]])
-    len > 0 && (hval += asso_values[units[end]])  # add the last
+    for unit in units
+        # Check every unit is inbounds, if not then we know it is not in the table
+        # so return a value that is large to be in the table.
+        # It is faster to precheck if these are inbounds in advance and then `@inbounds` the
+        # next section.
+        unit + 0x01 < UInt(length(asso_values)) || return IANA_TABLE_SIZE + 1
+    end
+
+    hval = len
+    @inbounds begin
+        len >= 19 && (hval += asso_values[units[19]])
+        len >= 12 && (hval += asso_values[units[12]])
+        len >= 11 && (hval += asso_values[units[11]])
+        len >= 9 && (hval += asso_values[units[9] + 1])
+        len >= 8 && (hval += asso_values[units[8]])
+        len >= 6 && (hval += asso_values[units[6] + 1])
+        len >= 4 && (hval += asso_values[units[4]])
+        len >= 2 && (hval += asso_values[units[2] + 1])
+        len >= 1 && (hval += asso_values[units[1]])
+        len > 0 && (hval += asso_values[units[end]])  # add the last
+    end
     return hval
 end
 
