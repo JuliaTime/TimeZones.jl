@@ -30,7 +30,7 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
     # ranges.jl
     guess
 
-const PKG_DIR = normpath(joinpath(dirname(@__FILE__), ".."))
+const PKG_DIR = dirname(@__DIR__)
 const DEPS_DIR = joinpath(PKG_DIR, "deps")
 
 # TimeZone types used to disambiguate the context of a DateTime
