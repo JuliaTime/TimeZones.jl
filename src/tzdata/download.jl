@@ -1,4 +1,5 @@
 using Dates
+using Downloads
 using TimeZones: DEPS_DIR
 
 const LATEST_FILE = joinpath(DEPS_DIR, "latest")
@@ -59,7 +60,7 @@ julia> last(tzdata_versions())  # Current latest available tzdata version
 ```
 """
 function tzdata_versions()
-    releases_file = Base.download("https://data.iana.org/time-zones/releases/")
+    releases_file = Downloads.download("https://data.iana.org/time-zones/releases/")
 
     html = try
         read(releases_file, String)
@@ -119,7 +120,7 @@ function tzdata_download(version::AbstractString="latest", dir::AbstractString=t
     end
 
     url = tzdata_url(version)
-    archive = Base.download(url, joinpath(dir, basename(url)))  # Overwrites the local file if any
+    archive = Downloads.download(url, joinpath(dir, basename(url)))  # Overwrites the local file if any
 
     # Note: An "HTTP 404 Not Found" may result in the 404 page being downloaded. Also,
     # catches issues with corrupt archives
