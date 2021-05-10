@@ -42,8 +42,11 @@ if v"1.3.1-pre.18" <= VERSION < v"1.3.2"
             Base.invokelatest(do_artifact_str, $(esc(name)), $(artifact_dict), $(artifacts_toml), $__module__)
         end
     end
-elseif VERSION >= v"1.3.0"
+elseif v"1.3.0" <= VERSION < v"1.6.0-beta1.15"
     # Issue does not exist in 1.3.0, and >= 1.4.0. Also, assume that the issue would also be
     # fixed on >= 1.3.2
     using Pkg.Artifacts: @artifact_str
+elseif VERSION >= v"1.6.0-beta1.15"
+    # Using Pkg instead of using LazyArtifacts is deprecated on 1.6.0-beta1.15 and 1.7.0-DEV.302
+    using LazyArtifacts: @artifact_str
 end
