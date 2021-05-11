@@ -1,4 +1,10 @@
 using ...TimeZones: Class
+if VERSION >= v"1.3"
+    # Artifacts introduced in Pkg v1.3
+    # Using Pkg instead of using LazyArtifacts is deprecated on 1.6.0-beta1.15 and 1.7.0-DEV.302
+    # LazyArtifacts.jl available for v1.3 and up
+    using LazyArtifacts
+end
 
 # The default tz source files we care about. See "ftp://ftp.iana.org/tz/data/Makefile"
 # "PRIMARY_YDATA" for listing of tz source files to include.

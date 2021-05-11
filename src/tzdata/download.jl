@@ -1,6 +1,13 @@
 using Dates
 using TimeZones: DEPS_DIR
 
+if VERSION >= v"1.6.0-DEV.923"
+    # Use Downloads.jl once TimeZones.jl drops support for Julia versions < 1.3
+    download(args...) = Base.invokelatest(Base.Downloads().download, args...)
+else
+    using Base: download
+end
+
 const LATEST_FILE = joinpath(DEPS_DIR, "latest")
 const LATEST_FORMAT = Dates.DateFormat("yyyy-mm-ddTHH:MM:SS")
 const LATEST_DELAY = Hour(1)  # In 1996 a correction to a release was made an hour later
@@ -59,7 +66,7 @@ julia> last(tzdata_versions())  # Current latest available tzdata version
 ```
 """
 function tzdata_versions()
-    releases_file = Base.download("https://data.iana.org/time-zones/releases/")
+    releases_file = download("https://data.iana.org/time-zones/releases/")
 
     html = try
         read(releases_file, String)
@@ -119,7 +126,7 @@ function tzdata_download(version::AbstractString="latest", dir::AbstractString=t
     end
 
     url = tzdata_url(version)
-    archive = Base.download(url, joinpath(dir, basename(url)))  # Overwrites the local file if any
+    archive = download(url, joinpath(dir, basename(url)))  # Overwrites the local file if any
 
     # Note: An "HTTP 404 Not Found" may result in the 404 page being downloaded. Also,
     # catches issues with corrupt archives
