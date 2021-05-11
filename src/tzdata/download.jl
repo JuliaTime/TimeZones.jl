@@ -3,7 +3,7 @@ using TimeZones: DEPS_DIR
 
 if VERSION >= v"1.6.0-DEV.923"
     # Use Downloads.jl once TimeZones.jl drops support for Julia versions < 1.3
-    download(args...) = invokelatest(Base.Downloads().download, args...)
+    download(args...) = Base.invokelatest(Base.Downloads().download, args...)
 else
     using Base: download
 end
