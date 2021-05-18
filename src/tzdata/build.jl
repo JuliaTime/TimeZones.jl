@@ -61,7 +61,10 @@ function build(
             @info "Installing $version tzdata region data"
             regions = union!(intersect(regions, readdir(artifact_dir)), CUSTOM_REGIONS)
             for region in setdiff(regions, CUSTOM_REGIONS)
-                cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
+                src = joinpath(artifact_dir, region)
+                dest = joinpath(tz_source_dir, region)
+                @info "$src -> $dest"
+                cp(src, dest, force=true)
             end
         end
     else
