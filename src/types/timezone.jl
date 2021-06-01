@@ -1,4 +1,26 @@
-const TIME_ZONE_CACHE = Dict{String,Tuple{TimeZone,Class}}()
+# ---------- Time Zone Cache setup ----------------------------------------------------------------
+# Thread-local timezone caches to support multithreaded tasks simultaneously constructing TimeZones.
+# See https://github.com/JuliaTime/TimeZones.jl/issues/342 for more information.
+
+const THREADLOCAL_TIME_ZONE_CACHES = Dict{String,Tuple{TimeZone,Class}}[]
+
+@inline default_tz_cache() = default_tz_cache(Threads.threadid())
+@noinline function default_tz_cache(tid::Int)
+    0 < tid <= length(THREADLOCAL_TIME_ZONE_CACHES) || _tz_cache_length_assert()
+    if @inbounds isassigned(THREADLOCAL_TIME_ZONE_CACHES, tid)
+        @inbounds TZ_CACHE = THREADLOCAL_TIME_ZONE_CACHES[tid]
+    else
+        TZ_CACHE = eltype(THREADLOCAL_TIME_ZONE_CACHES)()
+        @inbounds THREADLOCAL_TIME_ZONE_CACHES[tid] = TZ_CACHE
+    end
+    return TZ_CACHE
+end
+@noinline _tz_cache_length_assert() =  @assert false "0 < tid <= length(THREADLOCAL_TIME_ZONE_CACHES)"
+
+function __init__()
+    resize!(empty!(THREADLOCAL_TIME_ZONE_CACHES), Threads.nthreads()) # ensures that we didn't save a bad object
+end
+# ---------- End Time Zone Cache setup ------------------------------------------------------------
 
 """
     TimeZone(str::AbstractString) -> TimeZone
