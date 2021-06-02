@@ -17,9 +17,13 @@ const THREADLOCAL_TIME_ZONE_CACHES = Dict{String,Tuple{TimeZone,Class}}[]
 end
 @noinline _tz_cache_length_assert() =  @assert false "0 < tid <= length(THREADLOCAL_TIME_ZONE_CACHES)"
 
+module __InitThreadLocalCaches  # This module is only here to house the __init__() function.
+using ..TimeZones: THREADLOCAL_TIME_ZONE_CACHES
 function __init__()
     resize!(empty!(THREADLOCAL_TIME_ZONE_CACHES), Threads.nthreads()) # ensures that we didn't save a bad object
 end
+end
+
 # ---------- End Time Zone Cache setup ------------------------------------------------------------
 
 """
