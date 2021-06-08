@@ -1,5 +1,6 @@
 const TIME_ZONE_CACHE = Dict{String,Tuple{TimeZone,Class}}()
-const TZ_CACHE_LOCK = ReentrantLock()
+const TZ_CACHE_LOCK = ReadersWriterLock()
+
 
 """
     TimeZone(str::AbstractString) -> TimeZone
@@ -42,34 +43,36 @@ US/Pacific (UTC-8/UTC-7)
 TimeZone(::AbstractString, ::Class)
 
 function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
+    lock(TZ_CACHE_LOCK.readers)
+
     # Note: If the class `mask` does not match the time zone we'll still load the
     # information into the cache to ensure the result is consistent.
-    tz, class = get(TIME_ZONE_CACHE, str) do
-        lock(TZ_CACHE_LOCK)
+    if haskey(TIME_ZONE_CACHE, str)
+        tz, class = TIME_ZONE_CACHE[str]
+        unlock(TZ_CACHE_LOCK.readers)
+    else
+        unlock(TZ_CACHE_LOCK.readers)
+        lock(TZ_CACHE_LOCK.writer)
 
-        try
-            # The first thread to acquire the lock will update the cache. Other threads
-            # waiting for the lock will just read from the cache.
-            get!(TIME_ZONE_CACHE, str) do
-                tz_path = joinpath(TZData.COMPILED_DIR, split(str, "/")...)
+        tz, class = get!(TIME_ZONE_CACHE, str) do
+            tz_path = joinpath(TZData.COMPILED_DIR, split(str, "/")...)
 
-                if isfile(tz_path)
-                    open(deserialize, tz_path, "r")
-                elseif occursin(FIXED_TIME_ZONE_REGEX, str)
-                    FixedTimeZone(str), Class(:FIXED)
-                elseif !isdir(TZData.COMPILED_DIR) || isempty(readdir(TZData.COMPILED_DIR))
-                    # Note: Julia 1.0 supresses the build logs which can hide issues in time zone
-                    # compliation which result in no tzdata time zones being available.
-                    throw(ArgumentError(
-                        "Unable to find time zone \"$str\". Try running `TimeZones.build()`."
-                    ))
-                else
-                    throw(ArgumentError("Unknown time zone \"$str\""))
-                end
+            if isfile(tz_path)
+                open(deserialize, tz_path, "r")
+            elseif occursin(FIXED_TIME_ZONE_REGEX, str)
+                FixedTimeZone(str), Class(:FIXED)
+            elseif !isdir(TZData.COMPILED_DIR) || isempty(readdir(TZData.COMPILED_DIR))
+                # Note: Julia 1.0 supresses the build logs which can hide issues in time zone
+                # compliation which result in no tzdata time zones being available.
+                throw(ArgumentError(
+                    "Unable to find time zone \"$str\". Try running `TimeZones.build()`."
+                ))
+            else
+                throw(ArgumentError("Unknown time zone \"$str\""))
             end
-        finally
-            unlock(TZ_CACHE_LOCK)
         end
+
+        unlock(TZ_CACHE_LOCK.writer)
     end
 
     if mask & class == Class(:NONE)

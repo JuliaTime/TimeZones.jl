@@ -52,6 +52,7 @@ end
 include("compat.jl")
 include("utils.jl")
 include("indexable_generator.jl")
+include("readers_writer_lock.jl")
 
 include("class.jl")
 include("utcoffset.jl")
