@@ -46,10 +46,10 @@ end
 # abstract type UTC <: TimeZone end  # Already defined in the Dates stdlib
 abstract type Local <: TimeZone end
 
-const pkg_version = VersionNumber(TOML.parsefile(joinpath(dirname(@__DIR__), "Project.toml"))["version"])
+const PKG_VERSION = VersionNumber(TOML.parsefile(joinpath(dirname(@__DIR__), "Project.toml"))["version"])
 
 function __init__()
-    global DEPS_DIR = @get_scratch!("timezones-$VERSION-$pkg_version")
+    global DEPS_DIR = @get_scratch!("timezones-$VERSION-$PKG_VERSION")
     TZData._init()
     Sys.iswindows() && WindowsTimeZoneIDs._init()
     if isempty(readdir(DEPS_DIR))
