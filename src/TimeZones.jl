@@ -38,6 +38,8 @@ const DEPS_DIR = joinpath(PKG_DIR, "deps")
 abstract type Local <: TimeZone end
 
 function __init__()
+    copy!(TIME_ZONE_CACHE, TZData.compile())
+
     # Base extension needs to happen everytime the module is loaded (issue #24)
     Dates.CONVERSION_SPECIFIERS['z'] = TimeZone
     Dates.CONVERSION_SPECIFIERS['Z'] = TimeZone

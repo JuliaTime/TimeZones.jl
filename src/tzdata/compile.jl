@@ -711,8 +711,13 @@ function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
     return results
 end
 
-# TODO: Deprecate?
-function compile(tz_source_dir::AbstractString=TZ_SOURCE_DIR, dest_dir::AbstractString=COMPILED_DIR; kwargs...)
-    tz_source_paths = joinpath.(tz_source_dir, readdir(tz_source_dir))
-    compile(TZSource(tz_source_paths), dest_dir; kwargs...)
+function compile(; kwargs...)
+    results = Dict{String,Tuple{TimeZone,Class}}()
+    tz_source = TZSource(joinpath.(TZ_SOURCE_DIR, REGIONS))
+
+    for (tz, class) in compile(tz_source; kwargs...)
+        results[TimeZones.name(tz)] = (tz, class)
+    end
+
+    return results
 end
