@@ -5,6 +5,8 @@ using Printf
 using Serialization
 using RecipesBase: RecipesBase, @recipe
 using Unicode
+using Pkg.TOML
+using Scratch
 
 import Dates: TimeZone, UTC
 
@@ -30,14 +32,36 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
     # ranges.jl
     guess
 
-const PKG_DIR = dirname(@__DIR__)
-const DEPS_DIR = joinpath(PKG_DIR, "deps")
+# Compile the deps files contents into the precompiled module for relocatability.
+const DEPS_CONTENTS = Dict{String,String}()
+let deps = joinpath(@__DIR__, "..", "deps")
+    for (root, dirs, files) in walkdir(deps), file in files
+        path = joinpath(relpath(root, deps), file)
+        include_dependency(joinpath(deps, path))
+        DEPS_CONTENTS[path] = read(joinpath(deps, path), String)
+    end
+end
 
 # TimeZone types used to disambiguate the context of a DateTime
 # abstract type UTC <: TimeZone end  # Already defined in the Dates stdlib
 abstract type Local <: TimeZone end
 
+const pkg_version = VersionNumber(TOML.parsefile(joinpath(dirname(@__DIR__), "Project.toml"))["version"])
+
 function __init__()
+    global DEPS_DIR = @get_scratch!("timezones-$VERSION-$pkg_version")
+    TZData._init()
+    Sys.iswindows() && WindowsTimeZoneIDs._init()
+    if isempty(readdir(DEPS_DIR))
+        cd(DEPS_DIR) do
+            for (path, contents) in DEPS_CONTENTS
+                mkpath(dirname(path))
+                write(path, contents)
+            end
+        end
+        build()
+    end
+
     # Base extension needs to happen everytime the module is loaded (issue #24)
     Dates.CONVERSION_SPECIFIERS['z'] = TimeZone
     Dates.CONVERSION_SPECIFIERS['Z'] = TimeZone

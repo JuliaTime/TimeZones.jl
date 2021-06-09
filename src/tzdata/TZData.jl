@@ -1,7 +1,7 @@
 module TZData
 
 using Printf
-using ...TimeZones: DEPS_DIR
+import ...TimeZones
 
 import Pkg
 
@@ -14,11 +14,17 @@ end
 # the "tzdata" archive or more specifically the "tz source" files within the archive
 # (africa, australasia, ...)
 
-const ARCHIVE_DIR = joinpath(DEPS_DIR, "tzarchive")
-const TZ_SOURCE_DIR = joinpath(DEPS_DIR, "tzsource")
-const COMPILED_DIR = joinpath(DEPS_DIR, "compiled", string(VERSION))
+function _init()
+    global ARCHIVE_DIR = joinpath(TimeZones.DEPS_DIR, "tzarchive")
+    global TZ_SOURCE_DIR = joinpath(TimeZones.DEPS_DIR, "tzsource")
+    global COMPILED_DIR = joinpath(TimeZones.DEPS_DIR, "compiled", string(VERSION))
+    global ACTIVE_VERSION_FILE = joinpath(TimeZones.DEPS_DIR, "active_version")
+    global LATEST_FILE = joinpath(TimeZones.DEPS_DIR, "latest")
 
-const ARTIFACT_TOML = joinpath(@__DIR__, "..", "..", "Artifacts.toml")
+    global LATEST = let T = Tuple{AbstractString, DateTime}
+        isfile(LATEST_FILE) ? Ref{T}(read_latest(LATEST_FILE)) : Ref{T}()
+    end
+end
 
 export ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, REGIONS, LEGACY_REGIONS
 

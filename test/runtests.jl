@@ -3,7 +3,6 @@ using Mocking
 using RecipesBase
 using Test
 using TimeZones
-using TimeZones: PKG_DIR
 using TimeZones.TZData: ARCHIVE_DIR, TZSource, compile, build
 using Unicode
 
@@ -11,8 +10,8 @@ Mocking.activate()
 
 
 const TZDATA_VERSION = "2016j"
-const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(PKG_DIR, "test", "tzsource"))
-const TZFILE_DIR = joinpath(PKG_DIR, "test", "tzfile")
+const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(@__DIR__, "tzsource"))
+const TZFILE_DIR = joinpath(@__DIR__, "tzfile")
 const TEST_REGIONS = ["asia", "australasia", "europe", "northamerica"]
 
 # https://github.com/JuliaLang/julia/pull/27900

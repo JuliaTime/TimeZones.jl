@@ -43,11 +43,7 @@ function build(
             # Retrieve the current latest version the cached latest has expired
             if latest_version === nothing
                 latest_version = last(tzdata_versions())
-                tzdata_hash = artifact_hash("tzdata$latest_version", ARTIFACT_TOML)
-
-                if tzdata_hash === nothing
-                    error("Latest tzdata is $latest_version which is not present in the Artifacts.toml")
-                end
+                @artifact_str "tzdata$latest_version"
 
                 set_latest_cached(latest_version)
             end

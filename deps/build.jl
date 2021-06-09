@@ -1,3 +1,1 @@
-using TimeZones: build
-
-build()
+using TimeZones

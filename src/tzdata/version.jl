@@ -29,8 +29,6 @@ const TZDATA_NEWS_REGEX = r"""
     \b
 """x
 
-const ACTIVE_VERSION_FILE = joinpath(DEPS_DIR, "active_version")
-
 
 """
     read_news(news, [limit]) -> Vector{AbstractString}

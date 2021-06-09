@@ -1,5 +1,4 @@
 using Dates
-using TimeZones: DEPS_DIR
 
 if VERSION >= v"1.6.0-DEV.923"
     # Use Downloads.jl once TimeZones.jl drops support for Julia versions < 1.3
@@ -8,7 +7,6 @@ else
     using Base: download
 end
 
-const LATEST_FILE = joinpath(DEPS_DIR, "latest")
 const LATEST_FORMAT = Dates.DateFormat("yyyy-mm-ddTHH:MM:SS")
 const LATEST_DELAY = Hour(1)  # In 1996 a correction to a release was made an hour later
 
@@ -28,10 +26,6 @@ function write_latest(io::IO, version::AbstractString, retrieved_utc::DateTime=n
     write(io, version)
     write(io, "\n")
     write(io, Dates.format(retrieved_utc, LATEST_FORMAT))
-end
-
-const LATEST = let T = Tuple{AbstractString, DateTime}
-    isfile(LATEST_FILE) ? Ref{T}(read_latest(LATEST_FILE)) : Ref{T}()
 end
 
 function set_latest_cached(version::AbstractString, retrieved_utc::DateTime=now(Dates.UTC))
