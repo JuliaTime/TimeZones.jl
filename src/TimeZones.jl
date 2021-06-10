@@ -49,10 +49,11 @@ abstract type Local <: TimeZone end
 const PKG_VERSION = VersionNumber(TOML.parsefile(joinpath(dirname(@__DIR__), "Project.toml"))["version"])
 
 function __init__()
-    global DEPS_DIR = @get_scratch!("timezones-$VERSION-$PKG_VERSION")
+    global DEPS_DIR = @get_scratch!("timezones-$PKG_VERSION")
+    isdir(DEPS_DIR) || mkpath(DEPS_DIR)
     TZData._init()
-    Sys.iswindows() && WindowsTimeZoneIDs._init()
-    if isempty(readdir(DEPS_DIR))
+    @static Sys.iswindows() && WindowsTimeZoneIDs._init()
+    if !isdir(joinpath(DEPS_DIR, "compiled", string(VERSION)))
         cd(DEPS_DIR) do
             for (path, contents) in DEPS_CONTENTS
                 mkpath(dirname(path))
