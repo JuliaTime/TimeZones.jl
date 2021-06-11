@@ -30,7 +30,7 @@ end
 
 function set_latest_cached(version::AbstractString, retrieved_utc::DateTime=now(Dates.UTC))
     LATEST[] = version, retrieved_utc
-    open(LATEST_FILE, "w") do io
+    open(LATEST_FILE[], "w") do io
         write_latest(io, version, retrieved_utc)
     end
 end

@@ -144,8 +144,8 @@ function localzone()
         # - Read the Windows registry
         win_name = @mock read(`tzutil /g`, String)
 
-        if haskey(WINDOWS_TRANSLATION, win_name)
-            return TimeZone(WINDOWS_TRANSLATION[win_name], mask)
+        if haskey(WINDOWS_TRANSLATION[], win_name)
+            return TimeZone(WINDOWS_TRANSLATION[][win_name], mask)
         else
             error("unable to translate to POSIX time zone name from: \"$win_name\"")
         end

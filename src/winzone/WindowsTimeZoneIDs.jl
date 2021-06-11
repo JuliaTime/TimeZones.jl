@@ -15,15 +15,19 @@ const UNICODE_CLDR_VERSION = "release-37"
 const WINDOWS_ZONE_URL = "https://raw.githubusercontent.com/unicode-org/cldr/$UNICODE_CLDR_VERSION/common/supplemental/windowsZones.xml"
 const WINDOWS_ZONE_FILE = joinpath("cldr-$UNICODE_CLDR_VERSION", "common", "supplemental", "windowsZones.xml")
 
-function _init()
-    global WINDOWS_XML_DIR = joinpath(TimeZones.DEPS_DIR, "local")
-    global WINDOWS_XML_FILE = joinpath(WINDOWS_XML_DIR, "windowsZones.xml")
-    isdir(WINDOWS_XML_DIR) || mkdir(WINDOWS_XML_DIR)
+const WINDOWS_XML_DIR = Ref{String}()
+const WINDOWS_XML_FILE = Ref{String}()
+const WINDOWS_TRANSLATION = Ref{Dict{String,String}}()
 
-    global WINDOWS_TRANSLATION = if isfile(WINDOWS_XML_FILE)
-        compile(WINDOWS_XML_FILE)
+function _init()
+    WINDOWS_XML_DIR[] = joinpath(TimeZones.DEPS_DIR[], "local")
+    WINDOWS_XML_FILE[] = joinpath(WINDOWS_XML_DIR[], "windowsZones.xml")
+    isdir(WINDOWS_XML_DIR[]) || mkdir(WINDOWS_XML_DIR[])
+
+    WINDOWS_TRANSLATION[] = if isfile(WINDOWS_XML_FILE[])
+        compile(WINDOWS_XML_FILE[])
     else
-        Dict{AbstractString, AbstractString}()
+        Dict{String, String}()
     end
 end
 
@@ -47,8 +51,8 @@ function compile(xml_file::AbstractString)
     return translation
 end
 
-function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
-    fallback_xml_file = joinpath(WINDOWS_XML_DIR, "windowsZones2017a.xml")
+function build(xml_file::AbstractString=WINDOWS_XML_FILE[]; force::Bool=false)
+    fallback_xml_file = joinpath(WINDOWS_XML_DIR[], "windowsZones2017a.xml")
 
     if !isfile(xml_file)
         if isfile(fallback_xml_file) && !force
@@ -68,9 +72,9 @@ function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
     translation = compile(xml_file)
 
     # Copy contents into translation constant
-    empty!(WINDOWS_TRANSLATION)
+    empty!(WINDOWS_TRANSLATION[])
     for (k, v) in translation
-        WINDOWS_TRANSLATION[k] = v
+        WINDOWS_TRANSLATION[][k] = v
     end
 end
 

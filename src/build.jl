@@ -8,7 +8,7 @@ Builds the TimeZones package with the specified tzdata `version` and `regions`. 
 (e.g. "$DEFAULT_TZDATA_VERSION"). The `force` flag is used to re-download tzdata archives.
 """
 function build(version::AbstractString=tzdata_version(); force::Bool=false)
-    cd(DEPS_DIR) do
+    cd(DEPS_DIR[]) do
         for (path, contents) in DEPS_CONTENTS
             mkpath(dirname(path))
             write(path, contents)

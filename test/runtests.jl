@@ -19,12 +19,12 @@ if VERSION < v"1.2.0-DEV.642"
     const ProcessFailedException = ErrorException
 end
 
-isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
+isdir(ARCHIVE_DIR[]) || mkdir(ARCHIVE_DIR[])
 isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)
 
 # By default use a specific version of the tz database so we just testing for TimeZones.jl
 # changes and not changes to the tzdata.
-build(TZDATA_VERSION, TEST_REGIONS, ARCHIVE_DIR, TZ_SOURCE_DIR)
+build(TZDATA_VERSION, TEST_REGIONS, ARCHIVE_DIR[], TZ_SOURCE_DIR)
 
 # For testing we'll reparse the tzdata every time to instead of using the serialized data.
 # This should make the development/testing cycle simplier since you won't be forced to

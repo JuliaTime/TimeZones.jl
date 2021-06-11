@@ -38,7 +38,7 @@ end
 @static if use_artifacts
     artifact_dir = @artifact_str "tzdata$TZDATA_VERSION"
 else
-    archive = joinpath(ARCHIVE_DIR, "tzdata$TZDATA_VERSION.tar.gz")
+    archive = joinpath(ARCHIVE_DIR[], "tzdata$TZDATA_VERSION.tar.gz")
 end
 
 mktempdir() do temp_dir
@@ -79,6 +79,6 @@ version = active_version()
 if !use_artifacts
     archive = active_archive()
     @test isfile(archive)
-    @test dirname(archive) == ARCHIVE_DIR
+    @test dirname(archive) == ARCHIVE_DIR[]
     @test basename(archive) == "tzdata$version.tar.gz"
 end

@@ -712,7 +712,7 @@ function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
 end
 
 # TODO: Deprecate?
-function compile(tz_source_dir::AbstractString=TZ_SOURCE_DIR, dest_dir::AbstractString=COMPILED_DIR; kwargs...)
+function compile(tz_source_dir::AbstractString=TZ_SOURCE_DIR[], dest_dir::AbstractString=COMPILED_DIR[]; kwargs...)
     tz_source_paths = joinpath.(tz_source_dir, readdir(tz_source_dir))
     compile(TZSource(tz_source_paths), dest_dir; kwargs...)
 end

@@ -104,22 +104,22 @@ function build(
 end
 
 function build(version::AbstractString=tzdata_version())
-    isdir(ARCHIVE_DIR) || mkpath(ARCHIVE_DIR)
-    isdir(TZ_SOURCE_DIR) || mkpath(TZ_SOURCE_DIR)
-    isdir(COMPILED_DIR) || mkpath(COMPILED_DIR)
+    isdir(ARCHIVE_DIR[]) || mkpath(ARCHIVE_DIR[])
+    isdir(TZ_SOURCE_DIR[]) || mkpath(TZ_SOURCE_DIR[])
+    isdir(COMPILED_DIR[]) || mkpath(COMPILED_DIR[])
 
     # Empty the compile directory in case to handle different versions not overriding all
     # files.
-    for file in readdir(COMPILED_DIR)
-        rm(joinpath(COMPILED_DIR, file), recursive=true)
+    for file in readdir(COMPILED_DIR[])
+        rm(joinpath(COMPILED_DIR[], file), recursive=true)
     end
 
     version = build(
-        version, REGIONS, ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, verbose=true,
+        version, REGIONS, ARCHIVE_DIR[], TZ_SOURCE_DIR[], COMPILED_DIR[], verbose=true,
     )
 
     # Store the version of the compiled tzdata
-    write(ACTIVE_VERSION_FILE, version)
+    write(ACTIVE_VERSION_FILE[], version)
 
     return version
 end

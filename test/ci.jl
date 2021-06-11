@@ -5,21 +5,21 @@ using TimeZones: TZData
 
 @testset "build process" begin
     # Clean out deps directories for a clean re-build
-    rm(TZData.COMPILED_DIR, recursive=true)
-    for file in readdir(TZData.TZ_SOURCE_DIR)
+    rm(TZData.COMPILED_DIR[], recursive=true)
+    for file in readdir(TZData.TZ_SOURCE_DIR[])
         file == "utc" && continue
-        rm(joinpath(TZData.TZ_SOURCE_DIR, file))
+        rm(joinpath(TZData.TZ_SOURCE_DIR[], file))
     end
 
-    @test !isdir(TZData.COMPILED_DIR)
-    @test length(readdir(TZData.TZ_SOURCE_DIR)) == 1
+    @test !isdir(TZData.COMPILED_DIR[])
+    @test length(readdir(TZData.TZ_SOURCE_DIR[])) == 1
 
     # Using a version we already have avoids triggering a download
     TimeZones.build(TZDATA_VERSION)
 
-    @test isdir(TZData.COMPILED_DIR)
-    @test length(readdir(TZData.COMPILED_DIR)) > 0
-    @test readdir(TZData.TZ_SOURCE_DIR) == sort(TZData.REGIONS)
+    @test isdir(TZData.COMPILED_DIR[])
+    @test length(readdir(TZData.COMPILED_DIR[])) > 0
+    @test readdir(TZData.TZ_SOURCE_DIR[]) == sort(TZData.REGIONS)
 
     # Compile tz source files with an extended max_year. An example from the FAQ.
     warsaw = TimeZone("Europe/Warsaw")

@@ -1,6 +1,7 @@
 module TZData
 
 using Printf
+import Dates
 import ...TimeZones
 
 import Pkg
@@ -14,15 +15,22 @@ end
 # the "tzdata" archive or more specifically the "tz source" files within the archive
 # (africa, australasia, ...)
 
-function _init()
-    global ARCHIVE_DIR = joinpath(TimeZones.DEPS_DIR, "tzarchive")
-    global TZ_SOURCE_DIR = joinpath(TimeZones.DEPS_DIR, "tzsource")
-    global COMPILED_DIR = joinpath(TimeZones.DEPS_DIR, "compiled", string(VERSION))
-    global ACTIVE_VERSION_FILE = joinpath(TimeZones.DEPS_DIR, "active_version")
-    global LATEST_FILE = joinpath(TimeZones.DEPS_DIR, "latest")
+const ARCHIVE_DIR = Ref{String}()
+const TZ_SOURCE_DIR = Ref{String}()
+const COMPILED_DIR = Ref{String}()
+const ACTIVE_VERSION_FILE = Ref{String}()
+const LATEST_FILE = Ref{String}()
+const LATEST = Ref{Tuple{String, Dates.DateTime}}()
 
-    global LATEST = let T = Tuple{AbstractString, DateTime}
-        isfile(LATEST_FILE) ? Ref{T}(read_latest(LATEST_FILE)) : Ref{T}()
+function _init()
+    ARCHIVE_DIR[] = joinpath(TimeZones.DEPS_DIR[], "tzarchive")
+    TZ_SOURCE_DIR[] = joinpath(TimeZones.DEPS_DIR[], "tzsource")
+    COMPILED_DIR[] = joinpath(TimeZones.DEPS_DIR[], "compiled", string(VERSION))
+    ACTIVE_VERSION_FILE[] = joinpath(TimeZones.DEPS_DIR[], "active_version")
+    LATEST_FILE[] = joinpath(TimeZones.DEPS_DIR[], "latest")
+
+    if isfile(LATEST_FILE[])
+        LATEST[] = read_latest(LATEST_FILE[])
     end
 end
 
