@@ -83,7 +83,7 @@ jobs:
       - run: |
           git fetch origin +:refs/remotes/origin/HEAD
           julia --project=benchmark/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd()))'
-          julia --project=benchmark/ -e 'using PkgBenchmark, TimeZones; export_markdown(stdout, judge(TimeZones, "origin/HEAD", verbose=false))'
+          julia --project=benchmark/ -e 'using PkgBenchmark, TimeZones; TimeZones.build(); export_markdown(stdout, judge(TimeZones, "origin/HEAD", verbose=false))'
 
   doctest:
     name: Documentation - Julia ${{ matrix.version }}
