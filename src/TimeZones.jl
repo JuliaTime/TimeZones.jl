@@ -54,12 +54,6 @@ function __init__()
     TZData._init()
     @static Sys.iswindows() && WindowsTimeZoneIDs._init()
     if !isdir(joinpath(DEPS_DIR, "compiled", string(VERSION)))
-        cd(DEPS_DIR) do
-            for (path, contents) in DEPS_CONTENTS
-                mkpath(dirname(path))
-                write(path, contents)
-            end
-        end
         build()
     end
 
