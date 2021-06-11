@@ -50,7 +50,7 @@ const PKG_VERSION = VersionNumber(TOML.parsefile(joinpath(dirname(@__DIR__), "Pr
 const DEPS_DIR = Ref{String}()
 
 function __init__()
-    DEPS_DIR[] = @get_scratch!("timezones-$PKG_VERSION")
+    DEPS_DIR[] = @get_scratch!("timezones-$VERSION-$PKG_VERSION-$(TZData.tzdata_version())")
     isdir(DEPS_DIR[]) || mkpath(DEPS_DIR[])
     TZData._init()
     @static Sys.iswindows() && WindowsTimeZoneIDs._init()
