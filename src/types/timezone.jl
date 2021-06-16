@@ -1,28 +1,24 @@
-# ---------- Time Zone Cache setup ----------------------------------------------------------------
-# Thread-local timezone caches to support multithreaded tasks simultaneously constructing TimeZones.
-# See https://github.com/JuliaTime/TimeZones.jl/issues/342 for more information.
+const THREAD_TZ_CACHES = Dict{String,Tuple{TimeZone,Class}}[]
 
-const THREADLOCAL_TIME_ZONE_CACHES = Dict{String,Tuple{TimeZone,Class}}[]
-
-@inline default_tz_cache() = default_tz_cache(Threads.threadid())
-@noinline function default_tz_cache(tid::Int)
-    0 < tid <= length(THREADLOCAL_TIME_ZONE_CACHES) || _tz_cache_length_assert()
-    if @inbounds isassigned(THREADLOCAL_TIME_ZONE_CACHES, tid)
-        @inbounds TZ_CACHE = THREADLOCAL_TIME_ZONE_CACHES[tid]
+# Based upon the thread-safe Global RNG implementation in the Random stdlib:
+# https://github.com/JuliaLang/julia/blob/e4fcdf5b04fd9751ce48b0afc700330475b42443/stdlib/Random/src/RNGs.jl#L369-L385
+@inline _tz_cache() = _tz_cache(Threads.threadid())
+@noinline function _tz_cache(tid::Int)
+    0 < tid <= length(THREAD_TZ_CACHES) || _tz_cache_length_assert()
+    if @inbounds isassigned(THREAD_TZ_CACHES, tid)
+        @inbounds cache = THREAD_TZ_CACHES[tid]
     else
-        TZ_CACHE = eltype(THREADLOCAL_TIME_ZONE_CACHES)()
-        @inbounds THREADLOCAL_TIME_ZONE_CACHES[tid] = TZ_CACHE
+        cache = eltype(THREAD_TZ_CACHES)()
+        @inbounds THREAD_TZ_CACHES[tid] = cache
     end
-    return TZ_CACHE
+    return cache
 end
-@noinline _tz_cache_length_assert() =  @assert false "0 < tid <= length(THREADLOCAL_TIME_ZONE_CACHES)"
+@noinline _tz_cache_length_assert() = @assert false "0 < tid <= length(THREAD_TZ_CACHES)"
 
-# Called from __init__() to initialize the Thread Local caches at runtime.
-function _tz_cache_init()
-    resize!(empty!(THREADLOCAL_TIME_ZONE_CACHES), Threads.nthreads()) # ensures that we didn't save a bad object
+function _reset_tz_cache()
+    # ensures that we didn't save a bad object
+    resize!(empty!(THREAD_TZ_CACHES), Threads.nthreads())
 end
-
-# ---------- End Time Zone Cache setup ------------------------------------------------------------
 
 """
     TimeZone(str::AbstractString) -> TimeZone
