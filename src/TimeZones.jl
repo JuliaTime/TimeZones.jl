@@ -1,11 +1,11 @@
 module TimeZones
 
-using RelocatableFolders
 
 using Dates
 using Printf
 using Serialization
 using RecipesBase: RecipesBase, @recipe
+using RelocatableFolders: @path
 using Unicode
 
 import Dates: TimeZone, UTC
