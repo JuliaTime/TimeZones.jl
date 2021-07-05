@@ -55,7 +55,7 @@ function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
         @info "Downloading Windows to POSIX timezone ID XML version: $UNICODE_CLDR_VERSION"
         @static if VERSION >= v"1.3"
             artifact_dir = @artifact_str "unicode-cldr-$UNICODE_CLDR_VERSION"
-            xml_file = joinpath(artifact_dir, WINDOWS_ZONE_FILE)
+            cp(joinpath(artifact_dir, WINDOWS_ZONE_FILE), xml_file, force=true)
         else
             download(WINDOWS_ZONE_URL, xml_file)
         end
