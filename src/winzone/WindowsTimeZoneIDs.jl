@@ -5,6 +5,7 @@ using EzXML
 using Future: copy!
 
 if VERSION >= v"1.3"
+    using LazyArtifacts
     using ...TimeZones: @artifact_str
 end
 
