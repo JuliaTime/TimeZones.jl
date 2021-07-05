@@ -47,19 +47,13 @@ else
 end
 
 function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
-    fallback_xml_file = joinpath(WINDOWS_XML_DIR, "windowsZones2017a.xml")
-
-    if !isfile(xml_file)
-        if isfile(fallback_xml_file) && !force
-            cp(fallback_xml_file, xml_file)
+    if !isfile(xml_file) || force
+        @info "Downloading Windows to POSIX timezone ID XML version: $UNICODE_CLDR_VERSION"
+        @static if VERSION >= v"1.3"
+            artifact_dir = @artifact_str "unicode-cldr-$UNICODE_CLDR_VERSION"
+            xml_file = joinpath(artifact_dir, WINDOWS_ZONE_FILE)
         else
-            @info "Downloading Windows to POSIX timezone ID XML version: $UNICODE_CLDR_VERSION"
-            @static if VERSION >= v"1.3"
-                artifact_dir = @artifact_str "unicode-cldr-$UNICODE_CLDR_VERSION"
-                xml_file = joinpath(artifact_dir, WINDOWS_ZONE_FILE)
-            else
-                download(WINDOWS_ZONE_URL, xml_file)
-            end
+            download(WINDOWS_ZONE_URL, xml_file)
         end
     end
 
