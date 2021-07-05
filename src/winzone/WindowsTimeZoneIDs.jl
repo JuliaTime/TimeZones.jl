@@ -2,6 +2,7 @@ module WindowsTimeZoneIDs
 
 using ...TimeZones: DEPS_DIR
 using EzXML
+using Future: copy!
 
 if VERSION >= v"1.3"
     using ...TimeZones: @artifact_str
@@ -18,7 +19,15 @@ const WINDOWS_ZONE_FILE = joinpath("cldr-$UNICODE_CLDR_VERSION", "common", "supp
 const WINDOWS_XML_DIR = joinpath(DEPS_DIR, "local")
 const WINDOWS_XML_FILE = joinpath(WINDOWS_XML_DIR, "windowsZones.xml")
 
-isdir(WINDOWS_XML_DIR) || mkdir(WINDOWS_XML_DIR)
+const WINDOWS_TRANSLATION = Dict{String, String}()
+
+function __init__()
+    isdir(WINDOWS_XML_DIR) || mkdir(WINDOWS_XML_DIR)
+
+    if isfile(WINDOWS_XML_FILE)
+        copy!(WINDOWS_TRANSLATION, compile(WINDOWS_XML_FILE))
+    end
+end
 
 function compile(xml_file::AbstractString)
     # Get the timezone conversions from the file
@@ -40,12 +49,6 @@ function compile(xml_file::AbstractString)
     return translation
 end
 
-const WINDOWS_TRANSLATION = if isfile(WINDOWS_XML_FILE)
-    compile(WINDOWS_XML_FILE)
-else
-    Dict{AbstractString, AbstractString}()
-end
-
 function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
     if !isfile(xml_file) || force
         @info "Downloading Windows to POSIX timezone ID XML version: $UNICODE_CLDR_VERSION"
@@ -58,13 +61,7 @@ function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
     end
 
     @info "Compiling Windows time zone name translation"
-    translation = compile(xml_file)
-
-    # Copy contents into translation constant
-    empty!(WINDOWS_TRANSLATION)
-    for (k, v) in translation
-        WINDOWS_TRANSLATION[k] = v
-    end
+    copy!(WINDOWS_TRANSLATION, compile(xml_file))
 end
 
 end
