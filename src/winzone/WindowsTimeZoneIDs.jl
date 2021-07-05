@@ -7,7 +7,7 @@ if VERSION >= v"1.3"
     using ...TimeZones: @artifact_str
 end
 
-const UNICODE_CLDR_VERSION = "release-37"
+const UNICODE_CLDR_VERSION = "release-39"
 
 # A mapping of Windows timezone names to Olson timezone names.
 # Details on the contents of this file can be found at:
