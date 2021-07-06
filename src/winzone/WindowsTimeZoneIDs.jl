@@ -1,7 +1,6 @@
 module WindowsTimeZoneIDs
 
 using ...TimeZones: DEPS_DIR
-using EzXML
 using Future: copy!
 
 if VERSION >= v"1.3"
@@ -31,19 +30,20 @@ function __init__()
 end
 
 function compile(xml_file::AbstractString)
-    # Get the timezone conversions from the file
-    doc = readxml(xml_file)
 
-    # Territory "001" is the global default
-    map_zones = findall("//mapZone[@territory='001']", doc)
-
-    # TODO: Eliminate the Etc/* POSIX names here? See Windows section of `localzone`
-
-    # Dictionary to store the windows to time zone conversions
     translation = Dict{String,String}()
-    for map_zone in map_zones
-        win_name = map_zone["other"]
-        posix_name = map_zone["type"]
+
+    # Get the timezone conversions from the file
+    #
+    # Note: Since the XML file is simplistic enough that we can parse what we need via a
+    # regex we can avoid having an XML package dependency. Additionally, since this XML file
+    # is included as part of the this package we can correct any parsing issues before a
+    # TimeZones.jl release occurs.
+    for line in readlines(xml_file)
+        # Territory "001" is the global default
+        occursin("territory=\"001\"", line) || continue
+        win_name = match(r"other=\"(.*?)\"", line)[1]
+        posix_name = match(r"type=\"(.*?)\"", line)[1]
         translation[win_name] = posix_name
     end
 
