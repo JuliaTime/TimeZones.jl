@@ -2005,3 +2005,11 @@ lazy = true
     [[unicode-cldr-release-38-1.download]]
     sha256 = "923126ef0d459fc4a642514e982d1181472b7a191b82e69929a038a8a469ea7e"
     url = "https://github.com/unicode-org/cldr/archive/release-38-1.tar.gz"
+
+[unicode-cldr-release-39]
+git-tree-sha1 = "de1d78c75cc7ad8f66b8b8be271d05d04d81e305"
+lazy = true
+
+    [[unicode-cldr-release-39.download]]
+    sha256 = "baca3b9d6103a05c823d331e884626926a508d874e0d7ea0ff08d6eaf3534628"
+    url = "https://github.com/unicode-org/cldr/archive/release-39.tar.gz"
