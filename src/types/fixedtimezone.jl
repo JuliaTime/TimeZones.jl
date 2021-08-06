@@ -30,7 +30,7 @@ const FIXED_TIME_ZONE_REGEX = r"""
 A `TimeZone` with a constant offset for all of time.
 """
 struct FixedTimeZone <: TimeZone
-    name::String
+    name::InlineString15
     offset::UTCOffset
 end
 
@@ -95,3 +95,4 @@ end
 
 name(tz::FixedTimeZone) = tz.name
 rename(tz::FixedTimeZone, name::AbstractString) = FixedTimeZone(name, tz.offset)
+
