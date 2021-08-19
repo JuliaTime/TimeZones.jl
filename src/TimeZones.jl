@@ -39,7 +39,7 @@ abstract type Local <: TimeZone end
 
 function __init__()
     # Initialize the thread-local TimeZone cache (issue #342)
-    _tz_cache_init()
+    _reset_tz_cache()
 
     # Base extension needs to happen everytime the module is loaded (issue #24)
     Dates.CONVERSION_SPECIFIERS['z'] = TimeZone

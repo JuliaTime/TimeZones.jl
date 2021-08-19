@@ -63,7 +63,7 @@ TimeZone(::AbstractString, ::Class)
 function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
     # Note: If the class `mask` does not match the time zone we'll still load the
     # information into the cache to ensure the result is consistent.
-    tz, class = get!(default_tz_cache(), str) do
+    tz, class = get!(_tz_cache(), str) do
         tz_path = joinpath(TZData.COMPILED_DIR, split(str, "/")...)
 
         if isfile(tz_path)
@@ -118,12 +118,12 @@ function istimezone(str::AbstractString, mask::Class=Class(:DEFAULT))
     end
 
     # Perform more expensive checks against pre-compiled time zones
-    tz, class = get(default_tz_cache(), str) do
+    tz, class = get(_tz_cache(), str) do
         tz_path = joinpath(TZData.COMPILED_DIR, split(str, "/")...)
 
         if isfile(tz_path)
             # Cache the data since we're already performing the deserialization
-            default_tz_cache()[str] = open(deserialize, tz_path, "r")
+            _tz_cache()[str] = open(deserialize, tz_path, "r")
         else
             nothing, Class(:NONE)
         end
