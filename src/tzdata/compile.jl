@@ -694,7 +694,14 @@ function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
     results = compile(tz_source; kwargs...)
 
     isdir(dest_dir) || error("Destination directory doesn't exist")
-    empty!(_tz_cache())
+    # When we recompile the TimeZones from a new source, we clear all the existing cached
+    # TimeZone objects, so that newly constructed objects pick up the newly compiled rules.
+    # Since we use thread-local caches, we spawn a task on _each thread_ to clear that
+    # thread's local cache.
+    Threads.@threads for i in 1:Threads.nthreads()
+        @assert Threads.threadid() === i "TimeZones.TZData.compile() must be called from the main, top-level Task."
+        empty!(_tz_cache())
+    end
 
     for (tz, class) in results
         parts = split(TimeZones.name(tz), '/')
