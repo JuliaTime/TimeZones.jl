@@ -1,4 +1,3 @@
-using TimeZones: _reset_tz_cache
 using TimeZones.TZData: DEFAULT_TZDATA_VERSION, tzdata_version
 
 """
