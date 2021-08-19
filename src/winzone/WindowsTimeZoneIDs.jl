@@ -1,13 +1,14 @@
 module WindowsTimeZoneIDs
 
 using ...TimeZones: DEPS_DIR
-using EzXML
+using Future: copy!
 
 if VERSION >= v"1.3"
+    using LazyArtifacts
     using ...TimeZones: @artifact_str
 end
 
-const UNICODE_CLDR_VERSION = "release-37"
+const UNICODE_CLDR_VERSION = "release-39"
 
 # A mapping of Windows timezone names to Olson timezone names.
 # Details on the contents of this file can be found at:
@@ -18,59 +19,50 @@ const WINDOWS_ZONE_FILE = joinpath("cldr-$UNICODE_CLDR_VERSION", "common", "supp
 const WINDOWS_XML_DIR = joinpath(DEPS_DIR, "local")
 const WINDOWS_XML_FILE = joinpath(WINDOWS_XML_DIR, "windowsZones.xml")
 
-isdir(WINDOWS_XML_DIR) || mkdir(WINDOWS_XML_DIR)
+const WINDOWS_TRANSLATION = Dict{String, String}()
+
+function __init__()
+    isdir(WINDOWS_XML_DIR) || mkdir(WINDOWS_XML_DIR)
+
+    if isfile(WINDOWS_XML_FILE)
+        copy!(WINDOWS_TRANSLATION, compile(WINDOWS_XML_FILE))
+    end
+end
 
 function compile(xml_file::AbstractString)
-    # Get the timezone conversions from the file
-    doc = readxml(xml_file)
 
-    # Territory "001" is the global default
-    map_zones = findall("//mapZone[@territory='001']", doc)
-
-    # TODO: Eliminate the Etc/* POSIX names here? See Windows section of `localzone`
-
-    # Dictionary to store the windows to time zone conversions
     translation = Dict{String,String}()
-    for map_zone in map_zones
-        win_name = map_zone["other"]
-        posix_name = map_zone["type"]
+
+    # Get the timezone conversions from the file
+    #
+    # Note: Since the XML file is simplistic enough that we can parse what we need via a
+    # regex we can avoid having an XML package dependency. Additionally, since this XML file
+    # is included as part of the this package we can correct any parsing issues before a
+    # TimeZones.jl release occurs.
+    for line in readlines(xml_file)
+        # Territory "001" is the global default
+        occursin("territory=\"001\"", line) || continue
+        win_name = match(r"other=\"(.*?)\"", line)[1]
+        posix_name = match(r"type=\"(.*?)\"", line)[1]
         translation[win_name] = posix_name
     end
 
     return translation
 end
 
-const WINDOWS_TRANSLATION = if isfile(WINDOWS_XML_FILE)
-    compile(WINDOWS_XML_FILE)
-else
-    Dict{AbstractString, AbstractString}()
-end
-
 function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
-    fallback_xml_file = joinpath(WINDOWS_XML_DIR, "windowsZones2017a.xml")
-
-    if !isfile(xml_file)
-        if isfile(fallback_xml_file) && !force
-            cp(fallback_xml_file, xml_file)
+    if !isfile(xml_file) || force
+        @info "Downloading Windows to POSIX timezone ID XML version: $UNICODE_CLDR_VERSION"
+        @static if VERSION >= v"1.3"
+            artifact_dir = @artifact_str "unicode-cldr-$UNICODE_CLDR_VERSION"
+            cp(joinpath(artifact_dir, WINDOWS_ZONE_FILE), xml_file, force=true)
         else
-            @info "Downloading Windows to POSIX timezone ID XML version: $UNICODE_CLDR_VERSION"
-            @static if VERSION >= v"1.3"
-                artifact_dir = @artifact_str "unicode-cldr-$UNICODE_CLDR_VERSION"
-                xml_file = joinpath(artifact_dir, WINDOWS_ZONE_FILE)
-            else
-                download(WINDOWS_ZONE_URL, xml_file)
-            end
+            download(WINDOWS_ZONE_URL, xml_file)
         end
     end
 
     @info "Compiling Windows time zone name translation"
-    translation = compile(xml_file)
-
-    # Copy contents into translation constant
-    empty!(WINDOWS_TRANSLATION)
-    for (k, v) in translation
-        WINDOWS_TRANSLATION[k] = v
-    end
+    copy!(WINDOWS_TRANSLATION, compile(xml_file))
 end
 
 end
