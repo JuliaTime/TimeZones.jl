@@ -1,3 +1,4 @@
+using TimeZones: _reset_tz_cache
 using TimeZones.TZData: DEFAULT_TZDATA_VERSION, tzdata_version
 
 """
@@ -15,7 +16,7 @@ function build(version::AbstractString=tzdata_version(); force::Bool=false)
     end
 
     # Reset cached information
-    empty!(TIME_ZONE_CACHE)
+    _reset_tz_cache()
 
     @info "Successfully built TimeZones"
 end
