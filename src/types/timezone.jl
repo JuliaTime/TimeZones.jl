@@ -2,7 +2,7 @@
 # caching. Note that this means the cache will grow in size, and may store redundant objects
 # accross multiple threads, but this extra space usage allows for fast, lock-free access
 # to the cache, while still being thread-safe.
-const THREAD_TZ_CACHES = Dict{String,Tuple{TimeZone,Class}}[]
+const THREAD_TZ_CACHES = Vector{Dict{String,Tuple{TimeZone,Class}}}()
 
 # Based upon the thread-safe Global RNG implementation in the Random stdlib:
 # https://github.com/JuliaLang/julia/blob/e4fcdf5b04fd9751ce48b0afc700330475b42443/stdlib/Random/src/RNGs.jl#L369-L385
