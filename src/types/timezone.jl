@@ -1,3 +1,7 @@
+# Thread-local TimeZone cache, which caches time zones _per thread_, allowing thread-safe
+# caching. Note that this means the cache will grow in size, and may store redundant objects
+# accross multiple threads, but this extra space usage allows for fast, lock-free access
+# to the cache, while still being thread-safe.
 const THREAD_TZ_CACHES = Dict{String,Tuple{TimeZone,Class}}[]
 
 # Based upon the thread-safe Global RNG implementation in the Random stdlib:
