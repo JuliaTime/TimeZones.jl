@@ -1,5 +1,6 @@
 module TimeZones
 
+using Base: @lock
 using Dates
 using Printf
 using Serialization
@@ -39,7 +40,7 @@ abstract type Local <: TimeZone end
 
 function __init__()
     # Initialize the thread-local TimeZone cache (issue #342)
-    _reset_tz_cache()
+    _tz_cache_init()
 
     # Base extension needs to happen everytime the module is loaded (issue #24)
     Dates.CONVERSION_SPECIFIERS['z'] = TimeZone

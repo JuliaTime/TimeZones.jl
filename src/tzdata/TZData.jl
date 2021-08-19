@@ -1,7 +1,7 @@
 module TZData
 
 using Printf
-using ...TimeZones: DEPS_DIR
+using ...TimeZones: DEPS_DIR, _reset_tz_cache
 
 import Pkg
 
