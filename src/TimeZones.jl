@@ -1,11 +1,26 @@
 module TimeZones
 
-using Base: @lock
 using Dates
 using Printf
 using Serialization
 using RecipesBase: RecipesBase, @recipe
 using Unicode
+
+if VERSION >= v"1.3-"
+    using Base: @lock
+else
+    macro lock(l, e)
+        quote
+            ll = $(esc(l));
+            $lock(ll);
+            try
+                $(esc(e))
+            finally
+                $unlock(ll)
+            end
+        end
+    end
+end
 
 import Dates: TimeZone, UTC
 
