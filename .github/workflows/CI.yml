@@ -84,6 +84,8 @@ jobs:
           git fetch origin +:refs/remotes/origin/HEAD
           julia --project=benchmark/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd()))'
           julia --project=benchmark/ -e 'using PkgBenchmark, TimeZones; export_markdown(stdout, judge(TimeZones, "origin/HEAD", verbose=false))'
+        env:
+          TZDATA_VERSION: 2016j  # Matches tzdata version used in tests
 
   doctest:
     name: Documentation - Julia ${{ matrix.version }}
