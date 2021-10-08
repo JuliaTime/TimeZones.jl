@@ -59,7 +59,6 @@ function build(
             cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
         end
     end
-    
     if !isempty(compiled_dir)
         @info "Converting tz source files into TimeZone data"
         tz_source = TZSource(joinpath.(tz_source_dir, regions))

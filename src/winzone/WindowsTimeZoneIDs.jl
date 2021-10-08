@@ -1,7 +1,7 @@
 module WindowsTimeZoneIDs
 
 using LazyArtifacts
-using ...TimeZones: @artifact_str, DEPS_DIR
+using ...TimeZones: DEPS_DIR, @artifact_str
 using Future: copy!
 
 
