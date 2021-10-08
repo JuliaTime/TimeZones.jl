@@ -54,7 +54,6 @@ end
 # - https://github.com/JuliaLang/julia/issues/30901
 # - https://github.com/JuliaLang/julia/pull/33178
 if (
-    v"1.2.0-DEV.223" <= VERSION < v"1.2.0-pre.39" ||
     v"1.3-DEV" <= VERSION < v"1.3.0-rc1.33" ||
     v"1.4-DEV" <= VERSION < v"1.4.0-DEV.620" ||
     v"1.5.0-DEV.163" <= VERSION

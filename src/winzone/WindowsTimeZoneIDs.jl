@@ -1,12 +1,9 @@
 module WindowsTimeZoneIDs
 
-using ...TimeZones: DEPS_DIR
+using LazyArtifacts
+using ...TimeZones: @artifact_str, DEPS_DIR
 using Future: copy!
 
-if VERSION >= v"1.3"
-    using LazyArtifacts
-    using ...TimeZones: @artifact_str
-end
 
 const UNICODE_CLDR_VERSION = "release-39"
 

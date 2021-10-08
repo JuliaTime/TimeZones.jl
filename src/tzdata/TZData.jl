@@ -2,13 +2,11 @@ module TZData
 
 using Printf
 using ...TimeZones: DEPS_DIR
+using ...TimeZones: @artifact_str
 
 import Pkg
+using Pkg.Artifacts: artifact_hash
 
-if VERSION >= v"1.3"
-    using ...TimeZones: @artifact_str
-    using Pkg.Artifacts: artifact_hash
-end
 
 # Note: The tz database is made up of two parts: code and data. TimeZones.jl only requires
 # the "tzdata" archive or more specifically the "tz source" files within the archive
