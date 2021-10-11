@@ -49,12 +49,7 @@ end
 function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
     if !isfile(xml_file) || force
         @info "Downloading Windows to POSIX timezone ID XML version: $UNICODE_CLDR_VERSION"
-        @static if VERSION >= v"1.3"
-            artifact_dir = @artifact_str "unicode-cldr-$UNICODE_CLDR_VERSION"
-            cp(joinpath(artifact_dir, WINDOWS_ZONE_FILE), xml_file, force=true)
-        else
-            download(WINDOWS_ZONE_URL, xml_file)
-        end
+        download(WINDOWS_ZONE_URL, xml_file)
     end
 
     @info "Compiling Windows time zone name translation"
