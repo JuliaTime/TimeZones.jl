@@ -24,7 +24,6 @@ const REGIONS = [STANDARD_REGIONS; LEGACY_REGIONS]
 function build(
     version::AbstractString,
     regions::AbstractVector{<:AbstractString},
-    archive_dir::AbstractString,
     tz_source_dir::AbstractString="",
     compiled_dir::AbstractString="";
     verbose::Bool=false,
@@ -69,7 +68,6 @@ function build(
 end
 
 function build(version::AbstractString=tzdata_version())
-    isdir(ARCHIVE_DIR) || mkpath(ARCHIVE_DIR)
     isdir(TZ_SOURCE_DIR) || mkpath(TZ_SOURCE_DIR)
     isdir(COMPILED_DIR) || mkpath(COMPILED_DIR)
 
@@ -79,9 +77,7 @@ function build(version::AbstractString=tzdata_version())
         rm(joinpath(COMPILED_DIR, file), recursive=true)
     end
 
-    version = build(
-        version, REGIONS, ARCHIVE_DIR, TZ_SOURCE_DIR, COMPILED_DIR, verbose=true,
-    )
+    version = build(version, REGIONS, TZ_SOURCE_DIR, COMPILED_DIR, verbose=true)
 
     # Store the version of the compiled tzdata
     write(ACTIVE_VERSION_FILE, version)
