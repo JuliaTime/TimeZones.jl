@@ -9,7 +9,6 @@ end
 ## TZData
 
 ```@docs
-TimeZones.TZData.tzdata_url
 TimeZones.TZData.tzdata_version_dir
 TimeZones.TZData.tzdata_version_archive
 TimeZones.TZData.read_news

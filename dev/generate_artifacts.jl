@@ -5,7 +5,7 @@ using Inflate: inflate_gzip
 using Pkg.Artifacts
 using SHA: sha256
 using Tar: Tar
-using TimeZones.TZData: tzdata_url, tzdata_versions
+using TimeZones.TZData: tzdata_versions
 
 
 # Code loosely based upon: https://julialang.github.io/Pkg.jl/dev/artifacts/#Using-Artifacts-1
@@ -45,7 +45,8 @@ function update_artifacts!(artifacts_toml::String)
     versions = tzdata_versions()
     for version in versions
         artifact_name = "tzdata$version"
-        bind_artifact_url!(artifacts_toml, artifact_name, tzdata_url(version))
+        url = "https://data.iana.org/time-zones/releases/tzdata$version.tar.gz"
+        bind_artifact_url!(artifacts_toml, artifact_name, url)
     end
     latest_tzdata = last(versions)
 
