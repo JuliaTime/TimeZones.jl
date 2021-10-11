@@ -9,7 +9,6 @@ const UNICODE_CLDR_VERSION = "release-39"
 # A mapping of Windows timezone names to Olson timezone names.
 # Details on the contents of this file can be found at:
 # http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping
-const WINDOWS_ZONE_URL = "https://raw.githubusercontent.com/unicode-org/cldr/$UNICODE_CLDR_VERSION/common/supplemental/windowsZones.xml"
 const WINDOWS_ZONE_FILE = joinpath("cldr-$UNICODE_CLDR_VERSION", "common", "supplemental", "windowsZones.xml")
 
 const WINDOWS_XML_DIR = joinpath(DEPS_DIR, "local")
@@ -49,7 +48,8 @@ end
 function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
     if !isfile(xml_file) || force
         @info "Downloading Windows to POSIX timezone ID XML version: $UNICODE_CLDR_VERSION"
-        download(WINDOWS_ZONE_URL, xml_file)
+        artifact_dir = @artifact_str "unicode-cldr-$UNICODE_CLDR_VERSION"
+        cp(joinpath(artifact_dir, WINDOWS_ZONE_FILE), xml_file, force=true)
     end
 
     @info "Compiling Windows time zone name translation"
