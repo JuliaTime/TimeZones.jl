@@ -60,13 +60,8 @@ julia> last(tzdata_versions())  # Current latest available tzdata version
 ```
 """
 function tzdata_versions()
-    releases_file = download("https://data.iana.org/time-zones/releases/")
-
-    html = try
-        read(releases_file, String)
-    finally
-        rm(releases_file)
-    end
+    io = download("https://data.iana.org/time-zones/releases/", IOBuffer())
+    html = String(take!(io))
 
     versions = [
         m[:version]
@@ -80,65 +75,19 @@ function tzdata_versions()
 end
 
 """
-    tzdata_url(version="latest") -> AbstractString
+    tzdata_latest_version() -> String
 
-Generates a HTTPS URL for the specified tzdata version. Typical version strings are
-formatted as 4-digit year followed by a lowercase ASCII letter. Available versions start
-with "tzdata" and are listed on "https://data.iana.org/time-zones/releases/" or
-"ftp://ftp.iana.org/tz/releases/".
-
-# Examples
-```julia
-julia> tzdata_url("2017a")
-"https://data.iana.org/time-zones/releases/tzdata2017a.tar.gz"
-```
+Determine the latest version of tzdata available while limiting how often we check with
+remote servers.
 """
-function tzdata_url(version::AbstractString="latest")
-    # Note: We could also support FTP but the IANA server is unreliable and likely
-    # to break if working from behind a firewall.
-    if version == "latest"
-        "https://data.iana.org/time-zones/tzdata-latest.tar.gz"
-    else
-        "https://data.iana.org/time-zones/releases/tzdata$version.tar.gz"
-    end
-end
+function tzdata_latest_version()
+    latest_version = latest_cached()
 
-"""
-    tzdata_download(version="latest", dir=tempdir()) -> AbstractString
-
-Downloads a tzdata archive from IANA using the specified `version` to the specified
-directory. See `tzdata_url` for details on tzdata version strings.
-"""
-function tzdata_download(version::AbstractString="latest", dir::AbstractString=tempdir())
-    now_utc = now(Dates.UTC)
-    if version == "latest"
-        latest_version = latest_cached(now_utc)
-        if latest_version !== nothing
-            archive = joinpath(dir, "tzdata$(latest_version).tar.gz")
-            isfile(archive) && return archive
-        end
+    # Retrieve the current latest version the cached latest has expired
+    if latest_version === nothing
+        latest_version = last(tzdata_versions())
+        set_latest_cached(latest_version)
     end
 
-    url = tzdata_url(version)
-    archive = download(url, joinpath(dir, basename(url)))  # Overwrites the local file if any
-
-    # Note: An "HTTP 404 Not Found" may result in the 404 page being downloaded. Also,
-    # catches issues with corrupt archives
-    if !isarchive(archive)
-        rm(archive)
-        error("Unable to download $version tzdata")
-    end
-
-    # Rename the file to have an explicit version
-    if version == "latest"
-        version = tzdata_version_archive(archive)
-
-        archive_versioned = joinpath(dir, "tzdata$version.tar.gz")
-        mv(archive, archive_versioned, force=true)
-        archive = archive_versioned
-
-        set_latest_cached(version, now_utc)
-    end
-
-    return archive
+    return latest_version
 end
