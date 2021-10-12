@@ -60,13 +60,8 @@ julia> last(tzdata_versions())  # Current latest available tzdata version
 ```
 """
 function tzdata_versions()
-    releases_file = download("https://data.iana.org/time-zones/releases/")
-
-    html = try
-        read(releases_file, String)
-    finally
-        rm(releases_file)
-    end
+    io = download("https://data.iana.org/time-zones/releases/", IOBuffer())
+    html = String(take!(io))
 
     versions = [
         m[:version]
