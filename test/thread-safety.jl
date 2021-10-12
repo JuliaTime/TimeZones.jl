@@ -63,7 +63,7 @@ end
 
 @info "Running Thread Safety tests"
 @testset "Multithreaded TimeZone construction" begin
-    withenv("JULIA_NUM_THREADS"=>"8") do
+    withenv("JULIA_NUM_THREADS" => "8") do
         run(`$(Base.julia_cmd()) --proj -E $(program)`)
     end
 end
