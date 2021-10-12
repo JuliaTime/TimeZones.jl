@@ -78,3 +78,21 @@ function tzdata_versions()
 
     return versions
 end
+
+"""
+    tzdata_latest_version() -> String
+
+Determine the latest version of tzdata available while limiting how often we check with
+remote servers.
+"""
+function tzdata_latest_version()
+    latest_version = latest_cached()
+
+    # Retrieve the current latest version the cached latest has expired
+    if latest_version === nothing
+        latest_version = last(tzdata_versions())
+        set_latest_cached(latest_version)
+    end
+
+    return latest_version
+end

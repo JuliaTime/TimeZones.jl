@@ -28,25 +28,13 @@ function build(
     compiled_dir::AbstractString="";
     verbose::Bool=false,
 )
-
-    # Determine the current "latest" version but limit how often we check with remote
-    # servers.
     if version == "latest"
-        latest_version = latest_cached()
+        version = tzdata_latest_version()
+        tzdata_hash = artifact_hash("tzdata$latest_version", ARTIFACT_TOML)
 
-        # Retrieve the current latest version the cached latest has expired
-        if latest_version === nothing
-            latest_version = last(tzdata_versions())
-            tzdata_hash = artifact_hash("tzdata$latest_version", ARTIFACT_TOML)
-
-            if tzdata_hash === nothing
-                error("Latest tzdata is $latest_version which is not present in the Artifacts.toml")
-            end
-
-            set_latest_cached(latest_version)
+        if tzdata_hash === nothing
+            error("Latest tzdata is $latest_version which is not present in the Artifacts.toml")
         end
-
-        version = latest_version
     end
 
     artifact_dir = @artifact_str "tzdata$version"
