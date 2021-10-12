@@ -63,7 +63,10 @@ end
 
 @info "Running Thread Safety tests"
 @testset "Multithreaded TimeZone construction" begin
-    withenv("JULIA_NUM_THREADS" => "8") do
+    # Workaround for Apple Silicon hanging when using 8 threads
+    nthreads = first(Sys.cpu_info()).model == "Apple M1" ? 7 : 8
+
+    withenv("JULIA_NUM_THREADS" => nthreads) do
         run(`$(Base.julia_cmd()) --proj -E $(program)`)
     end
 end
