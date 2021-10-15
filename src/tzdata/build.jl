@@ -30,10 +30,10 @@ function build(
 )
     if version == "latest"
         version = tzdata_latest_version()
-        tzdata_hash = artifact_hash("tzdata$latest_version", ARTIFACT_TOML)
+        tzdata_hash = artifact_hash("tzdata$version", ARTIFACT_TOML)
 
         if tzdata_hash === nothing
-            error("Latest tzdata is $latest_version which is not present in the Artifacts.toml")
+            error("Latest tzdata is $version which is not present in the Artifacts.toml")
         end
     end
 
