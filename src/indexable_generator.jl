@@ -12,3 +12,6 @@ Base.ndims(ig::IndexableGenerator) = ndims(ig.g)
 
 Base.getindex(ig::IndexableGenerator, i::Integer) = ig.g.f(ig.g.iter[i])
 Base.lastindex(ig::IndexableGenerator) = lastindex(ig.g.iter)
+
+# Required for compatibility with: https://github.com/JuliaLang/julia/pull/42991
+Base.last(ig::IndexableGenerator) = ig[end]
