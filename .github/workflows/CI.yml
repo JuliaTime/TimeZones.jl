@@ -75,7 +75,7 @@ jobs:
     name: Benchmarks
     runs-on: ubuntu-latest
     strategy:
-      fast-fail: false
+      fail-fast: false
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
