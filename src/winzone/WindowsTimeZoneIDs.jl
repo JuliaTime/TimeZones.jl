@@ -1,7 +1,7 @@
 module WindowsTimeZoneIDs
 
 using LazyArtifacts
-using ...TimeZones: DEPS_DIR, @artifact_str
+using ...TimeZones: DEPS_DIR
 
 const UNICODE_CLDR_VERSION = "release-40"
 

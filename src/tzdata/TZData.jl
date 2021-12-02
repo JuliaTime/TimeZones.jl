@@ -1,12 +1,8 @@
 module TZData
 
+using LazyArtifacts
 using Printf
 using ...TimeZones: DEPS_DIR
-using ...TimeZones: @artifact_str
-
-import Pkg
-using Pkg.Artifacts: artifact_hash
-
 
 # Note: The tz database is made up of two parts: code and data. TimeZones.jl only requires
 # the "tzdata" archive or more specifically the "tz source" files within the archive
@@ -24,6 +20,5 @@ include("version.jl")
 include("download.jl")
 include("compile.jl")
 include("build.jl")
-include("deprecated.jl")
 
 end

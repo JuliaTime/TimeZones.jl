@@ -45,25 +45,8 @@ end
 @test sprint(show_compact, UTCOffset(0, 0)) == "UTC+0/+0"
 @test sprint(show_compact, UTCOffset(3600, 7200)) == "UTC+1/+2"
 
-# Added: https://github.com/JuliaLang/julia/pull/30817
-# Reverted for v1.2.0-rc1: https://github.com/JuliaLang/julia/pull/31727
-# Reverted for v1.3.0-rc2: https://github.com/JuliaLang/julia/pull/32973
-# Reverted for v1.4.0-DEV.620: https://github.com/JuliaLang/julia/pull/34116
-# Re-introduced in 1.5.0-DEV.163: https://github.com/JuliaLang/julia/pull/34387
-# Discussions:
-# - https://github.com/JuliaLang/julia/issues/30901
-# - https://github.com/JuliaLang/julia/pull/33178
-if (
-    v"1.3-DEV" <= VERSION < v"1.3.0-rc1.33" ||
-    v"1.4-DEV" <= VERSION < v"1.4.0-DEV.620" ||
-    v"1.5.0-DEV.163" <= VERSION
-)
-    @test sprint(show, UTCOffset(0, 0)) == "UTCOffset(Second(0), Second(0))"
-    @test sprint(show, UTCOffset(3600, 7200)) == "UTCOffset(Second(3600), Second(7200))"
-else
-    @test sprint(show, UTCOffset(0, 0)) == "UTCOffset(0 seconds, 0 seconds)"
-    @test sprint(show, UTCOffset(3600, 7200)) == "UTCOffset(3600 seconds, 7200 seconds)"
-end
+@test sprint(show, UTCOffset(0, 0)) == "UTCOffset(Second(0), Second(0))"
+@test sprint(show, UTCOffset(3600, 7200)) == "UTCOffset(Second(3600), Second(7200))"
 
 @test sprint(show, MIME("text/plain"), UTCOffset(0, 0)) == "UTC+0/+0"
 @test sprint(show, MIME("text/plain"), UTCOffset(3600, 7200)) == "UTC+1/+2"

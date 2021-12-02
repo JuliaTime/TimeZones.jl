@@ -53,7 +53,6 @@ function __init__()
     global ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
 end
 
-include("compat.jl")
 include("utils.jl")
 include("indexable_generator.jl")
 
