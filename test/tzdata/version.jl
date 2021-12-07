@@ -1,4 +1,4 @@
-using TimeZones: @artifact_str
+using LazyArtifacts: @artifact_str
 using TimeZones.TZData: TZDATA_VERSION_REGEX, TZDATA_NEWS_REGEX
 using TimeZones.TZData: read_news, tzdata_version_dir, tzdata_version_archive
 using TimeZones.TZData: active_version, active_archive
