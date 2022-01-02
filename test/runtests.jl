@@ -4,7 +4,7 @@ using RecipesBase
 using Test
 using TimeZones
 using TimeZones: PKG_DIR
-using TimeZones.TZData: ARCHIVE_DIR, TZSource, compile, build
+using TimeZones.TZData: TZSource, compile, build
 using Unicode
 
 Mocking.activate()
@@ -15,17 +15,11 @@ const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(PKG_DIR, "test", "tzsou
 const TZFILE_DIR = joinpath(PKG_DIR, "test", "tzfile")
 const TEST_REGIONS = ["asia", "australasia", "europe", "northamerica"]
 
-# https://github.com/JuliaLang/julia/pull/27900
-if VERSION < v"1.2.0-DEV.642"
-    const ProcessFailedException = ErrorException
-end
-
-isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
 isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)
 
 # By default use a specific version of the tz database so we just testing for TimeZones.jl
 # changes and not changes to the tzdata.
-build(TZDATA_VERSION, TEST_REGIONS, ARCHIVE_DIR, TZ_SOURCE_DIR)
+build(TZDATA_VERSION, TEST_REGIONS, TZ_SOURCE_DIR)
 
 # For testing we'll reparse the tzdata every time to instead of using the serialized data.
 # This should make the development/testing cycle simplier since you won't be forced to
@@ -46,7 +40,6 @@ include("helpers.jl")
 
     include("class.jl")
     include(joinpath("tzdata", "timeoffset.jl"))
-    include(joinpath("tzdata", "archive.jl"))
     include(joinpath("tzdata", "version.jl"))
     include(joinpath("tzdata", "download.jl"))
     include(joinpath("tzdata", "compile.jl"))
@@ -72,7 +65,7 @@ include("helpers.jl")
     include("rounding.jl")
     include("parse.jl")
     include("plotting.jl")
-    VERSION >= v"1.3" && include("thread-safety.jl")
+    include("thread-safety.jl")
 
     # Note: Run the build tests last to ensure that re-compiling the time zones files
     # doesn't interfere with other tests.

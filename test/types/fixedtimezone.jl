@@ -1,4 +1,6 @@
 @testset "FixedTimeZone" begin
+    @test isbitstype(FixedTimeZone)
+
     @test FixedTimeZone("0123") == FixedTimeZone("UTC+01:23", 4980)
     @test FixedTimeZone("+0123") == FixedTimeZone("UTC+01:23", 4980)
     @test FixedTimeZone("-0123") == FixedTimeZone("UTC-01:23", -4980)

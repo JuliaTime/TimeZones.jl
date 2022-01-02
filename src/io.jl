@@ -92,7 +92,7 @@ function Base.show(io::IO, tz::VariableTimeZone)
 end
 
 function Base.show(io::IO, t::Transition)
-    if get(io, :compact, false) || get(io, :compact_el, false)
+    if get(io, :compact, false)
         print(io, t)
     else
         # Fallback to calling the default show instead of reimplementing it.
@@ -101,24 +101,20 @@ function Base.show(io::IO, t::Transition)
 end
 
 function Base.show(io::IO, zdt::ZonedDateTime)
-    if VERSION <= v"1.5.0-DEV.163" && get(io, :compact_el, false)
-        print(io, zdt)
-    else
-        values = [
-            yearmonthday(zdt)...
-            hour(zdt)
-            minute(zdt)
-            second(zdt)
-            millisecond(zdt)
-        ]
-        index = something(findlast(!iszero, values), 1)
-        params = [
-            map(repr, values[1:index]);
-            repr(timezone(zdt); context=:compact => true)
-        ]
+    values = [
+        yearmonthday(zdt)...
+        hour(zdt)
+        minute(zdt)
+        second(zdt)
+        millisecond(zdt)
+    ]
+    index = something(findlast(!iszero, values), 1)
+    params = [
+        map(repr, values[1:index]);
+        repr(timezone(zdt); context=:compact => true)
+    ]
 
-        print(io, ZonedDateTime, "(", join(params, ", "), ")")
-    end
+    print(io, ZonedDateTime, "(", join(params, ", "), ")")
 end
 
 
@@ -127,17 +123,4 @@ Base.show(io::IO, ::MIME"text/plain", tz::TimeZone) = print(IOContext(io, :compa
 Base.show(io::IO, ::MIME"text/plain", zdt::ZonedDateTime) = print(io, zdt)
 
 # https://github.com/JuliaLang/julia/pull/33290
-if VERSION >= v"1.5.0-DEV.224"
-    Base.typeinfo_implicit(::Type{ZonedDateTime}) = true
-end
-
-# Use compact printing on certain element types for Julia versions before:
-# https://github.com/JuliaLang/julia/pull/34387
-if VERSION <= v"1.5.0-DEV.163"
-    function Base.show(io::IO, m::MIME"text/plain", X::AbstractArray{T}) where T <: Union{Transition, ZonedDateTime}
-        # Specify a custom IO context which we can use to perform compact printing of
-        # elements.
-        io = IOContext(io, :compact_el => true)
-        invoke(show, Tuple{IO, MIME"text/plain", AbstractArray}, io, m, X)
-    end
-end
+Base.typeinfo_implicit(::Type{ZonedDateTime}) = true

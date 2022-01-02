@@ -5,6 +5,7 @@ using Printf
 using Serialization
 using RecipesBase: RecipesBase, @recipe
 using Unicode
+using InlineStrings: InlineString15
 
 # TODO: Use Compat.@lock instead after https://github.com/JuliaLang/Compat.jl/issues/762.
 if VERSION >= v"1.3-"
@@ -69,7 +70,6 @@ function __init__()
     global ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
 end
 
-include("compat.jl")
 include("utils.jl")
 include("indexable_generator.jl")
 

@@ -1782,6 +1782,38 @@ lazy = true
     sha256 = "39e7d2ba08c68cbaefc8de3227aab0dec2521be8042cf56855f7dc3a9fb14e08"
     url = "https://data.iana.org/time-zones/releases/tzdata2021a.tar.gz"
 
+[tzdata2021b]
+git-tree-sha1 = "a1435b8e2d4048e771e9d5e161447f5d8e880221"
+lazy = true
+
+    [[tzdata2021b.download]]
+    sha256 = "53d9e6dbdb59dffe2b7bff59d140148181386c06e175fa69eaeb4cc83bc3deb7"
+    url = "https://data.iana.org/time-zones/releases/tzdata2021b.tar.gz"
+
+[tzdata2021c]
+git-tree-sha1 = "4af568c231533aebf764ec76d852aa746cc40c17"
+lazy = true
+
+    [[tzdata2021c.download]]
+    sha256 = "b4f1d1c8cb11c3500276dac862d8c7e6f88c69b1e8ee4c5e9d1daad17fbe3542"
+    url = "https://data.iana.org/time-zones/releases/tzdata2021c.tar.gz"
+
+[tzdata2021d]
+git-tree-sha1 = "2ba1f3280e466ed64def0dd4a74a0a2f1322ab55"
+lazy = true
+
+    [[tzdata2021d.download]]
+    sha256 = "d7c188a2b33d4a3c25ee4a9fdc68c1ff462bfdb302cf41343d84ca5942dbddf6"
+    url = "https://data.iana.org/time-zones/releases/tzdata2021d.tar.gz"
+
+[tzdata2021e]
+git-tree-sha1 = "ea98b1f1035a0cf1f1f6ab1953b255d049a2ad12"
+lazy = true
+
+    [[tzdata2021e.download]]
+    sha256 = "07ec42b737d0d3c6be9c337f8abb5f00554a0f9cc4fcf01a703d69403b6bb2b1"
+    url = "https://data.iana.org/time-zones/releases/tzdata2021e.tar.gz"
+
 [tzdata93g]
 git-tree-sha1 = "e7ddeb4a45080afa6dbdd7c38df81bcf8b9d8f1a"
 lazy = true
@@ -2013,3 +2045,11 @@ lazy = true
     [[unicode-cldr-release-39.download]]
     sha256 = "baca3b9d6103a05c823d331e884626926a508d874e0d7ea0ff08d6eaf3534628"
     url = "https://github.com/unicode-org/cldr/archive/release-39.tar.gz"
+
+[unicode-cldr-release-40]
+git-tree-sha1 = "8d7201f06ff8061c1b5bff0f661b5297ec1d3158"
+lazy = true
+
+    [[unicode-cldr-release-40.download]]
+    sha256 = "580cbe09e2bb97369d63a5b641e8f4bef76a585efdf7ccddc65130b0ffb579e2"
+    url = "https://github.com/unicode-org/cldr/archive/release-40.tar.gz"

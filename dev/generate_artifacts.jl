@@ -1,10 +1,12 @@
 using Base: SHA1
 using JSON: JSON
 using HTTP: HTTP
-using Pkg.GitTools: tree_hash
+using Inflate: inflate_gzip
 using Pkg.Artifacts
 using SHA: sha256
-using TimeZones.TZData: extract, tzdata_url, tzdata_versions
+using Tar: Tar
+using TimeZones.TZData: tzdata_versions
+
 
 # Code loosely based upon: https://julialang.github.io/Pkg.jl/dev/artifacts/#Using-Artifacts-1
 function bind_artifact_url!(artifacts_toml::String, name::String, url::String)
@@ -23,11 +25,7 @@ function bind_artifact_url!(artifacts_toml::String, name::String, url::String)
             # Compute the `git-tree-sha1`. Usually this is computed via
             # `create_artifact` but we want to avoid actually storing this data as an
             # artifact.
-            # Alternatively: `Tar.tree_hash(IOBuffer(inflate_gzip(archive)))`
-            artifact_hash = mktempdir() do temp_dir
-                extract(archive, temp_dir)
-                SHA1(tree_hash(temp_dir))
-            end
+            artifact_hash = SHA1(Tar.tree_hash(IOBuffer(inflate_gzip(archive))))
 
             bind_artifact!(
                 artifacts_toml,
@@ -47,7 +45,8 @@ function update_artifacts!(artifacts_toml::String)
     versions = tzdata_versions()
     for version in versions
         artifact_name = "tzdata$version"
-        bind_artifact_url!(artifacts_toml, artifact_name, tzdata_url(version))
+        url = "https://data.iana.org/time-zones/releases/tzdata$version.tar.gz"
+        bind_artifact_url!(artifacts_toml, artifact_name, url)
     end
     latest_tzdata = last(versions)
 
