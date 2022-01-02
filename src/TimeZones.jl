@@ -7,22 +7,7 @@ using RecipesBase: RecipesBase, @recipe
 using Unicode
 using InlineStrings: InlineString15
 
-# TODO: Use Compat.@lock instead after https://github.com/JuliaLang/Compat.jl/issues/762.
-if VERSION >= v"1.3-"
-    using Base: @lock
-else
-    macro lock(l, e)
-        quote
-            ll = $(esc(l));
-            $lock(ll);
-            try
-                $(esc(e))
-            finally
-                $unlock(ll)
-            end
-        end
-    end
-end
+using Base: @lock
 
 import Dates: TimeZone, UTC
 
