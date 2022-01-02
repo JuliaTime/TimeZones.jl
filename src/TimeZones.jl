@@ -6,6 +6,7 @@ using Serialization
 using RecipesBase: RecipesBase, @recipe
 using Unicode
 
+# TODO: Use Compat.@lock instead after https://github.com/JuliaLang/Compat.jl/issues/762.
 if VERSION >= v"1.3-"
     using Base: @lock
 else

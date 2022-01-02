@@ -103,7 +103,7 @@ function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
         if constructing
             tz_path = joinpath(TZData.COMPILED_DIR, split(str, "/")...)
 
-            tz = if isfile(tz_path)
+            t = if isfile(tz_path)
                 open(deserialize, tz_path, "r")
             elseif occursin(FIXED_TIME_ZONE_REGEX, str)
                 FixedTimeZone(str), Class(:FIXED)
@@ -117,7 +117,7 @@ function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
                 throw(ArgumentError("Unknown time zone \"$str\""))
             end
 
-            put!(future, tz)
+            put!(future, t)
         else
             fetch(future)
         end
