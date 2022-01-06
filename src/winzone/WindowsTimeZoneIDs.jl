@@ -53,6 +53,8 @@ function build(xml_file::AbstractString; force::Bool=false)
 end
 
 function build(; kwargs...)
+    # Note: Directory creation during package initialization can cause failures when using
+    # PackageCompiler.jl: https://github.com/JuliaTime/TimeZones.jl/issues/371
     isdir(WINDOWS_XML_DIR) || mkdir(WINDOWS_XML_DIR)
     return build(WINDOWS_XML_FILE; kwargs...)
 end
