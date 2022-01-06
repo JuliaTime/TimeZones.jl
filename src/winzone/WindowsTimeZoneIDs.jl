@@ -16,15 +16,12 @@ const WINDOWS_XML_FILE = joinpath(WINDOWS_XML_DIR, "windowsZones.xml")
 const WINDOWS_TRANSLATION = Dict{String, String}()
 
 function __init__()
-    isdir(WINDOWS_XML_DIR) || mkdir(WINDOWS_XML_DIR)
-
     if isfile(WINDOWS_XML_FILE)
         copy!(WINDOWS_TRANSLATION, compile(WINDOWS_XML_FILE))
     end
 end
 
 function compile(xml_file::AbstractString)
-
     translation = Dict{String,String}()
 
     # Get the timezone conversions from the file
@@ -44,7 +41,7 @@ function compile(xml_file::AbstractString)
     return translation
 end
 
-function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
+function build(xml_file::AbstractString; force::Bool=false)
     if !isfile(xml_file) || force
         @info "Downloading Windows to POSIX timezone ID XML version: $UNICODE_CLDR_VERSION"
         artifact_dir = @artifact_str "unicode-cldr-$UNICODE_CLDR_VERSION"
@@ -53,6 +50,11 @@ function build(xml_file::AbstractString=WINDOWS_XML_FILE; force::Bool=false)
 
     @info "Compiling Windows time zone name translation"
     copy!(WINDOWS_TRANSLATION, compile(xml_file))
+end
+
+function build(; kwargs...)
+    isdir(WINDOWS_XML_DIR) || mkdir(WINDOWS_XML_DIR)
+    return build(WINDOWS_XML_FILE; kwargs...)
 end
 
 end
