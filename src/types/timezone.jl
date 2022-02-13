@@ -7,8 +7,8 @@ const THREAD_TZ_CACHES = Vector{Dict{String,Tuple{TimeZone,Class}}}()
 # Holding a lock during construction of a specific TimeZone prevents multiple Tasks (on the
 # same or different threads) from attempting to construct the same TimeZone object, and
 # allows them all to share the result.
-const tz_cache_mutex = ReentrantLock()
-const TZ_CACHE_FUTURES = Dict{String,Channel{Tuple{TimeZone,Class}}}()  # Guarded by: tz_cache_mutex
+const TZ_CACHE_MUTEX = ReentrantLock()
+const TZ_CACHE_FUTURES = Dict{String,Channel{Tuple{TimeZone,Class}}}()  # Guarded by: TZ_CACHE_MUTEX
 
 # Based upon the thread-safe Global RNG implementation in the Random stdlib:
 # https://github.com/JuliaLang/julia/blob/e4fcdf5b04fd9751ce48b0afc700330475b42443/stdlib/Random/src/RNGs.jl#L369-L385
@@ -25,7 +25,7 @@ const TZ_CACHE_FUTURES = Dict{String,Channel{Tuple{TimeZone,Class}}}()  # Guarde
 end
 @noinline _tz_cache_length_assert() = @assert false "0 < tid <= length(THREAD_TZ_CACHES)"
 
-function _tz_cache_init()
+function _init_tz_cache()
     resize!(empty!(THREAD_TZ_CACHES), Threads.nthreads())
 end
 # ensures that we didn't save a bad object
@@ -36,7 +36,7 @@ function _reset_tz_cache()
         @assert Threads.threadid() === i "TimeZones.TZData.compile() must be called from the main, top-level Task."
         empty!(_tz_cache())
     end
-    @lock tz_cache_mutex begin
+    @lock TZ_CACHE_MUTEX begin
         empty!(TZ_CACHE_FUTURES)
     end
     return nothing
@@ -94,7 +94,7 @@ function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
         constructing = false
         # We lock the mutex, but for only a short, *constant time* duration, to grab the
         # future for this TimeZone, or create the future if it doesn't exist.
-        future = @lock tz_cache_mutex begin
+        future = @lock TZ_CACHE_MUTEX begin
             get!(TZ_CACHE_FUTURES, str) do
                 constructing = true
                 Channel{Tuple{TimeZone,Class}}(1)
