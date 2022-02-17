@@ -4,6 +4,12 @@
 # to the cache, while still being thread-safe.
 const THREAD_TZ_CACHES = Vector{Dict{String,Tuple{TimeZone,Class}}}()
 
+# Holding a lock during construction of a specific TimeZone prevents multiple Tasks (on the
+# same or different threads) from attempting to construct the same TimeZone object, and
+# allows them all to share the result.
+const TZ_CACHE_MUTEX = ReentrantLock()
+const TZ_CACHE_FUTURES = Dict{String,Channel{Tuple{TimeZone,Class}}}()  # Guarded by: TZ_CACHE_MUTEX
+
 # Based upon the thread-safe Global RNG implementation in the Random stdlib:
 # https://github.com/JuliaLang/julia/blob/e4fcdf5b04fd9751ce48b0afc700330475b42443/stdlib/Random/src/RNGs.jl#L369-L385
 @inline _tz_cache() = _tz_cache(Threads.threadid())
@@ -19,9 +25,21 @@ const THREAD_TZ_CACHES = Vector{Dict{String,Tuple{TimeZone,Class}}}()
 end
 @noinline _tz_cache_length_assert() = @assert false "0 < tid <= length(THREAD_TZ_CACHES)"
 
-function _reset_tz_cache()
-    # ensures that we didn't save a bad object
+function _init_tz_cache()
     resize!(empty!(THREAD_TZ_CACHES), Threads.nthreads())
+end
+# ensures that we didn't save a bad object
+function _reset_tz_cache()
+    # Since we use thread-local caches, we spawn a task on _each thread_ to clear that
+    # thread's local cache.
+    Threads.@threads for i in 1:Threads.nthreads()
+        @assert Threads.threadid() === i "TimeZones.TZData.compile() must be called from the main, top-level Task."
+        empty!(_tz_cache())
+    end
+    @lock TZ_CACHE_MUTEX begin
+        empty!(TZ_CACHE_FUTURES)
+    end
+    return nothing
 end
 
 """
@@ -68,20 +86,40 @@ function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
     # Note: If the class `mask` does not match the time zone we'll still load the
     # information into the cache to ensure the result is consistent.
     tz, class = get!(_tz_cache(), str) do
-        tz_path = joinpath(TZData.COMPILED_DIR, split(str, "/")...)
+        # Even though we're using Thread-local caches, we still need to lock during
+        # construction to prevent multiple tasks redundantly constructing the same object,
+        # and potential thread safety violations due to Tasks migrating threads.
+        # NOTE that we only grab the lock if the TZ doesn't exist, so the mutex contention
+        # is not on the critical path for most constructors. :)
+        constructing = false
+        # We lock the mutex, but for only a short, *constant time* duration, to grab the
+        # future for this TimeZone, or create the future if it doesn't exist.
+        future = @lock TZ_CACHE_MUTEX begin
+            get!(TZ_CACHE_FUTURES, str) do
+                constructing = true
+                Channel{Tuple{TimeZone,Class}}(1)
+            end
+        end
+        if constructing
+            tz_path = joinpath(TZData.COMPILED_DIR, split(str, "/")...)
 
-        if isfile(tz_path)
-            open(deserialize, tz_path, "r")
-        elseif occursin(FIXED_TIME_ZONE_REGEX, str)
-            FixedTimeZone(str), Class(:FIXED)
-        elseif !isdir(TZData.COMPILED_DIR) || isempty(readdir(TZData.COMPILED_DIR))
-            # Note: Julia 1.0 supresses the build logs which can hide issues in time zone
-            # compliation which result in no tzdata time zones being available.
-            throw(ArgumentError(
-                "Unable to find time zone \"$str\". Try running `TimeZones.build()`."
-            ))
+            t = if isfile(tz_path)
+                open(deserialize, tz_path, "r")
+            elseif occursin(FIXED_TIME_ZONE_REGEX, str)
+                FixedTimeZone(str), Class(:FIXED)
+            elseif !isdir(TZData.COMPILED_DIR) || isempty(readdir(TZData.COMPILED_DIR))
+                # Note: Julia 1.0 supresses the build logs which can hide issues in time zone
+                # compliation which result in no tzdata time zones being available.
+                throw(ArgumentError(
+                    "Unable to find time zone \"$str\". Try running `TimeZones.build()`."
+                ))
+            else
+                throw(ArgumentError("Unknown time zone \"$str\""))
+            end
+
+            put!(future, t)
         else
-            throw(ArgumentError("Unknown time zone \"$str\""))
+            fetch(future)
         end
     end
 

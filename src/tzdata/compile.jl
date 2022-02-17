@@ -2,7 +2,7 @@ using Dates
 using Serialization
 using Dates: parse_components
 
-using ...TimeZones: _tz_cache
+using ...TimeZones: _reset_tz_cache
 using ...TimeZones: TimeZones, TimeZone, FixedTimeZone, VariableTimeZone, Transition, Class
 using ...TimeZones: rename
 using ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET, MIN_SAVE, MAX_SAVE,
@@ -696,12 +696,7 @@ function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
     isdir(dest_dir) || error("Destination directory doesn't exist")
     # When we recompile the TimeZones from a new source, we clear all the existing cached
     # TimeZone objects, so that newly constructed objects pick up the newly compiled rules.
-    # Since we use thread-local caches, we spawn a task on _each thread_ to clear that
-    # thread's local cache.
-    Threads.@threads for i in 1:Threads.nthreads()
-        @assert Threads.threadid() === i "TimeZones.TZData.compile() must be called from the main, top-level Task."
-        empty!(_tz_cache())
-    end
+    _reset_tz_cache()
 
     for (tz, class) in results
         parts = split(TimeZones.name(tz), '/')

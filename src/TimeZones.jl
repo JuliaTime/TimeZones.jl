@@ -7,6 +7,8 @@ using RecipesBase: RecipesBase, @recipe
 using Unicode
 using InlineStrings: InlineString15
 
+using Base: @lock
+
 import Dates: TimeZone, UTC
 
 export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
@@ -40,7 +42,7 @@ abstract type Local <: TimeZone end
 
 function __init__()
     # Initialize the thread-local TimeZone cache (issue #342)
-    _reset_tz_cache()
+    _init_tz_cache()
 
     # Base extension needs to happen everytime the module is loaded (issue #24)
     Dates.CONVERSION_SPECIFIERS['z'] = TimeZone
