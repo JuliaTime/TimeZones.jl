@@ -1814,6 +1814,14 @@ lazy = true
     sha256 = "07ec42b737d0d3c6be9c337f8abb5f00554a0f9cc4fcf01a703d69403b6bb2b1"
     url = "https://data.iana.org/time-zones/releases/tzdata2021e.tar.gz"
 
+[tzdata2022a]
+git-tree-sha1 = "0a6b08679140a459a92cd574727bb18755249c48"
+lazy = true
+
+    [[tzdata2022a.download]]
+    sha256 = "ef7fffd9f4f50f4f58328b35022a32a5a056b245c5cb3d6791dddb342f871664"
+    url = "https://data.iana.org/time-zones/releases/tzdata2022a.tar.gz"
+
 [tzdata93g]
 git-tree-sha1 = "e7ddeb4a45080afa6dbdd7c38df81bcf8b9d8f1a"
 lazy = true
