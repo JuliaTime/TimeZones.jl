@@ -2,7 +2,7 @@
 # - https://man7.org/linux/man-pages/man5/tzfile.5.html
 # - ftp://ftp.iana.org/tz/code/tzfile.5.txt
 
-const TZFILE_MAX = unix2datetime(typemax(Int32))
+const TZFILE_CUTOFF = unix2datetime(typemax(Int32))
 
 # Minimum timestamps used in the tzfile format. Typically represents negative infinity.
 transition_min(::Type{Int64}) = -576460752303423488  # -2^59
@@ -143,16 +143,16 @@ function _read_tzfile(io::IO, name::AbstractString, force_version::Char='\0')
             end
         end
 
-        # tzfile's only seem to calculate transitions up to TZFILE_MAX even with version
-        # that use 64-bit values. Using a heuristic we can apply a reasonable cutoff for
-        # time zones that should probably have one.
+        # tzfile's only seem to calculate transitions up to `TZFILE_CUTOFF` even with
+        # version that use 64-bit values. Using this value as a heuristic we can set a
+        # appropriate cutoff for time zones that should probably have one.
         #
         # Note: that without knowing that additional transitions do exist beyond the last
         # stored transition we cannot determine with perfect accuracy what the cutoff should
         # be.
         cutoff = nothing
-        if DateTime(2037) <= last(transitions).utc_datetime < TZFILE_MAX
-            cutoff = TZFILE_MAX
+        if DateTime(2037) <= last(transitions).utc_datetime < TZFILE_CUTOFF
+            cutoff = TZFILE_CUTOFF
         end
 
         timezone = VariableTimeZone(name, transitions, cutoff)

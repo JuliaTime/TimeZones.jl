@@ -1,4 +1,4 @@
-using TimeZones: Transition, TZFILE_MAX
+using TimeZones: Transition, TZFILE_CUTOFF
 
 
 abbrs = b"LMT\0WSST\0SDT\0WSDT\0"  # Pacific/Apia
@@ -46,7 +46,7 @@ open(joinpath(TZFILE_DIR, "Europe", "Warsaw")) do f
     @test string(tz) == "Europe/Warsaw"
     @test first(tz.transitions).utc_datetime == DateTime(1915,8,4,22,36)
     @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
-    @test tz.cutoff == TZFILE_MAX
+    @test tz.cutoff == TZFILE_CUTOFF
     @test ==(overlap(tz.transitions, warsaw.transitions)...)
 end
 
@@ -57,7 +57,7 @@ open(joinpath(TZFILE_DIR, "Europe", "Warsaw (Version 2)")) do f
     @test string(tz) == "Europe/Warsaw"
     @test first(tz.transitions).utc_datetime == typemin(DateTime)
     @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
-    @test tz.cutoff == TZFILE_MAX
+    @test tz.cutoff == TZFILE_CUTOFF
 
     # File skips 1879-12-31T22:36:00
     @test ==(overlap(tz.transitions, warsaw.transitions[3:end])...)
@@ -69,7 +69,7 @@ open(joinpath(TZFILE_DIR, "Europe", "Warsaw (Version 2)")) do f
     @test string(tz) == "Europe/Warsaw"
     @test first(tz.transitions).utc_datetime == typemin(DateTime)
     @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
-    @test tz.cutoff == TZFILE_MAX
+    @test tz.cutoff == TZFILE_CUTOFF
     @test ==(overlap(tz.transitions, warsaw.transitions)...)
 end
 
@@ -80,7 +80,7 @@ open(joinpath(TZFILE_DIR, "America", "Godthab")) do f
     @test string(tz) == "America/Godthab"
     @test first(tz.transitions).utc_datetime == DateTime(1916,7,28,3,26,56)
     @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
-    @test tz.cutoff == TZFILE_MAX
+    @test tz.cutoff == TZFILE_CUTOFF
     @test ==(overlap(tz.transitions, godthab.transitions)...)
 end
 
@@ -91,7 +91,7 @@ open(joinpath(TZFILE_DIR, "America", "Godthab (Version 3)")) do f
     @test string(tz) == "America/Godthab"
     @test first(tz.transitions).utc_datetime == typemin(DateTime)
     @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
-    @test tz.cutoff == TZFILE_MAX
+    @test tz.cutoff == TZFILE_CUTOFF
     @test ==(overlap(tz.transitions, godthab.transitions)...)
 end
 
@@ -101,7 +101,7 @@ open(joinpath(TZFILE_DIR, "America", "Godthab (Version 3)")) do f
     @test string(tz) == "America/Godthab"
     @test first(tz.transitions).utc_datetime == typemin(DateTime)
     @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
-    @test tz.cutoff == TZFILE_MAX
+    @test tz.cutoff == TZFILE_CUTOFF
     @test ==(overlap(tz.transitions, godthab.transitions)...)
 end
 
@@ -115,7 +115,7 @@ open(joinpath(TZFILE_DIR, "Pacific", "Apia")) do f
     @test string(tz) == "Pacific/Apia"
     @test first(tz.transitions).utc_datetime == DateTime(1911,1,1,11,26,56)
     @test last(tz.transitions).utc_datetime == DateTime(2037,9,26,14)
-    @test tz.cutoff == TZFILE_MAX
+    @test tz.cutoff == TZFILE_CUTOFF
     @test ==(overlap(tz.transitions, apia.transitions)...)
 end
 
@@ -129,7 +129,7 @@ open(joinpath(TZFILE_DIR, "Europe", "Paris")) do f
     @test string(tz) == "Europe/Paris"
     @test first(tz.transitions).utc_datetime == DateTime(1911,3,10,23,51,39)
     @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
-    @test tz.cutoff == TZFILE_MAX
+    @test tz.cutoff == TZFILE_CUTOFF
 
     tz_transitions, paris_transitions = overlap(tz.transitions, paris.transitions)
 
@@ -147,7 +147,7 @@ open(joinpath(TZFILE_DIR, "Europe", "Madrid")) do f
     @test string(tz) == "Europe/Madrid"
     @test first(tz.transitions).utc_datetime == DateTime(1917,5,5,23)
     @test last(tz.transitions).utc_datetime == DateTime(2037,10,25,1)
-    @test tz.cutoff == TZFILE_MAX
+    @test tz.cutoff == TZFILE_CUTOFF
 
     tz_transitions, madrid_transitions = overlap(tz.transitions, madrid.transitions)
 
