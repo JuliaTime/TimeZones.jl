@@ -12,7 +12,7 @@ Mocking.activate()
 
 const TZDATA_VERSION = "2016j"
 const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(PKG_DIR, "test", "tzsource"))
-const TZFILE_DIR = joinpath(PKG_DIR, "test", "tzfile")
+const TZFILE_DIR = joinpath(PKG_DIR, "test", "tzfile", "data")
 const TEST_REGIONS = ["asia", "australasia", "europe", "northamerica"]
 
 isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)
@@ -54,7 +54,7 @@ include("helpers.jl")
     include("accessors.jl")
     include("arithmetic.jl")
     include("io.jl")
-    include("tzfile.jl")
+    include(joinpath("tzfile", "read.jl"))
     include("adjusters.jl")
     include("conversions.jl")
     include("ranges.jl")

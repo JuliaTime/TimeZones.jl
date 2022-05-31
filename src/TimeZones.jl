@@ -11,7 +11,7 @@ import Dates: TimeZone, UTC
 
 export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
     DateTime, Date, Time, UTC, Local, TimeError, AmbiguousTimeError, NonExistentTimeError,
-    UnhandledTimeError,
+    UnhandledTimeError, TZFile,
     # discovery.jl
     timezone_names, all_timezones, timezones_from_abbr, timezone_abbrs,
     next_transition_instant, show_next_transition,
@@ -70,7 +70,7 @@ include("interpret.jl")
 include("accessors.jl")
 include("arithmetic.jl")
 include("io.jl")
-include("tzfile.jl")
+include(joinpath("tzfile", "TZFile.jl"))
 include("adjusters.jl")
 include("conversions.jl")
 include("local.jl")
