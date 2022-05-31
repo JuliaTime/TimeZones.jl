@@ -4,6 +4,10 @@
 
 const TZFILE_MAX = unix2datetime(typemax(Int32))
 
+# Minimum timestamps used in the tzfile format. Typically represents negative infinity.
+transition_min(::Type{Int64}) = -576460752303423488  # -2^59
+transition_min(::Type{Int32}) = Int32(-2147483648)   # -2^31
+
 struct TransitionTimeInfo
     gmtoff::Int32     # tt_gmtoff
     isdst::Int8       # tt_isdst
@@ -50,9 +54,7 @@ function _read_tzfile(io::IO, name::AbstractString, force_version::Char='\0')
     tzh_charcnt = ntoh(read(io, Int32))  # Number of time zone abbreviation characters
 
     time_type = force_version == '\0' ? Int32 : Int64
-
-    # Transition time that represents negative infinity
-    initial_epoch = time_type == Int64 ? -Int64(2)^59 : typemin(Int32)
+    transition_time_min = transition_min(time_type)
 
     transition_times = Vector{time_type}(undef, tzh_timecnt)
     for i in eachindex(transition_times)
@@ -100,7 +102,7 @@ function _read_tzfile(io::IO, name::AbstractString, force_version::Char='\0')
     end
 
     # Now build the time zone transitions
-    if tzh_timecnt == 0 || (tzh_timecnt == 1 && transition_times[1] == initial_epoch)
+    if tzh_timecnt == 0 || (tzh_timecnt == 1 && transition_times[1] == transition_time_min)
         timezone = FixedTimeZone(name, ttinfo[1].gmtoff)
     else
         # Calculate transition info
@@ -131,7 +133,7 @@ function _read_tzfile(io::IO, name::AbstractString, force_version::Char='\0')
             tz = FixedTimeZone(abbr, utc, dst)
 
             if isempty(transitions) || last(transitions).zone != tz
-                if transition_times[i] == initial_epoch
+                if transition_times[i] == transition_time_min
                     utc_datetime = typemin(DateTime)
                 else
                     utc_datetime = unix2datetime(Int64(transition_times[i]))
