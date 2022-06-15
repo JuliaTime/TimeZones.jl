@@ -81,4 +81,6 @@ include("parse.jl")
 include("plotting.jl")
 include("deprecated.jl")
 
+include("tzjfile/TZJFile.jl")
+
 end # module
