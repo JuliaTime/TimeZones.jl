@@ -71,7 +71,7 @@ function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
         tz_path = joinpath(TZData.COMPILED_DIR, split(str, "/")...)
 
         if isfile(tz_path)
-            open(deserialize, tz_path, "r")
+            open(TZJFile.read, tz_path, "r")(str)
         elseif occursin(FIXED_TIME_ZONE_REGEX, str)
             FixedTimeZone(str), Class(:FIXED)
         elseif !isdir(TZData.COMPILED_DIR) || isempty(readdir(TZData.COMPILED_DIR))
@@ -127,7 +127,7 @@ function istimezone(str::AbstractString, mask::Class=Class(:DEFAULT))
 
         if isfile(tz_path)
             # Cache the data since we're already performing the deserialization
-            _tz_cache()[str] = open(deserialize, tz_path, "r")
+            _tz_cache()[str] = open(TZJFile.read, tz_path, "r")(str)
         else
             nothing, Class(:NONE)
         end

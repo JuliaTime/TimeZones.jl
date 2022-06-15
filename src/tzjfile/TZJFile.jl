@@ -7,6 +7,16 @@ using ...TimeZones.TZFile: transition_min, assemble_designations, DATETIME_EPOCH
 const DEFAULT_VERSION = 1
 const TIMESTAMP_MIN = transition_min(Int64)
 
+function datetime2timestamp(x, sentinel)
+    return x != sentinel ? convert(Int64, datetime2unix(x)) : TIMESTAMP_MIN
+end
+
+function timestamp2datetime(x::Int64, sentinel)
+    return x != TIMESTAMP_MIN ? unix2datetime(x) : sentinel
+end
+
+
+
 struct TZJTransition
     utc_offset::Int32  # Resolution in seconds
     dst_offset::Int16  # Resolution in seconds
@@ -39,6 +49,7 @@ function _read(io::IO, version::Val{1})
     for i in eachindex(lindexes)
         lindexes[i] = ntoh(Base.read(io, UInt8)) + 1 # Julia uses 1 indexing
     end
+
     tzj_transitions = Vector{TZJTransition}(undef, tzh_typecnt)
     for i in eachindex(tzj_transitions)
         tzj_transitions[i] = TZJTransition(
@@ -53,12 +64,12 @@ function _read(io::IO, version::Val{1})
     end
 
     # Now build the time zone transitions
-    constructor = if tzh_timecnt == 0 || (tzh_timecnt == 1 && tzj_transitions[1] == TIMESTAMP_MIN)
+    constructor = if tzh_timecnt == 0 || (tzh_typecnt == 1 && tzj_transitions[1] == TIMESTAMP_MIN)
         t = tzj_transitions[1]
         name -> (FixedTimeZone(name, t.utc_offset, t.dst_offset), class)
     else
         transitions = Transition[]
-        cutoff = unix2datetime(cutoff_time)
+        cutoff = timestamp2datetime(cutoff_time, nothing)
 
         prev_zone = nothing
         for i in eachindex(transition_times)
@@ -72,12 +83,7 @@ function _read(io::IO, version::Val{1})
             zone = FixedTimeZone(abbr, t.utc_offset, t.dst_offset)
 
             if zone != prev_zone
-                utc_datetime = if timestamp != TIMESTAMP_MIN
-                    unix2datetime(timestamp)
-                else
-                    typemin(DateTime)
-                end
-
+                utc_datetime = timestamp2datetime(timestamp, typemin(DateTime))
                 push!(transitions, Transition(utc_datetime, zone))
             end
 
@@ -98,19 +104,21 @@ function _write(
     tzj_transitions::Vector{TZJTransition},
     cutoff::Int64,
     assembled_designations::AbstractString,
-
 )
     # iscomposite(class) && error("Class of a time zone should be a single bit: $class")
 
-    @assert length(transition_times) == length(tzj_transitions)
-
     # TODO: Interface needs more thought. Definitely do need a index which maps the unique
     # `transition_time_infos` to each transition_time
-    unique_tzj_transitions = unique(tzj_transitions)
-    tzj_transition_indices = indexin(tzj_transitions, unique_tzj_transitions)
-    tzj_transitions = unique_tzj_transitions
+    if length(transition_times) > 0
+        unique_tzj_transitions = unique(tzj_transitions)
+        tzj_transition_indices = indexin(tzj_transitions, unique_tzj_transitions)
+        tzj_transitions = unique_tzj_transitions
 
-    @assert length(transition_times) == length(tzj_transition_indices)
+        @assert length(transition_times) == length(tzj_transition_indices)
+    else
+        tzj_transition_indices = Vector{Int}()
+        tzj_transitions = unique(tzj_transitions)
+    end
 
     Base.write(io, b"TZjf")  # Magic four-byte ASCII sequence
     Base.write(io, 0x01)  # Single-byte identifying the tzfile version
@@ -157,8 +165,9 @@ end
 function write(io::IO, tz::VariableTimeZone; class::Class, version::Integer=DEFAULT_VERSION)
     assembled_designations, designation_indices = assemble_designations(t.zone.name for t in tz.transitions)
 
+    # TODO: Sorting provides us a way to avoid checking for the sentinel on each loop
     transition_times = map(tz.transitions) do t
-        convert(Int64, datetime2unix(t.utc_datetime))
+        datetime2timestamp(t.utc_datetime, typemin(DateTime))
     end
 
     tzj_transitions = map(enumerate(tz.transitions)) do (i, t)
@@ -169,9 +178,9 @@ function write(io::IO, tz::VariableTimeZone; class::Class, version::Integer=DEFA
         )
     end
 
-    cutoff = convert(Int64, datetime2unix(tz.cutoff))
+    cutoff = datetime2timestamp(tz.cutoff, nothing)
 
-    _write(io, Val(Int(version)); class=class.val, transition_times, tzj_transitions, cutoff, assembled_designations, )
+    _write(io, Val(Int(version)); class=class.val, transition_times, tzj_transitions, cutoff, assembled_designations)
 end
 
 function write(io::IO, tz::FixedTimeZone; class::Class, version::Integer=DEFAULT_VERSION)
@@ -187,7 +196,7 @@ function write(io::IO, tz::FixedTimeZone; class::Class, version::Integer=DEFAULT
         )
     ]
 
-    cutoff = Int64(0)
+    cutoff = datetime2timestamp(nothing, nothing)
 
     _write(io, Val(Int(version)); class=class.val, transition_times, tzj_transitions, cutoff, assembled_designations)
 end

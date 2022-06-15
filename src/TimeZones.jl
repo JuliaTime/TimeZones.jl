@@ -63,6 +63,7 @@ include(joinpath("types", "fixedtimezone.jl"))
 include(joinpath("types", "variabletimezone.jl"))
 include(joinpath("types", "zoneddatetime.jl"))
 include(joinpath("tzfile", "TZFile.jl"))
+include(joinpath("tzjfile", "TZJFile.jl"))
 include("exceptions.jl")
 include(joinpath("tzdata", "TZData.jl"))
 Sys.iswindows() && include(joinpath("winzone", "WindowsTimeZoneIDs.jl"))
@@ -80,7 +81,5 @@ include("rounding.jl")
 include("parse.jl")
 include("plotting.jl")
 include("deprecated.jl")
-
-include("tzjfile/TZJFile.jl")
 
 end # module
