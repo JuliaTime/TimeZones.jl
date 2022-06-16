@@ -66,8 +66,6 @@ function read_content(io::IO, version::Char='\0')
     tzh_typecnt = ntoh(Base.read(io, Int32))  # Number of TransitionTimeInfos (must be > 0)
     tzh_charcnt = ntoh(Base.read(io, Int32))  # Number of time zone abbreviation characters
 
-    @show tzh_timecnt tzh_typecnt
-
     transition_times = Vector{T}(undef, tzh_timecnt)
     for i in eachindex(transition_times)
         transition_times[i] = ntoh(Base.read(io, T))
