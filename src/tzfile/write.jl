@@ -1,13 +1,6 @@
 # Number of seconds between the `typemin(DateTime)` and the UNIX epoch
 const DATETIME_EPOCH = convert(Int64, datetime2unix(typemin(DateTime)))
 
-struct TransitionTime
-    ut_instant::Int64  # Seconds since UNIX epoch
-    ut_offset::Int32   # Number of seconds to be added to Universal Time
-    is_dst::Bool
-    designation::String
-end
-
 function assemble_designations(abbrs)
     # Comparing by `endswith` results in maximal re-use of null-terminated strings
     unique_abbrs = sort!(unique(abbrs), lt=endswith)
@@ -49,81 +42,135 @@ function _assemble_designations(abbrs::AbstractVector{<:AbstractString})
     return result, indices
 end
 
-function write(io::IO, transitions::Vector{TransitionTime}; version::Char)
-    designation_agg_str, designation_indices = assemble_designations(t.designation for t in transitions)
+function write(io::IO, tz::FixedTimeZone; version::Char)
+    combined_designation, designation_indices = assemble_designations([tz.name])
 
-    transition_time_infos = map(enumerate(transitions)) do (i, t)
-        (;
-            ut_offset=t.ut_offset,
-            is_dst=t.is_dst,
-            designation_index=designation_indices[i],
-        )
-    end
+    transition_times = Vector{Int32}()
+    ttinfo = TransitionTimeInfo(
+        Dates.value(Second(tz.offset.std) + Second(tz.offset.dst)),
+        false,
+        only(designation_indices),
+    )
+    transition_types = [ttinfo]
 
-    # TODO: Interface needs more thought. Definitely do need a index which maps the unique
-    # `transition_time_infos` to each transition_time
-    unique_transition_time_infos = unique(transition_time_infos)
-    transition_time_indices = indexin(transition_time_infos, unique_transition_time_infos)
-    transition_time_infos = unique_transition_time_infos
+    write_signature(io)
+    write_version(io; version)
+    write_content(io; transition_times, transition_types, combined_designation)
 
-    @assert length(transitions) == length(transition_time_indices)
+    if version != '\0'
+        transition_times = Vector{Int64}()
 
-    Base.write(io, b"TZif")  # Magic four-byte ASCII sequence
-    Base.write(io, UInt8(version))  # Single-byte identifying the tzfile version
-
-    Base.write(io, fill(hton(0x00), 15))  # Fifteen bytes reserved for future use
-
-    # Six four-byte integer values
-    Base.write(io, hton(Int32(0)))                             # tzh_ttisutcnt (currently ignored)
-    Base.write(io, hton(Int32(0)))                             # tzh_ttisstdcnt (currently ignored)
-    Base.write(io, hton(Int32(0)))                             # tzh_leapcnt (currently ignored)
-    Base.write(io, hton(Int32(length(transitions))))           # tzh_timecnt
-    Base.write(io, hton(Int32(length(transition_time_infos)))) # tzh_typecnt
-    Base.write(io, hton(Int32(length(designation_agg_str))))   # tzh_charcnt
-
-    # Transition time and leap second time byte size
-    T = version == '\0' ? Int32 : Int64
-
-    # TODO: Sorting provides us a way to avoid checking on each loop
-    for t in transitions
-        timestamp = t.ut_instant
-
-        # Convert timestamps of `typemin(DateTime)` to the `timestamp_min`
-        if timestamp == DATETIME_EPOCH
-            timestamp = transition_min(T)
-        end
-
-        Base.write(io, hton(T(timestamp)))
-    end
-
-    for index in transition_time_indices
-        Base.write(io, hton(UInt8(index - 1)))  # Convert 1-indexing to 0-indexing
-    end
-
-    # tzh_typecnt ttinfo entries
-    for tt in transition_time_infos
-        Base.write(io, hton(Int32(tt.ut_offset)))
-        Base.write(io, hton(UInt8(tt.is_dst)))
-        Base.write(io, hton(UInt8(tt.designation_index - 1)))
-    end
-
-    for char in designation_agg_str
-        Base.write(io, hton(UInt8(char)))
+        write_signature(io)
+        write_version(io; version)
+        write_content(io; transition_times, transition_types, combined_designation)
     end
 end
 
 function write(io::IO, tz::VariableTimeZone; version::Char)
-    transitions = map(tz.transitions) do t
-        TransitionTime(
-            convert(Int64, datetime2unix(t.utc_datetime)),
-            Dates.value(Second(t.zone.offset.std + t.zone.offset.dst)),
-            isdst(t.zone.offset),
-            t.zone.name,
-        )
+    combined_designation, designation_indices = assemble_designations(t.zone.name for t in tz.transitions)
+
+    function compatible_transition(t::Transition)
+        return unix2datetime(typemin(Int32)) <= t.utc_datetime <= unix2datetime(typemax(Int32))
     end
 
-    write(io, transitions; version)
+    transition_times = sizehint!(Vector{Int32}(), length(tz.transitions))
+    transition_types = sizehint!(Vector{TransitionTimeInfo}(), length(tz.transitions))
+    for (i, t) in enumerate(filter(compatible_transition, tz.transitions))
+        # TODO: Sorting provides us a way to avoid checking for the sentinel on each loop
+        timestamp = datetime2timestamp(t.utc_datetime, Int32)
+
+        ttinfo = TransitionTimeInfo(
+            Dates.value(Second(t.zone.offset.std)),
+            isdst(t.zone.offset),
+            designation_indices[i]
+        )
+
+        push!(transition_times, timestamp)
+        push!(transition_types, ttinfo)
+    end
+
+    write_signature(io)
+    write_version(io; version)
+    write_content(io; transition_times, transition_types, combined_designation)
+
+    if version != '\0'
+        transition_times = sizehint!(Vector{Int64}(), length(tz.transitions))
+        transition_types = empty!(transition_types)
+        for (i, t) in enumerate(tz.transitions)
+            # TODO: Sorting provides us a way to avoid checking for the sentinel on each loop
+            timestamp = datetime2timestamp(t.utc_datetime, Int64)
+
+            ttinfo = TransitionTimeInfo(
+                Dates.value(Second(t.zone.offset.std)),
+                isdst(t.zone.offset),
+                designation_indices[i]
+            )
+
+            push!(transition_times, timestamp)
+            push!(transition_types, ttinfo)
+        end
+
+        write_signature(io)
+        write_version(io; version)
+        write_content(io; transition_times, transition_types, combined_designation)
+    end
 end
 
+write_signature(io::IO) = Base.write(io, b"TZif")  # Magic four-byte ASCII sequence
+write_version(io::IO; version::Char) = Base.write(io, UInt8(version))  # Single-byte identifying the tzfile version
+
+function write_content(
+    io::IO;
+    transition_times::Vector{T},
+    transition_types::Vector{TransitionTimeInfo},
+    combined_designation::AbstractString,
+) where T <: Union{Int32, Int64}
+    # TODO: Interface needs more thought. Definitely do need a index which maps the unique
+    # `transition_time_infos` to each transition_time
+    if length(transition_times) > 0
+        unique_transition_types = unique(transition_types)
+        transition_indices = indexin(transition_types, unique_transition_types)
+        transition_types = unique_transition_types
+
+        @assert length(transition_times) == length(transition_indices)
+    else
+        transition_indices = Vector{Int}()
+        transition_types = unique(transition_types)
+    end
+
+    @show transition_times transition_types
+
+    Base.write(io, fill(hton(0x00), 15))  # Fifteen bytes reserved for future use
+
+    # Six four-byte integer values
+    Base.write(io, hton(Int32(0)))                            # tzh_ttisutcnt (currently ignored)
+    Base.write(io, hton(Int32(0)))                            # tzh_ttisstdcnt (currently ignored)
+    Base.write(io, hton(Int32(0)))                            # tzh_leapcnt (currently ignored)
+    Base.write(io, hton(Int32(length(transition_times))))     # tzh_timecnt
+    Base.write(io, hton(Int32(length(transition_types))))     # tzh_typecnt
+    Base.write(io, hton(Int32(length(combined_designation)))) # tzh_charcnt
+
+    # TODO: Sorting provides us a way to avoid checking on each loop
+    for timestamp in transition_times
+        Base.write(io, hton(timestamp))
+    end
+
+    for index in transition_indices
+        Base.write(io, hton(UInt8(index - 1)))  # Convert 1-indexing to 0-indexing
+    end
+
+    # tzh_typecnt ttinfo entries
+    for ttinfo in transition_types
+        Base.write(io, hton(Int32(ttinfo.ut_offset)))
+        Base.write(io, hton(UInt8(ttinfo.is_dst)))
+        Base.write(io, hton(UInt8(ttinfo.designation_index - 1)))
+    end
+
+    for char in combined_designation
+        Base.write(io, hton(UInt8(char)))
+    end
+
+    return nothing
+end
 
 
