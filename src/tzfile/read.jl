@@ -1,8 +1,3 @@
-# Parsing tzfiles references:
-# - https://man7.org/linux/man-pages/man5/tzfile.5.html
-# - ftp://ftp.iana.org/tz/code/tzfile.5.txt
-
-
 const TZFILE_CUTOFF = unix2datetime(typemax(Int32))
 
 struct TransitionTimeInfo
@@ -16,14 +11,14 @@ function abbreviation(chars::AbstractVector{UInt8}, index::Integer=1)
 end
 
 """
-    TZFile.read(io::IO, name::AbstractString) -> TimeZone
+    TZFile.read(io::IO) -> Function
 
-Read the content of an I/O stream and process it as a
-[POSIX tzfile](https://man7.org/linux/man-pages/man5/tzfile.5.html). The returned
-`TimeZone` will be given the supplied name `name` unless a `FixedTimeZone` is returned.
+Read the content of an I/O stream as a
+[POSIX tzfile](https://data.iana.org/time-zones/data/tzfile.5.txt) to produce a `TimeZone`.
+As the tzfile format does not include the name of the interpreted time zone this function
+returns a closure which takes the single argument `name::AbstractString` and when called
+produces a `TimeZone` instance.
 """
-read(io::IO, name::AbstractString) = read(io)(name)
-
 function read(io::IO)
     # For compatibility reasons the tzfile will always start with version '\0' content.
     read_signature(io)

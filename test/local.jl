@@ -125,7 +125,7 @@ using TimeZones: _path_tz_name
 
                 @test_throws ArgumentError TimeZone("Test/UTC")
                 test_utc = open(joinpath(TZFILE_DIR, "Test", "UTC")) do f
-                    TZFile.read(f, "Test/UTC")
+                    TZFile.read(f)("Test/UTC")
                 end
                 withenv("TZ" => ":Test/UTC", "TZDIR" => TZFILE_DIR) do
                     @test localzone() == test_utc
@@ -141,7 +141,7 @@ using TimeZones: _path_tz_name
         @testset "absolute path" begin
             warsaw_path = joinpath(TZFILE_DIR, "Europe", "Warsaw")
             warsaw_from_file = open(warsaw_path) do f
-                TZFile.read(f, "Europe/Warsaw")
+                TZFile.read(f)("Europe/Warsaw")
             end
 
             withenv("TZ" => ":" * abspath(warsaw_path)) do
@@ -155,7 +155,7 @@ using TimeZones: _path_tz_name
         @testset "relative path" begin
             warsaw_path = joinpath(TZFILE_DIR, "Europe", "Warsaw")
             warsaw_from_file = open(warsaw_path) do f
-                TZFile.read(f, "Europe/Warsaw")
+                TZFile.read(f)("Europe/Warsaw")
             end
             warsaw = TimeZone("Europe/Warsaw")
 
