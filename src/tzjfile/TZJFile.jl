@@ -64,7 +64,7 @@ function _read(io::IO, version::Val{1})
     end
 
     # Now build the time zone transitions
-    constructor = if tzh_timecnt == 0 || (tzh_typecnt == 1 && tzj_transitions[1] == TIMESTAMP_MIN)
+    constructor = if tzh_timecnt == 0 || (tzh_timecnt == 1 && tzj_transitions[1] == TIMESTAMP_MIN)
         t = tzj_transitions[1]
         name -> (FixedTimeZone(name, t.utc_offset, t.dst_offset), class)
     else
