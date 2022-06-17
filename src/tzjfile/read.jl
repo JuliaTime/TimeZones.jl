@@ -21,7 +21,7 @@ read_version(io::IO) = Int(ntoh(Base.read(io, UInt8)))
 function read_content(io::IO, version::Val{1})
     tzh_timecnt = ntoh(Base.read(io, Int32))  # Number of transition dates
     tzh_typecnt = ntoh(Base.read(io, Int32))  # Number of transition types (must be > 0)
-    tzh_charcnt = ntoh(Base.read(io, Int32))  # Number of time zone abbreviation characters
+    tzh_charcnt = ntoh(Base.read(io, Int32))  # Number of time zone designation characters
     class = Class(ntoh(Base.read(io, UInt8)))
 
     transition_times = Vector{Int64}(undef, tzh_timecnt)
@@ -64,7 +64,7 @@ function read_content(io::IO, version::Val{1})
             # Sometimes tzfiles save on storage by having multiple names in one for example:
             # "WSST\0" at index 1 turns into "WSST" where as index 2 results in "SST"
             # for "Pacific/Apia".
-            name = abbreviation(combined_designations, tzj_info.designation_index)
+            name = get_designation(combined_designations, tzj_info.designation_index)
             zone = FixedTimeZone(name, tzj_info.utc_offset, tzj_info.dst_offset)
 
             if zone != prev_zone
