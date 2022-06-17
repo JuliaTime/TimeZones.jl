@@ -29,12 +29,18 @@ TimeZones.first_valid
 TimeZones.last_valid
 ```
 
+## TZFile
+
+```@docs
+TZFile.read
+TZFile.write
+```
+
 ## Etc.
 
 ```@docs
 TimeZones.UTCOffset
 TimeZones.@optional
-TimeZones.read_tzfile
 TimeZones.parse_tz_format
 TimeZones.tryparse_tz_format
 hash(::ZonedDateTime, ::UInt)

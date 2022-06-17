@@ -39,6 +39,14 @@ function _combine_designations(abbrs::AbstractVector{<:AbstractString})
     return result, indices
 end
 
+"""
+    TZFile.write(io::IO, tz::TimeZone; version::Char=TZFile.WRITE_VERSION)
+
+Writes the time zone to the I/O stream in the
+[POSIX tzfile](https://data.iana.org/time-zones/data/tzfile.5.txt) format.
+"""
+function write end
+
 function write(io::IO, tz::FixedTimeZone; version::Char=WRITE_VERSION)
     combined_designation, designation_indices = combine_designations([tz.name])
 
