@@ -712,12 +712,6 @@ function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
         open(tz_path, "w") do fp
             TZJFile.write(fp, tz; class)
         end
-
-        # Temporary self test
-        open(tz_path, "r") do fp
-            read_tz, class = TZJFile.read(fp)(tz.name)
-            @assert read_tz == tz
-        end
     end
 
     return results
