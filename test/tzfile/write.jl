@@ -1,9 +1,4 @@
 using TimeZones.TZFile: TZFile
-using Dates: Second
-
-utc = FixedTimeZone("UTC")
-warsaw = first(compile("Europe/Warsaw", tzdata["europe"]))
-moscow = first(compile("Europe/Moscow", tzdata["europe"]))
 
 # For this algorithm we don't really care about the internal ordering of the combined
 # designations. We only care that it takes full advantage of null-terminated strings and
@@ -55,13 +50,17 @@ end
 end
 
 @testset "write" begin
-    @testset "UTC (FixedTimeZone)" begin
+    # Tests the basic `FixedTimeZone` code path
+    @testset "UTC" begin
+        utc = FixedTimeZone("UTC", 0)
         io = IOBuffer()
         TZFile.write(io, utc)
         @test TZFile.read(seekstart(io))("UTC") == utc
     end
 
-    @testset "Europe/Warsaw (VariableTimeZone)" begin
+    # Tests the basic `VariableTimeZone` code path
+    @testset "Europe/Warsaw" begin
+        warsaw = first(compile("Europe/Warsaw", tzdata["europe"]))
         io = IOBuffer()
         TZFile.write(io, warsaw)
         @test TZFile.read(seekstart(io))("Europe/Warsaw") == warsaw
@@ -72,6 +71,7 @@ end
     # matter much as the total offset and isdst checks will be correct but the individual
     # UT/DST offset *values* may not be correct.
     @testset "Europe/Moscow" begin
+        moscow = first(compile("Europe/Moscow", tzdata["europe"]))
         io = IOBuffer()
         TZFile.write(io, moscow)
         tz = TZFile.read(seekstart(io))("Europe/Moscow")
