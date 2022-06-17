@@ -16,7 +16,7 @@ function read_signature(io::IO)
     return magic
 end
 
-read_version(io::IO) = Int(Base.read(io, UInt8))
+read_version(io::IO) = Int(ntoh(Base.read(io, UInt8)))
 
 function read_content(io::IO, version::Val{1})
     tzh_timecnt = ntoh(Base.read(io, Int32))  # Number of transition dates

@@ -57,7 +57,7 @@ function write(io::IO, tz::FixedTimeZone; class::Class, version::Integer=DEFAULT
 end
 
 write_signature(io::IO) = Base.write(io, b"TZjf")
-write_version(io::IO; version::Integer) = Base.write(io, UInt8(version))
+write_version(io::IO; version::Integer) = Base.write(io, hton(UInt8(version)))
 
 function write_content(io::IO, version::Integer; kwargs...)
     return write_content(io, Val(Int(version)); kwargs...)
