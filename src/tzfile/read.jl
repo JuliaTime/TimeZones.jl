@@ -1,8 +1,8 @@
 const TZFILE_CUTOFF = unix2datetime(typemax(Int32))
 
 struct TransitionTimeInfo
-    ut_offset::Int32     # tt_utoff
-    is_dst::Int8       # tt_isdst
+    ut_offset::Int32          # tt_utoff
+    is_dst::UInt8             # tt_isdst
     designation_index::UInt8  # tt_desigidx
 end
 
@@ -38,7 +38,9 @@ end
 
 function read_signature(io::IO)
     magic = Base.read(io, 4)  # Read the 4 byte magic identifier
-    @assert magic == b"TZif" "Magic file identifier \"TZif\" not found."
+    if magic != b"TZif"
+        throw(ArgumentError("Magic file identifier \"TZif\" not found."))
+    end
     return magic
 end
 

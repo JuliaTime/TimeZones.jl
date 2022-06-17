@@ -4,7 +4,7 @@ module TZFile
 # https://data.iana.org/time-zones/data/tzfile.5.txt
 
 using Dates: Dates, DateTime, Second, datetime2unix, unix2datetime
-using ...TimeZones: FixedTimeZone, Transition, VariableTimeZone, isdst
+using ...TimeZones: FixedTimeZone, VariableTimeZone, Transition, isdst
 
 include("utils.jl")
 include("read.jl")

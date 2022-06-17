@@ -1,17 +1,16 @@
-# Number of seconds between the `typemin(DateTime)` and the UNIX epoch
-const DATETIME_EPOCH = convert(Int64, datetime2unix(typemin(DateTime)))
+const LATEST_VERSION = '3'
 
-function assemble_designations(abbrs)
-    # Comparing by `endswith` results in maximal re-use of null-terminated strings
-    unique_abbrs = sort!(unique(abbrs), lt=endswith)
-    str, unique_indices = _assemble_designations(unique_abbrs)
+function combine_designations(abbrs)
+    # Comparing by reverse string length results maximal re-use of null-terminated strings
+    unique_abbrs = sort!(unique(abbrs), by=length, rev=true)
+    str, unique_indices = _combine_designations(unique_abbrs)
     mapping = Dict(unique_abbrs .=> unique_indices)
 
     indices = [mapping[abbr] for abbr in abbrs]
     return str, indices
 end
 
-function _assemble_designations(abbrs::AbstractVector{<:AbstractString})
+function _combine_designations(abbrs::AbstractVector{<:AbstractString})
     # Note: Could make use of an `OrderedDict` to combine these
     abbr_position = Dict{String,Int}()
     abbr_order = Vector{String}()
@@ -22,7 +21,7 @@ function _assemble_designations(abbrs::AbstractVector{<:AbstractString})
         indices[i] = get!(abbr_position, abbr) do
             # Determine if the new abbreviation is already present as a trailing substring
             # in a previously added abbreviation. Making use of the properties of
-            # null-terminated strings.
+            # null-terminated strings to reduce the output.
             for stored in abbr_order
                 if endswith(stored, abbr)
                     pos = abbr_position[stored] + ncodeunits(stored) - ncodeunits(abbr)
@@ -42,8 +41,8 @@ function _assemble_designations(abbrs::AbstractVector{<:AbstractString})
     return result, indices
 end
 
-function write(io::IO, tz::FixedTimeZone; version::Char)
-    combined_designation, designation_indices = assemble_designations([tz.name])
+function write(io::IO, tz::FixedTimeZone; version::Char=LATEST_VERSION)
+    combined_designation, designation_indices = combine_designations([tz.name])
 
     transition_times = Vector{Int32}()
     ttinfo = TransitionTimeInfo(
@@ -66,11 +65,11 @@ function write(io::IO, tz::FixedTimeZone; version::Char)
     end
 end
 
-function write(io::IO, tz::VariableTimeZone; version::Char)
-    combined_designation, designation_indices = assemble_designations(t.zone.name for t in tz.transitions)
+function write(io::IO, tz::VariableTimeZone; version::Char=LATEST_VERSION)
+    combined_designation, designation_indices = combine_designations(t.zone.name for t in tz.transitions)
 
     function compatible_transition(t::Transition)
-        return unix2datetime(typemin(Int32)) <= t.utc_datetime <= unix2datetime(typemax(Int32))
+        return typemin(Int32) <= datetime2unix(t.utc_datetime) <= typemax(Int32)
     end
 
     transition_times = sizehint!(Vector{Int32}(), length(tz.transitions))
@@ -80,7 +79,7 @@ function write(io::IO, tz::VariableTimeZone; version::Char)
         timestamp = datetime2timestamp(t.utc_datetime, Int32)
 
         ttinfo = TransitionTimeInfo(
-            Dates.value(Second(t.zone.offset.std)),
+            Dates.value(Second(t.zone.offset.std) + Second(t.zone.offset.dst)),
             isdst(t.zone.offset),
             designation_indices[i]
         )
@@ -101,7 +100,7 @@ function write(io::IO, tz::VariableTimeZone; version::Char)
             timestamp = datetime2timestamp(t.utc_datetime, Int64)
 
             ttinfo = TransitionTimeInfo(
-                Dates.value(Second(t.zone.offset.std)),
+                Dates.value(Second(t.zone.offset.std) + Second(t.zone.offset.dst)),
                 isdst(t.zone.offset),
                 designation_indices[i]
             )
@@ -125,8 +124,6 @@ function write_content(
     transition_types::Vector{TransitionTimeInfo},
     combined_designation::AbstractString,
 ) where T <: Union{Int32, Int64}
-    # TODO: Interface needs more thought. Definitely do need a index which maps the unique
-    # `transition_time_infos` to each transition_time
     if length(transition_times) > 0
         unique_transition_types = unique(transition_types)
         transition_indices = indexin(transition_types, unique_transition_types)
@@ -138,8 +135,6 @@ function write_content(
         transition_types = unique(transition_types)
     end
 
-    @show transition_times transition_types
-
     Base.write(io, fill(hton(0x00), 15))  # Fifteen bytes reserved for future use
 
     # Six four-byte integer values
@@ -150,7 +145,6 @@ function write_content(
     Base.write(io, hton(Int32(length(transition_types))))     # tzh_typecnt
     Base.write(io, hton(Int32(length(combined_designation)))) # tzh_charcnt
 
-    # TODO: Sorting provides us a way to avoid checking on each loop
     for timestamp in transition_times
         Base.write(io, hton(timestamp))
     end
@@ -159,7 +153,6 @@ function write_content(
         Base.write(io, hton(UInt8(index - 1)))  # Convert 1-indexing to 0-indexing
     end
 
-    # tzh_typecnt ttinfo entries
     for ttinfo in transition_types
         Base.write(io, hton(Int32(ttinfo.ut_offset)))
         Base.write(io, hton(UInt8(ttinfo.is_dst)))

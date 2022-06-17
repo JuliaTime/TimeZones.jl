@@ -22,7 +22,7 @@ function issimilar(x::Transition, y::Transition)
     x == y || x.utc_datetime == y.utc_datetime && x.zone.name == y.zone.name && isequal(x.zone.offset, y.zone.offset)
 end
 
-@test_throws AssertionError TZFile.read(IOBuffer())
+@test_throws ArgumentError TZFile.read(IOBuffer())
 
 # Compare tzfile transitions with those we resolved directly from the Olson zones/rules
 
