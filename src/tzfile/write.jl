@@ -39,7 +39,7 @@ function _combine_designations(abbrs::AbstractVector{<:AbstractString})
     return result, indices
 end
 
-function write(io::IO, tz::FixedTimeZone; version::Char=LATEST_VERSION)
+function write(io::IO, tz::FixedTimeZone; version::Char=WRITE_VERSION)
     combined_designation, designation_indices = combine_designations([tz.name])
 
     transition_times = Vector{Int32}()
@@ -63,7 +63,7 @@ function write(io::IO, tz::FixedTimeZone; version::Char=LATEST_VERSION)
     end
 end
 
-function write(io::IO, tz::VariableTimeZone; version::Char=LATEST_VERSION)
+function write(io::IO, tz::VariableTimeZone; version::Char=WRITE_VERSION)
     combined_designation, designation_indices = combine_designations(t.zone.name for t in tz.transitions)
 
     function compatible_transition(t::Transition)
