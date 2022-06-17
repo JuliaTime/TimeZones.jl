@@ -1,3 +1,5 @@
+const TIMESTAMP_MIN = transition_min(Int64)
+
 function datetime2timestamp(x, sentinel)
     return x != sentinel ? convert(Int64, datetime2unix(x)) : TIMESTAMP_MIN
 end

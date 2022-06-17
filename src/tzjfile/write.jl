@@ -1,12 +1,12 @@
 function write(io::IO, tz::VariableTimeZone; class::Class, version::Integer=DEFAULT_VERSION)
-    assembled_designations, designation_indices = assemble_designations(t.zone.name for t in tz.transitions)
+    combined_designation, designation_indices = combine_designations(t.zone.name for t in tz.transitions)
 
     # TODO: Sorting provides us a way to avoid checking for the sentinel on each loop
     transition_times = map(tz.transitions) do t
         datetime2timestamp(t.utc_datetime, typemin(DateTime))
     end
 
-    tzj_transitions = map(enumerate(tz.transitions)) do (i, t)
+    transition_types = map(enumerate(tz.transitions)) do (i, t)
         TZJTransition(
             Dates.value(Second(t.zone.offset.std)),
             Dates.value(Second(t.zone.offset.dst)),
@@ -16,15 +16,25 @@ function write(io::IO, tz::VariableTimeZone; class::Class, version::Integer=DEFA
 
     cutoff = datetime2timestamp(tz.cutoff, nothing)
 
-    _write(io, Val(Int(version)); class=class.val, transition_times, tzj_transitions, cutoff, assembled_designations)
+    write_signature(io)
+    write_version(io; version)
+    write_content(
+        io,
+        version;
+        class=class.val,
+        transition_times,
+        transition_types,
+        cutoff,
+        combined_designation,
+    )
 end
 
 function write(io::IO, tz::FixedTimeZone; class::Class, version::Integer=DEFAULT_VERSION)
-    assembled_designations, designation_indices = assemble_designations([tz.name])
+    combined_designation, designation_indices = combine_designations([tz.name])
 
     transition_times = Vector{Int64}()
 
-    tzj_transitions = [
+    transition_types = [
         TZJTransition(
             Dates.value(Second(tz.offset.std)),
             Dates.value(Second(tz.offset.dst)),
@@ -34,7 +44,24 @@ function write(io::IO, tz::FixedTimeZone; class::Class, version::Integer=DEFAULT
 
     cutoff = datetime2timestamp(nothing, nothing)
 
-    _write(io, Val(Int(version)); class=class.val, transition_times, tzj_transitions, cutoff, assembled_designations)
+    write_signature(io)
+    write_version(io; version)
+    write_content(
+        io,
+        version;
+        class=class.val,
+        transition_times,
+        transition_types,
+        cutoff,
+        combined_designation,
+    )
+end
+
+write_signature(io::IO) = Base.write(io, b"TZjf")
+write_version(io::IO; version::Integer) = Base.write(io, UInt8(version))
+
+function write_content(io::IO, version::Integer; kwargs...)
+    return write_content(io, Val(Int(version)); kwargs...)
 end
 
 function _write(
@@ -42,32 +69,25 @@ function _write(
     version::Val{1};
     class::UInt8,
     transition_times::Vector{Int64},
-    tzj_transitions::Vector{TZJTransition},
+    transition_types::Vector{TZJTransition},
     cutoff::Int64,
-    assembled_designations::AbstractString,
+    combined_designation::AbstractString,
 )
-    # iscomposite(class) && error("Class of a time zone should be a single bit: $class")
-
-    # TODO: Interface needs more thought. Definitely do need a index which maps the unique
-    # `transition_time_infos` to each transition_time
     if length(transition_times) > 0
-        unique_tzj_transitions = unique(tzj_transitions)
-        tzj_transition_indices = indexin(tzj_transitions, unique_tzj_transitions)
-        tzj_transitions = unique_tzj_transitions
+        unique_transition_types = unique(transition_types)
+        transition_indices = indexin(transition_types, unique_transition_types)
+        transition_types = unique_transition_types
 
-        @assert length(transition_times) == length(tzj_transition_indices)
+        @assert length(transition_times) == length(transition_indices)
     else
-        tzj_transition_indices = Vector{Int}()
-        tzj_transitions = unique(tzj_transitions)
+        transition_indices = Vector{Int}()
+        transition_types = unique(transition_types)
     end
 
-    Base.write(io, b"TZjf")  # Magic four-byte ASCII sequence
-    Base.write(io, 0x01)  # Single-byte identifying the tzfile version
-
-    # Six four-byte integer values
-    Base.write(io, hton(Int32(length(transition_times))))           # tzh_timecnt
-    Base.write(io, hton(Int32(length(tzj_transitions)))) # tzh_typecnt
-    Base.write(io, hton(Int32(length(assembled_designations))))   # tzh_charcnt
+    # Three four-byte integer values
+    Base.write(io, hton(Int32(length(transition_times))))      # tzh_timecnt
+    Base.write(io, hton(Int32(length(transition_types))))      # tzh_typecnt
+    Base.write(io, hton(Int32(length(combined_designation))))  # tzh_charcnt
     Base.write(io, hton(class))
 
     # Transition time and leap second time byte size
@@ -85,18 +105,18 @@ function _write(
     end
     Base.write(io, hton(cutoff))
 
-    for index in tzj_transition_indices
+    for index in transition_indices
         Base.write(io, hton(UInt8(index - 1)))  # Convert 1-indexing to 0-indexing
     end
 
     # tzh_typecnt ttinfo entries
-    for t in tzj_transitions
-        Base.write(io, hton(Int32(t.utc_offset)))
-        Base.write(io, hton(Int16(t.dst_offset)))
-        Base.write(io, hton(UInt8(t.designation_index - 1)))
+    for tzj_info in transition_types
+        Base.write(io, hton(Int32(tzj_info.utc_offset)))
+        Base.write(io, hton(Int16(tzj_info.dst_offset)))
+        Base.write(io, hton(UInt8(tzj_info.designation_index - 1)))
     end
 
-    for char in assembled_designations
+    for char in combined_designation
         Base.write(io, hton(UInt8(char)))
     end
 

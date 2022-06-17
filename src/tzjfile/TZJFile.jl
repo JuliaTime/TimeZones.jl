@@ -5,7 +5,6 @@ using ...TimeZones: Class, FixedTimeZone, Transition, VariableTimeZone, iscompos
 using ...TimeZones.TZFile: transition_min, assemble_designations, DATETIME_EPOCH, abbreviation
 
 const DEFAULT_VERSION = 1
-const TIMESTAMP_MIN = transition_min(Int64)
 
 include("utils.jl")
 include("read.jl")

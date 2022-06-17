@@ -4,17 +4,21 @@ struct TZJTransition
     designation_index::UInt8
 end
 
-read(io::IO, name::AbstractString) = read(io)(name)
-
 function read(io::IO)
-    magic = Base.read(io, 4)  # Read the 4 byte magic identifier
-    @assert magic == b"TZjf" "Magic file identifier \"TZjf\" not found."
-
-    version = Int(Base.read(io, UInt8))
-    return _read(io, Val(version))
+    read_signature(io)
+    version = read_version(io)
+    return read_content(io, Val(version))
 end
 
-function _read(io::IO, version::Val{1})
+function read_signature(io::IO)
+    magic = Base.read(io, 4)  # Read the 4 byte magic identifier
+    magic == b"TZjf" || throw(ArgumentError("Magic file identifier \"TZjf\" not found."))
+    return magic
+end
+
+read_version(io::IO) = Int(Base.read(io, UInt8))
+
+function read_content(io::IO, version::Val{1})
     tzh_timecnt = ntoh(Base.read(io, Int32))  # Number of transition dates
     tzh_typecnt = ntoh(Base.read(io, Int32))  # Number of transition types (must be > 0)
     tzh_charcnt = ntoh(Base.read(io, Int32))  # Number of time zone abbreviation characters
@@ -26,28 +30,28 @@ function _read(io::IO, version::Val{1})
     end
     cutoff_time = ntoh(Base.read(io, Int64))
 
-    lindexes = Vector{UInt8}(undef, tzh_timecnt)
-    for i in eachindex(lindexes)
-        lindexes[i] = ntoh(Base.read(io, UInt8)) + 1 # Julia uses 1 indexing
+    transition_indices = Vector{UInt8}(undef, tzh_timecnt)
+    for i in eachindex(transition_indices)
+        transition_indices[i] = ntoh(Base.read(io, UInt8)) + 1 # Julia uses 1 indexing
     end
 
-    tzj_transitions = Vector{TZJTransition}(undef, tzh_typecnt)
-    for i in eachindex(tzj_transitions)
-        tzj_transitions[i] = TZJTransition(
+    transition_types = Vector{TZJTransition}(undef, tzh_typecnt)
+    for i in eachindex(transition_types)
+        transition_types[i] = TZJTransition(
             ntoh(Base.read(io, Int32)),
             ntoh(Base.read(io, Int16)),
             ntoh(Base.read(io, UInt8)) + 1 # Julia uses 1 indexing
         )
     end
-    abbrs = Vector{UInt8}(undef, tzh_charcnt)
-    for i in eachindex(abbrs)
-        abbrs[i] = ntoh(Base.read(io, UInt8))
+    combined_designations = Vector{UInt8}(undef, tzh_charcnt)
+    for i in eachindex(combined_designations)
+        combined_designations[i] = ntoh(Base.read(io, UInt8))
     end
 
     # Now build the time zone transitions
-    constructor = if tzh_timecnt == 0 || (tzh_timecnt == 1 && tzj_transitions[1] == TIMESTAMP_MIN)
-        t = tzj_transitions[1]
-        name -> (FixedTimeZone(name, t.utc_offset, t.dst_offset), class)
+    tz_constructor = if tzh_timecnt == 0 || (tzh_timecnt == 1 && transition_types[1] == TIMESTAMP_MIN)
+        tzj_info = transition_types[1]
+        name -> (FixedTimeZone(name, tzj_info.utc_offset, tzj_info.dst_offset), class)
     else
         transitions = Transition[]
         cutoff = timestamp2datetime(cutoff_time, nothing)
@@ -55,13 +59,13 @@ function _read(io::IO, version::Val{1})
         prev_zone = nothing
         for i in eachindex(transition_times)
             timestamp = transition_times[i]
-            t = tzj_transitions[lindexes[i]]
+            tzj_info = transition_types[transition_indices[i]]
 
             # Sometimes tzfiles save on storage by having multiple names in one for example:
             # "WSST\0" at index 1 turns into "WSST" where as index 2 results in "SST"
             # for "Pacific/Apia".
-            abbr = abbreviation(abbrs, t.designation_index)
-            zone = FixedTimeZone(abbr, t.utc_offset, t.dst_offset)
+            name = abbreviation(combined_designations, tzj_info.designation_index)
+            zone = FixedTimeZone(name, tzj_info.utc_offset, tzj_info.dst_offset)
 
             if zone != prev_zone
                 utc_datetime = timestamp2datetime(timestamp, typemin(DateTime))
@@ -74,5 +78,5 @@ function _read(io::IO, version::Val{1})
         name -> (VariableTimeZone(name, transitions, cutoff), class)
     end
 
-    return constructor
+    return tz_constructor
 end
