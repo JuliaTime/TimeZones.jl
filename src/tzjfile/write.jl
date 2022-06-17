@@ -5,7 +5,6 @@ function write(io::IO, tz::VariableTimeZone; class::Class, version::Integer=DEFA
     transition_times = map(tz.transitions) do t
         datetime2timestamp(t.utc_datetime, typemin(DateTime))
     end
-
     transition_types = map(enumerate(tz.transitions)) do (i, t)
         TZJTransition(
             Dates.value(Second(t.zone.offset.std)),
@@ -64,7 +63,7 @@ function write_content(io::IO, version::Integer; kwargs...)
     return write_content(io, Val(Int(version)); kwargs...)
 end
 
-function _write(
+function write_content(
     io::IO,
     version::Val{1};
     class::UInt8,
@@ -90,17 +89,7 @@ function _write(
     Base.write(io, hton(Int32(length(combined_designation))))  # tzh_charcnt
     Base.write(io, hton(class))
 
-    # Transition time and leap second time byte size
-    T = Int64
-
-    # TODO: Sorting provides us a way to avoid checking on each loop
     for timestamp in transition_times
-
-        # Convert timestamps of `typemin(DateTime)` to the `timestamp_min`
-        if timestamp == DATETIME_EPOCH
-            timestamp = TIMESTAMP_MIN
-        end
-
         Base.write(io, hton(timestamp))
     end
     Base.write(io, hton(cutoff))

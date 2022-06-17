@@ -1,8 +1,8 @@
 module TZJFile
 
 using Dates: Dates, DateTime, Second, datetime2unix, unix2datetime
-using ...TimeZones: Class, FixedTimeZone, Transition, VariableTimeZone, iscomposite, isdst
-using ...TimeZones.TZFile: transition_min, assemble_designations, DATETIME_EPOCH, abbreviation
+using ...TimeZones: FixedTimeZone, VariableTimeZone, Class, Transition
+using ...TimeZones.TZFile: abbreviation, combine_designations, timestamp_min
 
 const DEFAULT_VERSION = 1
 
