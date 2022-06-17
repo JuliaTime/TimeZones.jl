@@ -6,6 +6,9 @@ module TZFile
 using Dates: Dates, DateTime, Second, datetime2unix, unix2datetime
 using ...TimeZones: FixedTimeZone, VariableTimeZone, Transition, isdst
 
+const SUPPORTED_VERSIONS = ('\0', '1', '2', '3', '4')
+const LATEST_VERSION = last(SUPPORTED_VERSIONS)
+
 include("utils.jl")
 include("read.jl")
 include("write.jl")

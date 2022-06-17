@@ -22,6 +22,19 @@ function issimilar(x::Transition, y::Transition)
     x == y || x.utc_datetime == y.utc_datetime && x.zone.name == y.zone.name && isequal(x.zone.offset, y.zone.offset)
 end
 
+@testset "read_signature" begin
+    @test TZFile.read_signature(IOBuffer(b"TZif")) == b"TZif"
+    @test_throws ArgumentError TZFile.read_signature(IOBuffer(b"TZya"))
+end
+
+@testset "read_version" begin
+    @test TZFile.read_version(IOBuffer("\0")) == '\0'
+    @test TZFile.read_version(IOBuffer("2")) == '2'
+    @test TZFile.read_version(IOBuffer("3")) == '3'
+    @test TZFile.read_version(IOBuffer("4")) == '4'
+    @test_throws ArgumentError TZFile.read_version(IOBuffer("5"))
+end
+
 @test_throws ArgumentError TZFile.read(IOBuffer())
 
 # Compare tzfile transitions with those we resolved directly from the Olson zones/rules
@@ -54,7 +67,7 @@ end
 open(joinpath(TZFILE_DIR, "Europe", "Warsaw (Version 2)")) do f
     TZFile.read_signature(f)
     version = TZFile.read_version(f)
-    tz = TZFile.read_content(f)("Europe/Warsaw")
+    tz = TZFile.read_content(f; version='\0')("Europe/Warsaw")
     @test version == '2'
     @test string(tz) == "Europe/Warsaw"
     @test first(tz.transitions).utc_datetime == typemin(DateTime)
@@ -90,7 +103,7 @@ end
 open(joinpath(TZFILE_DIR, "America", "Godthab (Version 3)")) do f
     TZFile.read_signature(f)
     version = TZFile.read_version(f)
-    tz = TZFile.read_content(f)("America/Godthab")
+    tz = TZFile.read_content(f; version='\0')("America/Godthab")
     @test version == '3'
     @test string(tz) == "America/Godthab"
     @test first(tz.transitions).utc_datetime == typemin(DateTime)

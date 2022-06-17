@@ -23,14 +23,14 @@ function read(io::IO)
     # For compatibility reasons the tzfile will always start with version '\0' content.
     read_signature(io)
     version = read_version(io)
-    tz_constructor = read_content(io, '\0')
+    tz_constructor = read_content(io; version='\0')
 
     # The higher precision data in version 2 and 3 formats occurs after the initial
     # compatibility data.
     if version != '\0'
         read_signature(io)
         read_version(io)
-        tz_constructor = read_content(io, version)
+        tz_constructor = read_content(io; version)
     end
 
     return tz_constructor
@@ -38,18 +38,20 @@ end
 
 function read_signature(io::IO)
     magic = Base.read(io, 4)  # Read the 4 byte magic identifier
-    if magic != b"TZif"
-        throw(ArgumentError("Magic file identifier \"TZif\" not found."))
-    end
+    magic == b"TZif" || throw(ArgumentError("Magic file identifier \"TZif\" not found."))
     return magic
 end
 
 function read_version(io::IO)
-    # A byte indicating the version of the file's format: '\0', '2', '3'
-    return Char(Base.read(io, UInt8))
+    # A byte indicating the version of the file's format
+    version = Char(Base.read(io, UInt8))
+    if !(version in SUPPORTED_VERSIONS)
+        throw(ArgumentError("Unrecognized tzfile version: '$version'"))
+    end
+    return version
 end
 
-function read_content(io::IO, version::Char='\0')
+function read_content(io::IO; version::Char)
     # In version '2' and beyond each transition time or leap second time uses
     # 8-bytes instead of 4-bytes.
     T = version == '\0' ? Int32 : Int64

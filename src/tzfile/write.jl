@@ -1,5 +1,3 @@
-const LATEST_VERSION = '3'
-
 function combine_designations(abbrs)
     # Comparing by reverse string length results maximal re-use of null-terminated strings
     unique_abbrs = sort!(unique(abbrs), by=length, rev=true)
