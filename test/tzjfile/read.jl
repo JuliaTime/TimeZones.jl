@@ -43,6 +43,8 @@ end
         @test tzj_class == class
     end
 
+    # As we use dispatch for chosing how to parse a version of a tzjfile attempting to read
+    # a newer version that TimeZones.jl does not understand results in a `MethodError`
     @testset "Future_Version" begin
         @test_throws MethodError open(joinpath(TZJFILE_DIR, "Future_Version"), "r") do fp
             TZJFile.read(fp)("Future_Version")
