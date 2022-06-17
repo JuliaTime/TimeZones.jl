@@ -171,5 +171,3 @@ function write_content(
 
     return nothing
 end
-
-
