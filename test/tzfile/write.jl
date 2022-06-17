@@ -8,7 +8,7 @@ using TimeZones.TZFile: TZFile
         desigs = ["LMT", "WSST", "SDT", "WSDT"]
         str, indices = TZFile.combine_designations(desigs)
         @test length(indices) == length(desigs)
-        @test TZFile.abbreviation.(Ref(collect(UInt8, str)), indices) == desigs
+        @test TZFile.get_designation.(Ref(collect(UInt8, str)), indices) == desigs
         @test ncodeunits(str) == 14
     end
 
@@ -16,7 +16,7 @@ using TimeZones.TZFile: TZFile
         desigs = ["ABC", "ABC"]
         str, indices = TZFile.combine_designations(desigs)
         @test length(indices) == length(desigs)
-        @test TZFile.abbreviation.(Ref(collect(UInt8, str)), indices) == desigs
+        @test TZFile.get_designation.(Ref(collect(UInt8, str)), indices) == desigs
         @test ncodeunits(str) == 4
     end
 
@@ -24,7 +24,7 @@ using TimeZones.TZFile: TZFile
         desigs = ["AB", "BA", "ABA", "BAB"]
         str, indices = TZFile.combine_designations(desigs)
         @test length(indices) == length(desigs)
-        @test TZFile.abbreviation.(Ref(collect(UInt8, str)), indices) == desigs
+        @test TZFile.get_designation.(Ref(collect(UInt8, str)), indices) == desigs
         @test ncodeunits(str) == 8
     end
 end

@@ -8,7 +8,7 @@ using Base: @deprecate
 
 const TZFILE_MAX = TZFile.TZFILE_CUTOFF
 const TransitionTimeInfo = TZFile.TransitionTimeInfo
-@deprecate abbreviation TZFile.abbreviation false
+@deprecate abbreviation TZFile.get_designation false
 @deprecate read_tzfile(io::IO, name::AbstractString) TZFile.read(io)(name) false
 
 # END TimeZones 1.0 deprecations

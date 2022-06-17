@@ -1,11 +1,11 @@
 using TimeZones: Transition
 using TimeZones.TZFile: TZFile, TZFILE_CUTOFF
 
-abbrs = b"LMT\0WSST\0SDT\0WSDT\0"  # Pacific/Apia
-@test TZFile.abbreviation(abbrs, 5) == "WSST"
-@test TZFile.abbreviation(abbrs, 6) == "SST"
-@test TZFile.abbreviation(abbrs, 10) == "SDT"
-@test TZFile.abbreviation(abbrs, 14) == "WSDT"
+desigs = b"LMT\0WSST\0SDT\0WSDT\0"  # Pacific/Apia
+@test TZFile.get_designation(desigs, 5) == "WSST"
+@test TZFile.get_designation(desigs, 6) == "SST"
+@test TZFile.get_designation(desigs, 10) == "SDT"
+@test TZFile.get_designation(desigs, 14) == "WSDT"
 
 
 # Extracts Transitions such that the two arrays start and stop at the

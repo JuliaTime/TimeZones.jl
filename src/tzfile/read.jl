@@ -6,7 +6,7 @@ struct TransitionTimeInfo
     designation_index::UInt8  # tt_desigidx
 end
 
-function abbreviation(chars::AbstractVector{UInt8}, index::Integer=1)
+function get_designation(chars::AbstractVector{UInt8}, index::Integer=1)
     return unsafe_string(pointer(chars, index))
 end
 
@@ -63,7 +63,7 @@ function read_content(io::IO; version::Char)
     tzh_leapcnt = ntoh(Base.read(io, Int32))  # Number of leap seconds
     tzh_timecnt = ntoh(Base.read(io, Int32))  # Number of transition dates
     tzh_typecnt = ntoh(Base.read(io, Int32))  # Number of TransitionTimeInfos (must be > 0)
-    tzh_charcnt = ntoh(Base.read(io, Int32))  # Number of time zone abbreviation characters
+    tzh_charcnt = ntoh(Base.read(io, Int32))  # Number of time zone designation characters
 
     transition_times = Vector{T}(undef, tzh_timecnt)
     for i in eachindex(transition_times)
@@ -138,7 +138,7 @@ function read_content(io::IO; version::Char)
             # Sometimes tzfiles save on storage by having multiple names in one for example:
             # "WSST\0" at index 1 turns into "WSST" where as index 2 results in "SST"
             # for "Pacific/Apia".
-            name = abbreviation(combined_designations, ttinfo.designation_index)
+            name = get_designation(combined_designations, ttinfo.designation_index)
             tz = FixedTimeZone(name, utc, dst)
 
             if isempty(transitions) || last(transitions).zone != tz
