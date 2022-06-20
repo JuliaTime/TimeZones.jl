@@ -2,14 +2,14 @@ module TZData
 
 using LazyArtifacts
 using Printf
-using ...TimeZones: TZJFile, DEPS_DIR
+using ...TimeZones: DEPS_DIR
 
 # Note: The tz database is made up of two parts: code and data. TimeZones.jl only requires
 # the "tzdata" archive or more specifically the "tz source" files within the archive
 # (africa, australasia, ...)
 
 const TZ_SOURCE_DIR = joinpath(DEPS_DIR, "tzsource")
-const COMPILED_DIR = joinpath(DEPS_DIR, "compiled", "tzjf")
+const COMPILED_DIR = joinpath(DEPS_DIR, "compiled", string(VERSION))
 
 const ARTIFACT_TOML = joinpath(@__DIR__, "..", "..", "Artifacts.toml")
 
