@@ -63,9 +63,5 @@ function build(version::AbstractString=tzdata_version())
     end
 
     version = build(version, REGIONS, TZ_SOURCE_DIR, COMPILED_DIR, verbose=true)
-
-    # Store the version of the compiled tzdata
-    write(ACTIVE_VERSION_FILE, version)
-
     return version
 end
