@@ -47,8 +47,8 @@ function __init__()
     # Write out our compiled tzdata representations into a scratchspace
     _COMPILED_DIR[] = _compiled_dir(tzdata_version())
 
-    # Initialize the thread-local TimeZone cache (issue #342)
-    _reset_tz_cache()
+    # Load the pre-computed TZData into memory
+    _prefetch_tz_cache()
 
     # Base extension needs to happen everytime the module is loaded (issue #24)
     Dates.CONVERSION_SPECIFIERS['z'] = TimeZone

@@ -32,10 +32,9 @@ end
 # Used in tests as a shorter form of: `sprint(show, ..., context=:compact => true)`
 show_compact = (io, args...) -> show(IOContext(io, :compact => true), args...)
 
-# Takes the tuple from `compile` and adds the result into TimeZones cache. Typically should
-# not be used and only should be required if the test tzdata version and built tzdata
-# version do not match.
+# Modified the internal TimeZones cache. Should only be used as part of testing and only is
+# needed when the data between the test tzdata version and the built tzdata versions differ.
 function cache_tz((tz, class)::Tuple{TimeZone, TimeZones.Class})
-    TimeZones._tz_cache()[TimeZones.name(tz)] = (tz, class)
+    TimeZones._TZ_CACHE[TimeZones.name(tz)] = (tz, class)
     return tz
 end
