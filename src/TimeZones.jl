@@ -11,7 +11,7 @@ import Dates: TimeZone, UTC
 
 export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDateTime,
     DateTime, Date, Time, UTC, Local, TimeError, AmbiguousTimeError, NonExistentTimeError,
-    UnhandledTimeError,
+    UnhandledTimeError, TZFile,
     # discovery.jl
     timezone_names, all_timezones, timezones_from_abbr, timezone_abbrs,
     next_transition_instant, show_next_transition,
@@ -62,6 +62,7 @@ include(joinpath("types", "timezone.jl"))
 include(joinpath("types", "fixedtimezone.jl"))
 include(joinpath("types", "variabletimezone.jl"))
 include(joinpath("types", "zoneddatetime.jl"))
+include(joinpath("tzfile", "TZFile.jl"))
 include("exceptions.jl")
 include(joinpath("tzdata", "TZData.jl"))
 Sys.iswindows() && include(joinpath("winzone", "WindowsTimeZoneIDs.jl"))
@@ -70,7 +71,6 @@ include("interpret.jl")
 include("accessors.jl")
 include("arithmetic.jl")
 include("io.jl")
-include("tzfile.jl")
 include("adjusters.jl")
 include("conversions.jl")
 include("local.jl")

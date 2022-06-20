@@ -52,7 +52,7 @@ elseif Sys.isunix()
 
         # Determine time zone from contents of /etc/localtime
         tz_from_file = open(tzfile_path) do f
-            TimeZones.read_tzfile(f, "local")
+            TZFile.read(f)("local")
         end
 
         patches = [

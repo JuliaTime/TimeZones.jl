@@ -53,7 +53,7 @@ function localzone()
 
             if startswith(name, '/')
                 return @mock open(name) do f
-                    read_tzfile(f, something(_path_tz_name(name, mask), "local"))
+                    TZFile.read(f)(something(_path_tz_name(name, mask), "local"))
                 end
             else
                 # The system time zone directory used depends on the (g)libc version
@@ -64,7 +64,7 @@ function localzone()
                     filepath = joinpath(dir, name)
                     (@mock isfile(filepath)) || continue
                     return @mock open(filepath) do f
-                        read_tzfile(f, name)
+                        TZFile.read(f)(name)
                     end
                 end
 
@@ -128,7 +128,7 @@ function localzone()
         for filepath in ("/etc/localtime", "/usr/local/etc/localtime")
             (@mock isfile(filepath)) || continue
             return @mock open(filepath) do f
-                read_tzfile(f, "local")
+                TZFile.read(f)("local")
             end
         end
     elseif Sys.iswindows()
