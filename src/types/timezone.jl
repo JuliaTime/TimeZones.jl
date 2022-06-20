@@ -16,7 +16,7 @@ function _prefetch_tz_cache()
             if isdir(path)
                 push!(check, (path, name))
             else
-                _TZ_CACHE[name] = open(TZJFile.read, tz_path, "r")(name)
+                _TZ_CACHE[name] = open(TZJFile.read, path, "r")(name)
             end
         end
     end
