@@ -20,8 +20,5 @@ function build(version::AbstractString=tzdata_version(); force::Bool=false)
     # Set the compiled directory to the new location
     _COMPILED_DIR[] = built.compiled_dir
 
-    # Reset cached information
-    _prefetch_tz_cache()
-
     @info "Successfully built TimeZones"
 end

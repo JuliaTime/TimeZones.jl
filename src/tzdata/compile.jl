@@ -706,6 +706,11 @@ function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
         end
     end
 
+    # TODO: Re-load the internal cache when compilation overwrites the `COMPILED_DIR`.
+    # We should make end-users manually flush the cache in the future or call
+    # `TimeZones.build`. However, dropping this would be a breaking change so this remains.
+    dest_dir == TimeZones.COMPILED_DIR[] && TimeZones._reload_cache()
+
     return results
 end
 

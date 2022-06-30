@@ -2,7 +2,7 @@
 # to this structure can result in inconsistent behaviour.
 const _TZ_CACHE = Dict{String,Tuple{TimeZone,Class}}()
 
-function _prefetch_tz_cache()
+function _reload_cache()
     empty!(_TZ_CACHE)
     check = Tuple{String,String}[(TZData.COMPILED_DIR, "")]
 
@@ -21,7 +21,7 @@ function _prefetch_tz_cache()
         end
     end
 
-    !isempty(_TZ_CACHE) || error("Pre-fetching resulted in empty `_TZ_CACHE`")
+    !isempty(_TZ_CACHE) || error("Cache remains empty after loading")
 
     return nothing
 end
