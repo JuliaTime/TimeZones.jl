@@ -37,6 +37,7 @@ include("helpers.jl")
 @testset "TimeZones" begin
     include("utils.jl")
     include("indexable_generator.jl")
+    include("artifacts.jl")
 
     include("class.jl")
     include(joinpath("tzdata", "timeoffset.jl"))
