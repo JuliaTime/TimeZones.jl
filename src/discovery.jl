@@ -7,7 +7,7 @@ Returns a sorted list of all of the pre-computed time zone names.
 """
 function timezone_names()
     names = String[]
-    check = Tuple{String,String}[(TZData.COMPILED_DIR, "")]
+    check = Tuple{String,String}[(TZData.serialized_cache_dir(), "")]
 
     for (dir, partial) in check
         for filename in readdir(dir)

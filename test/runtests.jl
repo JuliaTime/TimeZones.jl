@@ -3,7 +3,6 @@ using Mocking
 using RecipesBase
 using Test
 using TimeZones
-using TimeZones: PKG_DIR
 using TimeZones.TZData: TZSource, compile, build
 using Unicode
 
@@ -11,8 +10,8 @@ Mocking.activate()
 
 
 const TZDATA_VERSION = "2016j"
-const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(PKG_DIR, "test", "tzsource"))
-const TZFILE_DIR = joinpath(PKG_DIR, "test", "tzfile", "data")
+const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(@__DIR__, "tzsource"))
+const TZFILE_DIR = joinpath(@__DIR__, "tzfile", "data")
 const TEST_REGIONS = ["asia", "australasia", "europe", "northamerica"]
 
 isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)

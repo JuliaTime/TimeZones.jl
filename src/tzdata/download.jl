@@ -1,8 +1,8 @@
 using Dates
 using Downloads: download
-using TimeZones: DEPS_DIR
+using TimeZones: scratch_dir
 
-const LATEST_FILE = joinpath(DEPS_DIR, "latest")
+latest_file_path() = joinpath(scratch_dir("downloads"), "latest")
 const LATEST_FORMAT = Dates.DateFormat("yyyy-mm-ddTHH:MM:SS")
 const LATEST_DELAY = Hour(1)  # In 1996 a correction to a release was made an hour later
 
@@ -25,12 +25,13 @@ function write_latest(io::IO, version::AbstractString, retrieved_utc::DateTime=n
 end
 
 const LATEST = let T = Tuple{AbstractString, DateTime}
-    isfile(LATEST_FILE) ? Ref{T}(read_latest(LATEST_FILE)) : Ref{T}()
+    path = latest_file_path()
+    isfile(path) ? Ref{T}(read_latest(path)) : Ref{T}()
 end
 
 function set_latest_cached(version::AbstractString, retrieved_utc::DateTime=now(Dates.UTC))
     LATEST[] = version, retrieved_utc
-    open(LATEST_FILE, "w") do io
+    open(latest_file_path(), "w") do io
         write_latest(io, version, retrieved_utc)
     end
 end

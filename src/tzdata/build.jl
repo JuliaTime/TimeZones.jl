@@ -11,6 +11,7 @@ const LEGACY_REGIONS = [
 ]
 
 # Note: The "utc" region is a made up tz source file and isn't included in the archives.
+# It is held within the `deps/custom_tzsource_regions` directory
 const CUSTOM_REGIONS = [
     "utc",
 ]
@@ -21,9 +22,8 @@ const REGIONS = [STANDARD_REGIONS; LEGACY_REGIONS]
 function build(
     version::AbstractString,
     regions::AbstractVector{<:AbstractString},
-    tz_source_dir::AbstractString="",
-    compiled_dir::AbstractString="";
-    verbose::Bool=false,
+    source_dir::Union{Nothing,AbstractString}=nothing,
+    compiled_dir::Union{Nothing,AbstractString}=nothing;
 )
     if version == "latest"
         version = tzdata_latest_version()
@@ -36,16 +36,21 @@ function build(
 
     artifact_dir = @artifact_str "tzdata$version"
 
-    if !isempty(tz_source_dir)
+    if source_dir !== nothing
         @info "Installing $version tzdata region data"
         regions = union!(intersect(regions, readdir(artifact_dir)), CUSTOM_REGIONS)
         for region in setdiff(regions, CUSTOM_REGIONS)
-            cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
+            cp(joinpath(artifact_dir, region), joinpath(source_dir, region), force=true)
+        end
+        # Copy over our 'custom regions' from `deps/custom_tzsource_regions`
+        for region in CUSTOM_REGIONS
+            cp(joinpath(dirname(dirname(@__DIR__)), "deps", "custom_tzsource_regions", region),
+               joinpath(source_dir, region), force=true)
         end
     end
-    if !isempty(compiled_dir)
+    if compiled_dir !== nothing
         @info "Converting tz source files into TimeZone data"
-        tz_source = TZSource(joinpath.(tz_source_dir, regions))
+        tz_source = TZSource(joinpath.(source_dir, regions))
         compile(tz_source, compiled_dir)
     end
 
@@ -53,15 +58,11 @@ function build(
 end
 
 function build(version::AbstractString=tzdata_version())
-    isdir(TZ_SOURCE_DIR) || mkpath(TZ_SOURCE_DIR)
-    isdir(COMPILED_DIR) || mkpath(COMPILED_DIR)
+    # Empty the compile directory so each build starts fresh.  Note that `serialized_cache_dir()`
+    # creates the directory if it doesn't exist, so the `build()` call lower down will recreate
+    # the directory after we delete it here.
+    rm(serialized_cache_dir(), recursive=true)
 
-    # Empty the compile directory in case to handle different versions not overriding all
-    # files.
-    for file in readdir(COMPILED_DIR)
-        rm(joinpath(COMPILED_DIR, file), recursive=true)
-    end
-
-    version = build(version, REGIONS, TZ_SOURCE_DIR, COMPILED_DIR, verbose=true)
+    version = build(version, REGIONS, tz_source_dir(), serialized_cache_dir())
     return version
 end
