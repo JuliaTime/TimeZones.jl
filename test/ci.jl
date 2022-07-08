@@ -1,26 +1,27 @@
 using TimeZones: TZData
 
 # Note: These tests are only meant to be run in a CI environment as they will modify the
-# build time zones in the serialized_cache_dir().
+# build time zones in the `compiled_dir()`.
 
 @testset "build process" begin
     # Clean out deps directories for a clean re-build
-    cache_dir = TZData.serialized_cache_dir()
-    rm(cache_dir, recursive=true)
+    compiled_dir = TZData.compiled_dir()
     tz_source_dir = TZData.tz_source_dir()
+
+    rm(compiled_dir, recursive=true)
     for file in readdir(tz_source_dir)
         file == "utc" && continue
         rm(joinpath(tz_source_dir, file))
     end
 
-    @test !isdir(cache_dir)
+    @test !isdir(compiled_dir)
     @test length(readdir(tz_source_dir)) == 1
 
     # Using a version we already have avoids triggering a download
     TimeZones.build(TZDATA_VERSION)
 
-    @test isdir(cache_dir)
-    @test length(readdir(cache_dir)) > 0
+    @test isdir(compiled_dir)
+    @test length(readdir(compiled_dir)) > 0
     @test readdir(tz_source_dir) == sort(TZData.REGIONS)
 
     # Compile tz source files with an extended max_year. An example from the FAQ.

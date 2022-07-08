@@ -61,8 +61,8 @@ function build(version::AbstractString=tzdata_version())
     # Empty the compile directory so each build starts fresh.  Note that `serialized_cache_dir()`
     # creates the directory if it doesn't exist, so the `build()` call lower down will recreate
     # the directory after we delete it here.
-    rm(serialized_cache_dir(), recursive=true)
+    rm(compiled_dir(), recursive=true)
 
-    version = build(version, REGIONS, tz_source_dir(), serialized_cache_dir())
+    version = build(version, REGIONS, tz_source_dir(), compiled_dir())
     return version
 end

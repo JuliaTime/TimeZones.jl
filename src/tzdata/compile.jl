@@ -719,6 +719,6 @@ function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
 end
 
 # TODO: Deprecate?
-function compile(source_dir::AbstractString=tz_source_dir(), dest_dir::AbstractString=serialized_cache_dir(); kwargs...)
+function compile(source_dir::AbstractString=tz_source_dir(), dest_dir::AbstractString=compiled_dir(); kwargs...)
     compile(TZSource(readdir(source_dir; join=true)), dest_dir; kwargs...)
 end

@@ -9,11 +9,11 @@ using ...TimeZones: scratch_dir
 # (africa, australasia, ...)
 
 tz_source_dir() = scratch_dir("tzsource")
-serialized_cache_dir() = scratch_dir("serialized", string(VERSION))
+compiled_dir() = scratch_dir("serialized", string(VERSION))
 
 const ARTIFACT_TOML = joinpath(@__DIR__, "..", "..", "Artifacts.toml")
 
-export tz_source_dir, serialized_cache_dir, REGIONS, LEGACY_REGIONS
+export REGIONS, LEGACY_REGIONS
 
 include("timeoffset.jl")
 include("version.jl")
