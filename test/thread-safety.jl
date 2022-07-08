@@ -1,4 +1,6 @@
 @testset "Thread safety" begin
+    TimeZones._reset_tz_cache()
+
     @testset "Multithreaded TimeZone brute force test" begin
         function create_zdt(year, month, day, tz_name)
             ZonedDateTime(DateTime(year, month, day), TimeZone(tz_name))
