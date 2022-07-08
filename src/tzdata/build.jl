@@ -67,12 +67,17 @@ function build(
     return version
 end
 
+# TODO: Deprecate this function
 function build(version::AbstractString=tzdata_version())
-    # Empty the compile directory so each build starts fresh.  Note that `serialized_cache_dir()`
-    # creates the directory if it doesn't exist, so the `build()` call lower down will recreate
-    # the directory after we delete it here.
-    rm(compiled_dir(), recursive=true)
+    tz_source_dir = _tz_source_dir(version)
+    compiled_dir = _compiled_dir(version)
 
-    version = build(version, REGIONS, tz_source_dir(), compiled_dir())
+    # Empty directories to avoid having left over files from previous builds.
+    isdir(tz_source_dir) && rm(tz_source_dir, recursive=true)
+    isdir(compiled_dir) && rm(compiled_dir, recursive=true)
+    mkpath(tz_source_dir)
+    mkpath(compiled_dir)
+
+    version = build(version, REGIONS, tz_source_dir, compiled_dir)
     return version
 end

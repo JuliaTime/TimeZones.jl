@@ -31,15 +31,22 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
     # ranges.jl
     guess
 
-# When we write out things like serialized tzdata representations,
-# do it into a scratchspace.
-scratch_dir(args...) = mkpath(joinpath(@get_scratch!(args[1]), args[2:end]...))
+_scratch_dir() = @get_scratch!("build")
+_tz_source_dir(version::AbstractString) = joinpath(_scratch_dir(), "tzsource", version)
+function _compiled_dir(version::AbstractString)
+    joinpath(_scratch_dir(), "compiled", "tzjf", "v$(TZJFile.DEFAULT_VERSION)", version)
+end
+
+const COMPILED_DIR = Ref{String}()
 
 # TimeZone types used to disambiguate the context of a DateTime
 # abstract type UTC <: TimeZone end  # Already defined in the Dates stdlib
 abstract type Local <: TimeZone end
 
 function __init__()
+    # Write out our compiled tzdata representations into a scratchspace
+    COMPILED_DIR[] = _compiled_dir(tzdata_version())
+
     # Initialize the thread-local TimeZone cache (issue #342)
     _reset_tz_cache()
 
