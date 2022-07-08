@@ -22,8 +22,8 @@ const REGIONS = [STANDARD_REGIONS; LEGACY_REGIONS]
 function build(
     version::AbstractString,
     regions::AbstractVector{<:AbstractString},
-    tz_source_dir::Union{AbstractString,Nothing}=nothing,
-    compiled_dir::Union{AbstractString,Nothing}=nothing,
+    tz_source_dir::AbstractString="",
+    compiled_dir::AbstractString="",
 )
     if version == "latest"
         version = tzdata_latest_version()
@@ -36,7 +36,8 @@ function build(
 
     artifact_dir = @artifact_str "tzdata$version"
 
-    if tz_source_dir !== nothing
+    # TODO: Deprecate skipping tzdata installation step or use `nothing` instead
+    if !isempty(tz_source_dir)
         @info "Installing $version tzdata region data"
         regions = union!(intersect(regions, readdir(artifact_dir)), CUSTOM_REGIONS)
         for region in setdiff(regions, CUSTOM_REGIONS)
@@ -48,7 +49,9 @@ function build(
             cp(joinpath(custom_tz_source_dir, region), joinpath(tz_source_dir, region), force=true)
         end
     end
-    if compiled_dir !== nothing
+
+    # TODO: Deprecate skipping conversion step or use `nothing` instead
+    if !isempty(compiled_dir)
         @info "Converting tz source files into TimeZone data"
         tz_source = TZSource(joinpath.(tz_source_dir, regions))
         compile(tz_source, compiled_dir)
