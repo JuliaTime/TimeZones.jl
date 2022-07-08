@@ -67,8 +67,7 @@ function build(
     return version
 end
 
-# TODO: Deprecate this function
-function build(version::AbstractString=tzdata_version())
+function build(version::AbstractString=tzdata_version(); returned::Symbol=:version)
     tz_source_dir = _tz_source_dir(version)
     compiled_dir = _compiled_dir(version)
 
@@ -79,5 +78,12 @@ function build(version::AbstractString=tzdata_version())
     mkpath(compiled_dir)
 
     version = build(version, REGIONS, tz_source_dir, compiled_dir)
-    return version
+
+    if returned === :version
+        return version
+    elseif returned === :namedtuple
+        return (; version, tz_source_dir, compiled_dir)
+    else
+        throw(ArgumentError("Unhandled return option: $returned"))
+    end
 end
