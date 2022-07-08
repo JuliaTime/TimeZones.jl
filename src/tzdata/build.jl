@@ -11,7 +11,7 @@ const LEGACY_REGIONS = [
 ]
 
 # Note: The "utc" region is a made up tz source file and isn't included in the archives.
-# It is held within the `deps/custom_tzsource_regions` directory
+const CUSTOM_REGION_DIR = joinpath(@__DIR__, "..", "..", "deps", "tzsource_custom")
 const CUSTOM_REGIONS = [
     "utc",
 ]
@@ -43,10 +43,9 @@ function build(
         for region in setdiff(regions, CUSTOM_REGIONS)
             cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
         end
-        # Copy over our 'custom regions' from `deps/custom_tzsource_regions`
-        custom_tz_source_dir = joinpath(dirname(dirname(@__DIR__)), "deps", "custom_tzsource_regions")
+        # Copy custom regions
         for region in CUSTOM_REGIONS
-            cp(joinpath(custom_tz_source_dir, region), joinpath(tz_source_dir, region), force=true)
+            cp(joinpath(CUSTOM_REGION_DIR, region), joinpath(tz_source_dir, region), force=true)
         end
     end
 
