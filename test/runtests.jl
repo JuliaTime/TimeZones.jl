@@ -68,7 +68,15 @@ include("helpers.jl")
     include("rounding.jl")
     include("parse.jl")
     include("plotting.jl")
-    include("thread-safety.jl")
+
+    is_apple_silicon = first(Sys.cpu_info()).model == "Apple M1"
+    if is_apple_silicon && Threads.nthreads() == 8
+        @info "Thread safety tests can hang on Apple Silicon when using 8-threads. Use 7-threads instead"
+    elseif Threads.nthreads() == 1
+        @info "Skipping thread safety check as Julia was started with a single thread"
+    else
+        include("thread-safety.jl")
+    end
 
     # Note: Run the build tests last to ensure that re-compiling the time zones files
     # doesn't interfere with other tests.
