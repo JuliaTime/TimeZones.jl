@@ -45,7 +45,7 @@ function build(
         # Copy over our 'custom regions' from `deps/custom_tzsource_regions`
         custom_tz_source_dir = joinpath(dirname(dirname(@__DIR__)), "deps", "custom_tzsource_regions")
         for region in CUSTOM_REGIONS
-            cp(joinpath(custom_tz_source_dir, region), joinpath(source_dir, region), force=true)
+            cp(joinpath(custom_tz_source_dir, region), joinpath(tz_source_dir, region), force=true)
         end
     end
     if compiled_dir !== nothing
