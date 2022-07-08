@@ -9,7 +9,11 @@ using ...TimeZones: TZJFile, DEPS_DIR
 # (africa, australasia, ...)
 
 const TZ_SOURCE_DIR = joinpath(DEPS_DIR, "tzsource")
-const COMPILED_DIR = joinpath(DEPS_DIR, "compiled", "tzjf")
+
+# By including the default tzjfile version in the directory structure we can support having
+# multiple tzjfile file versions co-existing. Ideally the version specified here would be
+# tied in someway to the version produced by `compile` in a more explicit manner.
+const COMPILED_DIR = joinpath(DEPS_DIR, "compiled", "tzjf", "v$(TZJFile.DEFAULT_VERSION)")
 
 const ARTIFACT_TOML = joinpath(@__DIR__, "..", "..", "Artifacts.toml")
 
