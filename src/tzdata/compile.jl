@@ -1,5 +1,4 @@
 using Dates
-using Serialization
 using Dates: parse_components
 
 using ...TimeZones: _tz_cache
@@ -711,7 +710,7 @@ function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
         isdir(tz_dir) || mkpath(tz_dir)
 
         open(tz_path, "w") do fp
-            serialize(fp, (tz, class))
+            TZJFile.write(fp, tz; class)
         end
     end
 
