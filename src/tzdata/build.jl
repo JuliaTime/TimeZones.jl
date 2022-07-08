@@ -25,13 +25,10 @@ function build(
     tz_source_dir::AbstractString="",
     compiled_dir::AbstractString="",
 )
-    if version == "latest"
-        version = tzdata_latest_version()
-        tzdata_hash = artifact_hash("tzdata$version", ARTIFACT_TOML)
-
-        if tzdata_hash === nothing
-            error("Latest tzdata is $version which is not present in the Artifacts.toml")
-        end
+    # Validate that the version specified is in the Artifact.toml
+    tzdata_hash = artifact_hash("tzdata$version", ARTIFACT_TOML)
+    if tzdata_hash === nothing
+        error("tzdata$version is not present in the Artifacts.toml")
     end
 
     artifact_dir = @artifact_str "tzdata$version"

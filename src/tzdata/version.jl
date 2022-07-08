@@ -94,4 +94,7 @@ function tzdata_version_archive(archive::AbstractString)
     end
 end
 
-tzdata_version() = get(ENV, "JULIA_TZ_VERSION", DEFAULT_TZDATA_VERSION)
+function tzdata_version()
+    version = get(ENV, "JULIA_TZ_VERSION", DEFAULT_TZDATA_VERSION)
+    return version == "latest" ? tzdata_latest_version() : version
+end
