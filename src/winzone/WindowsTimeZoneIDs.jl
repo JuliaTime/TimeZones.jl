@@ -9,14 +9,14 @@ const UNICODE_CLDR_VERSION = "release-40"
 # Details on the contents of this file can be found at:
 # http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping
 const WINDOWS_ZONE_FILE = joinpath("cldr-$UNICODE_CLDR_VERSION", "common", "supplemental", "windowsZones.xml")
-const WINDOWS_XML_FILE_PATH = Ref{String}()
+const _WINDOWS_XML_FILE_PATH = Ref{String}()
 
 const WINDOWS_TRANSLATION = Dict{String, String}()
 
 function __init__()
-    WINDOWS_XML_FILE_PATH[] = joinpath(_scratch_dir(), "local", "windowsZones.xml")
-    if isfile(WINDOWS_XML_FILE_PATH[])
-        copy!(WINDOWS_TRANSLATION, compile(WINDOWS_XML_FILE_PATH[]))
+    _WINDOWS_XML_FILE_PATH[] = joinpath(_scratch_dir(), "local", "windowsZones.xml")
+    if isfile(_WINDOWS_XML_FILE_PATH[])
+        copy!(WINDOWS_TRANSLATION, compile(_WINDOWS_XML_FILE_PATH[]))
     end
 end
 
@@ -40,7 +40,7 @@ function compile(xml_file::AbstractString)
     return translation
 end
 
-function build(xml_file::AbstractString=WINDOWS_XML_FILE_PATH[]; force::Bool=false)
+function build(xml_file::AbstractString=_WINDOWS_XML_FILE_PATH[]; force::Bool=false)
     if !isfile(xml_file) || force
         @info "Downloading Windows to POSIX timezone ID XML version: $UNICODE_CLDR_VERSION"
         artifact_dir = @artifact_str "unicode-cldr-$UNICODE_CLDR_VERSION"

@@ -22,15 +22,15 @@ function write_latest(io::IO, version::AbstractString, retrieved_utc::DateTime=n
 end
 
 function set_latest_cached(version::AbstractString, retrieved_utc::DateTime=now(Dates.UTC))
-    LATEST[] = version, retrieved_utc
-    open(LATEST_FILE_PATH[], "w") do io
+    _LATEST[] = version, retrieved_utc
+    open(_LATEST_FILE_PATH[], "w") do io
         write_latest(io, version, retrieved_utc)
     end
 end
 
 function latest_cached(now_utc::DateTime=now(Dates.UTC))
-    if isassigned(LATEST)
-        latest_version, latest_retrieved_utc = LATEST[]
+    if isassigned(_LATEST)
+        latest_version, latest_retrieved_utc = _LATEST[]
 
         if now_utc - latest_retrieved_utc < LATEST_DELAY
             return latest_version

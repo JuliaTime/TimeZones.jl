@@ -23,7 +23,7 @@ function build(version::AbstractString=tzdata_version(); force::Bool=false)
     end
 
     # Set the compiled directory to the new location
-    COMPILED_DIR[] = compiled_dir
+    _COMPILED_DIR[] = compiled_dir
 
     # Reset cached information
     _reset_tz_cache()

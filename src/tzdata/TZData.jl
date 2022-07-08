@@ -10,15 +10,16 @@ using ...TimeZones: TZJFile, _scratch_dir
 # (africa, australasia, ...)
 
 const ARTIFACT_TOML = joinpath(@__DIR__, "..", "..", "Artifacts.toml")
-const LATEST_FILE_PATH = Ref{String}()
-const LATEST = Ref{Tuple{AbstractString, DateTime}}()
+
+const _LATEST_FILE_PATH = Ref{String}()
+const _LATEST = Ref{Tuple{AbstractString, DateTime}}()
 
 export REGIONS, LEGACY_REGIONS
 
 function __init__()
-    LATEST_FILE_PATH[] = joinpath(_scratch_dir(), "latest")
-    if isfile(LATEST_FILE_PATH[])
-        LATEST[] = read_latest(LATEST_FILE_PATH[])
+    _LATEST_FILE_PATH[] = joinpath(_scratch_dir(), "latest")
+    if isfile(_LATEST_FILE_PATH[])
+        _LATEST[] = read_latest(_LATEST_FILE_PATH[])
     end
 end
 
