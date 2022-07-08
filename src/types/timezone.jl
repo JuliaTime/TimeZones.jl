@@ -2,26 +2,15 @@
 # caching. Note that this means the cache will grow in size, and may store redundant objects
 # accross multiple threads, but this extra space usage allows for fast, lock-free access
 # to the cache, while still being thread-safe.
-const THREAD_TZ_CACHES = Vector{Dict{String,Tuple{TimeZone,Class}}}()
+const TZ_CACHE = Dict{String,Tuple{TimeZone,Class}}()
 
 # Based upon the thread-safe Global RNG implementation in the Random stdlib:
 # https://github.com/JuliaLang/julia/blob/e4fcdf5b04fd9751ce48b0afc700330475b42443/stdlib/Random/src/RNGs.jl#L369-L385
-@inline _tz_cache() = _tz_cache(Threads.threadid())
-@noinline function _tz_cache(tid::Int)
-    0 < tid <= length(THREAD_TZ_CACHES) || _tz_cache_length_assert()
-    if @inbounds isassigned(THREAD_TZ_CACHES, tid)
-        @inbounds cache = THREAD_TZ_CACHES[tid]
-    else
-        cache = eltype(THREAD_TZ_CACHES)()
-        @inbounds THREAD_TZ_CACHES[tid] = cache
-    end
-    return cache
-end
-@noinline _tz_cache_length_assert() = @assert false "0 < tid <= length(THREAD_TZ_CACHES)"
+@inline _tz_cache() = TZ_CACHE
 
 function _reset_tz_cache()
     # ensures that we didn't save a bad object
-    resize!(empty!(THREAD_TZ_CACHES), Threads.nthreads())
+    empty!(TZ_CACHE)
 end
 
 """
