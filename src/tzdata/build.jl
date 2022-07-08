@@ -39,20 +39,19 @@ function build(
     # TODO: Deprecate skipping tzdata installation step or use `nothing` instead
     if !isempty(tz_source_dir)
         @info "Installing $version tzdata region data"
-        regions = union!(intersect(regions, readdir(artifact_dir)), CUSTOM_REGIONS)
-        for region in setdiff(regions, CUSTOM_REGIONS)
-            cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
-        end
-        # Copy custom regions
-        for region in CUSTOM_REGIONS
-            cp(joinpath(CUSTOM_REGION_DIR, region), joinpath(tz_source_dir, region), force=true)
+        region_paths = vcat(
+            joinpath.(artifact_dir, intersect!(readdir(artifact_dir), regions)),
+            joinpath.(CUSTOM_REGION_DIR, CUSTOM_REGIONS),
+        )
+        for path in region_paths
+            cp(path, joinpath(tz_source_dir, basename(path)), force=true)
         end
     end
 
     # TODO: Deprecate skipping conversion step or use `nothing` instead
     if !isempty(compiled_dir)
         @info "Converting tz source files into TimeZone data"
-        tz_source = TZSource(joinpath.(tz_source_dir, regions))
+        tz_source = TZSource(readdir(tz_source_dir, join=true))
         compile(tz_source, compiled_dir)
     end
 
