@@ -2,7 +2,8 @@ module TimeZones
 
 using Dates
 using Printf
-using Serialization, Scratch
+using Scratch
+using Serialization
 using RecipesBase: RecipesBase, @recipe
 using Unicode
 using InlineStrings: InlineString15
