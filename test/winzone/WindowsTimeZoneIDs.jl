@@ -1,6 +1,6 @@
 using TimeZones.WindowsTimeZoneIDs
 
-xml_file = TimeZones.WindowsTimeZoneIDs.get_windows_xml_file_path()
+xml_file = TimeZones.WindowsTimeZoneIDs.windows_xml_file_path()
 !isfile(xml_file) && error("Missing required XML file. Run Pkg.build(\"TimeZones\").")
 
 trans = TimeZones.WindowsTimeZoneIDs.compile(xml_file)
