@@ -2,6 +2,7 @@ module TimeZones
 
 using Dates
 using Printf
+using Scratch
 using RecipesBase: RecipesBase, @recipe
 using Unicode
 using InlineStrings: InlineString15
@@ -30,8 +31,9 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
     # ranges.jl
     guess
 
-const PKG_DIR = dirname(@__DIR__)
-const DEPS_DIR = joinpath(PKG_DIR, "deps")
+# When we write out things like serialized tzdata representations,
+# do it into a scratchspace.
+scratch_dir(args...) = mkpath(joinpath(@get_scratch!(args[1]), args[2:end]...))
 
 # TimeZone types used to disambiguate the context of a DateTime
 # abstract type UTC <: TimeZone end  # Already defined in the Dates stdlib

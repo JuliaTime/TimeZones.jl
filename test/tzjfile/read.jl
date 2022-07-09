@@ -1,6 +1,6 @@
 using TimeZones: TZJFile
 
-const TZJFILE_DIR = joinpath(PKG_DIR, "test", "tzjfile", "data")
+const TZJFILE_DIR = joinpath(@__DIR__, "data")
 
 @testset "read_signature" begin
     @test TZJFile.read_signature(IOBuffer(b"TZjf")) == b"TZjf"

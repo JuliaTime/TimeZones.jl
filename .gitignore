@@ -3,13 +3,6 @@
 .DS_Store
 
 # Ignore dependencies that are built/retrieved
-deps/tzarchive
-deps/tzsource
-deps/compiled
-deps/local
-!deps/local/windowsZones.xml
-deps/active_version
-deps/latest
 test/tzsource
 docs/build
 

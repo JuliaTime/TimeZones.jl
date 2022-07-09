@@ -1,25 +1,28 @@
 using TimeZones: TZData
 
 # Note: These tests are only meant to be run in a CI environment as they will modify the
-# build time zones in the COMPILED_DIR.
+# build time zones in the `compiled_dir()`.
 
 @testset "build process" begin
     # Clean out deps directories for a clean re-build
-    rm(TZData.COMPILED_DIR, recursive=true)
-    for file in readdir(TZData.TZ_SOURCE_DIR)
+    compiled_dir = TZData.compiled_dir()
+    tz_source_dir = TZData.tz_source_dir()
+
+    rm(compiled_dir, recursive=true)
+    for file in readdir(tz_source_dir)
         file == "utc" && continue
-        rm(joinpath(TZData.TZ_SOURCE_DIR, file))
+        rm(joinpath(tz_source_dir, file))
     end
 
-    @test !isdir(TZData.COMPILED_DIR)
-    @test length(readdir(TZData.TZ_SOURCE_DIR)) == 1
+    @test !isdir(compiled_dir)
+    @test length(readdir(tz_source_dir)) == 1
 
     # Using a version we already have avoids triggering a download
     TimeZones.build(TZDATA_VERSION)
 
-    @test isdir(TZData.COMPILED_DIR)
-    @test length(readdir(TZData.COMPILED_DIR)) > 0
-    @test readdir(TZData.TZ_SOURCE_DIR) == sort(TZData.REGIONS)
+    @test isdir(compiled_dir)
+    @test length(readdir(compiled_dir)) > 0
+    @test readdir(tz_source_dir) == sort(TZData.REGIONS)
 
     # Compile tz source files with an extended max_year. An example from the FAQ.
     warsaw = TimeZone("Europe/Warsaw")

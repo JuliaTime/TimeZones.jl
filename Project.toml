@@ -11,6 +11,7 @@ LazyArtifacts = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 Mocking = "78c3b35d-d492-501b-9361-3d52fe80e533"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
+Scratch = "6c6a2e73-6563-6170-7368-637461726353"
 Unicode = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [compat]

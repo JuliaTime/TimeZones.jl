@@ -68,13 +68,14 @@ function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
     # Note: If the class `mask` does not match the time zone we'll still load the
     # information into the cache to ensure the result is consistent.
     tz, class = get!(_tz_cache(), str) do
-        tz_path = joinpath(TZData.COMPILED_DIR, split(str, "/")...)
+        compiled_dir = TZData.compiled_dir()
+        tz_path = joinpath(compiled_dir, split(str, "/")...)
 
         if isfile(tz_path)
             open(TZJFile.read, tz_path, "r")(str)
         elseif occursin(FIXED_TIME_ZONE_REGEX, str)
             FixedTimeZone(str), Class(:FIXED)
-        elseif !isdir(TZData.COMPILED_DIR) || isempty(readdir(TZData.COMPILED_DIR))
+        elseif !isdir(compiled_dir) || isempty(readdir(compiled_dir))
             # Note: Julia 1.0 supresses the build logs which can hide issues in time zone
             # compliation which result in no tzdata time zones being available.
             throw(ArgumentError(
@@ -123,7 +124,7 @@ function istimezone(str::AbstractString, mask::Class=Class(:DEFAULT))
 
     # Perform more expensive checks against pre-compiled time zones
     tz, class = get(_tz_cache(), str) do
-        tz_path = joinpath(TZData.COMPILED_DIR, split(str, "/")...)
+        tz_path = joinpath(TZData.compiled_dir(), split(str, "/")...)
 
         if isfile(tz_path)
             # Cache the data since we're already performing the deserialization
