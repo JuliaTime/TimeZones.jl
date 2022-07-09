@@ -1,4 +1,6 @@
 @testset "Thread safety" begin
+    # Reset the cache before running the thread-safety tests to increase the chance of an
+    # issue occurring when multiple threads load data at the same time.
     TimeZones._reset_tz_cache()
 
     @testset "Multithreaded TimeZone brute force test" begin
