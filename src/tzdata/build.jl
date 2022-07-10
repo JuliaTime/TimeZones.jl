@@ -46,12 +46,24 @@ function build(
         for path in region_paths
             cp(path, joinpath(tz_source_dir, basename(path)), force=true)
         end
+
+        # Update the set of regions to compile the regions that existed in the artifact
+        # directory and the custom regions. There are some subtleties to this logic:
+        #
+        # - Will skips compiling non-existent regions that were specified (but only when
+        #   `tz_source_dir` is used)
+        # - Custom regions are compiled even when not requested when `tz_source_dir` is used
+        # - Compile ignores extra files stored in the `tz_source_dir`
+        #
+        # TODO: In the future it's probably more sensible to get away from this subtle
+        # behaviour and just compile all files present in the `tz_source_dir`.
+        regions = basename.(region_paths)
     end
 
     # TODO: Deprecate skipping conversion step or use `nothing` instead
     if !isempty(compiled_dir)
         @info "Converting tz source files into TimeZone data"
-        tz_source = TZSource(readdir(tz_source_dir, join=true))
+        tz_source = TZSource(joinpath.(tz_source_dir, regions))
         compile(tz_source, compiled_dir)
     end
 
