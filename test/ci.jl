@@ -5,8 +5,8 @@ using TimeZones: TZData
 
 @testset "build process" begin
     # Clean out deps directories for a clean re-build
-    compiled_dir = TZData.compiled_dir()
-    tz_source_dir = TZData.tz_source_dir()
+    compiled_dir = TZData._compiled_dir(TZDATA_VERSION)
+    tz_source_dir = TZData._tz_source_dir(TZDATA_VERSION)
 
     rm(compiled_dir, recursive=true)
     for file in readdir(tz_source_dir)
