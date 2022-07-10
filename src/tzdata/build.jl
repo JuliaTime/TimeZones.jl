@@ -11,7 +11,7 @@ const LEGACY_REGIONS = [
 ]
 
 # Note: The "utc" region is a made up tz source file and isn't included in the archives.
-# It is held within the `deps/custom_tzsource_regions` directory
+const CUSTOM_REGION_DIR = joinpath(@__DIR__, "..", "..", "deps", "tzsource_custom")
 const CUSTOM_REGIONS = [
     "utc",
 ]
@@ -39,15 +39,25 @@ function build(
     # TODO: Deprecate skipping tzdata installation step or use `nothing` instead
     if !isempty(tz_source_dir)
         @info "Installing $version tzdata region data"
-        regions = union!(intersect(regions, readdir(artifact_dir)), CUSTOM_REGIONS)
-        for region in setdiff(regions, CUSTOM_REGIONS)
-            cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
+        region_paths = vcat(
+            joinpath.(artifact_dir, intersect!(readdir(artifact_dir), regions)),
+            joinpath.(CUSTOM_REGION_DIR, CUSTOM_REGIONS),
+        )
+        for path in region_paths
+            cp(path, joinpath(tz_source_dir, basename(path)), force=true)
         end
-        # Copy over our 'custom regions' from `deps/custom_tzsource_regions`
-        custom_tz_source_dir = joinpath(dirname(dirname(@__DIR__)), "deps", "custom_tzsource_regions")
-        for region in CUSTOM_REGIONS
-            cp(joinpath(custom_tz_source_dir, region), joinpath(tz_source_dir, region), force=true)
-        end
+
+        # Update the set of regions to compile the regions that existed in the artifact
+        # directory and the custom regions. There are some subtleties to this logic:
+        #
+        # - Will skips compiling non-existent regions that were specified (but only when
+        #   `tz_source_dir` is used)
+        # - Custom regions are compiled even when not requested when `tz_source_dir` is used
+        # - Compile ignores extra files stored in the `tz_source_dir`
+        #
+        # TODO: In the future it's probably more sensible to get away from this subtle
+        # behaviour and just compile all files present in the `tz_source_dir`.
+        regions = basename.(region_paths)
     end
 
     # TODO: Deprecate skipping conversion step or use `nothing` instead
