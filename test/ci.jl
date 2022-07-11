@@ -1,21 +1,19 @@
 using TimeZones: TZData
 
 # Note: These tests are only meant to be run in a CI environment as they will modify the
-# build time zones in the `compiled_dir()`.
+# built time zones in the `compiled_dir()`. This could interfere with concurrently running
+# Julia sessions or just leave the end-users system in a inconsistent state.
 
 @testset "build process" begin
     # Clean out deps directories for a clean re-build
-    compiled_dir = TZData.compiled_dir()
-    tz_source_dir = TZData.tz_source_dir()
+    compiled_dir = TZData._compiled_dir(TZDATA_VERSION)
+    tz_source_dir = TZData._tz_source_dir(TZDATA_VERSION)
 
     rm(compiled_dir, recursive=true)
-    for file in readdir(tz_source_dir)
-        file == "utc" && continue
-        rm(joinpath(tz_source_dir, file))
-    end
+    rm(tz_source_dir, recursive=true)
 
     @test !isdir(compiled_dir)
-    @test length(readdir(tz_source_dir)) == 1
+    @test !isdir(tz_source_dir)
 
     # Using a version we already have avoids triggering a download
     TimeZones.build(TZDATA_VERSION)
@@ -40,7 +38,6 @@ using TimeZones: TZData
     ZonedDateTime(2100, new_warsaw)  # Test this doesn't throw an exception
 
     @test_throws TimeZones.UnhandledTimeError ZonedDateTime(2100, warsaw)
-
 
     # Using the tz string macro which runs at parse time means that the resulting TimeZone
     # will not reflect changes made from compile or new builds during runtime.

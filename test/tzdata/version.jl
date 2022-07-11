@@ -1,6 +1,7 @@
 using LazyArtifacts: @artifact_str
 using TimeZones.TZData: TZDATA_VERSION_REGEX, TZDATA_NEWS_REGEX
-using TimeZones.TZData: read_news, tzdata_version_dir, tzdata_version_archive
+using TimeZones.TZData: read_news, tzdata_version_dir, tzdata_version_archive,
+    tzdata_version
 
 for year = ("12", "1234"), letter = ("", "z")
     version = year * letter
@@ -48,4 +49,22 @@ mktempdir() do temp_dir
     # Determine tzdata version from a directory
     @test tzdata_version_dir(temp_dir) == TZDATA_VERSION
     @test_throws ErrorException tzdata_version_dir(dirname(@__FILE__))
+end
+
+@testset "tzdata_version" begin
+    withenv("JULIA_TZ_VERSION" => nothing) do
+        version = tzdata_version()
+        @test version != "latest"
+        @test version == TimeZones.TZData.DEFAULT_TZDATA_VERSION
+    end
+
+    withenv("JULIA_TZ_VERSION" => TZDATA_VERSION) do
+        @test tzdata_version() == TZDATA_VERSION
+    end
+
+    withenv("JULIA_TZ_VERSION" => "latest") do
+        version = tzdata_version()
+        @test version != "latest"
+        @test occursin(TZDATA_VERSION_REGEX, version)
+    end
 end

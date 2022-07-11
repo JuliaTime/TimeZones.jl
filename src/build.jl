@@ -8,11 +8,14 @@ Builds the TimeZones package with the specified tzdata `version` and `regions`. 
 (e.g. "$DEFAULT_TZDATA_VERSION"). The `force` flag is used to re-download tzdata archives.
 """
 function build(version::AbstractString=tzdata_version(); force::Bool=false)
-    TimeZones.TZData.build(version)
+    built = TimeZones.TZData.build(version, returned=:namedtuple)
 
     if Sys.iswindows()
         TimeZones.WindowsTimeZoneIDs.build(force=force)
     end
+
+    # Set the compiled directory to the new location
+    _COMPILED_DIR[] = built.compiled_dir
 
     # Reset cached information
     _reset_tz_cache()

@@ -25,13 +25,10 @@ function build(
     tz_source_dir::AbstractString="",
     compiled_dir::AbstractString="",
 )
-    if version == "latest"
-        version = tzdata_latest_version()
-        tzdata_hash = artifact_hash("tzdata$version", ARTIFACT_TOML)
-
-        if tzdata_hash === nothing
-            error("Latest tzdata is $version which is not present in the Artifacts.toml")
-        end
+    # Validate that the version specified is in the Artifact.toml
+    tzdata_hash = artifact_hash("tzdata$version", ARTIFACT_TOML)
+    if tzdata_hash === nothing
+        error("tzdata$version is not present in the Artifacts.toml")
     end
 
     artifact_dir = @artifact_str "tzdata$version"
@@ -70,12 +67,23 @@ function build(
     return version
 end
 
-function build(version::AbstractString=tzdata_version())
-    # Empty the compile directory so each build starts fresh.  Note that `serialized_cache_dir()`
-    # creates the directory if it doesn't exist, so the `build()` call lower down will recreate
-    # the directory after we delete it here.
-    rm(compiled_dir(), recursive=true)
+function build(version::AbstractString=tzdata_version(); returned::Symbol=:version)
+    tz_source_dir = _tz_source_dir(version)
+    compiled_dir = _compiled_dir(version)
 
-    version = build(version, REGIONS, tz_source_dir(), compiled_dir())
-    return version
+    # Empty directories to avoid having left over files from previous builds.
+    isdir(tz_source_dir) && rm(tz_source_dir, recursive=true)
+    isdir(compiled_dir) && rm(compiled_dir, recursive=true)
+    mkpath(tz_source_dir)
+    mkpath(compiled_dir)
+
+    version = build(version, REGIONS, tz_source_dir, compiled_dir)
+
+    if returned === :version
+        return version
+    elseif returned === :namedtuple
+        return (; version, tz_source_dir, compiled_dir)
+    else
+        throw(ArgumentError("Unhandled return option: $returned"))
+    end
 end
