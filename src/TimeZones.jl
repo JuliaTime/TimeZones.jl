@@ -44,16 +44,11 @@ const _COMPILED_DIR = Ref{String}()
 abstract type Local <: TimeZone end
 
 function __init__()
+    # Write out our compiled tzdata representations into a scratchspace
+    _COMPILED_DIR[] = _compiled_dir(tzdata_version())
+
     # Initialize the thread-local TimeZone cache (issue #342)
     _reset_tz_cache()
-
-    # Write out our compiled tzdata representations into a scratchspace
-    version = tzdata_version()
-    _COMPILED_DIR[] = _compiled_dir(version)
-
-    # Build the time zone data if required. Should only occur when `JULIA_TZ_VERSION` is
-    # specified we to a version not previously built.
-    isdir(_COMPILED_DIR[]) || build(version)
 
     # Base extension needs to happen everytime the module is loaded (issue #24)
     Dates.CONVERSION_SPECIFIERS['z'] = TimeZone
