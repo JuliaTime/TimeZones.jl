@@ -40,7 +40,7 @@ function compile(xml_file::AbstractString)
     return translation
 end
 
-function build(xml_file::AbstractString=_WINDOWS_XML_FILE_PATH[]; force::Bool=false)
+function build(xml_file::AbstractString; force::Bool=false)
     if !isfile(xml_file) || force
         @info "Downloading Windows to POSIX timezone ID XML version: $UNICODE_CLDR_VERSION"
         artifact_dir = @artifact_str "unicode-cldr-$UNICODE_CLDR_VERSION"
@@ -49,6 +49,14 @@ function build(xml_file::AbstractString=_WINDOWS_XML_FILE_PATH[]; force::Bool=fa
 
     @info "Compiling Windows time zone name translation"
     copy!(WINDOWS_TRANSLATION, compile(xml_file))
+end
+
+function build(; kwargs...)
+    # Note: Directory creation during package initialization can cause failures when using
+    # PackageCompiler.jl: https://github.com/JuliaTime/TimeZones.jl/issues/371
+    windows_xml_dir = dirname(_WINDOWS_XML_FILE_PATH[])
+    isdir(windows_xml_dir) || mkdir(windows_xml_dir)
+    return build(_WINDOWS_XML_FILE_PATH[]; kwargs...)
 end
 
 end
