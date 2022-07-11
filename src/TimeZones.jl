@@ -2,7 +2,7 @@ module TimeZones
 
 using Dates
 using Printf
-using Scratch
+using Scratch: @get_scratch!
 using RecipesBase: RecipesBase, @recipe
 using Unicode
 using InlineStrings: InlineString15

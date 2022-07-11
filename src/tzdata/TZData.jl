@@ -1,7 +1,7 @@
 module TZData
 
 using Dates: Dates, DateTime
-using LazyArtifacts
+using LazyArtifacts: @artifact_str, artifact_hash
 using Printf
 using ...TimeZones: TZJFile, _scratch_dir
 
