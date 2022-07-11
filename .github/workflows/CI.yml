@@ -38,16 +38,7 @@ jobs:
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
-      - uses: actions/cache@v1
-        env:
-          cache-name: cache-artifacts
-        with:
-          path: ~/.julia/artifacts
-          key: ${{ runner.os }}-test-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-test-${{ env.cache-name }}-
-            ${{ runner.os }}-test-
-            ${{ runner.os }}-
+      - uses: julia-actions/cache@v1
       # Only download the tzdata version used in TimeZones.jl's tests to avoid unnecessary
       # load on IANA's servers. However, if the DEFAULT_TZDATA_VERSION constant was
       # changed we need to also build the version specified by the constant to ensure it can be
