@@ -24,8 +24,8 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
     firstdayofquarter, lastdayofquarter,
     # Re-export from Dates
     yearmonthday, yearmonth, monthday, year, month, week, day, dayofmonth,
-    # conversion.jl
-    now, today, todayat, astimezone,
+    # conversions.jl
+    now, today, todayat, astimezone, zdt2unix, unix2zdt, zdt2julian, julian2zdt,
     # local.jl
     localzone,
     # ranges.jl
