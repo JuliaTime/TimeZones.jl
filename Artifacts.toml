@@ -1816,6 +1816,7 @@ lazy = true
 
 [tzdata2022a]
 git-tree-sha1 = "0a6b08679140a459a92cd574727bb18755249c48"
+lazy = true
 
     [[tzdata2022a.download]]
     sha256 = "ef7fffd9f4f50f4f58328b35022a32a5a056b245c5cb3d6791dddb342f871664"
@@ -1823,7 +1824,6 @@ git-tree-sha1 = "0a6b08679140a459a92cd574727bb18755249c48"
 
 [tzdata2022b]
 git-tree-sha1 = "18d4de12617f98663540d55ea4ba10bd1fe69f53"
-lazy = true
 
     [[tzdata2022b.download]]
     sha256 = "f590eaf04a395245426c2be4fae71c143aea5cebc11088b7a0a5704461df397d"
