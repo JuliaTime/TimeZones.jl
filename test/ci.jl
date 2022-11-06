@@ -29,13 +29,17 @@ using TimeZones: TZData
     @test warsaw.cutoff == DateTime(2038, 3, 28, 1)
     @test_throws TimeZones.UnhandledTimeError ZonedDateTime(DateTime(2039), warsaw)
 
-    TZData.compile(max_year=2200)
+    # Note: Using `TZData.compile(max_year=2200)` will end up updating the compiled data for
+    # `tzdata_version()` instead of what we last built using `TZDATA_VERSION`.
+    tz_source = TZData.TZSource(joinpath.(tz_source_dir, ["europe", "africa"]))
+    TZData.compile(tz_source, compiled_dir, max_year=2200)
+
     new_warsaw = TimeZone("Europe/Warsaw")
 
     @test warsaw !== new_warsaw
     @test last(new_warsaw.transitions).utc_datetime == DateTime(2200, 10, 26, 1)
     @test new_warsaw.cutoff == DateTime(2201, 3, 29, 1)
-    ZonedDateTime(2100, new_warsaw)  # Test this doesn't throw an exception
+    @test year(ZonedDateTime(2100, new_warsaw)) == 2100  # Test this doesn't throw an exception
 
     @test_throws TimeZones.UnhandledTimeError ZonedDateTime(2100, warsaw)
 
