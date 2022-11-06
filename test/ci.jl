@@ -9,8 +9,8 @@ using TimeZones: TZData
     compiled_dir = TZData._compiled_dir(TZDATA_VERSION)
     tz_source_dir = TZData._tz_source_dir(TZDATA_VERSION)
 
-    rm(compiled_dir, recursive=true)
-    rm(tz_source_dir, recursive=true)
+    isdir(compiled_dir) && rm(compiled_dir, recursive=true)
+    isdir(tz_source_dir) && rm(tz_source_dir, recursive=true)
 
     @test !isdir(compiled_dir)
     @test !isdir(tz_source_dir)
