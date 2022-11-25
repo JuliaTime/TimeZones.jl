@@ -1,4 +1,4 @@
-using Dates: AbstractDateTime, argerror, validargs
+using Dates: AbstractDateTime, validargs
 
 # """
 #     ZonedDateTime
@@ -188,6 +188,6 @@ Base.typemax(::Type{ZonedDateTime}) = ZonedDateTime(typemax(DateTime), utc_tz; f
 function Dates.validargs(::Type{ZonedDateTime}, y::Int64, m::Union{Int64, Int32}, d::Int64, h::Int64, mi::Int64, s::Int64, ms::Int64, tz::AbstractString)
     err = validargs(DateTime, y, Int64(m), d, h, mi, s, ms)
     err === nothing || return err
-    istimezone(tz) || return argerror("TimeZone: \"$tz\" is not a recognized time zone")
-    return argerror()
+    istimezone(tz) || return ArgumentError("TimeZone: \"$tz\" is not a recognized time zone")
+    return nothing
 end
