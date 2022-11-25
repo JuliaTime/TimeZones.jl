@@ -1824,10 +1824,42 @@ lazy = true
 
 [tzdata2022b]
 git-tree-sha1 = "18d4de12617f98663540d55ea4ba10bd1fe69f53"
+lazy = true
 
     [[tzdata2022b.download]]
     sha256 = "f590eaf04a395245426c2be4fae71c143aea5cebc11088b7a0a5704461df397d"
     url = "https://data.iana.org/time-zones/releases/tzdata2022b.tar.gz"
+
+[tzdata2022c]
+git-tree-sha1 = "daa43fa9c236eedd0c28c74c21633ec7b5b539fd"
+lazy = true
+
+    [[tzdata2022c.download]]
+    sha256 = "6974f4e348bf2323274b56dff9e7500247e3159eaa4b485dfa0cd66e75c14bfe"
+    url = "https://data.iana.org/time-zones/releases/tzdata2022c.tar.gz"
+
+[tzdata2022d]
+git-tree-sha1 = "fe6be7b3644b1bd3d6062041a67cbbb88697ea35"
+lazy = true
+
+    [[tzdata2022d.download]]
+    sha256 = "6ecdbee27fa43dcfa49f3d4fd8bb1dfef54c90da1abcd82c9abcf2dc4f321de0"
+    url = "https://data.iana.org/time-zones/releases/tzdata2022d.tar.gz"
+
+[tzdata2022e]
+git-tree-sha1 = "117b5193f08e671e5090b60995a44893cde13ed7"
+lazy = true
+
+    [[tzdata2022e.download]]
+    sha256 = "8de4c2686dce3d1aae9030719e6814931c216a2d5e891ec3d332e6f6516aeccd"
+    url = "https://data.iana.org/time-zones/releases/tzdata2022e.tar.gz"
+
+[tzdata2022f]
+git-tree-sha1 = "f493dea1da29efcdeaeffd223aaa572f140d1c44"
+
+    [[tzdata2022f.download]]
+    sha256 = "9990d71f675d212567b931fe8aae1cab7027f89fefb8a79d808a6933a67af000"
+    url = "https://data.iana.org/time-zones/releases/tzdata2022f.tar.gz"
 
 [tzdata93g]
 git-tree-sha1 = "e7ddeb4a45080afa6dbdd7c38df81bcf8b9d8f1a"
@@ -2076,3 +2108,11 @@ lazy = true
     [[unicode-cldr-release-41.download]]
     sha256 = "9f8ac41a609bcd9bdae6674146472ee3f0fa2cf6ce73a27c9b1ab3fc75fc18ce"
     url = "https://github.com/unicode-org/cldr/archive/release-41.tar.gz"
+
+[unicode-cldr-release-42]
+git-tree-sha1 = "6a7df65d09c15538ee7f5f0fafcd6a16a3a017a0"
+lazy = true
+
+    [[unicode-cldr-release-42.download]]
+    sha256 = "a65de26e4595be980142590dbd33f3768e78f8c52cc0b15b45c03f20043d5ea7"
+    url = "https://github.com/unicode-org/cldr/archive/release-42.tar.gz"
