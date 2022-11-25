@@ -9,7 +9,7 @@ using TimeZones.TZData: tzdata_versions
 
 
 # Code loosely based upon: https://julialang.github.io/Pkg.jl/dev/artifacts/#Using-Artifacts-1
-function bind_artifact_url!(artifacts_toml::String, name::String, url::String)
+function bind_artifact_url!(artifacts_toml::String, name::String, url::String; lazy::Bool=true)
     # Query the `Artifacts.toml` file for the hash associated with artifact name. If no such
     # binding exists within the file then `nothing` will be returned.
     artifact_hash = Artifacts.artifact_hash(name, artifacts_toml)
@@ -26,29 +26,36 @@ function bind_artifact_url!(artifacts_toml::String, name::String, url::String)
             # `create_artifact` but we want to avoid actually storing this data as an
             # artifact.
             artifact_hash = SHA1(Tar.tree_hash(IOBuffer(inflate_gzip(archive))))
-
-            bind_artifact!(
-                artifacts_toml,
-                name,
-                artifact_hash,
-                lazy=true,
-                download_info=[(url, archive_sha)],
-            )
         finally
             rm(archive)
         end
+    else
+        download_info = Artifacts.artifact_meta(name, artifacts_toml)["download"]
+        archive_sha = only(download_info)["sha256"]
     end
+
+    # Must unbind before we can call bind on an already bound artifact
+    unbind_artifact!(artifacts_toml, name)
+    bind_artifact!(
+        artifacts_toml,
+        name,
+        artifact_hash;
+        lazy,
+        download_info=[(url, archive_sha)],
+    )
 end
 
 function update_artifacts!(artifacts_toml::String)
     @info "Checking for missing tzdata versions..."
     versions = tzdata_versions()
+    latest_tzdata = last(versions)
+
     for version in versions
         artifact_name = "tzdata$version"
         url = "https://data.iana.org/time-zones/releases/tzdata$version.tar.gz"
-        bind_artifact_url!(artifacts_toml, artifact_name, url)
+        lazy = version != latest_tzdata
+        bind_artifact_url!(artifacts_toml, artifact_name, url; lazy)
     end
-    latest_tzdata = last(versions)
 
     @info "Checking for latest Unicode CLDR release..."
     response = HTTP.get("https://api.github.com/repos/unicode-org/cldr/releases/latest")
