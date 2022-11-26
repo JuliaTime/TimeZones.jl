@@ -8,11 +8,11 @@ on:
     tags: "*"
   schedule:
     - cron: "0 2 * * *"  # Daily at 2 AM UTC (8 PM CST)
+# Skip/cancel execution of queued/running jobs from outdated commits. Jobs run on the
+# `master` branch are not subject to these restrictions and are always executed.
 concurrency:
-  # Skip intermediate builds: all builds except for builds on the `master` branch
-  # Cancel intermediate builds: only pull request builds
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/master' || github.run_number }}
-  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
