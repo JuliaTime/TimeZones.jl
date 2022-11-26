@@ -1,16 +1,12 @@
 name: CI
-# Run on master, tags, or any pull request
 on:
   pull_request:
-    branches: "*"
   push:
-    branches: master
+    branches:
+      - master
     tags: "*"
-  schedule:
-    - cron: "0 2 * * *"  # Daily at 2 AM UTC (8 PM CST)
 jobs:
   test:
-    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -19,6 +15,9 @@ jobs:
           - "1.6"  # LTS / Oldest supported version
           - "1"    # Latest release
           - nightly
+        threads:
+          - "1"
+          - "8"
         os:
           - ubuntu-latest
           - macOS-latest
@@ -58,7 +57,7 @@ jobs:
       - uses: julia-actions/julia-buildpkg@latest
       - uses: julia-actions/julia-runtest@latest
         env:
-          JULIA_NUM_THREADS: "8"  # Can probably use "auto" here instead
+          JULIA_NUM_THREADS: "${{ matrix.threads }}"
       - uses: julia-actions/julia-processcoverage@v1
       - uses: codecov/codecov-action@v2
         with:
