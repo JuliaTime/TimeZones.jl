@@ -1,7 +1,7 @@
 # The default tz source files we care about. See "ftp://ftp.iana.org/tz/data/Makefile"
 # "PRIMARY_YDATA" for listing of tz source files to include.
 const STANDARD_REGIONS = [
-    "africa", "antarctica", "asia", "australasia",
+    "africa", "antarctica", "asia", "australasia", "backzone",
     "europe", "northamerica", "southamerica", "utc",
 ]
 

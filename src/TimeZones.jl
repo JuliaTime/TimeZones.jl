@@ -5,7 +5,7 @@ using Printf
 using Scratch
 using RecipesBase: RecipesBase, @recipe
 using Unicode
-using InlineStrings: InlineString15
+using InlineStrings: InlineString31
 
 import Dates: TimeZone, UTC
 
