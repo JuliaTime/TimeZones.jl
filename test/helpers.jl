@@ -48,6 +48,11 @@ show_compact = (io, args...) -> show(IOContext(io, :compact => true), args...)
 # not be used and only should be required if the test tzdata version and built tzdata
 # version do not match.
 function cache_tz((tz, class)::Tuple{TimeZone, TimeZones.Class})
-    TimeZones._tz_cache()[TimeZones.name(tz)] = (tz, class)
+    tz_cache = if tz isa FixedTimeZone
+        TimeZones._ftz_cache()
+    elseif tz isa VariableTimeZone
+        TimeZones._vtz_cache()
+    end
+    tz_cache[TimeZones.name(tz)] = (tz, class)
     return tz
 end

@@ -1,7 +1,7 @@
 using Dates
 using Dates: parse_components
 
-using ...TimeZones: _tz_cache, _tz_source_dir, _compiled_dir
+using ...TimeZones: _ftz_cache, _vtz_cache, _tz_source_dir, _compiled_dir
 using ...TimeZones: TimeZones, TimeZone, FixedTimeZone, VariableTimeZone, Transition, Class
 using ...TimeZones: rename
 using ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET, MIN_SAVE, MAX_SAVE,
@@ -699,7 +699,8 @@ function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
     # thread's local cache.
     Threads.@threads :static for i in 1:Threads.nthreads()
         @assert Threads.threadid() === i "TimeZones.TZData.compile() must be called from the main, top-level Task."
-        empty!(_tz_cache())
+        empty!(_ftz_cache())
+        empty!(_vtz_cache())
     end
 
     for (tz, class) in results
