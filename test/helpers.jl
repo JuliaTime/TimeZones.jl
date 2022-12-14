@@ -1,5 +1,17 @@
 # Utility functions for testing
 
+if VERSION < v"1.9.0-"  # https://github.com/JuliaLang/julia/pull/47367
+    macro allocations(ex)
+        quote
+            Base.Experimental.@force_compile
+            local stats = Base.gc_num()
+            $(esc(ex))
+            local diff = Base.GC_Diff(Base.gc_num(), stats)
+            Base.gc_alloc_count(diff)
+        end
+    end
+end
+
 function ignore_output(body::Function; stdout::Bool=true, stderr::Bool=true)
     out_old = Base.stdout
     err_old = Base.stderr
