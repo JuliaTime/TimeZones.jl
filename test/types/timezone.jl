@@ -1,5 +1,15 @@
 using TimeZones: Class
 
+@testset "TimeZone allocations" begin
+    tz = TimeZone("UTC")  # run once for compilation and to populate cache
+    @assert tz isa FixedTimeZone
+    @test 0 == @allocations(TimeZone("UTC"))
+
+    tz = TimeZone("America/Winnipeg")  # populate cache
+    @assert tz isa VariableTimeZone
+    @test 1 == @allocations(TimeZone("America/Winnipeg"))
+end
+
 @testset "istimezone" begin
     @test istimezone("Europe/Warsaw")
     @test istimezone("UTC+02")
