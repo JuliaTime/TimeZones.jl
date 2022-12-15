@@ -85,13 +85,13 @@ function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
     # information into the cache to ensure the result is consistent.
     ftz, class = get(_ftz_cache(), str, (nothing, Class(:NONE)))
     if ftz !== nothing
-        _check_class(mask, class)
+        _check_class(mask, class, str)
         return ftz::FixedTimeZone
     end
 
     vtz, class = get(_vtz_cache(), str, (nothing, Class(:NONE)))
     if vtz !== nothing
-        _check_class(mask, class)
+        _check_class(mask, class, str)
         return vtz::VariableTimeZone
     end
 
@@ -101,18 +101,18 @@ function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
         tz, class = open(TZJFile.read, tz_path, "r")(str)::Tuple{TimeZone,Class}
         if tz isa FixedTimeZone
             _ftz_cache()[str] = (tz, class)
-            _check_class(mask, class)
+            _check_class(mask, class, str)
             return tz::FixedTimeZone
         elseif tz isa VariableTimeZone
             _vtz_cache()[str] = (tz, class)
-            _check_class(mask, class)
+            _check_class(mask, class, str)
             return tz::VariableTimeZone
         end
     elseif occursin(FIXED_TIME_ZONE_REGEX, str)
         ftz = FixedTimeZone(str)
         class = Class(:FIXED)
         _ftz_cache()[str] = (ftz, class)
-        _check_class(mask, class)
+        _check_class(mask, class, str)
         return ftz
     elseif !isdir(_COMPILED_DIR[]) || isempty(readdir(_COMPILED_DIR[]))
         # Note: Julia 1.0 supresses the build logs which can hide issues in time zone
@@ -125,7 +125,7 @@ function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
     end
 end
 
-function _check_class(mask::Class, class::Class)
+function _check_class(mask::Class, class::Class, str)
     if mask & class == Class(:NONE)
         throw(ArgumentError(
             "The time zone \"$str\" is of class `$(repr(class))` which is " *
