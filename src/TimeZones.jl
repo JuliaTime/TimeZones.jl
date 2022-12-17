@@ -49,7 +49,7 @@ function __init__()
 
     # Load the pre-computed TZData into memory. Skip pre-fetching the first time
     # TimeZones.jl is loaded by `deps/build.jl` as we have yet to compile the tzdata.
-    isdir(COMPILED_DIR[]) && _reload_cache()
+    isdir(_COMPILED_DIR[]) && _reload_cache(_COMPILED_DIR[])
 
     # Base extension needs to happen everytime the module is loaded (issue #24)
     Dates.CONVERSION_SPECIFIERS['z'] = TimeZone

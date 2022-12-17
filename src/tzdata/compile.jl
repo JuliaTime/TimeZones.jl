@@ -691,7 +691,6 @@ end
 
 function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
     results = compile(tz_source; kwargs...)
-
     isdir(dest_dir) || error("Destination directory doesn't exist")
 
     for (tz, class) in results
@@ -706,10 +705,7 @@ function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
         end
     end
 
-    # TODO: Re-load the internal cache when compilation overwrites the `COMPILED_DIR`.
-    # We should make end-users manually flush the cache in the future or call
-    # `TimeZones.build`. However, dropping this would be a breaking change so this remains.
-    dest_dir == TimeZones.COMPILED_DIR[] && TimeZones._reload_cache()
+    TimeZones._reload_cache(dest_dir)
 
     return results
 end
@@ -720,5 +716,12 @@ function compile(
     dest_dir::AbstractString=_compiled_dir(tzdata_version());
     kwargs...
 )
-    compile(TZSource(readdir(tz_source_dir; join=true)), dest_dir; kwargs...)
+    results = compile(TZSource(readdir(tz_source_dir; join=true)), dest_dir; kwargs...)
+
+    # TimeZones 1.0 has supported automatic flushing of the cache when calling `compile`
+    # (e.g. `compile(max_year=2200)`). We'll keep this behaviour to ensure we are not
+    # breaking our API but the low-level `compile` function should ideally be cache unaware.
+    TimeZones._reload_cache(dest_dir)
+
+    return results
 end
