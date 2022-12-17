@@ -705,8 +705,6 @@ function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
         end
     end
 
-    TimeZones._reload_cache(dest_dir)
-
     return results
 end
 
