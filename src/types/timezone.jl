@@ -2,7 +2,7 @@
 # caching. Note that this means the cache will grow in size, and may store redundant objects
 # accross multiple threads, but this extra space usage allows for fast, lock-free access
 # to the cache, while still being thread-safe.
-# Use a separate cache for FixedTimeZone (which is `isbits`) so the containers is concretely
+# Use a separate cache for FixedTimeZone (which is `isbits`) so the container is concretely
 # typed and we avoid allocating a FixedTimeZone every time we get one from the cache.
 const THREAD_FTZ_CACHES = Vector{Dict{String,Tuple{FixedTimeZone,Class}}}()
 const THREAD_VTZ_CACHES = Vector{Dict{String,Tuple{VariableTimeZone,Class}}}()
