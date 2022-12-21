@@ -3,7 +3,7 @@
 if VERSION < v"1.9.0-"  # https://github.com/JuliaLang/julia/pull/47367
     macro allocations(ex)
         quote
-            Base.Experimental.@force_compile
+            while false; end  # want to force compilation, but v1.6 doesn't have `@force_compile`
             local stats = Base.gc_num()
             $(esc(ex))
             local diff = Base.GC_Diff(Base.gc_num(), stats)
