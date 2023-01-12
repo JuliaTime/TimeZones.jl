@@ -16,7 +16,7 @@ struct ZonedDateTime <: AbstractDateTime
     end
 
     function ZonedDateTime(utc_datetime::DateTime, timezone::VariableTimeZone, zone::FixedTimeZone)
-        if timezone.cutoff !== nothing && utc_datetime >= timezone.cutoff
+        if timezone.cutoff isa DateTime && utc_datetime >= timezone.cutoff
             throw(UnhandledTimeError(timezone))
         end
 
