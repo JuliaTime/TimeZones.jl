@@ -60,7 +60,8 @@ function Base.show(io::IO, tz::FixedTimeZone)
         std = Dates.value(tz.offset.std)
         dst = Dates.value(tz.offset.dst)
 
-        params = [repr(string(tz.name)), repr(std)]
+        # Always show `tz.name` as a regular `String`.
+        params = [repr(String(tz.name)), repr(std)]
         dst != 0 && push!(params, repr(dst))
         print(io, FixedTimeZone, "(", join(params, ", "), ")")
     end
