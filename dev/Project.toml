@@ -8,7 +8,7 @@ Tar = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
 TimeZones = "f269a46b-ccf7-5d73-abea-4c690281aa53"
 
 [compat]
-HTTP = "0.8.1"
+HTTP = "1"
 Inflate = "0.1.2"
 JSON = "0.20.1, 0.21"
 Tar = "1"
