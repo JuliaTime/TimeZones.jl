@@ -19,9 +19,16 @@ const THREAD_TZ_CACHES = Vector{Dict{String,Tuple{TimeZone,Class}}}()
 end
 @noinline _tz_cache_length_assert() = @assert false "0 < tid <= length(THREAD_TZ_CACHES)"
 
+@static if VERSION >= v"1.9.0"
+function _reset_tz_cache()
+    # ensures that we didn't save a bad object
+    resize!(empty!(THREAD_TZ_CACHES), Threads.maxthreadid())
+end
+else # prior to 1.9.0
 function _reset_tz_cache()
     # ensures that we didn't save a bad object
     resize!(empty!(THREAD_TZ_CACHES), Threads.nthreads())
+end
 end
 
 """
