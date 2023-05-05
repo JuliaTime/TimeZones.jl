@@ -8,7 +8,7 @@ const THREAD_TZ_CACHES = Vector{Dict{String,Tuple{TimeZone,Class}}}()
 # https://github.com/JuliaLang/julia/blob/e4fcdf5b04fd9751ce48b0afc700330475b42443/stdlib/Random/src/RNGs.jl#L369-L385
 @inline _tz_cache() = _tz_cache(Threads.threadid())
 @noinline function _tz_cache(tid::Int)
-    0 < tid <= length(THREAD_TZ_CACHES) || _tz_cache_length_assert()
+    0 < tid <= length(THREAD_TZ_CACHES) || _tz_cache_length_assert(; tid)
     if @inbounds isassigned(THREAD_TZ_CACHES, tid)
         @inbounds cache = THREAD_TZ_CACHES[tid]
     else
@@ -17,7 +17,13 @@ const THREAD_TZ_CACHES = Vector{Dict{String,Tuple{TimeZone,Class}}}()
     end
     return cache
 end
-@noinline _tz_cache_length_assert() = @assert false "0 < tid <= length(THREAD_TZ_CACHES)"
+@noinline function _tz_cache_length_assert(; tid)
+    msg = "Assertion failed: 0 < tid <= length(THREAD_TZ_CACHES) where " *
+          "tid=$(tid) " *
+          "length(THREAD_TZ_CACHES)=$(length(THREAD_TZ_CACHES)) " *
+          "Threads.nthreads()=$(Threads.nthreads())"
+    throw(ErrorException(msg))
+end
 
 function _reset_tz_cache()
     # ensures that we didn't save a bad object
