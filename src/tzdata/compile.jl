@@ -689,18 +689,38 @@ function compile(tz_source::TZSource; kwargs...)
     return results
 end
 
+@static if VERSION >= v"1.9.0"
+# As the caches are thread local, we must spawn a task on every thread to
+# empty that thread's cache.
+function empty_thread_local_caches(both_pools = true)
+    tp = Threads.threadpool()
+    Threads.@threads :static for i in 1:Threads.nthreads(tp)
+        empty!(_tz_cache())
+    end
+    !both_pools && return
+    if tp == :default
+        if Threads.nthreads(:interactive) > 0
+            fetch(Threads.@spawn :interactive empty_thread_local_caches(false))
+        end
+    else
+        fetch(Threads.@spawn :default empty_thread_local_caches(false))
+    end
+end
+else # prior to 1.9.0
+function empty_thread_local_caches(both_pools = true)
+    Threads.@threads :static for i in 1:Threads.nthreads()
+        empty!(_tz_cache())
+    end
+end
+end
+
 function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
     results = compile(tz_source; kwargs...)
 
     isdir(dest_dir) || error("Destination directory doesn't exist")
     # When we recompile the TimeZones from a new source, we clear all the existing cached
     # TimeZone objects, so that newly constructed objects pick up the newly compiled rules.
-    # Since we use thread-local caches, we spawn a task on _each thread_ to clear that
-    # thread's local cache.
-    Threads.@threads :static for i in 1:Threads.nthreads()
-        @assert Threads.threadid() === i "TimeZones.TZData.compile() must be called from the main, top-level Task."
-        empty!(_tz_cache())
-    end
+    empty_thread_local_caches()
 
     for (tz, class) in results
         parts = split(TimeZones.name(tz), '/')
