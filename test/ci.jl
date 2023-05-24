@@ -31,8 +31,13 @@ using TimeZones: TZData
 
     # Note: Using `TZData.compile(max_year=2200)` will end up updating the compiled data for
     # `tzdata_version()` instead of what we last built using `TZDATA_VERSION`.
-    tz_source = TZData.TZSource(joinpath.(tz_source_dir, ["europe", "africa"]))
-    TZData.compile(tz_source, compiled_dir, max_year=2200)
+    TZData.compile(tz_source_dir, compiled_dir, max_year=2200)
+
+    # TODO: In the future the `TZData.compile` function won't reload the cache. We'll need
+    # revise the above line to be something like:
+    # tz_source = TZData.TZSource(joinpath.(tz_source_dir, ["europe", "africa"]))
+    # TZData.compile(tz_source, compiled_dir, max_year=2200)
+    # TimeZones._reload_cache(compiled_dir)
 
     new_warsaw = TimeZone("Europe/Warsaw")
 

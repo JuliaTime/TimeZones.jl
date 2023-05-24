@@ -1,27 +1,29 @@
-# Thread-local TimeZone cache, which caches time zones _per thread_, allowing thread-safe
-# caching. Note that this means the cache will grow in size, and may store redundant objects
-# accross multiple threads, but this extra space usage allows for fast, lock-free access
-# to the cache, while still being thread-safe.
-const THREAD_TZ_CACHES = Vector{Dict{String,Tuple{TimeZone,Class}}}()
+# Retains the compiled tzdata in memory. Read-only access is thread-safe and any changes
+# to this structure can result in inconsistent behaviour.
+const _TZ_CACHE = Dict{String,Tuple{TimeZone,Class}}()
 
-# Based upon the thread-safe Global RNG implementation in the Random stdlib:
-# https://github.com/JuliaLang/julia/blob/e4fcdf5b04fd9751ce48b0afc700330475b42443/stdlib/Random/src/RNGs.jl#L369-L385
-@inline _tz_cache() = _tz_cache(Threads.threadid())
-@noinline function _tz_cache(tid::Int)
-    0 < tid <= length(THREAD_TZ_CACHES) || _tz_cache_length_assert()
-    if @inbounds isassigned(THREAD_TZ_CACHES, tid)
-        @inbounds cache = THREAD_TZ_CACHES[tid]
-    else
-        cache = eltype(THREAD_TZ_CACHES)()
-        @inbounds THREAD_TZ_CACHES[tid] = cache
+function _reload_cache(compiled_dir)
+    empty!(_TZ_CACHE)
+    check = Tuple{String,String}[(compiled_dir, "")]
+
+    for (dir, partial) in check
+        for filename in readdir(dir)
+            startswith(filename, ".") && continue
+
+            path = joinpath(dir, filename)
+            name = isempty(partial) ? filename : join([partial, filename], "/")
+
+            if isdir(path)
+                push!(check, (path, name))
+            else
+                _TZ_CACHE[name] = open(TZJFile.read, path, "r")(name)
+            end
+        end
     end
-    return cache
-end
-@noinline _tz_cache_length_assert() = @assert false "0 < tid <= length(THREAD_TZ_CACHES)"
 
-function _reset_tz_cache()
-    # ensures that we didn't save a bad object
-    resize!(empty!(THREAD_TZ_CACHES), Threads.nthreads())
+    !isempty(_TZ_CACHE) || error("Cache remains empty after loading")
+
+    return nothing
 end
 
 """
@@ -65,14 +67,8 @@ US/Pacific (UTC-8/UTC-7)
 TimeZone(::AbstractString, ::Class)
 
 function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
-    # Note: If the class `mask` does not match the time zone we'll still load the
-    # information into the cache to ensure the result is consistent.
-    tz, class = get!(_tz_cache(), str) do
-        tz_path = joinpath(_COMPILED_DIR[], split(str, "/")...)
-
-        if isfile(tz_path)
-            open(TZJFile.read, tz_path, "r")(str)
-        elseif occursin(FIXED_TIME_ZONE_REGEX, str)
+    tz, class = get(_TZ_CACHE, str) do
+        if occursin(FIXED_TIME_ZONE_REGEX, str)
             FixedTimeZone(str), Class(:FIXED)
         elseif !isdir(_COMPILED_DIR[]) || isempty(readdir(_COMPILED_DIR[]))
             # Note: Julia 1.0 supresses the build logs which can hide issues in time zone
@@ -121,16 +117,9 @@ function istimezone(str::AbstractString, mask::Class=Class(:DEFAULT))
         return true
     end
 
-    # Perform more expensive checks against pre-compiled time zones
-    tz, class = get(_tz_cache(), str) do
-        tz_path = joinpath(_COMPILED_DIR[], split(str, "/")...)
-
-        if isfile(tz_path)
-            # Cache the data since we're already performing the deserialization
-            _tz_cache()[str] = open(TZJFile.read, tz_path, "r")(str)
-        else
-            nothing, Class(:NONE)
-        end
+    # Checks against pre-compiled time zones
+    tz, class = get(_TZ_CACHE, str) do
+        nothing, Class(:NONE)
     end
 
     return tz !== nothing && mask & class != Class(:NONE)

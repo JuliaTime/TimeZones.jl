@@ -1,9 +1,6 @@
 using TimeZones: Class
 
 @testset "istimezone" begin
-    # Invalidate the cache to ensure that `istimezone` works for non-loaded time zones.
-    TimeZones._reset_tz_cache()
-
     @test istimezone("Europe/Warsaw")
     @test istimezone("UTC+02")
     @test !istimezone("Europe/Camelot")

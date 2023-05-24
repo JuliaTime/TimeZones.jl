@@ -47,8 +47,9 @@ function __init__()
     # Write out our compiled tzdata representations into a scratchspace
     _COMPILED_DIR[] = _compiled_dir(tzdata_version())
 
-    # Initialize the thread-local TimeZone cache (issue #342)
-    _reset_tz_cache()
+    # Load the pre-computed TZData into memory. Skip pre-fetching the first time
+    # TimeZones.jl is loaded by `deps/build.jl` as we have yet to compile the tzdata.
+    isdir(_COMPILED_DIR[]) && _reload_cache(_COMPILED_DIR[])
 
     # Base extension needs to happen everytime the module is loaded (issue #24)
     Dates.CONVERSION_SPECIFIERS['z'] = TimeZone
