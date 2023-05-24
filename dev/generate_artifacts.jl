@@ -1,5 +1,5 @@
 using Base: SHA1
-using JSON: JSON
+using JSON3: JSON3
 using HTTP: HTTP
 using Inflate: inflate_gzip
 using Pkg.Artifacts
@@ -59,8 +59,8 @@ function update_artifacts!(artifacts_toml::String)
 
     @info "Checking for latest Unicode CLDR release..."
     response = HTTP.get("https://api.github.com/repos/unicode-org/cldr/releases/latest")
-    json = JSON.parse(String(response.body))
-    latest_unicode_cldr = json["tag_name"]  # latest release
+    json = JSON3.read(response.body)
+    latest_unicode_cldr = json.tag_name  # latest release
 
     @info "Latest Unicode CLDR release: $latest_unicode_cldr"
     url = "https://github.com/unicode-org/cldr/archive/$latest_unicode_cldr.tar.gz"

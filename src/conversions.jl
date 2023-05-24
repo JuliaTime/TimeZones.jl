@@ -178,7 +178,7 @@ function astimezone end
 function astimezone(zdt::ZonedDateTime, tz::VariableTimeZone)
     i = searchsortedlast(
         tz.transitions, zdt.utc_datetime,
-        by=v -> typeof(v) == Transition ? v.utc_datetime : v,
+        by=v -> v isa Transition ? v.utc_datetime : v,
     )
 
     if i == 0
