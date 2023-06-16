@@ -87,7 +87,7 @@ jobs:
           TZDATA_VERSION: 2016j  # Matches tzdata version used in tests
 
   doctest:
-    name: Documentation - Julia ${{ matrix.version }}
+    name: Documentation - DocTests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
