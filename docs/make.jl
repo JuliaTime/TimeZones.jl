@@ -18,4 +18,6 @@ makedocs(
     checkdocs=:exports,
     linkcheck=true,
     strict=true,
+    # RUN_DOCTESTS=true is set by the doctest CI jobs
+    doctest=get(ENV, "RUN_DOCTESTS", nothing) == "true",
 )
