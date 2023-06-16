@@ -89,46 +89,32 @@ jobs:
   doctest:
     name: Documentation - Julia ${{ matrix.version }}
     runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: true
-      matrix:
-        version:
-          - "1.6"
-          - nightly
-        os:
-          - ubuntu-latest
-        arch:
-          - x64
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:
-          version: ${{ matrix.version }}
-          arch: ${{ matrix.arch }}
+          version: "1.9"
       - uses: julia-actions/julia-buildpkg@latest
       - run: |
           julia --project=docs -e '
             using Pkg
-            Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()'
       - run: julia --project=docs docs/make.jl
+        env:
+          RUN_DOCTESTS: true
 
-  # TODO: Previously on Travis CI was conditional on running on `master` or a tag:
-  # `if: (branch = master AND type != pull_request) OR tag =~ ^v`
   docs:
-    name: Documentation Deploy
+    name: Documentation
     runs-on: ubuntu-latest
-    needs: doctest
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:
-          version: "1"
+          version: "1.9"
       - uses: julia-actions/julia-buildpkg@latest
       - run: |
           julia --project=docs -e '
             using Pkg
-            Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()'
       - run: julia --project=docs docs/deploy.jl
         env:
