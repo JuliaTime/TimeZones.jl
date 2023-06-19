@@ -87,24 +87,7 @@ jobs:
           TZDATA_VERSION: 2016j  # Matches tzdata version used in tests
 
   doctest:
-    name: Documentation - Julia ${{ matrix.version }}
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
-        with:
-          version: "1.9"
-      - uses: julia-actions/julia-buildpkg@latest
-      - run: |
-          julia --project=docs -e '
-            using Pkg
-            Pkg.instantiate()'
-      - run: julia --project=docs docs/make.jl
-        env:
-          RUN_DOCTESTS: true
-
-  docs:
-    name: Documentation
+    name: Documentation - DocTests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -112,11 +95,29 @@ jobs:
         with:
           version: "1.9"
       - uses: julia-actions/julia-buildpkg@latest
-      - run: |
-          julia --project=docs -e '
-            using Pkg
-            Pkg.instantiate()'
-      - run: julia --project=docs docs/deploy.jl
+      - shell: julia --color=yes --project=docs {0}
+        run: |
+          using Pkg
+          Pkg.instantiate()
+      - run: julia --project=docs docs/make.jl
+        env:
+          DOCTESTS: "true"
+
+  docs:
+    name: Documentation - Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: "1.9"
+      - uses: julia-actions/julia-buildpkg@latest
+      - shell: julia --color=yes --project=docs {0}
+        run: |
+          using Pkg
+          Pkg.instantiate()
+      - run: julia --project=docs docs/make.jl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+          DEPLOY_DOCS: "true"

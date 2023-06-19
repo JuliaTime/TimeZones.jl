@@ -113,12 +113,12 @@ the less-than (<) and greater-than (>) signs the character set is expanded to in
 plus (+) sign, the minus (-) sign, and digits.
 
 # Examples
-```jldoctest
+```jldoctest; setup = :(using TimeZones: _parsesub_tzabbr)
 julia> _parsesub_tzabbr("ABC+1")
 ("ABC", 4)
 
 julia> _parsesub_tzabbr("<ABC+1>+2")
-("ABC+1", 6)
+("ABC+1", 8)
 ```
 """
 function _parsesub_tzabbr(
@@ -182,12 +182,12 @@ between 0 and 24, and the minutes and seconds 00 and 59. This follows specificat
 offsets as defined in the tzset(3) man page.
 
 # Example
-```jldoctest
+```jldoctest; setup = :(using TimeZones: _parsesub_offset)
 julia> _parsesub_offset("1:0:0")
-(3600, 5)
+(3600, 6)
 
 julia> _parsesub_offset("-0:1:2")
-(-62, 6)
+(-62, 7)
 ```
 """
 function _parsesub_offset(
@@ -280,23 +280,25 @@ includes an anonymous function which takes the argument `year::Integer` and retu
           the last week in which day `d` occurs. Day 0 is a Sunday.
 
 # Example
-```jldoctest
+```jldoctest; setup = :(using TimeZones: _parsesub_tzdate)
 julia> f, i = _parsesub_tzdate("J60");
 
 julia> f.(2019:2020)
-2-element Array{Date,1}:
+2-element Vector{Date}:
  2019-03-01
  2020-03-01
 
 julia> f, i = _parsesub_tzdate("60");
-2-element Array{Date,1}:
+
+julia> f.(2019:2020)
+2-element Vector{Date}:
  2019-03-02
  2020-03-01
 
 julia> f, i = _parsesub_tzdate("M3.3.0");  # Third Sunday in March
 
 julia> f.(2019:2020)
-2-element Array{Date,1}:
+2-element Vector{Date}:
  2019-03-17
  2020-03-15
 ```
@@ -449,7 +451,7 @@ end
 Parse a direct representation of a time zone as specified by the tzset(3) man page.
 
 # Examples
-```jldoctest
+```jldoctest; setup = :(using TimeZones: _parsesub_tz)
 julia> first(_parsesub_tz("EST+5"))
 EST (UTC-5)
 
