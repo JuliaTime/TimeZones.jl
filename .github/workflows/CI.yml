@@ -101,7 +101,7 @@ jobs:
             Pkg.instantiate()'
       - run: julia --project=docs docs/make.jl
         env:
-          RUN_DOCTESTS: true
+          DOCTESTS: "true"
 
   docs:
     name: Documentation
@@ -116,7 +116,8 @@ jobs:
           julia --project=docs -e '
             using Pkg
             Pkg.instantiate()'
-      - run: julia --project=docs docs/deploy.jl
+      - run: julia --project=docs docs/make.jl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+          DEPLOY_DOCS: "true"
