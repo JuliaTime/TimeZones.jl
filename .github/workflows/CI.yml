@@ -95,7 +95,7 @@ jobs:
         with:
           version: "1.9"
       - uses: julia-actions/julia-buildpkg@latest
-      - shell: julia --color=yes --projects=docs {0}
+      - shell: julia --color=yes --project=docs {0}
         run: |
           using Pkg
           Pkg.instantiate()
