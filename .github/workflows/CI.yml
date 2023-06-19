@@ -95,10 +95,10 @@ jobs:
         with:
           version: "1.9"
       - uses: julia-actions/julia-buildpkg@latest
-      - run: |
-          julia --project=docs -e '
-            using Pkg
-            Pkg.instantiate()'
+      - shell: julia --color=yes --projects=docs {0}
+        run: |
+          using Pkg
+          Pkg.instantiate()
       - run: julia --project=docs docs/make.jl
         env:
           DOCTESTS: "true"
@@ -112,10 +112,10 @@ jobs:
         with:
           version: "1.9"
       - uses: julia-actions/julia-buildpkg@latest
-      - run: |
-          julia --project=docs -e '
-            using Pkg
-            Pkg.instantiate()'
+      - shell: julia --color=yes --project=docs {0}
+        run: |
+          using Pkg
+          Pkg.instantiate()
       - run: julia --project=docs docs/make.jl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
