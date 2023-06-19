@@ -1,11 +1,5 @@
 # TimeZones Internal API
 
-```@meta
-DocTestSetup = quote
-    using TimeZones
-end
-```
-
 ## TZData
 
 ```@docs

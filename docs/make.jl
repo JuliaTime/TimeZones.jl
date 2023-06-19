@@ -1,5 +1,7 @@
 using Dates, Documenter, TimeZones
 
+DocMeta.setdocmeta!(TimeZones, :DocTestSetup, :(using TimeZones))
+
 makedocs(
     modules=[TimeZones],
     format=Documenter.HTML(prettyurls=get(ENV, "CI", nothing) == "true"),
