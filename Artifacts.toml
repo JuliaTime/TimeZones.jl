@@ -2101,57 +2101,139 @@ lazy = true
     sha256 = "02f8321a3236105338a2a071f9f9ef98dadeb8f939cbe3dc2dd53e1931015604"
     url = "https://data.iana.org/time-zones/releases/tzdata96k.tar.gz"
 
-[unicode-cldr-release-37]
+[[unicode-cldr-release-37]]
 git-tree-sha1 = "614e10267d8173c9d75167149cae0f5da9f6b68e"
 lazy = true
+arch = "i686"
+os = "windows"
 
     [[unicode-cldr-release-37.download]]
     sha256 = "28e1617f70f18cd96162972b1deeb3f2bacc5b9fe02a1494b6dbfcff79ea0f7a"
     url = "https://github.com/unicode-org/cldr/archive/release-37.tar.gz"
 
-[unicode-cldr-release-38-1]
+[[unicode-cldr-release-37]]
+git-tree-sha1 = "614e10267d8173c9d75167149cae0f5da9f6b68e"
+lazy = true
+arch = "x86_64"
+os = "windows"
+
+    [[unicode-cldr-release-37.download]]
+    sha256 = "28e1617f70f18cd96162972b1deeb3f2bacc5b9fe02a1494b6dbfcff79ea0f7a"
+    url = "https://github.com/unicode-org/cldr/archive/release-37.tar.gz"
+
+[[unicode-cldr-release-38-1]]
 git-tree-sha1 = "e3650bb0f45e427653d800ef75558003e7ab4fc0"
 lazy = true
+arch = "i686"
+os = "windows"
 
     [[unicode-cldr-release-38-1.download]]
     sha256 = "923126ef0d459fc4a642514e982d1181472b7a191b82e69929a038a8a469ea7e"
     url = "https://github.com/unicode-org/cldr/archive/release-38-1.tar.gz"
 
-[unicode-cldr-release-39]
+[[unicode-cldr-release-38-1]]
+git-tree-sha1 = "e3650bb0f45e427653d800ef75558003e7ab4fc0"
+lazy = true
+arch = "x86_64"
+os = "windows"
+
+    [[unicode-cldr-release-38-1.download]]
+    sha256 = "923126ef0d459fc4a642514e982d1181472b7a191b82e69929a038a8a469ea7e"
+    url = "https://github.com/unicode-org/cldr/archive/release-38-1.tar.gz"
+
+[[unicode-cldr-release-39]]
 git-tree-sha1 = "de1d78c75cc7ad8f66b8b8be271d05d04d81e305"
 lazy = true
+arch = "i686"
+os = "windows"
 
     [[unicode-cldr-release-39.download]]
     sha256 = "baca3b9d6103a05c823d331e884626926a508d874e0d7ea0ff08d6eaf3534628"
     url = "https://github.com/unicode-org/cldr/archive/release-39.tar.gz"
 
-[unicode-cldr-release-40]
+[[unicode-cldr-release-39]]
+git-tree-sha1 = "de1d78c75cc7ad8f66b8b8be271d05d04d81e305"
+lazy = true
+arch = "x86_64"
+os = "windows"
+
+    [[unicode-cldr-release-39.download]]
+    sha256 = "baca3b9d6103a05c823d331e884626926a508d874e0d7ea0ff08d6eaf3534628"
+    url = "https://github.com/unicode-org/cldr/archive/release-39.tar.gz"
+
+[[unicode-cldr-release-40]]
 git-tree-sha1 = "8d7201f06ff8061c1b5bff0f661b5297ec1d3158"
 lazy = true
+arch = "i686"
+os = "windows"
 
     [[unicode-cldr-release-40.download]]
     sha256 = "580cbe09e2bb97369d63a5b641e8f4bef76a585efdf7ccddc65130b0ffb579e2"
     url = "https://github.com/unicode-org/cldr/archive/release-40.tar.gz"
 
-[unicode-cldr-release-41]
+[[unicode-cldr-release-40]]
+git-tree-sha1 = "8d7201f06ff8061c1b5bff0f661b5297ec1d3158"
+lazy = true
+arch = "x86_64"
+os = "windows"
+
+    [[unicode-cldr-release-40.download]]
+    sha256 = "580cbe09e2bb97369d63a5b641e8f4bef76a585efdf7ccddc65130b0ffb579e2"
+    url = "https://github.com/unicode-org/cldr/archive/release-40.tar.gz"
+
+[[unicode-cldr-release-41]]
 git-tree-sha1 = "2d3c24083305ba06fe44e09f7c269eb02b61bee6"
 lazy = true
+arch = "i686"
+os = "windows"
 
     [[unicode-cldr-release-41.download]]
     sha256 = "9f8ac41a609bcd9bdae6674146472ee3f0fa2cf6ce73a27c9b1ab3fc75fc18ce"
     url = "https://github.com/unicode-org/cldr/archive/release-41.tar.gz"
 
-[unicode-cldr-release-42]
+[[unicode-cldr-release-41]]
+git-tree-sha1 = "2d3c24083305ba06fe44e09f7c269eb02b61bee6"
+lazy = true
+arch = "x86_64"
+os = "windows"
+
+    [[unicode-cldr-release-41.download]]
+    sha256 = "9f8ac41a609bcd9bdae6674146472ee3f0fa2cf6ce73a27c9b1ab3fc75fc18ce"
+    url = "https://github.com/unicode-org/cldr/archive/release-41.tar.gz"
+
+[[unicode-cldr-release-42]]
 git-tree-sha1 = "6a7df65d09c15538ee7f5f0fafcd6a16a3a017a0"
 lazy = true
+arch = "i686"
+os = "windows"
 
     [[unicode-cldr-release-42.download]]
     sha256 = "a65de26e4595be980142590dbd33f3768e78f8c52cc0b15b45c03f20043d5ea7"
     url = "https://github.com/unicode-org/cldr/archive/release-42.tar.gz"
 
-[unicode-cldr-release-43]
-git-tree-sha1 = "768b8b82edd878449348f31bf989867bb13e42a9"
+[[unicode-cldr-release-42]]
+git-tree-sha1 = "6a7df65d09c15538ee7f5f0fafcd6a16a3a017a0"
 lazy = true
+arch = "x86_64"
+os = "windows"
+
+    [[unicode-cldr-release-42.download]]
+    sha256 = "a65de26e4595be980142590dbd33f3768e78f8c52cc0b15b45c03f20043d5ea7"
+    url = "https://github.com/unicode-org/cldr/archive/release-42.tar.gz"
+
+[[unicode-cldr-release-43]]
+git-tree-sha1 = "768b8b82edd878449348f31bf989867bb13e42a9"
+arch = "i686"
+os = "windows"
+
+    [[unicode-cldr-release-43.download]]
+    sha256 = "f76345dc07b31cda3e63aed9feee74f40ebb7b7af764fabdd70ff1cc3f897679"
+    url = "https://github.com/unicode-org/cldr/archive/release-43.tar.gz"
+
+[[unicode-cldr-release-43]]
+git-tree-sha1 = "768b8b82edd878449348f31bf989867bb13e42a9"
+arch = "x86_64"
+os = "windows"
 
     [[unicode-cldr-release-43.download]]
     sha256 = "f76345dc07b31cda3e63aed9feee74f40ebb7b7af764fabdd70ff1cc3f897679"
