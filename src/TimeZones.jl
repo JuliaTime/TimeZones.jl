@@ -6,6 +6,7 @@ using Scratch: @get_scratch!
 using RecipesBase: RecipesBase, @recipe
 using Unicode
 using InlineStrings: InlineString15
+using tzdata_jll: tzdata_jll
 
 import Dates: TimeZone, UTC
 
@@ -41,7 +42,14 @@ abstract type Local <: TimeZone end
 
 function __init__()
     # Write out our compiled tzdata representations into a scratchspace
-    _COMPILED_DIR[] = _compiled_dir(tzdata_version())
+    version = TZData.tzdata_version()
+
+    _COMPILED_DIR[] = if false && version == tzdata_jll.version()
+        tzdata_jll.compiled_dir()
+    else
+        @info "Loading tzdata $version"
+        TZData.build(version, _scratch_dir())
+    end
 
     # Load the pre-computed TZData into memory. Skip pre-fetching the first time
     # TimeZones.jl is loaded by `deps/build.jl` as we have yet to compile the tzdata.
