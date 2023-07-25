@@ -2,7 +2,7 @@ module TimeZones
 
 using Dates
 using Printf
-using Scratch
+using Scratch: @get_scratch!
 using RecipesBase: RecipesBase, @recipe
 using Unicode
 using InlineStrings: InlineString15
@@ -32,10 +32,6 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
     guess
 
 _scratch_dir() = @get_scratch!("build")
-_tz_source_dir(version::AbstractString) = joinpath(_scratch_dir(), "tzsource", version)
-function _compiled_dir(version::AbstractString)
-    joinpath(_scratch_dir(), "compiled", "tzjf", "v$(TZJFile.DEFAULT_VERSION)", version)
-end
 
 const _COMPILED_DIR = Ref{String}()
 

@@ -1,9 +1,8 @@
 using Dates
 using Dates: parse_components
 
-using ...TimeZones: _tz_source_dir, _compiled_dir
 using ...TimeZones: TimeZones, TimeZone, FixedTimeZone, VariableTimeZone, Transition, Class
-using ...TimeZones: rename
+using ...TimeZones: rename, _scratch_dir
 using ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET, MIN_SAVE, MAX_SAVE,
     ABS_DIFF_OFFSET
 
@@ -710,8 +709,8 @@ end
 
 # TODO: Deprecate?
 function compile(
-    tz_source_dir::AbstractString=_tz_source_dir(tzdata_version()),
-    dest_dir::AbstractString=_compiled_dir(tzdata_version());
+    tz_source_dir::AbstractString=joinpath(_scratch_dir(), _tz_source_relative_dir(tzdata_version())),
+    dest_dir::AbstractString=joinpath(_scratch_dir(), _compiled_relative_dir(tzdata_version())),
     kwargs...
 )
     results = compile(TZSource(readdir(tz_source_dir; join=true)), dest_dir; kwargs...)
