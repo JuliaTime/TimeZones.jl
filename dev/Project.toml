@@ -1,6 +1,7 @@
 [deps]
+CodecZlib = "944b1d66-785c-5afd-91f1-9de20f533193"
+Downloads = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
-Inflate = "d25df0c9-e2be-5dd7-82c8-3ad0b3e990b9"
 JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 SHA = "ea8e919c-243c-51af-8825-aaa63cd721ce"
@@ -8,8 +9,12 @@ Tar = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
 TimeZones = "f269a46b-ccf7-5d73-abea-4c690281aa53"
 
 [compat]
+CodecZlib = "0.7"
+Downloads = "1.6"
 HTTP = "1"
-Inflate = "0.1.2"
 JSON3 = "1"
+Pkg = "1.6"
+SHA = "0.7"
 Tar = "1"
-julia = "1.6.2"
+TimeZones = "1"
+julia = "1.8"
