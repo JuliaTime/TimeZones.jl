@@ -3,7 +3,7 @@ module WindowsTimeZoneIDs
 using LazyArtifacts
 using ...TimeZones: _scratch_dir
 
-const UNICODE_CLDR_VERSION = "release-43"
+const UNICODE_CLDR_VERSION = "release-43-1"
 
 # A mapping of Windows timezone names to Olson timezone names.
 # Details on the contents of this file can be found at:
