@@ -3,32 +3,30 @@ using Mocking
 using RecipesBase
 using Test
 using TimeZones
-using TimeZones.TZData: TZSource, compile, build
+using TimeZones.TZData: TZSource, compile, build, _tz_source_relative_dir
 using Unicode
 
 Mocking.activate()
 
 
 const TZDATA_VERSION = "2016j"
-const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(@__DIR__, "tzsource"))
 const TZFILE_DIR = joinpath(@__DIR__, "tzfile", "data")
 const TEST_REGIONS = ["asia", "australasia", "europe", "northamerica"]
 
-isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)
+# By default use a specific version of tzdata so we just testing for TimeZones.jl code
+# changes and not changes to the dataa.
+build(TZDATA_VERSION, TimeZones._scratch_dir())
+tz_source_dir = joinpath(TimeZones._scratch_dir(), _tz_source_relative_dir(TZDATA_VERSION))
 
-# By default use a specific version of the tz database so we just testing for TimeZones.jl
-# changes and not changes to the tzdata.
-build(TZDATA_VERSION, TEST_REGIONS, TZ_SOURCE_DIR)
-
-# For testing we'll reparse the tzdata every time to instead of using the serialized data.
-# This should make the development/testing cycle simplier since you won't be forced to
-# re-build the cache every time you make a change.
+# For testing we'll reparse the tzdata every time to instead of using the compiled data.
+# This should make interactive development/testing cycles simplier since you won't be forced
+# to re-build the cache every time you make a change.
 #
 # Note: resolving only the time zones we want is much faster than running compile which
 # recompiles all the time zones.
 tzdata = Dict{String,TZSource}()
 for name in TEST_REGIONS
-    tzdata[name] = TZSource(joinpath(TZ_SOURCE_DIR, name))
+    tzdata[name] = TZSource(joinpath(tz_source_dir, name))
 end
 
 include("helpers.jl")
