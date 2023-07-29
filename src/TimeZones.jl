@@ -6,6 +6,7 @@ using Scratch: @get_scratch!
 using RecipesBase: RecipesBase, @recipe
 using Unicode
 using InlineStrings: InlineString15
+using TZJData: TZJData
 
 import Dates: TimeZone, UTC
 
@@ -41,11 +42,13 @@ abstract type Local <: TimeZone end
 
 function __init__()
     # Write out our compiled tzdata representations into a scratchspace
-    version = TZData.tzdata_version()
+    desired_version = TZData.tzdata_version()
 
-    _COMPILED_DIR[] = begin
-        @info "Loading tzdata $version"
-        TZData.build(version, _scratch_dir())
+    _COMPILED_DIR[] = if desired_version == TZJData.TZDATA_VERSION
+        TZJData.ARTIFACT_DIR
+    else
+        @info "Loading tzdata $desired_version"
+        TZData.build(desired_version, _scratch_dir())
     end
 
     # Load the pre-computed TZData into memory. Skip pre-fetching the first time
