@@ -1,7 +1,8 @@
-using LazyArtifacts, TimeZones, Test
-
 @testset "Artifacts" begin
-    all_artifacts = LazyArtifacts.select_downloadable_artifacts(TimeZones.TZData.ARTIFACT_TOML; include_lazy=true)
+    all_artifacts = select_downloadable_artifacts(
+        TimeZones.TZData.ARTIFACT_TOML;
+        include_lazy=true
+    )
     non_lazy_artifacts = String[]
 
     # Collect all `tzdata` artifacts, assert that they are all lazy except for the default one

@@ -1,6 +1,6 @@
 module WindowsTimeZoneIDs
 
-using LazyArtifacts
+using Artifacts: @artifact_str
 using ...TimeZones: _scratch_dir
 
 const UNICODE_CLDR_VERSION = "release-43-1"

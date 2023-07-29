@@ -1,9 +1,12 @@
 using Mocking
 
+using Artifacts: select_downloadable_artifacts
 using RecipesBase
 using Test
 using TimeZones
-using TimeZones.TZData: TZSource, compile, build, _tz_source_relative_dir
+using TimeZones: _scratch_dir
+using TimeZones.TZData: TZSource, compile, build, tzdata_url, unpack,
+    _tz_source_relative_dir, _archive_relative_dir
 using Unicode
 
 Mocking.activate()
@@ -12,11 +15,11 @@ Mocking.activate()
 const TZDATA_VERSION = "2016j"
 const TZFILE_DIR = joinpath(@__DIR__, "tzfile", "data")
 const TEST_REGIONS = ["asia", "australasia", "europe", "northamerica"]
+const TEST_TZ_SOURCE_DIR = joinpath(_scratch_dir(), _tz_source_relative_dir(TZDATA_VERSION))
 
 # By default use a specific version of tzdata so we just testing for TimeZones.jl code
 # changes and not changes to the dataa.
-build(TZDATA_VERSION, TimeZones._scratch_dir())
-tz_source_dir = joinpath(TimeZones._scratch_dir(), _tz_source_relative_dir(TZDATA_VERSION))
+build(TZDATA_VERSION, _scratch_dir())
 
 # For testing we'll reparse the tzdata every time to instead of using the compiled data.
 # This should make interactive development/testing cycles simplier since you won't be forced
@@ -26,7 +29,7 @@ tz_source_dir = joinpath(TimeZones._scratch_dir(), _tz_source_relative_dir(TZDAT
 # recompiles all the time zones.
 tzdata = Dict{String,TZSource}()
 for name in TEST_REGIONS
-    tzdata[name] = TZSource(joinpath(tz_source_dir, name))
+    tzdata[name] = TZSource(joinpath(TEST_TZ_SOURCE_DIR, name))
 end
 
 include("helpers.jl")
