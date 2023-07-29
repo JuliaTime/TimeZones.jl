@@ -1,4 +1,10 @@
-
+const exe7z = if Sys.iswindows()
+    if isdefined(Base, :LIBEXECDIR)
+        joinpath(Sys.BINDIR, Base.LIBEXECDIR, "7z.exe")
+    else
+        joinpath(Sys.BINDIR, "7z.exe")
+    end
+end
 
 """
     unpack(archive, directory, [files]; [verbose=false]) -> Nothing
