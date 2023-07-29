@@ -1,6 +1,7 @@
 using Mocking
 
 using Artifacts: select_downloadable_artifacts
+using Base.BinaryPlatforms: Platform
 using RecipesBase
 using Test
 using TimeZones

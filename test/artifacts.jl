@@ -1,20 +1,21 @@
 @testset "Artifacts" begin
-    all_artifacts = select_downloadable_artifacts(
-        TimeZones.TZData.ARTIFACT_TOML;
-        include_lazy=true
-    )
-    non_lazy_artifacts = String[]
+    @testset "unicode-cldr" begin
+        platforms = [
+            Platform("x86_64", "windows"),
+            Platform("i686", "windows"),
+        ]
 
-    # Collect all `tzdata` artifacts, assert that they are all lazy except for the default one
-    for (name, meta) in all_artifacts
-        if !startswith(name, "tzdata")
-            continue
-        end
-        if get(meta, "lazy", "false") == "false"
-            push!(non_lazy_artifacts, name)
+        for platform in platforms
+            dict = select_downloadable_artifacts(
+                TimeZones.TZData.ARTIFACT_TOML;
+                platform,
+                include_lazy=true,
+            )
+            @test length(dict) == 1
+
+            name, info = first(dict)
+            @test startswith(name, "unicode-cldr")
+            @test get(info, "lazy", false) == false
         end
     end
-
-    @test length(non_lazy_artifacts) == 1
-    @test only(non_lazy_artifacts) == string("tzdata", TimeZones.TZData.DEFAULT_TZDATA_VERSION)
 end
