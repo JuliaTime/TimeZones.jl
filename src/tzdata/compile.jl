@@ -710,7 +710,7 @@ end
 # TODO: Deprecate?
 function compile(
     tz_source_dir::AbstractString=joinpath(_scratch_dir(), _tz_source_relative_dir(tzdata_version())),
-    dest_dir::AbstractString=joinpath(_scratch_dir(), _compiled_relative_dir(tzdata_version())),
+    dest_dir::AbstractString=joinpath(_scratch_dir(), _compiled_relative_dir(tzdata_version()));
     kwargs...
 )
     results = compile(TZSource(readdir(tz_source_dir; join=true)), dest_dir; kwargs...)
