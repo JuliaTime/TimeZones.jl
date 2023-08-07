@@ -5,18 +5,20 @@ using TimeZones: TZData
 # Julia sessions or just leave the end-users system in a inconsistent state.
 
 @testset "build process" begin
-    # Clean out deps directories for a clean re-build
-    compiled_dir = TZData._compiled_dir(TZDATA_VERSION)
-    tz_source_dir = TZData._tz_source_dir(TZDATA_VERSION)
+    working_dir = _scratch_dir()
 
-    isdir(compiled_dir) && rm(compiled_dir, recursive=true)
-    isdir(tz_source_dir) && rm(tz_source_dir, recursive=true)
+    # Clean out deps directories for a clean re-build
+    TZData.cleanup(TZDATA_VERSION, working_dir)
+
+    tz_source_dir = joinpath(working_dir, _tz_source_relative_dir(version))
+    compiled_dir = joinpath(working_dir, _compiled_relative_dir(version))
 
     @test !isdir(compiled_dir)
-    @test !isdir(tz_source_dir)
+    @test !isdir(tz_source_dir
 
+    # TODO: Comment incorrect
     # Using a version we already have avoids triggering a download
-    TimeZones.build(TZDATA_VERSION)
+    TimeZones.build(TZDATA_VERSION, working_dir)
 
     @test isdir(compiled_dir)
     @test length(readdir(compiled_dir)) > 0
