@@ -10,15 +10,15 @@ using TimeZones: TZData
     # Clean out deps directories for a clean re-build
     TZData.cleanup(TZDATA_VERSION, working_dir)
 
-    tz_source_dir = joinpath(working_dir, _tz_source_relative_dir(version))
-    compiled_dir = joinpath(working_dir, _compiled_relative_dir(version))
+    tz_source_dir = joinpath(working_dir, _tz_source_relative_dir(TZDATA_VERSION))
+    compiled_dir = joinpath(working_dir, _compiled_relative_dir(TZDATA_VERSION))
 
     @test !isdir(compiled_dir)
-    @test !isdir(tz_source_dir
+    @test !isdir(tz_source_dir)
 
     # TODO: Comment incorrect
     # Using a version we already have avoids triggering a download
-    TimeZones.build(TZDATA_VERSION, working_dir)
+    TZData.build(TZDATA_VERSION, working_dir)
 
     @test isdir(compiled_dir)
     @test length(readdir(compiled_dir)) > 0

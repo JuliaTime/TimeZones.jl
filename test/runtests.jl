@@ -7,7 +7,7 @@ using Test
 using TimeZones
 using TimeZones: _scratch_dir
 using TimeZones.TZData: TZSource, compile, build, tzdata_url, unpack,
-    _tz_source_relative_dir, _archive_relative_dir
+    _tz_source_relative_dir, _archive_relative_dir, _compiled_relative_dir
 using Unicode
 
 Mocking.activate()
