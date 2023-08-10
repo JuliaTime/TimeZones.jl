@@ -8,7 +8,8 @@ function build(
 )
     Base.depwarn(
         "`$build(version, regions, tz_source_dir, compiled_dir)` is deprecated with no " *
-        "direct replacement, see `$build(version, working_dir)` as an alternative."
+        "direct replacement, see `$build(version, working_dir)` as an alternative.",
+        :build,
     )
 
     url = tzdata_url(version)
@@ -54,7 +55,8 @@ function build()
             version
         end
         ```
-        instead."""
+        instead.""",
+        :build
     )
 
     version = tzdata_version()
@@ -73,7 +75,8 @@ function build(version::AbstractString; returned::Symbol=:version)
                 version
             end
             ```
-            instead."""
+            instead.""",
+            :build,
         )
     elseif returned === :namedtuple
         Base.depwarn(
@@ -85,7 +88,8 @@ function build(version::AbstractString; returned::Symbol=:version)
                 (; version, tz_source_dir, compiled_dir)
             end
             ```
-            instead."""
+            instead.""",
+            :build
         )
     else
         throw(ArgumentError("Unhandled return option: $returned"))
