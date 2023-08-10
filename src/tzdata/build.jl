@@ -38,11 +38,12 @@ function build(version::AbstractString, working_dir::AbstractString)
 
     if !isdir(tz_source_dir)
         @info "Decompressing tzdata $version region data"
+        isarchive(tzdata_archive_file) || error("Invalid archive: $tzdata_archive_file")
         mkpath(tz_source_dir)
 
         # TODO: Confirm that "utc" was ever included in the tzdata archives
         regions = intersect!(list(tzdata_archive_file), REGIONS)
-        unpack(tzdata_archive_file, tz_source_dir, regions; verbose=true)
+        unpack(tzdata_archive_file, tz_source_dir, regions)
 
         for custom_region in CUSTOM_REGIONS
             cp(joinpath(CUSTOM_REGION_DIR, custom_region), joinpath(tz_source_dir, custom_region))
