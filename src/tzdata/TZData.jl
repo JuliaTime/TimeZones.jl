@@ -11,8 +11,6 @@ using p7zip_jll: p7zip_jll
 # the "tzdata" archive or more specifically the "tz source" files within the archive
 # (africa, australasia, ...)
 
-const ARTIFACT_TOML = joinpath(@__DIR__, "..", "..", "Artifacts.toml")
-
 const _LATEST_FILE_PATH = Ref{String}()
 const _LATEST = Ref{Tuple{AbstractString, DateTime}}()
 

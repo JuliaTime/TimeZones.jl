@@ -7,7 +7,7 @@
 
         for platform in platforms
             dict = select_downloadable_artifacts(
-                TimeZones.TZData.ARTIFACT_TOML;
+                joinpath(@__DIR__, "..", "Artifacts.toml");
                 platform,
                 include_lazy=true,
             )
