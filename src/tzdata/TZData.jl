@@ -4,6 +4,7 @@ using Artifacts: @artifact_str
 using Dates: Dates, DateTime
 using Printf
 using ...TimeZones: TZJFile, _scratch_dir
+using TZJData: TZJData
 using p7zip_jll: p7zip_jll
 
 # Note: The tz database is made up of two parts: code and data. TimeZones.jl only requires

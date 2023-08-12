@@ -58,7 +58,7 @@ end
     withenv("JULIA_TZ_VERSION" => nothing) do
         version = tzdata_version()
         @test version != "latest"
-        @test version == TimeZones.TZData.DEFAULT_TZDATA_VERSION
+        @test version == TZJData.TZDATA_VERSION
     end
 
     withenv("JULIA_TZ_VERSION" => TZDATA_VERSION) do

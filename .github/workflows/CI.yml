@@ -13,6 +13,12 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/master' || github.run_number }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+# Only download the tzdata version used in TimeZones.jl's tests to avoid unnecessary
+# load on IANA's servers.
+env:
+  JULIA_TZ_VERSION: 2016j  # Matches tzdata version used in tests
+
 jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
@@ -45,22 +51,6 @@ jobs:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
       - uses: julia-actions/cache@v1
-      # Only download the tzdata version used in TimeZones.jl's tests to avoid unnecessary
-      # load on IANA's servers. However, if the DEFAULT_TZDATA_VERSION constant was
-      # changed we need to also build the version specified by the constant to ensure it can be
-      # compiled.
-      # Note: The `git diff` command has a `--quiet` flag that will suppress output but doesn't
-      # catch all changes.
-      #
-      # https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-environment-variable
-      - run: |
-          git fetch origin +:refs/remotes/origin/HEAD
-          if git diff --exit-code -G"^const DEFAULT_TZDATA_VERSION" origin/HEAD..HEAD > /dev/null; then
-            echo "JULIA_TZ_VERSION=$TZDATA_VERSION" >> $GITHUB_ENV
-          fi
-        shell: bash
-        env:
-          TZDATA_VERSION: 2016j  # Matches tzdata version used in tests
       - uses: julia-actions/julia-buildpkg@latest
       - uses: julia-actions/julia-runtest@latest
       - uses: julia-actions/julia-processcoverage@v1
@@ -83,8 +73,6 @@ jobs:
           git fetch origin +:refs/remotes/origin/HEAD
           julia --project=benchmark/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd()))'
           julia --project=benchmark/ -e 'using PkgBenchmark, TimeZones; export_markdown(stdout, judge(TimeZones, "origin/HEAD", verbose=false))'
-        env:
-          TZDATA_VERSION: 2016j  # Matches tzdata version used in tests
 
   doctest:
     name: Documentation - DocTests
