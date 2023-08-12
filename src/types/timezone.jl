@@ -2,8 +2,14 @@
 # to this structure can result in inconsistent behaviour.
 const _TZ_CACHE = Dict{String,Tuple{TimeZone,Class}}()
 
-function _reload_cache(compiled_dir)
-    empty!(_TZ_CACHE)
+function _reload_cache(compiled_dir::AbstractString)
+    _reload_cache!(_TZ_CACHE, compiled_dir)
+    !isempty(_TZ_CACHE) || error("Cache remains empty after loading")
+    return nothing
+end
+
+function _reload_cache!(cache::AbstractDict, compiled_dir::AbstractString)
+    empty!(cache)
     check = Tuple{String,String}[(compiled_dir, "")]
 
     for (dir, partial) in check
@@ -16,14 +22,12 @@ function _reload_cache(compiled_dir)
             if isdir(path)
                 push!(check, (path, name))
             else
-                _TZ_CACHE[name] = open(TZJFile.read, path, "r")(name)
+                cache[name] = open(TZJFile.read, path, "r")(name)
             end
         end
     end
 
-    !isempty(_TZ_CACHE) || error("Cache remains empty after loading")
-
-    return nothing
+    return cache
 end
 
 """
