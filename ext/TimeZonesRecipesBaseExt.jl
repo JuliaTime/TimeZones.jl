@@ -1,3 +1,8 @@
+module TimeZonesRecipesBaseExt
+
+using TimeZones
+using RecipesBase: RecipesBase, @recipe
+
 #==
 Plot ZonedDateTime, on x-axis.
 We convert it to DateTimes, in the local timezone,
@@ -22,3 +27,5 @@ for details on the options and their tradeoffs.
         [], ys
     end
 end
+
+end #module

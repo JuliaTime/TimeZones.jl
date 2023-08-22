@@ -3,7 +3,6 @@ module TimeZones
 using Dates
 using Printf
 using Scratch: @get_scratch!
-using RecipesBase: RecipesBase, @recipe
 using Unicode
 using InlineStrings: InlineString15
 using TZJData: TZJData
@@ -92,7 +91,10 @@ include("ranges.jl")
 include("discovery.jl")
 include("rounding.jl")
 include("parse.jl")
-include("plotting.jl")
 include("deprecated.jl")
+
+if !isdefined(Base, :get_extension)
+    include("../ext/TimeZonesRecipesBaseExt.jl")
+end
 
 end # module
