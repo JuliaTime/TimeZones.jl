@@ -22,7 +22,9 @@ InlineStrings = "1"
 Mocking = "0.7"
 RecipesBase = "0.7, 0.8, 1"
 Scratch = "1.1.1"
+TZJData = "1"
 julia = "1.6"
+p7zip_jll = "17.4"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
