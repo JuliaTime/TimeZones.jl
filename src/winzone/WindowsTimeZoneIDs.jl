@@ -1,6 +1,6 @@
 module WindowsTimeZoneIDs
 
-using LazyArtifacts
+using Artifacts: @artifact_str
 using ...TimeZones: _scratch_dir
 
 const UNICODE_CLDR_VERSION = "release-43-1"
@@ -17,6 +17,8 @@ function __init__()
     _WINDOWS_XML_FILE_PATH[] = joinpath(_scratch_dir(), "local", "windowsZones.xml")
     if isfile(_WINDOWS_XML_FILE_PATH[])
         copy!(WINDOWS_TRANSLATION, compile(_WINDOWS_XML_FILE_PATH[]))
+    else
+        build()
     end
 end
 

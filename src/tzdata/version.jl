@@ -1,10 +1,3 @@
-# Default tzdata version to use if the environmental variable "JULIA_TZ_VERSION" is not set.
-# We want to use a specific version here to ensure that specific revisions of the
-# TimeZones.jl package always use the same revision of tzdata. Doing so ensure that we can
-# always use older revisions of this package and always reproduce the same results.
-const DEFAULT_TZDATA_VERSION = "2023c"  # Do not use floating revision "latest" here
-
-
 # Note: A tz code or data version consists of a year and letter while a release consists of
 # a pair of tz code and data versions. In recent releases the tz code and data use the same
 # version.
@@ -95,6 +88,6 @@ function tzdata_version_archive(archive::AbstractString)
 end
 
 function tzdata_version()
-    version = get(ENV, "JULIA_TZ_VERSION", DEFAULT_TZDATA_VERSION)
+    version = get(ENV, "JULIA_TZ_VERSION", TZJData.TZDATA_VERSION)
     return version == "latest" ? tzdata_latest_version() : version
 end

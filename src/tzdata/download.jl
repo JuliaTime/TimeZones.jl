@@ -84,3 +84,25 @@ function tzdata_latest_version()
 
     return latest_version
 end
+
+"""
+    tzdata_url(version::AbstractVersion) -> AbstractString
+
+Generate a HTTPS URL for the specified tzdata version. Typical version strings are
+formatted as 4-digit year followed by a lowercase ASCII letter. Available versions can be
+listed with [`tzdata_versions`](@ref) or by viewing the contents of
+"https://data.iana.org/time-zones/releases/" and looking at the files starting with
+"tzdata".
+
+# Examples
+```julia
+julia> tzdata_url("2017a")
+"https://data.iana.org/time-zones/releases/tzdata2017a.tar.gz"
+```
+"""
+function tzdata_url(version::AbstractString)
+    # Note: IANA also provides tzdata via an FTP server at "ftp://ftp.iana.org/tz/releases/"
+    # but this service is unreliable and likely to break if accessing the service from
+    # behind a firewall.
+    return "https://data.iana.org/time-zones/releases/tzdata$version.tar.gz"
+end

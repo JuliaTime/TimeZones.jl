@@ -1,34 +1,37 @@
 using Mocking
 
+using Artifacts: select_downloadable_artifacts
+using Base.BinaryPlatforms: Platform
 using RecipesBase
 using Test
 using TimeZones
-using TimeZones.TZData: TZSource, compile, build
+using TimeZones: _scratch_dir
+using TimeZones.TZData: TZSource, compile, build, tzdata_url, unpack,
+    _tz_source_relative_dir, _archive_relative_dir, _compiled_relative_dir
+using TZJData: TZJData
 using Unicode
 
 Mocking.activate()
 
 
 const TZDATA_VERSION = "2016j"
-const TZ_SOURCE_DIR = get(ENV, "TZ_SOURCE_DIR", joinpath(@__DIR__, "tzsource"))
 const TZFILE_DIR = joinpath(@__DIR__, "tzfile", "data")
 const TEST_REGIONS = ["asia", "australasia", "europe", "northamerica"]
+const TEST_TZ_SOURCE_DIR = joinpath(_scratch_dir(), _tz_source_relative_dir(TZDATA_VERSION))
 
-isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)
+# By default use a specific version of tzdata so we just testing for TimeZones.jl code
+# changes and not changes to the dataa.
+build(TZDATA_VERSION, _scratch_dir())
 
-# By default use a specific version of the tz database so we just testing for TimeZones.jl
-# changes and not changes to the tzdata.
-build(TZDATA_VERSION, TEST_REGIONS, TZ_SOURCE_DIR)
-
-# For testing we'll reparse the tzdata every time to instead of using the serialized data.
-# This should make the development/testing cycle simplier since you won't be forced to
-# re-build the cache every time you make a change.
+# For testing we'll reparse the tzdata every time to instead of using the compiled data.
+# This should make interactive development/testing cycles simplier since you won't be forced
+# to re-build the cache every time you make a change.
 #
 # Note: resolving only the time zones we want is much faster than running compile which
 # recompiles all the time zones.
 tzdata = Dict{String,TZSource}()
 for name in TEST_REGIONS
-    tzdata[name] = TZSource(joinpath(TZ_SOURCE_DIR, name))
+    tzdata[name] = TZSource(joinpath(TEST_TZ_SOURCE_DIR, name))
 end
 
 include("helpers.jl")
@@ -43,6 +46,7 @@ include("helpers.jl")
     include(joinpath("tzdata", "version.jl"))
     include(joinpath("tzdata", "download.jl"))
     include(joinpath("tzdata", "compile.jl"))
+    include(joinpath("tzdata", "build.jl"))
     Sys.iswindows() && include(joinpath("winzone", "WindowsTimeZoneIDs.jl"))
     include("utcoffset.jl")
     include(joinpath("types", "timezone.jl"))
@@ -68,10 +72,4 @@ include("helpers.jl")
     include("rounding.jl")
     include("parse.jl")
     include("plotting.jl")
-
-    # Note: Run the build tests last to ensure that re-compiling the time zones files
-    # doesn't interfere with other tests.
-    if lowercase(get(ENV, "CI", "false")) == "true"
-        include("ci.jl")
-    end
 end

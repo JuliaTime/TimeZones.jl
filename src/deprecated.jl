@@ -11,4 +11,6 @@ const TransitionTimeInfo = TZFile.TransitionTimeInfo
 @deprecate abbreviation TZFile.get_designation false
 @deprecate read_tzfile(io::IO, name::AbstractString) TZFile.read(io)(name) false
 
+@deprecate build(; force=false) build(TZJData.TZDATA_VERSION; force)
+
 # END TimeZones 1.0 deprecations
