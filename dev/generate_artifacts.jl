@@ -1,58 +1,13 @@
 using Base: SHA1
-using Base.BinaryPlatforms: HostPlatform, Platform
+using Base.BinaryPlatforms: Platform
 using CodecZlib: GzipDecompressorStream
 using Downloads: download
 using JSON3: JSON3
 using HTTP: HTTP
-using Pkg.Artifacts: AbstractPlatform, artifact_hash, artifact_meta, bind_artifact!,
-    load_artifacts_toml, unbind_artifact!
+using Pkg.Artifacts: bind_artifact!, load_artifacts_toml, unbind_artifact!
 using SHA: SHA
 using Tar: Tar
 using TimeZones.TZData: tzdata_versions
-
-
-function artifact_checksums(tarball_url::AbstractString)
-    tarball = download(tarball_url, IOBuffer())
-
-    # Compute the Artifact.toml `sha256` from the compressed archive.
-    sha256 = bytes2hex(SHA.sha256(seekstart(tarball)))
-
-    # Compute the Artifact.toml `git-tree-sha1`. Usually this is computed via
-    # `Artifacts.create_artifact` but we want to avoid actually storing this data as an
-    # artifact.
-    git_tree_sha1 = SHA1(Tar.tree_hash(GzipDecompressorStream(seekstart(tarball))))
-
-    return git_tree_sha1, sha256
-end
-
-# Code loosely based upon: https://julialang.github.io/Pkg.jl/dev/artifacts/#Using-Artifacts-1
-function bind_artifact_url!(
-    artifacts_toml::String,
-    name::String,
-    url::String;
-    lazy::Bool=true,
-    platform::Union{AbstractPlatform,Nothing}=nothing,
-)
-    p = something(platform, HostPlatform())
-
-    # Query the `Artifacts.toml` file for the hash associated with artifact name. If no such
-    # binding exists within the file then `nothing` will be returned.
-    git_tree_sha1 = artifact_hash(name, artifacts_toml; platform=p)
-
-    if git_tree_sha1 === nothing
-        @info "Processing new artifact: $name"
-        git_tree_sha1, sha256 = artifact_checksums(url)
-    else
-        meta = artifact_meta(name, artifacts_toml; platform=p)
-        sha256 = only(meta["download"])["sha256"]
-    end
-
-    download_info = [(url, sha256)]
-
-    # Must unbind before we can call bind on an already bound artifact
-    unbind_artifact!(artifacts_toml, name)
-    bind_artifact!(artifacts_toml, name, git_tree_sha1; lazy, platform, download_info)
-end
 
 function update_uncode_cldr_artifacts!(artifacts_toml::AbstractString)
     @info "Checking for latest Unicode CLDR release..."
@@ -76,7 +31,15 @@ function update_uncode_cldr_artifacts!(artifacts_toml::AbstractString)
         sha256 = only(info["download"])["sha256"]
     else
         @info "Processing new artifact: $name"
-        git_tree_sha1, sha256 = artifact_checksums(url)
+        tarball = download(tarball_url, IOBuffer())
+
+        # Compute the Artifact.toml `sha256` from the compressed archive.
+        sha256 = bytes2hex(SHA.sha256(seekstart(tarball)))
+
+        # Compute the Artifact.toml `git-tree-sha1`. Usually this is computed via
+        # `Artifacts.create_artifact` but we want to avoid actually storing this data as an
+        # artifact.
+        git_tree_sha1 = SHA1(Tar.tree_hash(GzipDecompressorStream(seekstart(tarball))))
     end
 
     download_info = [(url, sha256)]
@@ -97,16 +60,9 @@ end
 
 
 function update_artifacts!(artifacts_toml::String)
-    @info "Checking for missing tzdata versions..."
+    @info "Determining latest tzdata version..."
     versions = tzdata_versions()
     latest_tzdata = last(versions)
-
-    for version in versions
-        artifact_name = "tzdata$version"
-        url = "https://data.iana.org/time-zones/releases/tzdata$version.tar.gz"
-        lazy = version != latest_tzdata
-        bind_artifact_url!(artifacts_toml, artifact_name, url; lazy)
-    end
 
     latest_unicode_cldr = update_uncode_cldr_artifacts!(artifacts_toml)
 

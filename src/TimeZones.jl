@@ -2,10 +2,11 @@ module TimeZones
 
 using Dates
 using Printf
-using Scratch
+using Scratch: @get_scratch!
 using RecipesBase: RecipesBase, @recipe
 using Unicode
 using InlineStrings: InlineString15
+using TZJData: TZJData
 
 import Dates: TimeZone, UTC
 
@@ -32,10 +33,6 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
     guess
 
 _scratch_dir() = @get_scratch!("build")
-_tz_source_dir(version::AbstractString) = joinpath(_scratch_dir(), "tzsource", version)
-function _compiled_dir(version::AbstractString)
-    joinpath(_scratch_dir(), "compiled", "tzjf", "v$(TZJFile.DEFAULT_VERSION)", version)
-end
 
 const _COMPILED_DIR = Ref{String}()
 
@@ -45,7 +42,14 @@ abstract type Local <: TimeZone end
 
 function __init__()
     # Write out our compiled tzdata representations into a scratchspace
-    _COMPILED_DIR[] = _compiled_dir(tzdata_version())
+    desired_version = TZData.tzdata_version()
+
+    _COMPILED_DIR[] = if desired_version == TZJData.TZDATA_VERSION
+        TZJData.ARTIFACT_DIR
+    else
+        @info "Loading tzdata $desired_version"
+        TZData.build(desired_version, _scratch_dir())
+    end
 
     # Load the pre-computed TZData into memory. Skip pre-fetching the first time
     # TimeZones.jl is loaded by `deps/build.jl` as we have yet to compile the tzdata.
