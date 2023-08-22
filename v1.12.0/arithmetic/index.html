@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Arithmetic · TimeZones.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">TimeZones.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Introduction</a></li><li><a class="tocitem" href="../types/">Types</a></li><li><a class="tocitem" href="../conversions/">Converting</a></li><li class="is-active"><a class="tocitem" href>Arithmetic</a><ul class="internal"><li><a class="tocitem" href="#ZonedDateTime-Period-Arithmetic"><span>ZonedDateTime-Period Arithmetic</span></a></li><li><a class="tocitem" href="#Ranges"><span>Ranges</span></a></li></ul></li><li><a class="tocitem" href="../rounding/">Rounding</a></li><li><a class="tocitem" href="../current/">Current Time</a></li><li><a class="tocitem" href="../faq/">Frequently Asked Questions</a></li><li><a class="tocitem" href="../api-public/">API – Public</a></li><li><a class="tocitem" href="../api-private/">API – Private</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Arithmetic</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Arithmetic</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/JuliaTime/TimeZones.jl/blob/master/docs/src/arithmetic.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Arithmetic"><a class="docs-heading-anchor" href="#Arithmetic">Arithmetic</a><a id="Arithmetic-1"></a><a class="docs-heading-anchor-permalink" href="#Arithmetic" title="Permalink"></a></h1><h2 id="ZonedDateTime-Period-Arithmetic"><a class="docs-heading-anchor" href="#ZonedDateTime-Period-Arithmetic">ZonedDateTime-Period Arithmetic</a><a id="ZonedDateTime-Period-Arithmetic-1"></a><a class="docs-heading-anchor-permalink" href="#ZonedDateTime-Period-Arithmetic" title="Permalink"></a></h2><p><code>ZonedDateTime</code> uses calendrical arithmetic in a <a href="https://docs.julialang.org/en/v1/stdlib/Dates/#TimeType-Period-Arithmetic-1">similar manner to <code>DateTime</code></a> but with some key differences. Lets look at these differences by adding a day to March 30th 2014 in Europe/Warsaw.</p><pre><code class="language-julia-repl hljs">julia&gt; using TimeZones, Dates
+
+julia&gt; warsaw = tz&quot;Europe/Warsaw&quot;
+Europe/Warsaw (UTC+1/UTC+2)
+
+julia&gt; spring = ZonedDateTime(2014, 3, 30, warsaw)
+2014-03-30T00:00:00+01:00
+
+julia&gt; spring + Day(1)
+2014-03-31T00:00:00+02:00</code></pre><p>Adding a day to the <code>ZonedDateTime</code> changed the date from the 30th to the 31st as expected. Looking closely however you&#39;ll notice that the time zone offset changed from +01:00 to +02:00. The reason for this change is because the time zone &quot;Europe/Warsaw&quot; switched from standard time (+01:00) to daylight saving time (+02:00) on the 30th. The change in the offset caused the local DateTime 2014-03-31T02:00:00 to be skipped effectively making the 30th a day which only contained 23 hours. Alternatively if we added hours we can see the difference:</p><pre><code class="language-julia-repl hljs">julia&gt; spring + Hour(24)
+2014-03-31T01:00:00+02:00
+
+julia&gt; spring + Hour(23)
+2014-03-31T00:00:00+02:00</code></pre><p>A potential cause of confusion regarding this behaviour is the loss in associativity when ordering is forced. For example:</p><pre><code class="language-julia-repl hljs">julia&gt; (spring + Day(1)) + Hour(24)
+2014-04-01T00:00:00+02:00
+
+julia&gt; (spring + Hour(24)) + Day(1)
+2014-04-01T01:00:00+02:00</code></pre><p>The first example adds 1 day to 2014-03-30T00:00:00+01:00, which results in 2014-03-31T00:00:00+02:00; then we add 24 hours to get 2014-04-01T00:00:00+02:00. The second example add 24 hours <em>first</em> to get 2014-03-31T01:00:00+02:00, and <em>then</em> add 1 day which results in 2014-04-01T01:00:00+02:00. When working with operations using multiple periods the operations will be ordered by the Period&#39;s <em>types</em> and not their positional order; this means <code>Day</code> will be added before <code>Hour</code>. Hence the following <em>does</em> result in associativity:</p><pre><code class="language-julia-repl hljs">julia&gt; spring + Hour(24) + Day(1)
+2014-04-01T00:00:00+02:00
+
+julia&gt; spring + Day(1) + Hour(24)
+2014-04-01T00:00:00+02:00</code></pre><h2 id="Ranges"><a class="docs-heading-anchor" href="#Ranges">Ranges</a><a id="Ranges-1"></a><a class="docs-heading-anchor-permalink" href="#Ranges" title="Permalink"></a></h2><p><a href="https://docs.julialang.org/en/v1/stdlib/Dates/#Query-Functions-1">Query</a> and <a href="https://docs.julialang.org/en/v1/stdlib/Dates/#Adjuster-Functions-1">adjuster functions</a> can be used as with <code>Date</code> and <code>DateTime</code>. We can use <code>filter</code> to apply a predicate to a <code>StepRange</code> of <code>TimeType</code>s to produce a vector of dates that fit certain inclusion criteria (for example, &quot;every fifth Wednesday of the month in 2014 at 09:00&quot;):</p><pre><code class="language-julia-repl hljs">julia&gt; warsaw = tz&quot;Europe/Warsaw&quot;
+Europe/Warsaw (UTC+1/UTC+2)
+
+julia&gt; start = ZonedDateTime(2014, warsaw)
+2014-01-01T00:00:00+01:00
+
+julia&gt; stop = ZonedDateTime(2015, warsaw)
+2015-01-01T00:00:00+01:00
+
+julia&gt; filter(start:Dates.Hour(1):stop) do d
+           Dates.dayofweek(d) == Dates.Wednesday &amp;&amp;
+           Dates.hour(d) == 9 &amp;&amp;
+           Dates.dayofweekofmonth(d) == 5
+       end
+5-element Array{ZonedDateTime,1}:
+ 2014-01-29T09:00:00+01:00
+ 2014-04-30T09:00:00+02:00
+ 2014-07-30T09:00:00+02:00
+ 2014-10-29T09:00:00+01:00
+ 2014-12-31T09:00:00+01:00</code></pre><p>Note the transition from standard time to daylight saving time (and back again).</p><p>It is possible to define a range <code>start:step:stop</code> such that <code>start</code> and <code>stop</code> have different time zones. In this case the resulting <code>ZonedDateTime</code>s will all share a time zone with <code>start</code> but the range will stop at the instant that corresponds to <code>stop</code> in <code>start</code>&#39;s time zone. For example:</p><pre><code class="language-julia-repl hljs">julia&gt; start = ZonedDateTime(2016, 1, 1, 12, tz&quot;UTC&quot;)
+2016-01-01T12:00:00+00:00
+
+julia&gt; stop = ZonedDateTime(2016, 1, 1, 18, tz&quot;Europe/Warsaw&quot;)
+2016-01-01T18:00:00+01:00
+
+julia&gt; collect(start:Dates.Hour(1):stop)
+6-element Array{ZonedDateTime,1}:
+ 2016-01-01T12:00:00+00:00
+ 2016-01-01T13:00:00+00:00
+ 2016-01-01T14:00:00+00:00
+ 2016-01-01T15:00:00+00:00
+ 2016-01-01T16:00:00+00:00
+ 2016-01-01T17:00:00+00:00</code></pre><p>Note that 2016-01-01T17:00:00 in UTC corresponds to 2016-01-01T18:00:00 in &quot;Europe/Warsaw&quot;, which is the requested endpoint of the range.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../conversions/">« Converting</a><a class="docs-footer-nextpage" href="../rounding/">Rounding »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Tuesday 22 August 2023 05:27">Tuesday 22 August 2023</span>. Using Julia version 1.9.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
