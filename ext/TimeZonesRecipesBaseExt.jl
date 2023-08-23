@@ -28,4 +28,4 @@ for details on the options and their tradeoffs.
     end
 end
 
-end #module
+end # module

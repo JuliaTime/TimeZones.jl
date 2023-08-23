@@ -93,6 +93,7 @@ include("rounding.jl")
 include("parse.jl")
 include("deprecated.jl")
 
+# Required to support Julia `VERSION < v"1.9"`
 if !isdefined(Base, :get_extension)
     include("../ext/TimeZonesRecipesBaseExt.jl")
 end
