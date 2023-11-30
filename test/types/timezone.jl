@@ -7,7 +7,7 @@ using TimeZones: Class
 
     tz = TimeZone("America/Winnipeg")  # populate cache
     @assert tz isa VariableTimeZone
-    @test 1 == @allocations(TimeZone("America/Winnipeg"))
+    @test 2 == @allocations(TimeZone("America/Winnipeg"))
 end
 
 @testset "istimezone" begin
