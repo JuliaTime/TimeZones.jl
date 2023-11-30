@@ -1,5 +1,8 @@
 # Retains the compiled tzdata in memory. Read-only access is thread-safe and any changes
 # to this structure can result in inconsistent behaviour.
+#
+# Use a separate cache for FixedTimeZone (which is `isbits`) so the container is concretely
+# typed and we avoid allocating a FixedTimeZone every time we get one from the cache.
 const _FTZ_CACHE = Dict{String,Tuple{FixedTimeZone,Class}}()
 const _VTZ_CACHE = Dict{String,Tuple{VariableTimeZone,Class}}()
 
