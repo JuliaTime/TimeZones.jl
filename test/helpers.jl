@@ -74,15 +74,13 @@ function with_tz_cache(f, cache::Dict{String,Tuple{TimeZone,TimeZones.Class}})
     # as appropriate.
     empty!(TimeZones._FTZ_CACHE)
     empty!(TimeZones._VTZ_CACHE)
-    foreach(items(cache)) do (k, v)
+    foreach(cache) do (k, v)
         setindex!(
-            isa(v, FixedTimeZone) ? TimeZones._FTZ_CACHE : TimeZones._VTZ_CACHE,
-            k,
+            isa(first(v), FixedTimeZone) ? TimeZones._FTZ_CACHE : TimeZones._VTZ_CACHE,
             v,
+            k,
         )
     end
-    copy!(TimeZones._FTZ_CACHE, cache)
-    copy!(TimeZones._VTZ_CACHE, cache)
 
     try
         return f()
