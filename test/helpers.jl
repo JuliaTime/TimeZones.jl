@@ -1,6 +1,6 @@
 # Utility functions for testing
 
-if VERSION < v"1.9.0-"  # https://github.com/JuliaLang/julia/pull/47367
+if VERSION < v"1.9.0-DEV.1744"  # https://github.com/JuliaLang/julia/pull/47367
     macro allocations(ex)
         quote
             while false; end  # want to force compilation, but v1.6 doesn't have `@force_compile`
@@ -75,11 +75,9 @@ function with_tz_cache(f, cache::Dict{String,Tuple{TimeZone,TimeZones.Class}})
     empty!(TimeZones._FTZ_CACHE)
     empty!(TimeZones._VTZ_CACHE)
     foreach(cache) do (k, v)
-        setindex!(
-            isa(first(v), FixedTimeZone) ? TimeZones._FTZ_CACHE : TimeZones._VTZ_CACHE,
-            v,
-            k,
-        )
+        tz = first(v)
+        cache = tz isa FixedTimeZone ? TimeZones._FTZ_CACHE : TimeZones._VTZ_CACHE
+        setindex!(cache, v, k)
     end
 
     try

@@ -32,6 +32,8 @@ function _reload_cache!(ftz_cache::AbstractDict, vtz_cache::AbstractDict, compil
                     ftz_cache[name] = (tz, class)
                 elseif isa(tz, VariableTimeZone)
                     vtz_cache[name] = (tz, class)
+                else
+                    error("Unhandled TimeZone class encountered: $(typeof(tz))")
                 end
             end
         end

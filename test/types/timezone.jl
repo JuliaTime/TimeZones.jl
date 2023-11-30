@@ -3,11 +3,11 @@ using TimeZones: Class
 @testset "TimeZone allocations" begin
     tz = TimeZone("UTC")  # run once for compilation and to populate cache
     @assert tz isa FixedTimeZone
-    @test 0 == @allocations(TimeZone("UTC"))
+    @test @allocations(TimeZone("UTC")) == 0
 
     tz = TimeZone("America/Winnipeg")  # populate cache
     @assert tz isa VariableTimeZone
-    @test 2 == @allocations(TimeZone("America/Winnipeg"))
+    @test @allocations(TimeZone("America/Winnipeg")) == 2
 end
 
 @testset "istimezone" begin
