@@ -67,12 +67,27 @@ function add!(cache::Dict, tz::FixedTimeZone)
 end
 
 function with_tz_cache(f, cache::Dict{String,Tuple{TimeZone,TimeZones.Class}})
-    old_cache = deepcopy(TimeZones._TZ_CACHE)
-    copy!(TimeZones._TZ_CACHE, cache)
+    old_ftz_cache = deepcopy(TimeZones._FTZ_CACHE)
+    old_vtz_cache = deepcopy(TimeZones._VTZ_CACHE)
+
+    # Split the contents of `cache` between the fixed and variable caches
+    # as appropriate.
+    empty!(TimeZones._FTZ_CACHE)
+    empty!(TimeZones._VTZ_CACHE)
+    foreach(items(cache)) do (k, v)
+        setindex!(
+            isa(v, FixedTimeZone) ? TimeZones._FTZ_CACHE : TimeZones._VTZ_CACHE,
+            k,
+            v,
+        )
+    end
+    copy!(TimeZones._FTZ_CACHE, cache)
+    copy!(TimeZones._VTZ_CACHE, cache)
 
     try
         return f()
     finally
-        copy!(TimeZones._TZ_CACHE, old_cache)
+        copy!(TimeZones._FTZ_CACHE, old_ftz_cache)
+        copy!(TimeZones._VTZ_CACHE, old_vtz_cache)
     end
 end
