@@ -30,7 +30,7 @@ function _reload_cache!(ftz_cache::AbstractDict, vtz_cache::AbstractDict, compil
                 tz, class = open(TZJFile.read, path, "r")(name)
                 if isa(tz, FixedTimeZone)
                     ftz_cache[name] = (tz, class)
-                elseif isa(tz, VariableTimeZone)  
+                elseif isa(tz, VariableTimeZone)
                     vtz_cache[name] = (tz, class)
                 end
             end
