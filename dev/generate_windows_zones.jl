@@ -25,6 +25,7 @@ function create_mapping(doc::Node)::Vector{Pair{String,String}}
     for node in children(timezones)
         if tag(node) == "mapZone"
             attr = attributes(node)
+            # Territory "001" is the global default
             if attr["territory"] == "001"
                 zone_windows = attr["other"]
                 zone_olson = attr["type"]
