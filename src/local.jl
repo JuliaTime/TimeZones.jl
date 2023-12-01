@@ -2,10 +2,6 @@
 # Based upon Python's tzlocal https://pypi.python.org/pypi/tzlocal
 using Mocking: Mocking, @mock
 
-if Sys.iswindows()
-    import TimeZones.WindowsTimeZoneIDs: WINDOWS_TRANSLATION
-end
-
 """
     localzone() -> TimeZone
 
