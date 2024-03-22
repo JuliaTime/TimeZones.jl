@@ -106,11 +106,11 @@ end
 
 # Convenience constructors
 @doc """
-    ZonedDateTime(y, [m, d, h, mi, s, ms], tz, [amb]) -> DateTime
+    ZonedDateTime(y, [m, d, h, mi, s, ms], tz, [amb]) -> ZonedDateTime
 
 Construct a `ZonedDateTime` type by parts. Arguments `y, m, ..., ms` must be convertible to
-`Int64` and `tz` must be a `TimeZone`. If the given `DateTime` is ambiguous in the given
-`TimeZone` then `amb` can be supplied to resolve ambiguity.
+`Int64` and `tz` must be a `TimeZone`. If the given provided local time is ambiguous in the
+given `TimeZone` then `amb` can be supplied to resolve ambiguity.
 """ ZonedDateTime
 
 @optional function ZonedDateTime(y::Integer, m::Integer=1, d::Integer=1, h::Integer=0, mi::Integer=0, s::Integer=0, ms::Integer=0, tz::VariableTimeZone, amb::Union{Integer,Bool})
