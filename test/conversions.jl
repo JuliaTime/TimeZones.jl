@@ -6,39 +6,40 @@ warsaw = first(compile("Europe/Warsaw", tzdata["europe"]))
 apia = first(compile("Pacific/Apia", tzdata["australasia"]))
 midway = first(compile("Pacific/Midway", tzdata["australasia"]))
 
-@testset "Construct ZonedDateTime / DateTime" begin
-    # Constructing a ZonedDateTime from a DateTime and the reverse
+@testset "Construct DateTime from ZonedDateTime" begin
+    # Construct a ZonedDateTime from a DateTime and the reverse
     dt = DateTime(2019, 4, 11, 0)
     zdt = ZonedDateTime(dt, warsaw)
     @test DateTime(zdt) == DateTime(2019, 4, 11, 0)
     @test DateTime(zdt, UTC) == DateTime(2019, 4, 10, 22)
 
-    # Converting between ZonedDateTime and DateTime isn't possible as it isn't lossless.
+    # Converting between ZonedDateTime and DateTime isn't possible as it is lossy.
     @test_throws MethodError convert(DateTime, zdt)
     @test_throws MethodError convert(ZonedDateTime, dt)
 end
 
-@testset "Construct Date / ZonedDateTime" begin
+@testset "Construct Date from ZonedDateTime" begin
     date = Date(2018, 6, 14)
     zdt = ZonedDateTime(date, warsaw)
     @test Date(zdt) == Date(2018, 6, 14)
     @test Date(zdt, UTC) == Date(2018, 6, 13)
 
-    # Converting between ZonedDateTime and Date isn't possible as it isn't lossless.
+    # Converting between ZonedDateTime and Date isn't possible as it is lossy.
     @test_throws MethodError convert(Date, zdt)
     @test_throws MethodError convert(ZonedDateTime, date)
 end
 
-@testset "Construct Time" begin
+@testset "Construct Time from ZonedDateTime" begin
     zdt = ZonedDateTime(2017, 8, 21, 0, 12, warsaw)
     @test Time(zdt) == Time(0, 12)
     @test Time(zdt, UTC) == Time(22, 12)
 
-    # Converting between ZonedDateTime and Time isn't possible as it isn't lossless.
+    # Converting between ZonedDateTime and Time isn't possible as it is lossy.
     @test_throws MethodError convert(Time, zdt)
+    @test_throws MethodError convert(ZonedDateTime, Time(0))
 end
 
-@testset "Extract FixedTimeZone" begin
+@testset "Construct FixedTimeZone from ZonedDateTime" begin
     zdt1 = ZonedDateTime(2014, 1, 1, warsaw)
     zdt2 = ZonedDateTime(2014, 6, 1, warsaw)
     @test FixedTimeZone(zdt1) == FixedTimeZone("CET", Second(Hour(1)))
@@ -47,7 +48,7 @@ end
     @test FixedTimeZone(zdt2) === zdt2.zone
 end
 
-@testset "Extract TimeZone" begin
+@testset "Construct TimeZone from ZonedDateTime" begin
     zdt = ZonedDateTime(2014, 1, 1, warsaw)
     @test TimeZone(zdt) === warsaw
 end
