@@ -150,6 +150,18 @@ function ZonedDateTime(parts::Union{Period,TimeZone}...)
     return ZonedDateTime(DateTime(periods...), tz)
 end
 
+"""
+    ZonedDateTime(date::Date, ...)
+    ZonedDateTime(date::Date, time::Time, ...)
+
+Construct a `ZonedDateTime` from `Date` and `Time` arguments.
+"""
+ZonedDateTime(::Date, ::Vararg)
+
+function ZonedDateTime(date::Date, time::Time, args...; kwargs...)
+    return ZonedDateTime(DateTime(date, time), args...; kwargs...)
+end
+
 function ZonedDateTime(date::Date, args...; kwargs...)
     return ZonedDateTime(DateTime(date), args...; kwargs...)
 end
