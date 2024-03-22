@@ -38,6 +38,15 @@ end
     @test_throws MethodError convert(Time, zdt)
 end
 
+@testset "Extract FixedTimeZone" begin
+    zdt1 = ZonedDateTime(2014, 1, 1, warsaw)
+    zdt2 = ZonedDateTime(2014, 6, 1, warsaw)
+    @test FixedTimeZone(zdt1) == FixedTimeZone("CET", Second(Hour(1)))
+    @test FixedTimeZone(zdt1) === zdt1.zone
+    @test FixedTimeZone(zdt2) == FixedTimeZone("CEST", Second(Hour(1)), Second(Hour(1)))
+    @test FixedTimeZone(zdt2) === zdt2.zone
+end
+
 @testset "now" begin
     dt = now(Dates.UTC)::DateTime
     zdt = now(warsaw)
