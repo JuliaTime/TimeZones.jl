@@ -8,7 +8,13 @@ const utc_tz = FixedTimeZone("UTC")
 """
     DateTime(zdt::ZonedDateTime) -> DateTime
 
-Extract the `DateTime` portion from the local representation of the `ZonedDateTime`.
+Construct a `DateTime` based on the "local time" representation of the provided
+`ZonedDateTime`.
+
+!!! warning
+
+    Any arithmetic performed on the returned `DateTime` will be timezone unaware and will
+    not reflect an accurate local time if the operation would cross a DST transition.
 
 See also: [`DateTime(::ZonedDateTime, ::Type{UTC})`](@ref).
 
@@ -27,7 +33,7 @@ Dates.DateTime(zdt::ZonedDateTime) = zdt.utc_datetime + zdt.zone.offset
 """
     DateTime(zdt::ZonedDateTime, ::Type{UTC}) -> DateTime
 
-Extract the `DateTime` portion from the UTC representation of the `ZonedDateTime`.
+Construct a `DateTime` based on the UTC representation of the provided `ZonedDateTime`.
 
 See also: [`DateTime(::ZonedDateTime)`](@ref).
 
@@ -47,7 +53,7 @@ Dates.DateTime(zdt::ZonedDateTime, ::Type{UTC}) = zdt.utc_datetime
 """
     Date(zdt::ZonedDateTime) -> Date
 
-Extract the `Date` portion from the local representation of the `ZonedDateTime`.
+Construct a `Date` based on the "local time" representation of the provided `ZonedDateTime`.
 
 See also: [`Date(::ZonedDateTime, ::Type{UTC})`](@ref).
 
@@ -67,7 +73,7 @@ Dates.Date(zdt::ZonedDateTime) = Date(DateTime(zdt))
 """
     Date(zdt::ZonedDateTime, ::Type{UTC}) -> Date
 
-Extract the `Date` portion from the UTC representation of the `ZonedDateTime`.
+Construct a `Date` based on the UTC representation of the provided `ZonedDateTime`.
 
 See also: [`Date(::ZonedDateTime)`](@ref).
 
@@ -87,7 +93,7 @@ Dates.Date(zdt::ZonedDateTime, ::Type{UTC}) = Date(DateTime(zdt, UTC))
 """
     Time(zdt::ZonedDateTime) -> Time
 
-Extract the `Time` portion from the local representation of the `ZonedDateTime`.
+Construct a `Time` based on the "local time" representation of the provided `ZonedDateTime`.
 
 See also: [`Time(::ZonedDateTime, ::Type{UTC})`](@ref).
 
@@ -107,7 +113,7 @@ Dates.Time(zdt::ZonedDateTime) = Time(DateTime(zdt))
 """
     Time(zdt::ZonedDateTime, ::Type{UTC}) -> Date
 
-Extract the `Time` from the UTC representation of the `ZonedDateTime`.
+Construct a `Time` based on the UTC representation of the provided `ZonedDateTime`.
 
 See also: [`Time(::ZonedDateTime)`](@ref).
 
