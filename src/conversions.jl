@@ -137,6 +137,8 @@ Construct a `FixedTimeZone` using the UTC offset for the timestamp provided by t
 `ZonedDateTime`. If the timezone used by the `ZonedDateTime` has UTC offsets that change
 over time the returned `FixedTimeZone` will vary based upon the timestamp.
 
+See also: [`TimeZone(::ZonedDateTime)`](@ref).
+
 # Example
 
 ```jldoctest
@@ -154,6 +156,25 @@ EST (UTC-5)
 ```
 """
 FixedTimeZone(zdt::ZonedDateTime) = zdt.zone
+
+"""
+    TimeZone(zdt::ZonedDateTime) -> TimeZone
+
+Extract the `TimeZone` associated with the `ZonedDateTime`.
+
+See also: [`timezone(::ZonedDateTime)`](@ref), [`FixedTimeZone(::ZonedDateTime)`](@ref).
+
+# Examples
+
+```jldoctest
+julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"America/New_York")
+2014-05-30T21:00:00-04:00
+
+julia> TimeZone(zdt)
+America/New_York (UTC-5/UTC-4)
+```
+"""
+TimeZone(zdt::ZonedDateTime) = zdt.timezone
 
 
 """

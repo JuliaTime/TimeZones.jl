@@ -47,6 +47,11 @@ end
     @test FixedTimeZone(zdt2) === zdt2.zone
 end
 
+@testset "Extract TimeZone" begin
+    zdt = ZonedDateTime(2014, 1, 1, warsaw)
+    @test TimeZone(zdt) === warsaw
+end
+
 @testset "now" begin
     dt = now(Dates.UTC)::DateTime
     zdt = now(warsaw)
