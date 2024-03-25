@@ -1,5 +1,17 @@
 # Utility functions for testing
 
+if VERSION < v"1.9.0-DEV.1744"  # https://github.com/JuliaLang/julia/pull/47367
+    macro allocations(ex)
+        quote
+            while false; end  # want to force compilation, but v1.6 doesn't have `@force_compile`
+            local stats = Base.gc_num()
+            $(esc(ex))
+            local diff = Base.GC_Diff(Base.gc_num(), stats)
+            Base.gc_alloc_count(diff)
+        end
+    end
+end
+
 function ignore_output(body::Function; stdout::Bool=true, stderr::Bool=true)
     out_old = Base.stdout
     err_old = Base.stderr
@@ -55,12 +67,23 @@ function add!(cache::Dict, tz::FixedTimeZone)
 end
 
 function with_tz_cache(f, cache::Dict{String,Tuple{TimeZone,TimeZones.Class}})
-    old_cache = deepcopy(TimeZones._TZ_CACHE)
-    copy!(TimeZones._TZ_CACHE, cache)
+    old_ftz_cache = deepcopy(TimeZones._FTZ_CACHE)
+    old_vtz_cache = deepcopy(TimeZones._VTZ_CACHE)
+
+    # Split the contents of `cache` between the fixed and variable caches
+    # as appropriate.
+    empty!(TimeZones._FTZ_CACHE)
+    empty!(TimeZones._VTZ_CACHE)
+    foreach(cache) do (k, v)
+        tz = first(v)
+        cache = tz isa FixedTimeZone ? TimeZones._FTZ_CACHE : TimeZones._VTZ_CACHE
+        setindex!(cache, v, k)
+    end
 
     try
         return f()
     finally
-        copy!(TimeZones._TZ_CACHE, old_cache)
+        copy!(TimeZones._FTZ_CACHE, old_ftz_cache)
+        copy!(TimeZones._VTZ_CACHE, old_vtz_cache)
     end
 end
