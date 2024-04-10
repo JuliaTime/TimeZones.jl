@@ -1,7 +1,7 @@
 name = "TimeZones"
 uuid = "f269a46b-ccf7-5d73-abea-4c690281aa53"
 authors = ["Curtis Vogt <curtis.vogt@gmail.com>"]
-version = "1.13.0"
+version = "1.14.0"
 
 [deps]
 Artifacts = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
