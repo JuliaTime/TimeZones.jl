@@ -81,8 +81,6 @@ function Dates.format(io::IO, d::DatePart{'Z'}, zdt, locale)
     write(io, string(zdt.zone))  # In most cases will be an abbreviation.
 end
 
-# Note: ISOZonedDateTimeFormat is defined in the module __init__ which means that this
-# function can not be called from within this module. TODO: Ignore linting for this line
 function ZonedDateTime(str::AbstractString, df::DateFormat=ISOZonedDateTimeFormat)
     try
         parse(ZonedDateTime, str, df)

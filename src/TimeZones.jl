@@ -39,32 +39,6 @@ const _COMPILED_DIR = Ref{String}()
 # abstract type UTC <: TimeZone end  # Already defined in the Dates stdlib
 abstract type Local <: TimeZone end
 
-function __init__()
-    # Write out our compiled tzdata representations into a scratchspace
-    desired_version = TZData.tzdata_version()
-
-    _COMPILED_DIR[] = if desired_version == TZJData.TZDATA_VERSION
-        TZJData.ARTIFACT_DIR
-    else
-        @info "Loading tzdata $desired_version"
-        TZData.build(desired_version, _scratch_dir())
-    end
-
-    # Load the pre-computed TZData into memory. Skip pre-fetching the first time
-    # TimeZones.jl is loaded by `deps/build.jl` as we have yet to compile the tzdata.
-    isdir(_COMPILED_DIR[]) && _reload_cache(_COMPILED_DIR[])
-
-    # Base extension needs to happen everytime the module is loaded (issue #24)
-    Dates.CONVERSION_SPECIFIERS['z'] = TimeZone
-    Dates.CONVERSION_SPECIFIERS['Z'] = TimeZone
-    Dates.CONVERSION_DEFAULTS[TimeZone] = ""
-    Dates.CONVERSION_TRANSLATIONS[ZonedDateTime] = (
-        Year, Month, Day, Hour, Minute, Second, Millisecond, TimeZone,
-    )
-
-    global ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
-end
-
 include("utils.jl")
 include("indexable_generator.jl")
 
@@ -90,12 +64,44 @@ include("local.jl")
 include("ranges.jl")
 include("discovery.jl")
 include("rounding.jl")
-include("parse.jl")
-include("deprecated.jl")
 
 # Required to support Julia `VERSION < v"1.9"`
 if !isdefined(Base, :get_extension)
     include("../ext/TimeZonesRecipesBaseExt.jl")
 end
+
+function update_dates_extension()
+    Dates.CONVERSION_SPECIFIERS['z'] = TimeZone
+    Dates.CONVERSION_SPECIFIERS['Z'] = TimeZone
+    Dates.CONVERSION_DEFAULTS[TimeZone] = ""
+    Dates.CONVERSION_TRANSLATIONS[ZonedDateTime] = (
+        Year, Month, Day, Hour, Minute, Second, Millisecond, TimeZone,
+    )
+end
+
+function __init__()
+   # Write out our compiled tzdata representations into a scratchspace
+   desired_version = TZData.tzdata_version()
+
+   _COMPILED_DIR[] = if desired_version == TZJData.TZDATA_VERSION
+       TZJData.ARTIFACT_DIR
+   else
+       @info "Loading tzdata $desired_version"
+       TZData.build(desired_version, _scratch_dir())
+   end
+
+   # Load the pre-computed TZData into memory. Skip pre-fetching the first time
+   # TimeZones.jl is loaded by `deps/build.jl` as we have yet to compile the tzdata.
+   isdir(_COMPILED_DIR[]) && _reload_cache(_COMPILED_DIR[])
+
+   # Base extension needs to happen everytime the module is loaded (issue #24)
+   update_dates_extension()
+end
+
+update_dates_extension()
+const ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
+
+include("parse.jl")
+include("deprecated.jl")
 
 end # module
