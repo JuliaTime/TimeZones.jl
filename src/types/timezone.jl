@@ -39,7 +39,7 @@ function initialize_tz_cache()
     _COMPILED_DIR[] = if desired_version == TZJData.TZDATA_VERSION
         TZJData.ARTIFACT_DIR
     else
-        @info "Loading tzdata $desired_version"
+        # @info "Loading tzdata $desired_version"
         TZData.build(desired_version, _scratch_dir())
     end
 
