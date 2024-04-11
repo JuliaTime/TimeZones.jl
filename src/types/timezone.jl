@@ -1,5 +1,6 @@
 # Retains the compiled tzdata in memory. Read-only access is thread-safe and any changes
 # to this structure can result in inconsistent behaviour.
+# Do not access this object directly, instead use `get_tz_cache()` to access the cache.
 const _TZ_CACHE = Dict{String,Tuple{TimeZone,Class}}()
 
 function _reload_cache(compiled_dir::AbstractString)
@@ -29,6 +30,38 @@ function _reload_cache!(cache::AbstractDict, compiled_dir::AbstractString)
 
     return cache
 end
+
+const _TZ_CACHE_INITIALIZED = Threads.Atomic{Bool}(false)
+function initialize_tz_cache()
+    # Write out our compiled tzdata representations into a scratchspace
+    desired_version = TZData.tzdata_version()
+
+    _COMPILED_DIR[] = if desired_version == TZJData.TZDATA_VERSION
+        TZJData.ARTIFACT_DIR
+    else
+        @info "Loading tzdata $desired_version"
+        TZData.build(desired_version, _scratch_dir())
+    end
+
+    # Load the pre-computed TZData into memory.
+    _reload_cache(_COMPILED_DIR[])
+    _TZ_CACHE_INITIALIZED[] = true
+
+    return nothing
+end
+
+const _TZ_CACHE_LOCK = ReentrantLock()
+function get_tz_cache()
+    if  !_TZ_CACHE_INITIALIZED[]
+        lock(_TZ_CACHE_LOCK) do
+            if !_TZ_CACHE_INITIALIZED[]
+                initialize_tz_cache()
+            end
+        end
+    end
+    return _TZ_CACHE
+end
+
 
 """
     TimeZone(str::AbstractString) -> TimeZone
@@ -71,7 +104,7 @@ US/Pacific (UTC-8/UTC-7)
 TimeZone(::AbstractString, ::Class)
 
 function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
-    tz, class = get(_TZ_CACHE, str) do
+    tz, class = get(get_tz_cache(), str) do
         if occursin(FIXED_TIME_ZONE_REGEX, str)
             FixedTimeZone(str), Class(:FIXED)
         else
@@ -116,9 +149,12 @@ function istimezone(str::AbstractString, mask::Class=Class(:DEFAULT))
     end
 
     # Checks against pre-compiled time zones
-    tz, class = get(_TZ_CACHE, str) do
-        nothing, Class(:NONE)
+    tz_class = get(get_tz_cache(), str, nothing)
+    tz_class === nothing && return false
+    if tz_class === nothing
+        return false
+    else
+        _, class = tz_class
+        return mask & class != Class(:NONE)
     end
-
-    return tz !== nothing && mask & class != Class(:NONE)
 end
