@@ -6,7 +6,7 @@ using XML
 function unicode_cldr_latest_release()::String
     response = HTTP.get("https://api.github.com/repos/unicode-org/cldr/releases/latest")
     json = JSON3.read(response.body)
-    return = json.tag_name
+    return json.tag_name
 end
 
 "Download the `windowsZones.xml` from the Unicode CLDR release"
@@ -61,15 +61,15 @@ Details on the mapping can be found at:
 https://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping
 """
 function main(ARGS)
-    release = unicode_cldr_latest_release()
+    latest_cldr_version = unicode_cldr_latest_release()
     @info "Latest Unicode CLDR release: $latest_cldr_version"
-    
-    xml_str = download_windows_zones_xml(release)
+
+    xml_str = download_windows_zones_xml(latest_cldr_version)
     mapping = create_mapping(xml_str)
     @info "Mapped $(length(mapping)) zones"
-    
+
     open(joinpath(@__DIR__, "..", "src", "windows_zones.jl"), "w") do io
-        write_code(io, mapping, release)
+        generate_code(io, mapping, latest_cldr_version)
     end
 end
 
