@@ -1,6 +1,5 @@
 using Mocking
 
-using Artifacts: select_downloadable_artifacts
 using Base.BinaryPlatforms: Platform
 using RecipesBase
 using Test
@@ -39,7 +38,6 @@ include("helpers.jl")
 @testset "TimeZones" begin
     include("utils.jl")
     include("indexable_generator.jl")
-    include("artifacts.jl")
 
     include("class.jl")
     include(joinpath("tzdata", "timeoffset.jl"))
@@ -47,7 +45,7 @@ include("helpers.jl")
     include(joinpath("tzdata", "download.jl"))
     include(joinpath("tzdata", "compile.jl"))
     include(joinpath("tzdata", "build.jl"))
-    Sys.iswindows() && include(joinpath("winzone", "WindowsTimeZoneIDs.jl"))
+    include("windows_zones.jl")
     include("utcoffset.jl")
     include(joinpath("types", "timezone.jl"))
     include(joinpath("types", "fixedtimezone.jl"))
