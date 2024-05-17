@@ -22,17 +22,24 @@ RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 TimeZonesRecipesBaseExt = "RecipesBase"
 
 [compat]
+Aqua = "0.8"
+Dates = "1"
+Downloads = "1"
 InlineStrings = "1"
 Mocking = "0.7"
+Printf = "1"
 RecipesBase = "0.7, 0.8, 1"
 Scratch = "1.1.1"
 TZJData = "1"
+Test = "1"
+Unicode = "1"
 julia = "1.6"
 p7zip_jll = "17.4"
 
 [extras]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "RecipesBase"]
+test = ["Aqua", "Test", "RecipesBase"]

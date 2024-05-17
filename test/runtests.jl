@@ -1,6 +1,8 @@
 using Mocking
 
+using Aqua: Aqua
 using Base.BinaryPlatforms: Platform
+using Dates: Dates
 using RecipesBase
 using Test
 using TimeZones
@@ -36,6 +38,11 @@ end
 include("helpers.jl")
 
 @testset "TimeZones" begin
+    @testset "Aqua" begin
+        Aqua.test_all(TimeZones; ambiguities=false, piracies=false)
+        Aqua.test_piracies(TimeZones; treat_as_own=[TimeZone, Dates.DatePart])
+    end
+
     include("utils.jl")
     include("indexable_generator.jl")
 
