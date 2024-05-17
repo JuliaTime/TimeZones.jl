@@ -54,15 +54,8 @@ function __init__()
     # TimeZones.jl is loaded by `deps/build.jl` as we have yet to compile the tzdata.
     isdir(_COMPILED_DIR[]) && _reload_cache(_COMPILED_DIR[])
 
-    # Base extension needs to happen everytime the module is loaded (issue #24)
-    Dates.CONVERSION_SPECIFIERS['z'] = TimeZone
-    Dates.CONVERSION_SPECIFIERS['Z'] = TimeZone
-    Dates.CONVERSION_DEFAULTS[TimeZone] = ""
-    Dates.CONVERSION_TRANSLATIONS[ZonedDateTime] = (
-        Year, Month, Day, Hour, Minute, Second, Millisecond, TimeZone,
-    )
-
-    global ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
+    # Dates extension needs to happen everytime the module is loaded (issue #24)
+    init_dates_extension()
 end
 
 include("utils.jl")
