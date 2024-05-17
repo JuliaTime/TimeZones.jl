@@ -149,12 +149,6 @@ function istimezone(str::AbstractString, mask::Class=Class(:DEFAULT))
     end
 
     # Checks against pre-compiled time zones
-    tz_class = get(get_tz_cache(), str, nothing)
-    tz_class === nothing && return false
-    if tz_class === nothing
-        return false
-    else
-        _, class = tz_class
-        return mask & class != Class(:NONE)
-    end
+    class = get(get_tz_cache(), str, (UTC_ZERO, Class(:NONE)))[2]
+    return mask & class != Class(:NONE)
 end
