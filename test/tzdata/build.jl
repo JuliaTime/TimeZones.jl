@@ -32,7 +32,7 @@ using TimeZones: TZData
             # revise the above line to be something like:
             # tz_source = TZData.TZSource(joinpath.(tz_source_dir, ["europe", "africa"]))
             # TZData.compile(tz_source, compiled_dir, max_year=2200)
-            # TimeZones._reload_cache(compiled_dir)
+            # TimeZones._reload_tz_cache(compiled_dir)
 
             new_warsaw = TimeZone("Europe/Warsaw")
 
@@ -50,6 +50,6 @@ using TimeZones: TZData
             @test TimeZone("Africa/Windhoek").cutoff == DateTime(2201, 4, 5)
         end
     finally
-        TimeZones._reload_cache(TimeZones._COMPILED_DIR[])
+        TimeZones._reload_tz_cache(TimeZones._COMPILED_DIR[])
     end
 end
