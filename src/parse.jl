@@ -1,6 +1,22 @@
 using Dates: DateFormat, DatePart, min_width, max_width, tryparsenext_base10
 using TimeZones.TZData: MIN_YEAR, MAX_YEAR
 
+function init_dates_extension()
+    Dates.CONVERSION_SPECIFIERS['z'] = TimeZone
+    Dates.CONVERSION_SPECIFIERS['Z'] = TimeZone
+    Dates.CONVERSION_DEFAULTS[TimeZone] = ""
+    Dates.CONVERSION_TRANSLATIONS[ZonedDateTime] = (
+        Year, Month, Day, Hour, Minute, Second, Millisecond, TimeZone,
+    )
+end
+
+const ISOZonedDateTimeFormat = let
+    init_dates_extension()
+    DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
+end
+
+Dates.default_format(::Type{ZonedDateTime}) = ISOZonedDateTimeFormat
+
 function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
     i == len && str[i] === 'Z' && return ("Z", i+1)
 
@@ -98,8 +114,6 @@ end
 function ZonedDateTime(str::AbstractString, format::AbstractString; locale::AbstractString="english")
     ZonedDateTime(str, DateFormat(format, locale))
 end
-
-Dates.default_format(::Type{ZonedDateTime}) = ISOZonedDateTimeFormat
 
 
 """
