@@ -42,6 +42,10 @@ abstract type Local <: TimeZone end
 function __init__()
     # Dates extension needs to happen everytime the module is loaded (issue #24)
     init_dates_extension()
+
+    if haskey(ENV, "JULIA_TZ_VERSION")
+        @info "Using tzdata $(TZData.tzdata_version())"
+    end
 end
 
 include("utils.jl")
