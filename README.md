@@ -3,6 +3,7 @@ TimeZones.jl
 
 [![CI](https://github.com/JuliaTime/TimeZones.jl/workflows/CI/badge.svg)](https://github.com/JuliaTime/TimeZones.jl/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/JuliaTime/TimeZones.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaTime/TimeZones.jl)
+[![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 <br/>
 [![Stable Documentation](https://img.shields.io/badge/docs-stable-blue.svg)](https://juliatime.github.io/TimeZones.jl/stable)
 [![Dev Documentation](https://img.shields.io/badge/docs-dev-blue.svg)](https://juliatime.github.io/TimeZones.jl/dev)
