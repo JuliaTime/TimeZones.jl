@@ -13,7 +13,7 @@ function build(version::AbstractString; force::Bool=false)
 
     # Set the compiled directory to the new location
     _COMPILED_DIR[] = compiled_dir
-    _reload_cache(compiled_dir)
+    _reload_tz_cache(compiled_dir)
 
     @info "Successfully built TimeZones"
 end

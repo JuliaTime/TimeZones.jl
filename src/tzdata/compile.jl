@@ -718,7 +718,7 @@ function compile(
     # TimeZones 1.0 has supported automatic flushing of the cache when calling `compile`
     # (e.g. `compile(max_year=2200)`). We'll keep this behaviour to ensure we are not
     # breaking our API but the low-level `compile` function should ideally be cache unaware.
-    TimeZones._reload_cache(dest_dir)
+    TimeZones._reload_tz_cache(dest_dir)
 
     return results
 end

@@ -1,14 +1,31 @@
 # Retains the compiled tzdata in memory. Read-only access is thread-safe and any changes
 # to this structure can result in inconsistent behaviour.
+# Do not access this object directly, instead use `get_tz_cache()` to access the cache.
 const _TZ_CACHE = Dict{String,Tuple{TimeZone,Class}}()
+const _TZ_CACHE_LOCK = ReentrantLock()
+const _TZ_CACHE_INITIALIZED = Threads.Atomic{Bool}(false)
 
-function _reload_cache(compiled_dir::AbstractString)
-    _reload_cache!(_TZ_CACHE, compiled_dir)
-    !isempty(_TZ_CACHE) || error("Cache remains empty after loading")
-    return nothing
+function _init_tz_cache()
+    # Write out our compiled tzdata representations into a scratchspace
+    desired_version = TZData.tzdata_version()
+
+    _COMPILED_DIR[] = if desired_version == TZJData.TZDATA_VERSION
+        TZJData.ARTIFACT_DIR
+    else
+        TZData.build(desired_version, _scratch_dir())
+    end
+
+    # Load the pre-computed TZData into memory.
+    return _reload_tz_cache(_COMPILED_DIR[])
 end
 
-function _reload_cache!(cache::AbstractDict, compiled_dir::AbstractString)
+function _reload_tz_cache(compiled_dir::AbstractString)
+    _reload_tz_cache!(_TZ_CACHE, compiled_dir)
+    !isempty(_TZ_CACHE) || error("Cache remains empty after loading")
+    return _TZ_CACHE
+end
+
+function _reload_tz_cache!(cache::AbstractDict, compiled_dir::AbstractString)
     empty!(cache)
     check = Tuple{String,String}[(compiled_dir, "")]
 
@@ -28,6 +45,18 @@ function _reload_cache!(cache::AbstractDict, compiled_dir::AbstractString)
     end
 
     return cache
+end
+
+function _get_tz_cache()
+    if !_TZ_CACHE_INITIALIZED[]
+        lock(_TZ_CACHE_LOCK) do
+            if !_TZ_CACHE_INITIALIZED[]
+                _init_tz_cache()
+                _TZ_CACHE_INITIALIZED[] = true
+            end
+        end
+    end
+    return _TZ_CACHE
 end
 
 """
@@ -71,7 +100,7 @@ US/Pacific (UTC-8/UTC-7)
 TimeZone(::AbstractString, ::Class)
 
 function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
-    tz, class = get(_TZ_CACHE, str) do
+    tz, class = get(_get_tz_cache(), str) do
         if occursin(FIXED_TIME_ZONE_REGEX, str)
             FixedTimeZone(str), Class(:FIXED)
         else
@@ -116,9 +145,6 @@ function istimezone(str::AbstractString, mask::Class=Class(:DEFAULT))
     end
 
     # Checks against pre-compiled time zones
-    tz, class = get(_TZ_CACHE, str) do
-        nothing, Class(:NONE)
-    end
-
-    return tz !== nothing && mask & class != Class(:NONE)
+    class = get(_get_tz_cache(), str, (UTC_ZERO, Class(:NONE)))[2]
+    return mask & class != Class(:NONE)
 end

@@ -40,22 +40,12 @@ const _COMPILED_DIR = Ref{String}()
 abstract type Local <: TimeZone end
 
 function __init__()
-    # Write out our compiled tzdata representations into a scratchspace
-    desired_version = TZData.tzdata_version()
-
-    _COMPILED_DIR[] = if desired_version == TZJData.TZDATA_VERSION
-        TZJData.ARTIFACT_DIR
-    else
-        @info "Loading tzdata $desired_version"
-        TZData.build(desired_version, _scratch_dir())
-    end
-
-    # Load the pre-computed TZData into memory. Skip pre-fetching the first time
-    # TimeZones.jl is loaded by `deps/build.jl` as we have yet to compile the tzdata.
-    isdir(_COMPILED_DIR[]) && _reload_cache(_COMPILED_DIR[])
-
     # Dates extension needs to happen everytime the module is loaded (issue #24)
     init_dates_extension()
+
+    if haskey(ENV, "JULIA_TZ_VERSION")
+        @info "Using tzdata $(TZData.tzdata_version())"
+    end
 end
 
 include("utils.jl")
