@@ -100,10 +100,15 @@ US/Pacific (UTC-8/UTC-7)
 TimeZone(::AbstractString, ::Class)
 
 function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
-    tz, class = get(_get_tz_cache(), str) do
-        if occursin(FIXED_TIME_ZONE_REGEX, str)
-            FixedTimeZone(str), Class(:FIXED)
-        else
+    # Avoid performing the initial load of the tz cache when only loading a fixed time zone.
+    # Doing this avoids having dependents of TimeZones.jl incurring the initial cache load
+    # cost when using `@tz_str` or `TimeZone` (at the top-level). Specifically, for
+    # packages using `tz"UTC"` we can still support construction at parse time without
+    # adding to the load time of the package when monitoring `@time_imports`.
+    tz, class = if mask & Class(:FIXED) == Class(:FIXED) && occursin(FIXED_TIME_ZONE_REGEX, str)
+        FixedTimeZone(str), Class(:FIXED)
+    else
+        get(_get_tz_cache(), str) do
             throw(ArgumentError("Unknown time zone \"$str\""))
         end
     end
@@ -130,7 +135,7 @@ Africa/Nairobi (UTC+3)
 ```
 """
 macro tz_str(str)
-    TimeZone(str)
+    return TimeZone(str)
 end
 
 """

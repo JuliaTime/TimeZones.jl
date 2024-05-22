@@ -25,6 +25,8 @@
     @test FixedTimeZone("+00:30") == FixedTimeZone("UTC+00:30", 1800)
     @test FixedTimeZone("-00:30") == FixedTimeZone("UTC-00:30", -1800)
 
+    @test FixedTimeZone(Test.GenericString("UTC")) == FixedTimeZone("UTC", 0)
+
     @test_throws ArgumentError FixedTimeZone("1")
     @test_throws ArgumentError FixedTimeZone("01")
     @test_throws ArgumentError FixedTimeZone("123")
