@@ -14,10 +14,13 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/master' || github.run_number }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
-# Only download the tzdata version used in TimeZones.jl's tests to avoid unnecessary
-# load on IANA's servers.
 env:
+  # Only download the tzdata version used in TimeZones.jl's tests to avoid unnecessary
+  # load on IANA's servers.
   JULIA_TZ_VERSION: 2016j  # Matches tzdata version used in tests
+
+  # The HEAD commit which triggered this workflow. By default PRs use a merge commit
+  SHA: ${{ github.event.pull_request.head.sha || github.sha }}
 
 jobs:
   test:
@@ -57,6 +60,22 @@ jobs:
       - uses: codecov/codecov-action@v4
         with:
           files: lcov.info
+
+  # https://pkgdocs.julialang.org/v1/creating-packages/#Transition-from-normal-dependency-to-extension
+  weakdeps:
+    name: Weakdeps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: "1.6"  # LTS / Oldest support version
+      - uses: julia-actions/cache@v2
+      - shell: julia --color=yes --project=docs {0}
+        run: |
+          using Pkg
+          Pkg.add(PackageSpec(name="TimeZones", rev=ENV["SHA"]))
+          using TimeZones
 
   benchmarks:
     name: Benchmarks
