@@ -35,7 +35,8 @@ end
 
     try
         @test isempty(TimeZones._TZ_CACHE)
-        @test TimeZone("UTC")
+
+        TimeZone("UTC")  # Construct a `FixedTimeZone` without loading the tz cache
         @test isempty(TimeZones._TZ_CACHE)
     finally
         TimeZones._reload_tz_cache(TimeZones._COMPILED_DIR[])
