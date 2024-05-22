@@ -74,7 +74,7 @@ jobs:
       - shell: julia --color=yes --project=docs {0}
         run: |
           using Pkg
-          Pkg.add(PackageSpec(name="TimeZones", rev=ENV["SHA"])
+          Pkg.add(PackageSpec(name="TimeZones", rev=ENV["SHA"]))
           using TimeZones
 
   benchmarks:
