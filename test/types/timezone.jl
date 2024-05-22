@@ -25,3 +25,19 @@ end
     @test TimeZone("Etc/GMT+12", Class(:LEGACY)) == FixedTimeZone("Etc/GMT+12", -12 * 3600)
     @test TimeZone("Etc/GMT-14", Class(:LEGACY)) == FixedTimeZone("Etc/GMT-14", 14 * 3600)
 end
+
+@testset "fixed time zone cache skip" begin
+    # Reset the tz cache as if we had just loaded the package
+    lock(TimeZones._TZ_CACHE_LOCK) do
+        TimeZones._TZ_CACHE_INITIALIZED[] = false
+        empty!(TimeZones._TZ_CACHE)
+    end
+
+    try
+        @test isempty(TimeZones._TZ_CACHE)
+        @test TimeZone("UTC")
+        @test isempty(TimeZones._TZ_CACHE)
+    finally
+        TimeZones._reload_tz_cache(TimeZones._COMPILED_DIR[])
+    end
+end
