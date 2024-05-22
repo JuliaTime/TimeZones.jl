@@ -72,7 +72,7 @@ UTC+15:45:21
 function FixedTimeZone(s::AbstractString)
     s == "Z" && return UTC_ZERO
 
-    m = match(FIXED_TIME_ZONE_REGEX, s)
+    m = match(FIXED_TIME_ZONE_REGEX, String(s))
     m === nothing && throw(ArgumentError("Unrecognized time zone: $s"))
 
     coefficient = m[:sign] == "-" ? -1 : 1
