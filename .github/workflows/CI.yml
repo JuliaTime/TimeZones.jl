@@ -36,17 +36,23 @@ jobs:
           - nightly
         os:
           - ubuntu-latest
-          - macOS-latest
+          - macos-latest-xlarge  # Apple silicon
           - windows-latest
         arch:
           - x64
           - x86
+          - aarch64
         exclude:
           # Test 32-bit only on Linux
-          - os: macOS-latest
+          - os: macos-latest-xlarge
             arch: x86
           - os: windows-latest
             arch: x86
+          # Test ARM64 only on macOS
+          - os: ubuntu-latest
+            arch: aarch64
+          - os: windows-latest
+            arch: aarch64
           # Disable Windows tests on Julia 1.6 as it's particularly slow
           - version: "1.6"
             os: windows-latest
