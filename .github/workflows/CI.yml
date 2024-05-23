@@ -53,9 +53,20 @@ jobs:
             arch: aarch64
           - os: windows-latest
             arch: aarch64
+          # Prefer testing against Apple Silicon
+          - os: macos-14
+            arch: x64
+          - version: "1.6"
+            os: macos-14
+            arch: aarch64
           # Disable Windows tests on Julia 1.6 as it's particularly slow
           - version: "1.6"
             os: windows-latest
+        include:
+          # Apple silicon isn't supported by Julia 1.6
+          - version: "1.6"
+            os: macos-latest  # Intel
+            arch: x64
     steps:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v2
