@@ -81,6 +81,7 @@ jobs:
       - uses: codecov/codecov-action@v4
         with:
           files: lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   # https://pkgdocs.julialang.org/v1/creating-packages/#Transition-from-normal-dependency-to-extension
   weakdeps:
