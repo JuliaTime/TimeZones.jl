@@ -47,6 +47,9 @@ jobs:
             arch: x86
           - os: windows-latest
             arch: x86
+          # Disable Windows tests on Julia 1.6 as it's particularly slow
+          - version: "1.6"
+            os: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v2
