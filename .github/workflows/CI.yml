@@ -34,6 +34,7 @@ jobs:
           - "1.6"  # LTS / Oldest supported version
           - "1"    # Latest release
           - nightly
+        # https://github.com/actions/runner-images#available-images
         os:
           - ubuntu-latest
           - macos-14  # Apple silicon
@@ -65,7 +66,7 @@ jobs:
         include:
           # Apple silicon isn't supported by Julia 1.6
           - version: "1.6"
-            os: macos-latest  # Intel
+            os: macos-13  # Intel
             arch: x64
     steps:
       - uses: actions/checkout@v4
