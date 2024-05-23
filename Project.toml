@@ -1,14 +1,12 @@
 name = "TimeZones"
 uuid = "f269a46b-ccf7-5d73-abea-4c690281aa53"
 authors = ["Curtis Vogt <curtis.vogt@gmail.com>"]
-version = "1.13.0"
+version = "1.16.1"
 
 [deps]
-Artifacts = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Downloads = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 InlineStrings = "842dd82b-1e85-43dc-bf29-5d0ee9dffc48"
-LazyArtifacts = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 Mocking = "78c3b35d-d492-501b-9361-3d52fe80e533"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
@@ -17,24 +15,31 @@ TZJData = "dc5dba14-91b3-4cab-a142-028a31da12f7"
 Unicode = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 p7zip_jll = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 
-[compat]
-InlineStrings = "1"
-Mocking = "0.7"
-RecipesBase = "0.7, 0.8, 1"
-Scratch = "1.1.1"
-TZJData = "1"
-julia = "1.6"
-p7zip_jll = "17.4"
+[weakdeps]
+RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 
 [extensions]
 TimeZonesRecipesBaseExt = "RecipesBase"
 
+[compat]
+Aqua = "0.8"
+Dates = "1"
+Downloads = "1"
+InlineStrings = "1"
+Mocking = "0.7"
+Printf = "1"
+RecipesBase = "0.7, 0.8, 1"
+Scratch = "1.1.1"
+TZJData = "1"
+Test = "1"
+Unicode = "1"
+julia = "1.6"
+p7zip_jll = "17.4"
+
 [extras]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "RecipesBase"]
-
-[weakdeps]
-RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
+test = ["Aqua", "Test", "RecipesBase"]

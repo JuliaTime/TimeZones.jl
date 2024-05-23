@@ -1,6 +1,5 @@
 module TZData
 
-using Artifacts: @artifact_str
 using Dates: Dates, DateTime
 using Printf
 using ...TimeZones: TZJFile, _scratch_dir

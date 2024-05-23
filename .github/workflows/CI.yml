@@ -14,10 +14,13 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/master' || github.run_number }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
-# Only download the tzdata version used in TimeZones.jl's tests to avoid unnecessary
-# load on IANA's servers.
 env:
+  # Only download the tzdata version used in TimeZones.jl's tests to avoid unnecessary
+  # load on IANA's servers.
   JULIA_TZ_VERSION: 2016j  # Matches tzdata version used in tests
+
+  # The HEAD commit which triggered this workflow. By default PRs use a merge commit
+  SHA: ${{ github.event.pull_request.head.sha || github.sha }}
 
 jobs:
   test:
@@ -45,18 +48,34 @@ jobs:
           - os: windows-latest
             arch: x86
     steps:
-      - uses: actions/checkout@v3
-      - uses: julia-actions/setup-julia@v1
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
-      - uses: julia-actions/cache@v1
+      - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         with:
           files: lcov.info
+
+  # https://pkgdocs.julialang.org/v1/creating-packages/#Transition-from-normal-dependency-to-extension
+  weakdeps:
+    name: Weakdeps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: "1.6"  # LTS / Oldest support version
+      - uses: julia-actions/cache@v2
+      - shell: julia --color=yes --project=docs {0}
+        run: |
+          using Pkg
+          Pkg.add(PackageSpec(name="TimeZones", rev=ENV["SHA"]))
+          using TimeZones
 
   benchmarks:
     name: Benchmarks
@@ -64,11 +83,11 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
-      - uses: julia-actions/setup-julia@v1
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
         with:
           version: "1"
-      - uses: julia-actions/cache@v1
+      - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
       - run: |
           git fetch origin +:refs/remotes/origin/HEAD
@@ -79,11 +98,11 @@ jobs:
     name: Documentation - DocTests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: julia-actions/setup-julia@v1
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
         with:
           version: "1.9"
-      - uses: julia-actions/cache@v1
+      - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
       - shell: julia --color=yes --project=docs {0}
         run: |
@@ -97,11 +116,11 @@ jobs:
     name: Documentation - Deploy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: julia-actions/setup-julia@v1
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
         with:
           version: "1.9"
-      - uses: julia-actions/cache@v1
+      - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
       - shell: julia --color=yes --project=docs {0}
         run: |

@@ -11,13 +11,9 @@ Builds the TimeZones package with the specified tzdata `version` and `regions`. 
 function build(version::AbstractString; force::Bool=false)
     compiled_dir = TimeZones.TZData.build(version, _scratch_dir())
 
-    if Sys.iswindows()
-        TimeZones.WindowsTimeZoneIDs.build(force=force)
-    end
-
     # Set the compiled directory to the new location
     _COMPILED_DIR[] = compiled_dir
-    _reload_cache(compiled_dir)
+    _reload_tz_cache(compiled_dir)
 
     @info "Successfully built TimeZones"
 end

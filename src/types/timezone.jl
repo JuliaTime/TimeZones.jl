@@ -1,18 +1,35 @@
-# Retains the compiled tzdata in memory. Read-only access is thread-safe and any changes
-# to this structure can result in inconsistent behaviour.
+# Retains the compiled tzdata in memory. Read-only access to the cache is thread-safe and
+# any changes to this structure can result in inconsistent behaviour. Do not access this
+# object directly, instead use `_get_tz_cache_entry()` to access the cache content.
 #
 # Use a separate cache for FixedTimeZone (which is `isbits`) so the container is concretely
 # typed and we avoid allocating a FixedTimeZone every time we get one from the cache.
 const _FTZ_CACHE = Dict{String,Tuple{FixedTimeZone,Class}}()
 const _VTZ_CACHE = Dict{String,Tuple{VariableTimeZone,Class}}()
+const _TZ_CACHE_LOCK = ReentrantLock()
+const _TZ_CACHE_INITIALIZED = Threads.Atomic{Bool}(false)
 
-function _reload_cache(compiled_dir::AbstractString)
-    _reload_cache!(_FTZ_CACHE, _VTZ_CACHE, compiled_dir)
+function _init_tz_cache()
+    # Write out our compiled tzdata representations into a scratchspace
+    desired_version = TZData.tzdata_version()
+
+    _COMPILED_DIR[] = if desired_version == TZJData.TZDATA_VERSION
+        TZJData.ARTIFACT_DIR
+    else
+        TZData.build(desired_version, _scratch_dir())
+    end
+
+    # Load the pre-computed TZData into memory.
+    return _reload_tz_cache(_COMPILED_DIR[])
+end
+
+function _reload_tz_cache(compiled_dir::AbstractString)
+    _reload_tz_cache!(_FTZ_CACHE, _VTZ_CACHE, compiled_dir)
     !isempty(_FTZ_CACHE) && !isempty(_VTZ_CACHE) || error("Cache remains empty after loading")
     return nothing
 end
 
-function _reload_cache!(ftz_cache::AbstractDict, vtz_cache::AbstractDict, compiled_dir::AbstractString)
+function _reload_tz_cache!(ftz_cache::AbstractDict, vtz_cache::AbstractDict, compiled_dir::AbstractString)
     empty!(ftz_cache)
     empty!(vtz_cache)
     check = Tuple{String,String}[(compiled_dir, "")]
@@ -28,9 +45,10 @@ function _reload_cache!(ftz_cache::AbstractDict, vtz_cache::AbstractDict, compil
                 push!(check, (path, name))
             else
                 tz, class = open(TZJFile.read, path, "r")(name)
-                if isa(tz, FixedTimeZone)
+
+                if tz isa FixedTimeZone
                     ftz_cache[name] = (tz, class)
-                elseif isa(tz, VariableTimeZone)
+                elseif tz isa VariableTimeZone
                     vtz_cache[name] = (tz, class)
                 else
                     error("Unhandled TimeZone class encountered: $(typeof(tz))")
@@ -41,10 +59,19 @@ function _reload_cache!(ftz_cache::AbstractDict, vtz_cache::AbstractDict, compil
     return nothing
 end
 
-function _get_from_cache(f_default::Function, name::AbstractString)
+function _get_tz_cache_entry(body::Function, name::AbstractString)
+    if !_TZ_CACHE_INITIALIZED[]
+        lock(_TZ_CACHE_LOCK) do
+            if !_TZ_CACHE_INITIALIZED[]
+                _init_tz_cache()
+                _TZ_CACHE_INITIALIZED[] = true
+            end
+        end
+    end
+
     return get(_FTZ_CACHE, name) do
         get(_VTZ_CACHE, name) do
-            return f_default()
+            body()
         end
     end
 end
@@ -90,7 +117,7 @@ US/Pacific (UTC-8/UTC-7)
 TimeZone(::AbstractString, ::Class)
 
 function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
-    tz, class = _get_from_cache(str) do
+    tz, class = _get_tz_cache_entry(str) do
         if occursin(FIXED_TIME_ZONE_REGEX, str)
             FixedTimeZone(str), Class(:FIXED)
         else
@@ -135,9 +162,6 @@ function istimezone(str::AbstractString, mask::Class=Class(:DEFAULT))
     end
 
     # Checks against pre-compiled time zones
-    tz, class = _get_from_cache(str) do
-        nothing, Class(:NONE)
-    end
-
-    return tz !== nothing && mask & class != Class(:NONE)
+    class = _get_tz_cache_entry(() -> (UTC_ZERO, Class(:NONE)), str)[2]
+    return mask & class != Class(:NONE)
 end

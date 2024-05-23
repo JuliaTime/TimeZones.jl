@@ -6,119 +6,11 @@ const utc_tz = FixedTimeZone("UTC")
 
 
 """
-    DateTime(zdt::ZonedDateTime) -> DateTime
-
-Create a `DateTime` by dropping the associated time zone. Effectively, this new `DateTime`
-is implicitly associated with `timezone(zdt)`.
-
-# Example
-
-```jldoctest
-julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
-2014-05-30T21:00:00-04:00
-
-julia> DateTime(zdt)
-2014-05-30T21:00:00
-```
-"""
-Dates.DateTime(zdt::ZonedDateTime) = zdt.utc_datetime + zdt.zone.offset
-
-"""
-    DateTime(zdt::ZonedDateTime, ::Type{UTC}) -> DateTime
-
-Create a `DateTime` which is implicitly associated with UTC.
-
-# Example
-
-```jldoctest
-julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
-2014-05-30T21:00:00-04:00
-
-julia> DateTime(zdt, UTC)
-2014-05-31T01:00:00
-```
-"""
-Dates.DateTime(zdt::ZonedDateTime, ::Type{UTC}) = zdt.utc_datetime
-
-
-"""
-    Date(zdt::ZonedDateTime) -> Date
-
-Create a `Date` by dropping the associated time zone. Effectively, this new `Date`
-is implicitly associated with `timezone(zdt)`.
-
-# Example
-
-```jldoctest
-julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
-2014-05-30T21:00:00-04:00
-
-julia> Date(zdt)
-2014-05-30
-```
-"""
-Dates.Date(zdt::ZonedDateTime) = Date(DateTime(zdt))
-
-
-"""
-    Date(zdt::ZonedDateTime, ::Type{UTC}) -> Date
-
-Create a `Date` which is implicitly associated with UTC.
-
-# Example
-
-```jldoctest
-julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
-2014-05-30T21:00:00-04:00
-
-julia> Date(zdt, UTC)
-2014-05-31
-```
-"""
-Dates.Date(zdt::ZonedDateTime, ::Type{UTC}) = Date(DateTime(zdt, UTC))
-
-
-"""
-    Time(zdt::ZonedDateTime) -> Time
-
-Create a `Time` by dropping the associated time zone. Effectively, this new `Time`
-is implicitly associated with `timezone(zdt)`.
-
-# Example
-
-```jldoctest
-julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
-2014-05-30T21:00:00-04:00
-
-julia> Time(zdt)
-21:00:00
-```
-"""
-Dates.Time(zdt::ZonedDateTime) = Time(DateTime(zdt))
-
-
-"""
-    Time(zdt::ZonedDateTime, ::Type{UTC}) -> Date
-
-Create a `Time` which is implicitly associated with UTC.
-
-# Example
-
-```jldoctest
-julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
-2014-05-30T21:00:00-04:00
-
-julia> Time(zdt, UTC)
-01:00:00
-```
-"""
-Dates.Time(zdt::ZonedDateTime, ::Type{UTC}) = Time(DateTime(zdt, UTC))
-
-
-"""
     now(::TimeZone) -> ZonedDateTime
 
-Returns a `ZonedDateTime` corresponding to the user's system time in the specified `TimeZone`.
+Create a `ZonedDateTime` corresponding to the current system time in the specified `TimeZone`.
+
+See also: [`today(::TimeZone)`](@ref), [`todayat(::TimeZone)`](@ref).
 """
 function Dates.now(tz::TimeZone)
     utc = unix2datetime(time())
@@ -128,7 +20,9 @@ end
 """
     today(tz::TimeZone) -> Date
 
-Returns the date portion of `now(tz)` in local time.
+Create the current `Date` in the specified `TimeZone`. Equivalent to `Date(now(tz))`.
+
+See also: [`now(::TimeZone)`](@ref), [`todayat(::TimeZone)`](@ref).
 
 # Examples
 
@@ -146,19 +40,30 @@ julia> today(tz"Pacific/Midway"), today(tz"Pacific/Apia")
 Dates.today(tz::TimeZone) = Date(now(tz))
 
 """
-    todayat(tod::Time, tz::TimeZone, [amb]) -> ZonedDateTime
+    todayat(tod::Time, tz::TimeZone, [amb::Union{Integer,Bool}]) -> ZonedDateTime
 
 Creates a `ZonedDateTime` for today at the specified time of day. If the result is ambiguous
 in the given `TimeZone` then `amb` can be supplied to resolve ambiguity.
+
+See also: [`now(::TimeZone)`](@ref), [`today(::TimeZone)`](@ref).
 
 # Examples
 
 ```julia
 julia> today(tz"Europe/Warsaw")
-2017-11-09
+2017-10-29
 
 julia> todayat(Time(10, 30), tz"Europe/Warsaw")
-2017-11-09T10:30:00+01:00
+2017-10-29T10:30:00+01:00
+
+julia> todayat(Time(2), tz"Europe/Warsaw")
+ERROR: AmbiguousTimeError: Local DateTime 2017-10-29T02:00:00 is ambiguous within Europe/Warsaw
+
+julia> todayat(Time(2), tz"Europe/Warsaw", 1)
+2017-10-29T02:00:00+02:00
+
+julia> todayat(Time(2), tz"Europe/Warsaw", 2)
+2017-10-29T02:00:00+01:00
 ```
 """
 function todayat(tod::Time, tz::VariableTimeZone, amb::Union{Integer,Bool})

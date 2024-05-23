@@ -1,7 +1,8 @@
 using Mocking
 
-using Artifacts: select_downloadable_artifacts
+using Aqua: Aqua
 using Base.BinaryPlatforms: Platform
+using Dates: Dates
 using RecipesBase
 using Test
 using TimeZones
@@ -37,9 +38,13 @@ end
 include("helpers.jl")
 
 @testset "TimeZones" begin
+    @testset "Aqua" begin
+        Aqua.test_all(TimeZones; ambiguities=false, piracies=false)
+        Aqua.test_piracies(TimeZones; treat_as_own=[TimeZone, Dates.DatePart])
+    end
+
     include("utils.jl")
     include("indexable_generator.jl")
-    include("artifacts.jl")
 
     include("class.jl")
     include(joinpath("tzdata", "timeoffset.jl"))
@@ -47,7 +52,7 @@ include("helpers.jl")
     include(joinpath("tzdata", "download.jl"))
     include(joinpath("tzdata", "compile.jl"))
     include(joinpath("tzdata", "build.jl"))
-    Sys.iswindows() && include(joinpath("winzone", "WindowsTimeZoneIDs.jl"))
+    include("windows_zones.jl")
     include("utcoffset.jl")
     include(joinpath("types", "timezone.jl"))
     include(joinpath("types", "fixedtimezone.jl"))

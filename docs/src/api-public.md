@@ -26,8 +26,11 @@ ZonedDateTime
 ZonedDateTime(::DateTime, ::VariableTimeZone)
 ZonedDateTime(::DateTime, ::VariableTimeZone, ::Integer)
 ZonedDateTime(::DateTime, ::VariableTimeZone, ::Bool)
+ZonedDateTime(::Date, ::Vararg)
 astimezone
 TimeZones.timezone(::ZonedDateTime)
+TimeZone(::ZonedDateTime)
+FixedTimeZone(::ZonedDateTime)
 DateTime(::ZonedDateTime)
 DateTime(::ZonedDateTime, ::Type{UTC})
 Date(::ZonedDateTime)
