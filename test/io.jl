@@ -1,7 +1,8 @@
 using TimeZones.TZData: parse_components
 using TimeZones: Transition
 
-cache = Dict{String,Tuple{TimeZone,TimeZones.Class}}()
+cache = TimeZones.TimeZoneCache()
+cache.initialized[] = true
 
 dt = DateTime(1942,12,25,1,23,45)
 custom_dt = DateTime(1800,1,1)
