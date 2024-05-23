@@ -36,7 +36,7 @@ jobs:
           - nightly
         os:
           - ubuntu-latest
-          - macos-latest-xlarge  # Apple silicon
+          - macos-14  # Apple silicon
           - windows-latest
         arch:
           - x64
@@ -44,7 +44,7 @@ jobs:
           - aarch64
         exclude:
           # Test 32-bit only on Linux
-          - os: macos-latest-xlarge
+          - os: macos-14
             arch: x86
           - os: windows-latest
             arch: x86
