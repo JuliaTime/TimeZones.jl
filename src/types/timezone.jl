@@ -24,28 +24,16 @@ end
 function reload!(cache::TimeZoneCache, compiled_dir::AbstractString=_COMPILED_DIR[])
     empty!(cache.ftz)
     empty!(cache.vtz)
-    check = Tuple{String,String}[(compiled_dir, "")]
 
-    for (dir, partial) in check
-        for filename in readdir(dir)
-            startswith(filename, ".") && continue
+    walk_tz_dir(compiled_dir) do name, path
+        tz, class = open(TZJFile.read, path, "r")(name)
 
-            path = joinpath(dir, filename)
-            name = isempty(partial) ? filename : join([partial, filename], "/")
-
-            if isdir(path)
-                push!(check, (path, name))
-            else
-                tz, class = open(TZJFile.read, path, "r")(name)
-
-                if tz isa FixedTimeZone
-                    cache.ftz[name] = (tz, class)
-                elseif tz isa VariableTimeZone
-                    cache.vtz[name] = (tz, class)
-                else
-                    error("Unhandled TimeZone class encountered: $(typeof(tz))")
-                end
-            end
+        if tz isa FixedTimeZone
+            cache.ftz[name] = (tz, class)
+        elseif tz isa VariableTimeZone
+            cache.vtz[name] = (tz, class)
+        else
+            error("Unhandled TimeZone class encountered: $(typeof(tz))")
         end
     end
 
