@@ -7,23 +7,9 @@ Returns a sorted list of all of the pre-computed time zone names.
 """
 function timezone_names()
     names = String[]
-    check = Tuple{String,String}[(_COMPILED_DIR[], "")]
-
-    for (dir, partial) in check
-        for filename in readdir(dir)
-            startswith(filename, ".") && continue
-
-            path = joinpath(dir, filename)
-            name = partial == "" ? filename : join([partial, filename], "/")
-
-            if isdir(path)
-                push!(check, (path, name))
-            else
-                push!(names, name)
-            end
-        end
+    walk_tz_dir(_COMPILED_DIR[]) do name, path
+        push!(names, name)
     end
-
     return sort!(names)
 end
 
