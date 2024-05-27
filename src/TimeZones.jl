@@ -33,7 +33,7 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
 
 _scratch_dir() = @get_scratch!("build")
 
-const _COMPILED_DIR = Ref{String}()
+const _COMPILED_DIR = Ref{String}(TZJData.ARTIFACT_DIR)
 
 # TimeZone types used to disambiguate the context of a DateTime
 # abstract type UTC <: TimeZone end  # Already defined in the Dates stdlib
@@ -53,9 +53,10 @@ include("indexable_generator.jl")
 
 include("class.jl")
 include("utcoffset.jl")
+include(joinpath("types", "timezone.jl"))
 include(joinpath("types", "fixedtimezone.jl"))
 include(joinpath("types", "variabletimezone.jl"))
-include(joinpath("types", "timezone.jl"))
+include(joinpath("types", "timezonecache.jl"))
 include(joinpath("types", "zoneddatetime.jl"))
 include(joinpath("tzfile", "TZFile.jl"))
 include(joinpath("tzjfile", "TZJFile.jl"))
