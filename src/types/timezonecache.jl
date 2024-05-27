@@ -26,7 +26,6 @@ function reload!(cache::TimeZoneCache, compiled_dir::AbstractString=_COMPILED_DI
     empty!(cache.vtz)
 
     walk_tz_dir(compiled_dir) do name, path
-        # tz, class = TZJFile.read(IOBuffer(read(path)))(name)
         tz, class = open(TZJFile.read, path, "r")(name)
 
         if tz isa FixedTimeZone
