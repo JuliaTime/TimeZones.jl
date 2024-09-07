@@ -130,7 +130,7 @@ jobs:
         run: |
           using Pkg
           Pkg.instantiate()
-      - run: julia --project=docs docs/make.jl
+      - run: julia --color=yes --project=docs docs/make.jl
         env:
           DOCTESTS: "true"
 
@@ -148,7 +148,7 @@ jobs:
         run: |
           using Pkg
           Pkg.instantiate()
-      - run: julia --project=docs docs/make.jl
+      - run: julia --color=yes --project=docs docs/make.jl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
