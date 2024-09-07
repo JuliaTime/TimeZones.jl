@@ -3,6 +3,7 @@
 ```@meta
 DocTestSetup = quote
     using TimeZones, Dates
+    tz"UTC" # Trigger time zones build (if necessary)
 end
 ```
 
