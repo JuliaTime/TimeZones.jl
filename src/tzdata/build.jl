@@ -53,7 +53,7 @@ function build(version::AbstractString, working_dir::AbstractString)
         regions = intersect!(readdir(tz_source_dir), REGIONS)
     end
 
-    if !isdir(compiled_dir)
+    if !isdir(compiled_dir) || isempty(readdir(compiled_dir))
         @info "Compiling tzdata $version region data"
         mkpath(compiled_dir)
         tz_source = TZSource(joinpath.(tz_source_dir, regions))
