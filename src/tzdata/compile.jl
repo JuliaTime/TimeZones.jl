@@ -297,7 +297,7 @@ function Base.parse(::Type{Rule}, str::AbstractString)
     from = from_str != "min" ? parse(Int, from_str) : nothing
     to = to_str == "only" ? from : (to_str != "max" ? parse(Int, to_str) : nothing)
     type_str == "-" || throw(ArgumentError("Unhandled rule type: \"$type_str\""))
-    month = MONTHS[month_str]
+    month = MONTHS[month_str[1:3]]
 
     # Now we need to get the right anonymous function
     # for determining the right day for transitioning
