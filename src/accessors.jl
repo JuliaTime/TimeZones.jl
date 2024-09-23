@@ -1,4 +1,4 @@
-using Dates: Quarter, Year, Month, Day, Hour, Minute, Second, Millisecond, days, hour, minute, second, millisecond
+using Dates: Quarter, Year, Month, Week, Day, Hour, Minute, Second, Millisecond, days, hour, minute, second, millisecond
 
 """
     timezone(::ZonedDateTime) -> TimeZone
@@ -9,7 +9,7 @@ timezone(zdt::ZonedDateTime) = zdt.timezone
 
 Dates.days(zdt::ZonedDateTime) = days(DateTime(zdt))
 
-for period in (:Quarter, :Year, :Month, :Day, :Hour, :Minute, :Second, :Millisecond)
+for period in (:Quarter, :Year, :Month, :Week, :Day, :Hour, :Minute, :Second, :Millisecond)
     accessor = Symbol(lowercase(string(period)))
     @eval begin
         Dates.$accessor(zdt::ZonedDateTime) = $accessor(DateTime(zdt))
