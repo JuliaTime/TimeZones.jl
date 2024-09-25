@@ -27,11 +27,15 @@ zdt = ZonedDateTime(DateTime(2014,6,12,23,59,58,57), fixed)
 @test Dates.yearmonthday(zdt) == (2014, 6, 12)
 
 # Also ensure that we can access the Period of ZonedDateTime
-@test Dates.Year(zdt).value == 2014
-@test Dates.Month(zdt).value == 6
-@test Dates.Week(zdt).value == 24
-@test Dates.Day(zdt).value == 12
-@test Dates.Hour(zdt).value == 23
+@test Dates.Year(zdt) == Dates.Year(2014)
+@test Dates.Quarter(zdt) == Dates.Quarter(2)
+@test Dates.Month(zdt) == Dates.Month(6)
+@test Dates.Week(zdt) == Dates.Week(24)
+@test Dates.Day(zdt) == Dates.Day(12)
+@test Dates.Hour(zdt) == Dates.Hour(23)
+@test Dates.Minute(zdt) == Dates.Hour(59)
+@test Dates.Second(zdt) == Dates.Hour(58)
+@test Dates.Millisecond(zdt) == Dates.Hour(57)
 
 # Vectorized accessors
 # Note: fill is used to test for size and equality.
