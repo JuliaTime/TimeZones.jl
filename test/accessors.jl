@@ -35,7 +35,7 @@ zdt = ZonedDateTime(DateTime(2014,6,12,23,59,58,57), fixed)
 @test Dates.Hour(zdt) == Dates.Hour(23)
 @test Dates.Minute(zdt) == Dates.Minute(59)
 @test Dates.Second(zdt) == Dates.Second(58)
-@test Dates.Millisecond(zdt) == Dates.Hour(57)
+@test Dates.Millisecond(zdt) == Dates.Millisecond(57)
 
 # Vectorized accessors
 # Note: fill is used to test for size and equality.
