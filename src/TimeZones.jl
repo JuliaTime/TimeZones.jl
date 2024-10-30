@@ -33,13 +33,16 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
 
 _scratch_dir() = @get_scratch!("build")
 
-const _COMPILED_DIR = Ref{String}(TZJData.ARTIFACT_DIR)
+const _COMPILED_DIR = Ref{String}()
 
 # TimeZone types used to disambiguate the context of a DateTime
 # abstract type UTC <: TimeZone end  # Already defined in the Dates stdlib
 abstract type Local <: TimeZone end
 
 function __init__()
+    # Must be set at runtime to ensure relocatability 
+    _COMPILED_DIR[] = TZJData.artifact_dir()
+
     # Dates extension needs to happen everytime the module is loaded (issue #24)
     init_dates_extension()
 
