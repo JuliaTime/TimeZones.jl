@@ -8,41 +8,40 @@ fixed = FixedTimeZone("Fixed", -7200, 3600)
 zdt = ZonedDateTime(DateTime(2014,6,12,23,59,58,57), fixed)
 @test timezone(zdt) === fixed
 
-@test TimeZones.days(zdt) == 735396
-@test TimeZones.hour(zdt) == 23
-@test TimeZones.minute(zdt) == 59
-@test TimeZones.second(zdt) == 58
-@test TimeZones.millisecond(zdt) == 57
-
 @test eps(zdt) == Millisecond(1)
 
-# Make sure that Dates accessors work with ZonedDateTime.
-@test Dates.year(zdt) == 2014
-@test Dates.month(zdt) == 6
-@test Dates.week(zdt) == 24
-@test Dates.day(zdt) == 12
-@test Dates.dayofmonth(zdt) == 12
-@test Dates.yearmonth(zdt) == (2014, 6)
-@test Dates.monthday(zdt) == (6, 12)
-@test Dates.yearmonthday(zdt) == (2014, 6, 12)
+# Ensure changes to Dates.jl don't break support for ZonedDateTime
+@testset "accessors" begin
+    # Dates.jl accessors heavily rely on using `days`.
+    @test Dates.days(zdt) == 735396
 
-# Vectorized accessors
-# Note: fill is used to test for size and equality.
-n = 10
-arr = fill(zdt, n)
-@test TimeZones.hour.(arr) == fill(23, n)
-@test TimeZones.minute.(arr) == fill(59, n)
-@test TimeZones.second.(arr) == fill(58, n)
-@test TimeZones.millisecond.(arr) == fill(57, n)
+    @test Dates.year(zdt) == 2014
+    @test Dates.quarterofyear(zdt) == 2
+    @test Dates.month(zdt) == 6
+    @test Dates.week(zdt) == 24
+    @test Dates.day(zdt) == 12
+    @test Dates.hour(zdt) == 23
+    @test Dates.minute(zdt) == 59
+    @test Dates.second(zdt) == 58
+    @test Dates.millisecond(zdt) == 57
 
-@test Dates.year.(arr) == fill(2014, n)
-@test Dates.month.(arr) == fill(6, n)
-@test Dates.day.(arr) == fill(12, n)
-@test Dates.dayofmonth.(arr) == fill(12, n)
-@test Dates.yearmonth.(arr) == fill((2014, 6), n)
-@test Dates.monthday.(arr) == fill((6, 12), n)
-@test Dates.yearmonthday.(arr) == fill((2014, 6, 12), n)
+    @test Dates.dayofmonth(zdt) == 12
+    @test Dates.yearmonth(zdt) == (2014, 6)
+    @test Dates.monthday(zdt) == (6, 12)
+    @test Dates.yearmonthday(zdt) == (2014, 6, 12)
+end
 
+@testset "Period constructors" begin
+    @test Dates.Year(zdt) == Dates.Year(2014)
+    @test Dates.Quarter(zdt) == Dates.Quarter(2)
+    @test Dates.Month(zdt) == Dates.Month(6)
+    @test Dates.Week(zdt) == Dates.Week(24)
+    @test Dates.Day(zdt) == Dates.Day(12)
+    @test Dates.Hour(zdt) == Dates.Hour(23)
+    @test Dates.Minute(zdt) == Dates.Minute(59)
+    @test Dates.Second(zdt) == Dates.Second(58)
+    @test Dates.Millisecond(zdt) == Dates.Millisecond(57)
+end
 
 @testset "DateTime from ZonedDateTime" begin
     # Construct a ZonedDateTime from a DateTime and the reverse
