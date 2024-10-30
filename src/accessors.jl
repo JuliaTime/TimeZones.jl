@@ -1,4 +1,4 @@
-using Dates: Year, Month, Week, Day, Hour, Minute, Second, Millisecond, days, hour, minute, second, millisecond
+using Dates: Hour, Minute, Second, Millisecond, days, hour, minute, second, millisecond
 
 """
     timezone(::ZonedDateTime) -> TimeZone
@@ -7,21 +7,16 @@ Returns the `TimeZone` used by the `ZonedDateTime`.
 """
 timezone(zdt::ZonedDateTime) = zdt.timezone
 
-Dates.days(zdt::ZonedDateTime) = days(DateTime(zdt))
-
-for period in (:Year, :Month, :Week, :Day, :Hour, :Minute, :Second, :Millisecond)
-    accessor = Symbol(lowercase(string(period)))
-    @eval begin
-        Dates.$accessor(zdt::ZonedDateTime) = $accessor(DateTime(zdt))
-        Dates.$period(zdt::ZonedDateTime) = $period($accessor(zdt))
-    end
+for accessor in (:days, :hour, :minute, :second, :millisecond)
+    @eval Dates.$accessor(zdt::ZonedDateTime) = Dates.$accessor(DateTime(zdt))
 end
 
-Dates.quarter(zdt::ZonedDateTime) = Dates.quarterofyear(DateTime(zdt))
-Dates.Quarter(zdt::ZonedDateTime) = Dates.Quarter(quarterofyear(zdt))
+for period in (:Year, :Quarter, :Month, :Week, :Day, :Hour, :Minute, :Second, :Millisecond)
+    accessor = Symbol(lowercase(string(period)))
+    @eval Dates.$period(zdt::ZonedDateTime) = Dates.$period(Dates.$accessor(zdt))
+end
 
 Base.eps(::ZonedDateTime) = Millisecond(1)
-
 
 """
     DateTime(zdt::ZonedDateTime) -> DateTime
