@@ -1,5 +1,6 @@
 module TimeZones
 
+using Artifacts
 using Dates
 using Printf
 using Scratch: @get_scratch!
@@ -41,7 +42,12 @@ abstract type Local <: TimeZone end
 
 function __init__()
     # Must be set at runtime to ensure relocatability 
-    _COMPILED_DIR[] = TZJData.artifact_dir()
+    _COMPILED_DIR[] = if isdefined(TZJData, :artifact_dir)
+        TZJData.artifact_dir()
+    else
+        # Backwards compatibility with TZJData v1.3.0 and below.
+        Artifacts.artifact_path(Base.SHA1(basename(TZJData.ARTIFACT_DIR)))
+    end
 
     # Dates extension needs to happen everytime the module is loaded (issue #24)
     init_dates_extension()
