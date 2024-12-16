@@ -41,6 +41,7 @@ const _COMPILED_DIR = Ref{String}()
 abstract type Local <: TimeZone end
 
 function __init__()
+    # COV_EXCL_START
     # Must be set at runtime to ensure relocatability 
     _COMPILED_DIR[] = if isdefined(TZJData, :artifact_dir)
         # Recent versions of TZJData are relocatable
@@ -60,6 +61,7 @@ function __init__()
         end
         Artifacts.artifact_path(hash)
     end
+    # COV_EXCL_STOP
 
     # Dates extension needs to happen everytime the module is loaded (issue #24)
     init_dates_extension()
