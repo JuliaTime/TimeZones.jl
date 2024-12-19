@@ -1,6 +1,6 @@
 module TimeZones
 
-using Artifacts
+using Artifacts: Artifacts
 using Dates
 using Printf
 using Scratch: @get_scratch!
@@ -42,23 +42,13 @@ abstract type Local <: TimeZone end
 
 function __init__()
     # COV_EXCL_START
-    # Must be set at runtime to ensure relocatability 
-    _COMPILED_DIR[] = if isdefined(TZJData, :artifact_dir)
-        # Recent versions of TZJData are relocatable
+    # Set at runtime to ensure relocatability
+    _COMPILED_DIR[] = @static if isdefined(TZJData, :artifact_dir)
         TZJData.artifact_dir()
     else
-        # Backwards compatibility with TZJData v1.3.0 and below
-        hash = if TZJData.TZDATA_VERSION == "2024b"
-            Base.SHA1("7fdea2a12522469ca39925546d1fd93c10748180")
-        elseif TZJData.TZDATA_VERSION == "2024a"
-            Base.SHA1("520ce3f83be7fbb002cca87993a1b1f71fe10912")
-        elseif TZJData.TZDATA_VERSION == "2023d"
-            Base.SHA1("b071cffdb310f5d3ca640c09cfa3dc3f23d450ad")
-        elseif TZJData.TZDATA_VERSION == "2023c"
-            Base.SHA1("52e48e96c4df04eeebc6ece0d9f1c3b545f0544c")
-        else
-            error("TZJData.jl with TZDATA_VERSION = $(TZJData.TZDATA_VERSION) is supposed to be relocatable!")
-        end
+        # Backwards compatibility for TZJData versions below v1.3.1
+        artifact_dict = Artifacts.parse_toml(joinpath(pkgdir(TZJData), "Artifacts.toml"))
+        hash = Base.SHA1(artifact_dict["tzjdata"]["git-tree-sha1"])
         Artifacts.artifact_path(hash)
     end
     # COV_EXCL_STOP
