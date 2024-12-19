@@ -3,8 +3,9 @@
     # lets use avoid a Plots.jl dependency and issues with running that during tests.
     # `RecipesBase.apply_recipe` is not a documented API, but is fairly usable.
     # Comments above each use show the matching `plot` function command
-    start_zdt = ZonedDateTime(2017,1,1,0,0,0, tz"EST")
-    end_zdt = ZonedDateTime(2017,1,1,10,30,0, tz"EST")
+    tz = FixedTimeZone("EST", -18000)
+    start_zdt = ZonedDateTime(2017,1,1,0,0,0, tz)
+    end_zdt = ZonedDateTime(2017,1,1,10,30,0, tz)
     zoned_dates = start_zdt:Hour(1):end_zdt
 
     # what the point should be after recipe is applied
