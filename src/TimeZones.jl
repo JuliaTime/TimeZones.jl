@@ -46,7 +46,7 @@ function __init__()
         TZJData.artifact_dir()
     else
         # Backwards compatibility for TZJData versions below v1.3.1.
-        pkg = Base.identify_package(TZJData)
+        pkg = Base.identify_package(TZJData, "TZJData")
         pkg_dir = joinpath(Base.locate_package(pkg), "..", "..")
         artifact_dict = Artifacts.parse_toml(joinpath(pkg_dir, "Artifacts.toml"))
         hash = Base.SHA1(artifact_dict["tzjdata"]["git-tree-sha1"])
