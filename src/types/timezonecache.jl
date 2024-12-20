@@ -15,9 +15,11 @@ TimeZoneCache() = TimeZoneCache(Dict(), Dict(), ReentrantLock(), Threads.Atomic{
 const _TZ_CACHE = TimeZoneCache()
 
 function Base.copy!(dst::TimeZoneCache, src::TimeZoneCache)
-    copy!(dst.ftz, src.ftz)
-    copy!(dst.vtz, src.vtz)
-    dst.initialized[] = src.initialized[]
+    lock(dst.lock) do
+        copy!(dst.ftz, src.ftz)
+        copy!(dst.vtz, src.vtz)
+        dst.initialized[] = src.initialized[]
+    end
     return dst
 end
 

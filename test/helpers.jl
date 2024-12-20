@@ -81,3 +81,14 @@ function with_tz_cache(f, cache::TimeZones.TimeZoneCache)
         copy!(TimeZones._TZ_CACHE, old_cache)
     end
 end
+
+function with_tz_cache(f)
+    old_cache = deepcopy(TimeZones._TZ_CACHE)
+    copy!(TimeZones._TZ_CACHE, TimeZones.TimeZoneCache())
+
+    try
+        return withenv(f, "JULIA_TZDATA_VERSION" => TZDATA_VERSION)
+    finally
+        copy!(TimeZones._TZ_CACHE, old_cache)
+    end
+end

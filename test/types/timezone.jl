@@ -26,14 +26,22 @@ end
     @test TimeZone("Etc/GMT-14", Class(:LEGACY)) == FixedTimeZone("Etc/GMT-14", 14 * 3600)
 end
 
+# These allocation tests are a bit fragile. Clearing the cache makes these tests more
+# in on Julia 1.12.0-DEV.1786.
 @testset "allocations" begin
-    tz = TimeZone("UTC")  # Trigger compilation and ensure the cache is populated
-    @test tz isa FixedTimeZone
-    @test @allocations(TimeZone("UTC")) == 0
-    @test @allocations(istimezone("UTC")) == 0
+    with_tz_cache() do
+        # Trigger compilation (only upon the first call in Julia) and populate the cache
+        @test @allocations(TimeZone("UTC")) > 0
 
-    tz = TimeZone("America/Winnipeg")  # Trigger compilation and ensure the cache is populated
-    @test tz isa VariableTimeZone
-    @test @allocations(TimeZone("America/Winnipeg")) == 2
-    @test @allocations(istimezone("America/Winnipeg")) == 1
+        @test @allocations(TimeZone("UTC")) == 0
+        @test @allocations(istimezone("UTC")) == 0
+    end
+
+    with_tz_cache() do
+        # Trigger compilation (only upon the first call in Julia) and populate the cache
+        @test @allocations(TimeZone("America/Winnipeg")) > 0
+
+        @test @allocations(TimeZone("America/Winnipeg")) == 2
+        @test @allocations(istimezone("America/Winnipeg")) == 1
+    end
 end
