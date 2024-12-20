@@ -122,7 +122,7 @@ jobs:
         shell: julia --color=yes --project=@sysimage {0}
         run: |
           using Pkg
-          Pkg.dev(".")
+          Pkg.develop(path=".")
       - name: Create sysimage
         shell: julia --color=yes {0}
         run: |
