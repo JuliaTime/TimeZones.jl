@@ -119,7 +119,7 @@ jobs:
           version: ${{ matrix.version }}
       - uses: julia-actions/cache@v2
       - name: Add TimeZones
-        shell: julia --color=yes --project=sysimage {0}
+        shell: julia --color=yes --project=@sysimage {0}
         run: |
           using Pkg
           Pkg.add(PackageSpec(name="TimeZones", rev=ENV["SHA"]))
@@ -129,16 +129,16 @@ jobs:
           using Pkg
           Pkg.add(PackageSpec(name="PackageCompiler", version="2"))
           using PackageCompiler
-          create_sysimage(; project="sysimage", sysimage_path="sysimage.so")
+          create_sysimage(; project=joinpath(first(DEPOT_PATH), "environments", "sysimage"), sysimage_path="sysimage.so")
       - name: Validate sysimage works
-        shell: julia --color=yes --project=sysimage -Jsysimage.so
+        shell: julia --color=yes --project=@sysimage -Jsysimage.so {0}
         run: |
           using TimeZones
           println(TimeZones._COMPILED_DIR[])
       - name: Relocate Julia depot
         run: mv build-depot sysimage-depot
       - name: Validate sysimage works with relocated depot
-        shell: julia --color=yes --project=sysimage -Jsysimage.so
+        shell: julia --color=yes --project=@sysimage -Jsysimage.so {0}
         run: |
           using TimeZones
           println(TimeZones._COMPILED_DIR[])
