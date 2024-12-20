@@ -48,9 +48,8 @@ function __init__()
         # Backwards compatibility for TZJData versions below v1.3.1. The portion of the
         # code which determines the `pkg_dir` could be replaced by `pkgdir(TZJData)` however
         # the `pkgdir` function doesn't work well with relocated system images.
-        # pkg = Base.identify_package(TZJData, "TZJData")
-        # pkg_dir = dirname(dirname(Base.locate_package(pkg)))
-        pkg_dir = pkgdir(TZJData)
+        pkg = Base.identify_package(TZJData, "TZJData")
+        pkg_dir = dirname(dirname(Base.locate_package(pkg)))
         artifact_dict = Artifacts.parse_toml(joinpath(pkg_dir, "Artifacts.toml"))
         hash = Base.SHA1(artifact_dict["tzjdata"]["git-tree-sha1"])
         Artifacts.artifact_path(hash)
