@@ -100,7 +100,7 @@ jobs:
           using TimeZones
 
   sysimage:
-    name: System Image
+    name: System Image - Julia ${{ matrix.version }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -118,22 +118,27 @@ jobs:
         with:
           version: ${{ matrix.version }}
       - uses: julia-actions/cache@v2
-      - shell: julia --color=yes --project=@sysimage {0}
+      - name: Add TimeZones
+        shell: julia --color=yes --project=@sysimage {0}
         run: |
           using Pkg
-          Pkg.add(".")
-      - shell: julia --color=yes {0}
+          Pkg.dev(".")
+      - name: Create sysimage
+        shell: julia --color=yes {0}
         run: |
           using Pkg
           Pkg.add(PackageSpec(name="PackageCompiler", version="2"))
           using PackageCompiler
           create_sysimage(; project="@sysimage", sysimage_path="sysimage.so")
-      - shell: julia --color=yes --project=@sysimage -Jsysimage.so
+      - name: Validate sysimage works
+        shell: julia --color=yes --project=@sysimage -Jsysimage.so
         run: |
           using TimeZones
           println(TimeZones._COMPILED_DIR[])
-      - run: mv build-depot sysimage-depot
-      - shell: julia --color=yes --project=@sysimage -Jsysimage.so
+      - name: Relocate Julia depot
+        run: mv build-depot sysimage-depot
+      - name: Validate sysimage works with relocated depot
+        shell: julia --color=yes --project=@sysimage -Jsysimage.so
         run: |
           using TimeZones
           println(TimeZones._COMPILED_DIR[])
