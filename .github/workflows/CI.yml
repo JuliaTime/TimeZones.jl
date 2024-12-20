@@ -99,6 +99,47 @@ jobs:
           Pkg.add(PackageSpec(name="TimeZones", rev=ENV["SHA"]))
           using TimeZones
 
+  sysimage:
+    name: System Image
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - "1.6"  # LTS / Oldest supported version
+          - "1"    # Latest release
+        os:
+          - ubuntu-latest
+    env:
+      JULIA_DEPOT_PATH: build-depot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: ${{ matrix.version }}
+      - uses: julia-actions/cache@v2
+      - shell: julia --color=yes --project=@sysimage {0}
+        run: |
+          using Pkg
+          Pkg.add(".")
+      - shell: julia --color=yes {0}
+        run: |
+          using Pkg
+          Pkg.add(PackageSpec(name="PackageCompiler", version="2"))
+          using PackageCompiler
+          create_sysimage(; project="@sysimage", sysimage_path="sysimage.so")
+      - shell: julia --color=yes --project=@sysimage -Jsysimage.so
+        run: |
+          using TimeZones
+          println(TimeZones._COMPILED_DIR[])
+      - run: mv build-depot sysimage-depot
+      - shell: julia --color=yes --project=@sysimage -Jsysimage.so
+        run: |
+          using TimeZones
+          println(TimeZones._COMPILED_DIR[])
+        env:
+          JULIA_DEPOT_PATH: sysimage-depot
+
   benchmarks:
     name: Benchmarks
     runs-on: ubuntu-latest
