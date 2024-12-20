@@ -45,8 +45,9 @@ function __init__()
     _COMPILED_DIR[] = @static if isdefined(TZJData, :artifact_dir)
         TZJData.artifact_dir()
     else
-        # Backwards compatibility for TZJData versions below v1.3.1
-        pkg_dir = realpath(joinpath(Base.locate_package(Base.identify_package("TZJData")), "..", ".."))
+        # Backwards compatibility for TZJData versions below v1.3.1.
+        pkg = Base.identify_package(TZJData)
+        pkg_dir = joinpath(Base.locate_package(pkg), "..", "..")
         artifact_dict = Artifacts.parse_toml(joinpath(pkg_dir, "Artifacts.toml"))
         hash = Base.SHA1(artifact_dict["tzjdata"]["git-tree-sha1"])
         Artifacts.artifact_path(hash)
