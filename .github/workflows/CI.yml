@@ -99,6 +99,7 @@ jobs:
           Pkg.add(PackageSpec(name="TimeZones", rev=ENV["SHA"]))
           using TimeZones
 
+  # TODO: Use shared project environments when the minimum version of Julia is 1.8 (e.g. `@sysimage`)
   sysimage:
     name: System Image - Julia ${{ matrix.version }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -130,6 +131,7 @@ jobs:
           Pkg.add(PackageSpec(name="PackageCompiler", version="2"))
           using PackageCompiler
           create_sysimage(; project="sysimage", sysimage_path="sysimage.so")
+          # create_sysimage(; project=joinpath(first(DEPOT_PATH), "environments", "sysimage"), sysimage_path="sysimage.so")
       - name: Validate sysimage works
         shell: julia --color=yes --project=sysimage -Jsysimage.so {0}
         run: |
