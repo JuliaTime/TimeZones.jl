@@ -15,6 +15,12 @@ const ISOZonedDateTimeFormat = let
     DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
 end
 
+const NoMillisecondFormat = let
+    init_dates_extension()
+    DateFormat("yyyy-mm-ddTHH:MM:SSzzz")
+end
+
+Base.parse(::Type{ZonedDateTime}, str::AbstractString) = ZonedDateTime(str)
 Dates.default_format(::Type{ZonedDateTime}) = ISOZonedDateTimeFormat
 
 function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
@@ -97,7 +103,15 @@ function Dates.format(io::IO, d::DatePart{'Z'}, zdt, locale)
     write(io, string(zdt.zone))  # In most cases will be an abbreviation.
 end
 
-function ZonedDateTime(str::AbstractString, df::DateFormat=ISOZonedDateTimeFormat)
+function ZonedDateTime(str::AbstractString)
+    if length(str) < 20 || str[20] == '.'
+        ZonedDateTime(str, ISOZonedDateTimeFormat)
+    else
+        ZonedDateTime(str, NoMillisecondFormat)
+    end
+end
+
+function ZonedDateTime(str::AbstractString, df::DateFormat)
     try
         parse(ZonedDateTime, str, df)
     catch e

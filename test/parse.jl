@@ -1,4 +1,4 @@
-using Dates: parse_components, default_format
+using Dates: parse_components, default_format, Millisecond
 using TimeZones: ParseNextError, _parsesub_tzabbr, _parsesub_offset, _parsesub_time, _parsesub_tzdate, _parsesub_tz
 
 @testset "parse" begin
@@ -75,6 +75,15 @@ end
         @test e isa ArgumentError
         @test occursin(str, e.msg)
         @test occursin(string(TimeZones.ISOZonedDateTimeFormat), e.msg)
+    end
+end
+
+@testset "self parseable" begin
+    tt = [ZonedDateTime(2025, 2, 28, 14, 22, tz"UTC")]
+    push!(tt, tt[1] + Millisecond(55))
+    for t in tt
+        @test t == ZonedDateTime(string(t))
+        @test t == parse(ZonedDateTime, string(t))
     end
 end
 
