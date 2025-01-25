@@ -1,4 +1,4 @@
-using Dates: parse_components, default_format, Millisecond
+using Dates: parse_components, Millisecond
 using TimeZones: ParseNextError, _parsesub_tzabbr, _parsesub_offset, _parsesub_time, _parsesub_tzdate, _parsesub_tz
 
 @testset "parse" begin
@@ -47,10 +47,6 @@ end
         tz"UTC+01",
     ]
     @test parse_components(test...) == expected
-end
-
-@testset "default format" begin
-    @test default_format(ZonedDateTime) === TimeZones.ISOZonedDateTimeFormat
 end
 
 @testset "parse constructor" begin

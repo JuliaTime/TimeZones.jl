@@ -21,7 +21,6 @@ const NoMillisecondFormat = let
 end
 
 Base.parse(::Type{ZonedDateTime}, str::AbstractString) = ZonedDateTime(str)
-Dates.default_format(::Type{ZonedDateTime}) = ISOZonedDateTimeFormat
 
 function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
     i == len && str[i] === 'Z' && return ("Z", i+1)
