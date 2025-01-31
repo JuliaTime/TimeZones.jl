@@ -21,8 +21,12 @@ begin
 end
 
 function Base.parse(::Type{ZonedDateTime}, str::AbstractString)
-    res = tryparse(ZonedDateTime, str, ISOZonedDateTimeFormat)
-    return isnothing(res) ? parse(ZonedDateTime, str, ISOZonedDateTimeNoMillisecondFormat) : res
+    # Works as the format should only contain a period when milliseconds are included
+    return if contains(str, '.')
+        parse(ZonedDateTime, str, ISOZonedDateTimeFormat)
+    else
+        parse(ZonedDateTime, str, ISOZonedDateTimeNoMillisecondFormat)
+    end
 end
 
 function Base.parse(::Type{ZonedDateTime}, str::AbstractString, df::DateFormat)
