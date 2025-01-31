@@ -21,7 +21,6 @@ using TimeZones: ParseNextError, _parsesub_tzabbr, _parsesub_offset, _parsesub_t
         parse(ZonedDateTime, Test.GenericString("2018-01-01 00:00 UTC"), dateformat"yyyy-mm-dd HH:MM ZZZ"),
         ZonedDateTime(2018, 1, 1, 0, tz"UTC"),
     )
-
 end
 
 @testset "tryparse" begin
@@ -76,13 +75,20 @@ end
 end
 
 @testset "self parseable" begin
-    tt = [ZonedDateTime(2025, 2, 28, 14, 22, tz"UTC"),
-          ZonedDateTime(20025, 2, 28, 14, tz"UTC+05"),
-         ]
-    push!(tt, tt[1] + Millisecond(55), tt[2] + Millisecond(4))
-    for t in tt
-        @test t == ZonedDateTime(string(t))
-        @test t == parse(ZonedDateTime, string(t))
+    zdt_args = Iterators.product(
+        [0, 1, 10, 100, 1000, 10000],  # Year
+        [1, 12],  # Month
+        [3, 31],  # Day
+        [0, 4, 23],  # Hour
+        [0, 5, 55],  # Minute
+        [0, 6, 56],  # Seconds
+        [0, 7, 77, 777],  # Milliseconds
+        [tz"UTC"],  # Time zones
+    )
+    for args in zdt_args
+        zdt = ZonedDateTime(args...)
+        @test zdt == parse(ZonedDateTime, string(zdt))
+        @test zdt == ZonedDateTime(string(zdt))
     end
 end
 
