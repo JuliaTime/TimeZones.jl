@@ -106,7 +106,6 @@ function ZonedDateTime(str::AbstractString, df::DateFormat=ISOZonedDateTimeForma
                 "Unable to parse string \"$str\" using format $df. $(e.msg)"
             ))
         else
-            println("Untested")
             rethrow()
         end
     end
