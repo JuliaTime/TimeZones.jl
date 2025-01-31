@@ -1,4 +1,4 @@
-using Base: @deprecate
+using Base: @deprecate, depwarn
 
 # BEGIN TimeZones 1.0 deprecations
 
@@ -15,7 +15,7 @@ const TransitionTimeInfo = TZFile.TransitionTimeInfo
 
 function Dates.default_format(::Type{ZonedDateTime})
     depwarn(
-        "`$(Dates.default_format)(ZonedDateTime)` is deprecated and has direct " *
+        "`Dates.default_format(ZonedDateTime)` is deprecated and has no direct " *
         "replacement. Consider using refactoring to use " *
         "`parse(::Type{ZonedDateTime}, ::AbstractString)` as an alternative.",
         :default_format,

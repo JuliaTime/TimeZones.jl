@@ -1,4 +1,4 @@
-using Dates: parse_components, Millisecond
+using Dates: parse_components
 using TimeZones: ParseNextError, _parsesub_tzabbr, _parsesub_offset, _parsesub_time, _parsesub_tzdate, _parsesub_tz
 
 @testset "parse" begin

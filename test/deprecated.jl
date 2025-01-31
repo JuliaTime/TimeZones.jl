@@ -1,3 +1,3 @@
 @testset "default format" begin
-    @test default_format(ZonedDateTime) === TimeZones.ISOZonedDateTimeFormat
+    @test Dates.default_format(ZonedDateTime) === TimeZones.ISOZonedDateTimeFormat
 end
