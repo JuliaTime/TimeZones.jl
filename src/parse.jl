@@ -10,14 +10,14 @@ function init_dates_extension()
     )
 end
 
-const ISOZonedDateTimeFormat = let
+begin
+    # Needs to be initialized to construct formats
     init_dates_extension()
-    DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
-end
 
-const NoMillisecondFormat = let
-    init_dates_extension()
-    DateFormat("yyyy-mm-ddTHH:MM:SSzzz")
+    # Follows the ISO 8601 standard for date and time with an offset. See
+    # `Dates.ISODateTimeFormat` for the `DateTime` equivalent.
+    const ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
+    const NoMillisecondFormat = DateFormat("yyyy-mm-ddTHH:MM:SSzzz")
 end
 
 Base.parse(::Type{ZonedDateTime}, str::AbstractString) = ZonedDateTime(str)
