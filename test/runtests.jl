@@ -77,4 +77,5 @@ include("helpers.jl")
     include("rounding.jl")
     include("parse.jl")
     include("plotting.jl")
+    include("deprecated.jl")
 end
