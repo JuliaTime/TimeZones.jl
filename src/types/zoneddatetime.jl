@@ -166,6 +166,15 @@ function ZonedDateTime(date::Date, args...; kwargs...)
     return ZonedDateTime(DateTime(date), args...; kwargs...)
 end
 
+# Parsing constructors
+
+ZonedDateTime(str::AbstractString) = parse(ZonedDateTime, str)
+ZonedDateTime(str::AbstractString, df::DateFormat) = parse(ZonedDateTime, str, df)
+
+function ZonedDateTime(str::AbstractString, format::AbstractString; locale::AbstractString="english")
+    return parse(ZonedDateTime, str, DateFormat(format, locale))
+end
+
 # Promotion
 
 # Because of the promoting fallback definitions for TimeType, we need a special case for

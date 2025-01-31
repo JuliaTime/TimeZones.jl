@@ -61,17 +61,6 @@ end
         ZonedDateTime("2018-11-01-0600", dateformat"yyyy-mm-ddzzzz"),
         ZonedDateTime(2018, 11, 1, tz"UTC-06"),
     )
-
-    # Validate that error message contains the original string and the format used
-    str = "2018-11-01"
-    try
-        ZonedDateTime(str)
-    catch e
-        @test e isa ArgumentError
-        @test occursin(str, e.msg)
-        @test occursin(string(TimeZones.ISOZonedDateTimeFormat), e.msg) ||
-               occursin(string(TimeZones.ISOZonedDateTimeNoMillisecondFormat), e.msg)
-    end
 end
 
 @testset "self parseable" begin
@@ -89,6 +78,29 @@ end
         zdt = ZonedDateTime(args...)
         @test zdt == parse(ZonedDateTime, string(zdt))
         @test zdt == ZonedDateTime(string(zdt))
+    end
+end
+
+# Validate that error message contains the original string and the format used
+@testset "contextual error" begin
+    str = "2018-11-01"
+
+    try
+        parse(ZonedDateTime, str)
+        @test false
+    catch e
+        @test e isa ArgumentError
+        @test occursin(str, e.msg)
+        @test occursin(string(TimeZones.ISOZonedDateTimeNoMillisecondFormat), e.msg)
+    end
+
+    try
+        ZonedDateTime(str)
+        @test false
+    catch e
+        @test e isa ArgumentError
+        @test occursin(str, e.msg)
+        @test occursin(string(TimeZones.ISOZonedDateTimeNoMillisecondFormat), e.msg)
     end
 end
 

@@ -20,7 +20,25 @@ begin
     const ISOZonedDateTimeNoMillisecondFormat = DateFormat("yyyy-mm-dd\\THH:MM:SSzzz")
 end
 
-Base.parse(::Type{ZonedDateTime}, str::AbstractString) = ZonedDateTime(str)
+function Base.parse(::Type{ZonedDateTime}, str::AbstractString)
+    res = tryparse(ZonedDateTime, str, ISOZonedDateTimeFormat)
+    return isnothing(res) ? parse(ZonedDateTime, str, ISOZonedDateTimeNoMillisecondFormat) : res
+end
+
+function Base.parse(::Type{ZonedDateTime}, str::AbstractString, df::DateFormat)
+    argtypes = Tuple{Type{<:TimeType},AbstractString,DateFormat}
+    try
+        invoke(parse, argtypes, ZonedDateTime, str, df)
+    catch e
+        if e isa ArgumentError
+            rethrow(ArgumentError(
+                "Unable to parse string \"$str\" using format $df. $(e.msg)"
+            ))
+        else
+            rethrow()
+        end
+    end
+end
 
 function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
     i == len && str[i] === 'Z' && return ("Z", i+1)
@@ -101,30 +119,6 @@ end
 function Dates.format(io::IO, d::DatePart{'Z'}, zdt, locale)
     write(io, string(zdt.zone))  # In most cases will be an abbreviation.
 end
-
-function ZonedDateTime(str::AbstractString)
-    res = tryparse(ZonedDateTime, str, ISOZonedDateTimeFormat)
-    return isnothing(res) ? ZonedDateTime(str, ISOZonedDateTimeNoMillisecondFormat) : res
-end
-
-function ZonedDateTime(str::AbstractString, df::DateFormat)
-    try
-        parse(ZonedDateTime, str, df)
-    catch e
-        if e isa ArgumentError
-            rethrow(ArgumentError(
-                "Unable to parse string \"$str\" using format $df. $(e.msg)"
-            ))
-        else
-            rethrow()
-        end
-    end
-end
-
-function ZonedDateTime(str::AbstractString, format::AbstractString; locale::AbstractString="english")
-    ZonedDateTime(str, DateFormat(format, locale))
-end
-
 
 """
     _parsesub_tzabbr(str, [i, len]) -> Union{Tuple{AbstractString, Integer}, Exception}
