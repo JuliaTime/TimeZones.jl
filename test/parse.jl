@@ -71,7 +71,7 @@ end
         @test e isa ArgumentError
         @test occursin(str, e.msg)
         @test occursin(string(TimeZones.ISOZonedDateTimeFormat), e.msg) ||
-               occursin(string(TimeZones.NoMillisecondFormat), e.msg)
+               occursin(string(TimeZones.ISOZonedDateTimeNoMillisecondFormat), e.msg)
     end
 end
 

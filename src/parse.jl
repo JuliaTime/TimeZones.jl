@@ -17,7 +17,7 @@ begin
     # Follows the ISO 8601 standard for date and time with an offset. See
     # `Dates.ISODateTimeFormat` for the `DateTime` equivalent.
     const ISOZonedDateTimeFormat = DateFormat("yyyy-mm-dd\\THH:MM:SS.ssszzz")
-    const NoMillisecondFormat = DateFormat("yyyy-mm-dd\\THH:MM:SSzzz")
+    const ISOZonedDateTimeNoMillisecondFormat = DateFormat("yyyy-mm-dd\\THH:MM:SSzzz")
 end
 
 Base.parse(::Type{ZonedDateTime}, str::AbstractString) = ZonedDateTime(str)
@@ -104,7 +104,7 @@ end
 
 function ZonedDateTime(str::AbstractString)
     res = tryparse(ZonedDateTime, str, ISOZonedDateTimeFormat)
-    isnothing(res) ?  ZonedDateTime(str, NoMillisecondFormat) : res
+    return isnothing(res) ? ZonedDateTime(str, ISOZonedDateTimeNoMillisecondFormat) : res
 end
 
 function ZonedDateTime(str::AbstractString, df::DateFormat)
