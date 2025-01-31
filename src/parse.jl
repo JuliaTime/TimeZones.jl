@@ -103,11 +103,8 @@ function Dates.format(io::IO, d::DatePart{'Z'}, zdt, locale)
 end
 
 function ZonedDateTime(str::AbstractString)
-    if length(str) < 20 || str[20] == '.'
-        ZonedDateTime(str, ISOZonedDateTimeFormat)
-    else
-        ZonedDateTime(str, NoMillisecondFormat)
-    end
+    res = tryparse(ZonedDateTime, str, ISOZonedDateTimeFormat)
+    isnothing(res) ?  ZonedDateTime(str, NoMillisecondFormat) : res
 end
 
 function ZonedDateTime(str::AbstractString, df::DateFormat)

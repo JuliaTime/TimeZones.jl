@@ -70,13 +70,16 @@ end
     catch e
         @test e isa ArgumentError
         @test occursin(str, e.msg)
-        @test occursin(string(TimeZones.ISOZonedDateTimeFormat), e.msg)
+        @test occursin(string(TimeZones.ISOZonedDateTimeFormat), e.msg) ||
+               occursin(string(TimeZones.NoMillisecondFormat), e.msg)
     end
 end
 
 @testset "self parseable" begin
-    tt = [ZonedDateTime(2025, 2, 28, 14, 22, tz"UTC")]
-    push!(tt, tt[1] + Millisecond(55))
+    tt = [ZonedDateTime(2025, 2, 28, 14, 22, tz"UTC"),
+          ZonedDateTime(20025, 2, 28, 14, tz"UTC+05"),
+         ]
+    push!(tt, tt[1] + Millisecond(55), tt[2] + Millisecond(4))
     for t in tt
         @test t == ZonedDateTime(string(t))
         @test t == parse(ZonedDateTime, string(t))
