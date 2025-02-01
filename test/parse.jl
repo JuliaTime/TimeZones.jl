@@ -65,14 +65,14 @@ end
 
 @testset "self parseable" begin
     zdt_args = Iterators.product(
-        [0, 1, 10, 100, 1000, 10000],  # Year
+        [0, 1, 10, 100, 1000, 2025, 10000],  # Year
         [1, 12],  # Month
         [3, 31],  # Day
         [0, 4, 23],  # Hour
         [0, 5, 55],  # Minute
         [0, 6, 56],  # Seconds
-        [0, 7, 77, 777],  # Milliseconds
-        [tz"UTC"],  # Time zones
+        [0, 7, 50, 77, 777],  # Milliseconds
+        [tz"UTC-06", tz"UTC", tz"UTC+08:45", tz"UTC+14"],  # Time zones
     )
     for args in zdt_args
         zdt = ZonedDateTime(args...)
