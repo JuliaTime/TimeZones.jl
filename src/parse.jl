@@ -20,6 +20,18 @@ begin
     const ISOZonedDateTimeNoMillisecondFormat = DateFormat("yyyy-mm-dd\\THH:MM:SSzzz")
 end
 
+@doc """
+    DateFormat(format::AbstractString, locale="english") --> DateFormat
+
+When the `TimeZones` package is loaded, 2 extra character codes are available
+for constructing the `format` string:
+
+| Code       | Matches   | Comment                                                       |
+|:-----------|:----------|:--------------------------------------------------------------|
+| `z`        | +02:00    | Numeric UTC offset                                            |
+| `Z`        | GST, UTC  | Time zone abbreviation                                        |
+""" DateFormat
+
 function Base.parse(::Type{ZonedDateTime}, str::AbstractString)
     # Works as the format should only contain a period when milliseconds are included
     return if contains(str, '.')
