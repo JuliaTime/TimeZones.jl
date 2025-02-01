@@ -168,7 +168,21 @@ end
 
 # Parsing constructors
 
+"""
+    ZonedDateTime(str::AbstractString)
+
+Construct a `ZonedDateTime` by parsing `str`. This method is designed so that
+`zdt == ZonedDateTime(string(zdt))` where `zdt` can be any `ZonedDateTime`
+object.
+"""
 ZonedDateTime(str::AbstractString) = parse(ZonedDateTime, str)
+
+"""
+    ZonedDateTime(str::AbstractString, df::DateFormat)
+
+Construct a `ZonedDateTime` by parsing `str` according to the format specified
+in `df`.
+"""
 ZonedDateTime(str::AbstractString, df::DateFormat) = parse(ZonedDateTime, str, df)
 
 function ZonedDateTime(str::AbstractString, format::AbstractString; locale::AbstractString="english")
