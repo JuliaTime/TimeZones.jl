@@ -10,12 +10,51 @@ function init_dates_extension()
     )
 end
 
-const ISOZonedDateTimeFormat = let
+begin
+    # Needs to be initialized to construct formats
     init_dates_extension()
-    DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
+
+    # Follows the ISO 8601 standard for date and time with an offset. See
+    # `Dates.ISODateTimeFormat` for the `DateTime` equivalent.
+    const ISOZonedDateTimeFormat = DateFormat("yyyy-mm-dd\\THH:MM:SS.ssszzz")
+    const ISOZonedDateTimeNoMillisecondFormat = DateFormat("yyyy-mm-dd\\THH:MM:SSzzz")
 end
 
-Dates.default_format(::Type{ZonedDateTime}) = ISOZonedDateTimeFormat
+@doc """
+    DateFormat(format::AbstractString, locale="english") --> DateFormat
+
+When the `TimeZones` package is loaded, 2 extra character codes are available
+for constructing the `format` string:
+
+| Code       | Matches            | Comment                                               |
+|:-----------|:-------------------|:------------------------------------------------------|
+| `z`        | +02:00, -0100, +14 | Parsing matches a fixed numeric UTC offset `±hh:mm`, `±hhmm`, or `±hh`. Formatting outputs `±hh:mm` |
+| `Z`        | UTC, GMT, America/New_York | Name of a time zone as specified in the IANA tz database |
+""" DateFormat
+
+function Base.parse(::Type{ZonedDateTime}, str::AbstractString)
+    # Works as the format should only contain a period when milliseconds are included
+    return if contains(str, '.')
+        parse(ZonedDateTime, str, ISOZonedDateTimeFormat)
+    else
+        parse(ZonedDateTime, str, ISOZonedDateTimeNoMillisecondFormat)
+    end
+end
+
+function Base.parse(::Type{ZonedDateTime}, str::AbstractString, df::DateFormat)
+    argtypes = Tuple{Type{<:TimeType},AbstractString,DateFormat}
+    try
+        invoke(parse, argtypes, ZonedDateTime, str, df)
+    catch e
+        if e isa ArgumentError
+            rethrow(ArgumentError(
+                "Unable to parse string \"$str\" using format $df. $(e.msg)"
+            ))
+        else
+            rethrow()
+        end
+    end
+end
 
 function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
     i == len && str[i] === 'Z' && return ("Z", i+1)
@@ -96,25 +135,6 @@ end
 function Dates.format(io::IO, d::DatePart{'Z'}, zdt, locale)
     write(io, string(zdt.zone))  # In most cases will be an abbreviation.
 end
-
-function ZonedDateTime(str::AbstractString, df::DateFormat=ISOZonedDateTimeFormat)
-    try
-        parse(ZonedDateTime, str, df)
-    catch e
-        if e isa ArgumentError
-            rethrow(ArgumentError(
-                "Unable to parse string \"$str\" using format $df. $(e.msg)"
-            ))
-        else
-            rethrow()
-        end
-    end
-end
-
-function ZonedDateTime(str::AbstractString, format::AbstractString; locale::AbstractString="english")
-    ZonedDateTime(str, DateFormat(format, locale))
-end
-
 
 """
     _parsesub_tzabbr(str, [i, len]) -> Union{Tuple{AbstractString, Integer}, Exception}

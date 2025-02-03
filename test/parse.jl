@@ -1,4 +1,4 @@
-using Dates: parse_components, default_format
+using Dates: parse_components
 using TimeZones: ParseNextError, _parsesub_tzabbr, _parsesub_offset, _parsesub_time, _parsesub_tzdate, _parsesub_tz
 
 @testset "parse" begin
@@ -21,7 +21,6 @@ using TimeZones: ParseNextError, _parsesub_tzabbr, _parsesub_offset, _parsesub_t
         parse(ZonedDateTime, Test.GenericString("2018-01-01 00:00 UTC"), dateformat"yyyy-mm-dd HH:MM ZZZ"),
         ZonedDateTime(2018, 1, 1, 0, tz"UTC"),
     )
-
 end
 
 @testset "tryparse" begin
@@ -49,10 +48,6 @@ end
     @test parse_components(test...) == expected
 end
 
-@testset "default format" begin
-    @test default_format(ZonedDateTime) === TimeZones.ISOZonedDateTimeFormat
-end
-
 @testset "parse constructor" begin
     @test isequal(
         ZonedDateTime("2000-01-02T03:04:05.006+0700"),
@@ -66,15 +61,46 @@ end
         ZonedDateTime("2018-11-01-0600", dateformat"yyyy-mm-ddzzzz"),
         ZonedDateTime(2018, 11, 1, tz"UTC-06"),
     )
+end
 
-    # Validate that error message contains the original string and the format used
+@testset "self parseable" begin
+    zdt_args = Iterators.product(
+        [0, 1, 10, 100, 1000, 2025, 10000],  # Year
+        [1, 12],  # Month
+        [3, 31],  # Day
+        [0, 4, 23],  # Hour
+        [0, 5, 55],  # Minute
+        [0, 6, 56],  # Seconds
+        [0, 7, 50, 77, 777],  # Milliseconds
+        [tz"UTC-06", tz"UTC", tz"UTC+08:45", tz"UTC+14"],  # Time zones
+    )
+    for args in zdt_args
+        zdt = ZonedDateTime(args...)
+        @test zdt == parse(ZonedDateTime, string(zdt))
+        @test zdt == ZonedDateTime(string(zdt))
+    end
+end
+
+# Validate that error message contains the original string and the format used
+@testset "contextual error" begin
     str = "2018-11-01"
+
     try
-        ZonedDateTime(str)
+        parse(ZonedDateTime, str)
+        @test false
     catch e
         @test e isa ArgumentError
         @test occursin(str, e.msg)
-        @test occursin(string(TimeZones.ISOZonedDateTimeFormat), e.msg)
+        @test occursin(string(TimeZones.ISOZonedDateTimeNoMillisecondFormat), e.msg)
+    end
+
+    try
+        ZonedDateTime(str)
+        @test false
+    catch e
+        @test e isa ArgumentError
+        @test occursin(str, e.msg)
+        @test occursin(string(TimeZones.ISOZonedDateTimeNoMillisecondFormat), e.msg)
     end
 end
 
