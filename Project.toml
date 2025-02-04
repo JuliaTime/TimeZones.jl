@@ -30,7 +30,7 @@ TZJData = "1"
 Test = "1"
 Unicode = "1"
 julia = "1.6"
-p7zip_jll = "17.4"
+p7zip_jll = "16, 17"
 
 [extensions]
 TimeZonesRecipesBaseExt = "RecipesBase"
