@@ -151,6 +151,28 @@ jobs:
         env:
           JULIA_DEPOT_PATH: sysimage-depot
 
+  force-latest-compatible:
+    name: Force Latest Compatible - Julia ${{ matrix.version }} - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - "1.7"
+        os:
+          - windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: ${{ matrix.version }}
+      - uses: julia-actions/cache@v2
+      - name: Test
+        shell: julia --color=yes --project {0}
+        run: |
+          using Pkg
+          Pkg.test(; allow_reresolve=true, force_latest_compatible_version=true)
+
   benchmarks:
     name: Benchmarks
     runs-on: ubuntu-latest
