@@ -3,7 +3,7 @@ using Base: @deprecate, depwarn
 # BEGIN TimeZones 1.0 deprecations
 
 # https://github.com/JuliaLang/julia/pull/44394
-if VERSION < v"1.9.0-DEV.663"
+@static if VERSION < v"1.9.0-DEV.663"
     import Dates: DateTime, Date, Time
     @deprecate DateTime(zdt::ZonedDateTime, ::Type{Local}) DateTime(zdt) false
     @deprecate Date(zdt::ZonedDateTime, ::Type{Local}) Date(zdt) false
