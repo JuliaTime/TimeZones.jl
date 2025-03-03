@@ -1,5 +1,8 @@
 using Base: @deprecate, depwarn
 
+# Needed as `@deprecate` can't use qualified function calls
+import Dates: DateTime, Date, Time
+
 # BEGIN TimeZones 1.0 deprecations
 
 @deprecate DateTime(zdt::ZonedDateTime, ::Type{Local}) DateTime(zdt)
