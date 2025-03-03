@@ -1,13 +1,10 @@
 using Base: @deprecate, depwarn
 
-# Needed as `@deprecate` can't use qualified function calls
-import Dates: DateTime, Date, Time
-
 # BEGIN TimeZones 1.0 deprecations
 
-@deprecate DateTime(zdt::ZonedDateTime, ::Type{Local}) DateTime(zdt)
-@deprecate Date(zdt::ZonedDateTime, ::Type{Local}) Date(zdt)
-@deprecate Time(zdt::ZonedDateTime, ::Type{Local}) Time(zdt)
+@deprecate Dates.DateTime(zdt::ZonedDateTime, ::Type{Local}) DateTime(zdt) false
+@deprecate Dates.Date(zdt::ZonedDateTime, ::Type{Local}) Date(zdt) false
+@deprecate Dates.Time(zdt::ZonedDateTime, ::Type{Local}) Time(zdt) false
 
 const TZFILE_MAX = TZFile.TZFILE_CUTOFF
 const TransitionTimeInfo = TZFile.TransitionTimeInfo
