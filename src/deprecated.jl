@@ -2,9 +2,17 @@ using Base: @deprecate, depwarn
 
 # BEGIN TimeZones 1.0 deprecations
 
-@deprecate Dates.DateTime(zdt::ZonedDateTime, ::Type{Local}) DateTime(zdt) false
-@deprecate Dates.Date(zdt::ZonedDateTime, ::Type{Local}) Date(zdt) false
-@deprecate Dates.Time(zdt::ZonedDateTime, ::Type{Local}) Time(zdt) false
+# https://github.com/JuliaLang/julia/pull/44394
+if VERSION < v"1.9.0-DEV.663"
+    import Dates: DateTime, Date, Time
+    @deprecate DateTime(zdt::ZonedDateTime, ::Type{Local}) DateTime(zdt) false
+    @deprecate Date(zdt::ZonedDateTime, ::Type{Local}) Date(zdt) false
+    @deprecate Time(zdt::ZonedDateTime, ::Type{Local}) Time(zdt) false
+else
+    @deprecate Dates.DateTime(zdt::ZonedDateTime, ::Type{Local}) DateTime(zdt) false
+    @deprecate Dates.Date(zdt::ZonedDateTime, ::Type{Local}) Date(zdt) false
+    @deprecate Dates.Time(zdt::ZonedDateTime, ::Type{Local}) Time(zdt) false
+end
 
 const TZFILE_MAX = TZFile.TZFILE_CUTOFF
 const TransitionTimeInfo = TZFile.TransitionTimeInfo
