@@ -1,4 +1,4 @@
-import Dates
+using Dates: Dates
 using Mocking
 
 utc = FixedTimeZone("UTC")
