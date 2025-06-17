@@ -43,4 +43,9 @@
         fixed_tz = FixedTimeZone("UTC")
         @test size(fixed_tz .== fixed_tz) == ()
     end
+    
+    @test isless(FixedTimeZone("UTC-4"), FixedTimeZone("UTC-5"))
+    @test FixedTimeZone("UTC-5") > FixedTimeZone("UTC-4")
+    @test FixedTimeZone("UTC-5") == FixedTimeZone("UTC-5")
+    @test !isless(FixedTimeZone("UTC-5"), FixedTimeZone("UTC-4"))
 end
