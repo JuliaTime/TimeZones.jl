@@ -97,7 +97,7 @@ name(tz::FixedTimeZone) = tz.name
 rename(tz::FixedTimeZone, name::AbstractString) = FixedTimeZone(name, tz.offset)
 
 """
-Base.isless(a::FixedTimeZone, b::FixedTimeZone)
+    isless(a::FixedTimeZone, b::FixedTimeZone) -> Bool
 
 Defines a true chronological ordering for FixedTimeZone objects, answering
 the question: "which time zone represents an earlier moment in absolute time?"
@@ -109,7 +109,12 @@ For example, 10:00 AM in UTC-5 is an earlier absolute moment than 10:00 AM
 in UTC-8. This function correctly sorts UTC-5 as being less than UTC-8.
 
 Examples:
-    isless(tz"UTC-5", tz"UTC-8")  # returns true
-    isless(tz"UTC+2", tz"UTC-1")  # returns true
+```jldoctests
+julia> isless(tz"UTC-5", tz"UTC-8")
+true
+
+julia> isless(tz"UTC+2", tz"UTC-1")
+true
+```
 """
 Base.isless(a::FixedTimeZone, b::FixedTimeZone) = isless(b.offset, a.offset)
