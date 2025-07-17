@@ -104,6 +104,77 @@ end
     end
 end
 
+@testset "tryparsenext_fixedtz" begin
+    using TimeZones: tryparsenext_fixedtz
+
+    @testset "valid" begin
+        @test tryparsenext_fixedtz("9959", 1, 4) == ("9959", 5)
+        @test tryparsenext_fixedtz("99:59", 1, 5) == ("99:59", 6)
+
+        @test tryparsenext_fixedtz("-99", 1, 3) == ("-99", 4)
+        @test tryparsenext_fixedtz("-99:59", 1, 6) == ("-99:59", 7)
+
+        @test tryparsenext_fixedtz("+99", 1, 3) == ("+99", 4)
+        @test tryparsenext_fixedtz("+9959", 1, 5) == ("+9959", 6)
+        @test tryparsenext_fixedtz("+99:59", 1, 6) == ("+99:59", 7)
+    end
+
+    @testset "automatic stop" begin
+        @test tryparsenext_fixedtz("1230abc", 1, 7) == ("1230", 5)
+        @test_broken tryparsenext_fixedtz("12300", 1, 5) == ("1230", 5)
+        @test_broken tryparsenext_fixedtz("12:300", 1, 6) == ("12:30", 6)
+
+        @test tryparsenext_fixedtz("-1230abc", 1, 7) == ("-1230", 6)
+        @test_broken tryparsenext_fixedtz("-12300", 1, 6) == ("-1230", 6)
+        @test_broken tryparsenext_fixedtz("-12:300", 1, 7) == ("-12:30", 7)
+        @test_broken tryparsenext_fixedtz("-123", 1, 4) == ("-12", 4)
+        @test_broken tryparsenext_fixedtz("-12:3", 1, 5) == ("-12", 4)
+
+        @test tryparsenext_fixedtz("+1230abc", 1, 7) == ("+1230", 6)
+        @test_broken tryparsenext_fixedtz("+12300", 1, 6) == ("+1230", 6)
+        @test_broken tryparsenext_fixedtz("+12:300", 1, 7) == ("+12:30", 6)
+        @test_broken tryparsenext_fixedtz("+123", 1, 4) == ("+12", 4)
+        @test_broken tryparsenext_fixedtz("+12:3", 1, 5) == ("+12", 4)
+    end
+
+    @testset "min width" begin
+        @test tryparsenext_fixedtz("1230", 1, 4, 5, 0) === nothing
+        @test_broken tryparsenext_fixedtz("+1230", 1, 5, 5, 0) == ("+1230", 6)
+    end
+
+    @testset "max width" begin
+        @test_broken tryparsenext_fixedtz("+12301999", 1, 9, 1, 5) == ("+1230", 6)
+        @test_broken tryparsenext_fixedtz("+12301999", 1, 9, 1, 3) == ("+12", 4)
+    end
+
+    @testset "invalid" begin
+        @test tryparsenext_fixedtz("1", 1, 1) === nothing
+        @test_broken tryparsenext_fixedtz("12", 1, 2) === nothing
+        @test_broken tryparsenext_fixedtz("123", 1, 3) === nothing
+        @test_broken tryparsenext_fixedtz("9999", 1, 4) === nothing
+        @test_broken tryparsenext_fixedtz("1:", 1, 2) === nothing
+        @test_broken tryparsenext_fixedtz("1:30", 1, 4) === nothing
+        @test_broken tryparsenext_fixedtz("12:", 1, 3) === nothing
+        @test_broken tryparsenext_fixedtz("12:3", 1, 4) === nothing
+        @test_broken tryparsenext_fixedtz("99:99", 1, 5) === nothing
+        @test_broken tryparsenext_fixedtz("12::30", 1, 4) === nothing
+
+        @test tryparsenext_fixedtz("-", 1, 1) === nothing
+        @test_broken tryparsenext_fixedtz("-1", 1, 2) === nothing
+        @test_broken tryparsenext_fixedtz("-1:", 1, 3) === nothing
+        @test_broken tryparsenext_fixedtz("-1:30", 1, 5) === nothing
+        @test_broken tryparsenext_fixedtz("-99:99", 1, 6) === nothing
+        @test tryparsenext_fixedtz("--12", 1, 4) === nothing
+
+        @test tryparsenext_fixedtz("+", 1, 1) === nothing
+        @test_broken tryparsenext_fixedtz("+1", 1, 2) === nothing
+        @test_broken tryparsenext_fixedtz("+1:", 1, 3) === nothing
+        @test_broken tryparsenext_fixedtz("+1:30", 1, 5) === nothing
+        @test_broken tryparsenext_fixedtz("+99:99", 1, 6) === nothing
+        @test tryparsenext_fixedtz("++12", 1, 4) === nothing
+    end
+end
+
 @testset "_parsesub_tzabbr" begin
     empty_msg = "Time zone abbreviation must start with a letter or the less-than (<) character"
     not_closed_msg = "Expected expanded time zone abbreviation end with the greater-than sign (>)"
