@@ -143,8 +143,8 @@ end
     end
 
     @testset "max width" begin
-        @test_broken tryparsenext_fixedtz("+12301999", 1, 9, 1, 5) == ("+1230", 6)
-        @test_broken tryparsenext_fixedtz("+12301999", 1, 9, 1, 3) == ("+12", 4)
+        @test tryparsenext_fixedtz("+12301999", 1, 9, 1, 5) == ("+1230", 6)
+        @test tryparsenext_fixedtz("+12301999", 1, 9, 1, 3) == ("+12", 4)
     end
 
     @testset "invalid" begin
@@ -205,7 +205,7 @@ end
     end
 
     @testset "max width" begin
-        @test_broken tryparsenext_tz("Europe/Warsaw/Extra", 1, 19, 1, 13) == ("Europe/Warsaw", 14)
+        @test tryparsenext_tz("Europe/Warsaw/Extra", 1, 19, 1, 13) == ("Europe/Warsaw", 14)
     end
 
     @testset "invalid" begin
