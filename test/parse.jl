@@ -220,24 +220,34 @@ end
 
     # Validate we can parse all of the supported time zone names.
     @testset "all time zone names" begin
-        for tz_name in timezone_names()
-            @testset let tz_name = tz_name
-                expected = if startswith(tz_name, "Etc/GMT")
-                    ("Etc/GMT", 8)
-                elseif startswith(tz_name, "GMT")
-                    ("GMT", 4)
-                elseif startswith(tz_name, "UTC")
-                    ("UTC", 4)
-                elseif contains(tz_name, '-') && contains(tz_name, '/')
-                    i = findfirst('-', tz_name)
-                    (SubString(tz_name, 1, prevind(tz_name, i)), i)
-                elseif contains(tz_name, '/')
-                    (tz_name, length(tz_name) + 1)
-                else
-                    nothing
-                end
+        function test_tryparsenext_tz(tz_name)
+            expected = if startswith(tz_name, "Etc/GMT")
+                ("Etc/GMT", 8)
+            elseif startswith(tz_name, "GMT")
+                ("GMT", 4)
+            elseif startswith(tz_name, "UTC")
+                ("UTC", 4)
+            elseif contains(tz_name, '-') && contains(tz_name, '/')
+                i = findfirst('-', tz_name)
+                (SubString(tz_name, 1, prevind(tz_name, i)), i)
+            elseif contains(tz_name, '/')
+                (tz_name, length(tz_name) + 1)
+            else
+                nothing
+            end
 
-                @test tryparsenext_tz(tz_name, 1, length(tz_name)) == expected
+            @test tryparsenext_tz(tz_name, 1, length(tz_name)) == expected
+        end
+
+        for tz_name in timezone_names()
+            @static if VERSION >= v"1.9"
+                @testset let tz_name = tz_name
+                    test_tryparsenext_tz(tz_name)
+                end
+            else
+                @testset "$tz_name" begin
+                    test_tryparsenext_tz(tz_name)
+                end
             end
         end
     end
