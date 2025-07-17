@@ -106,11 +106,11 @@ end
 
 # Convenience constructors
 @doc """
-    ZonedDateTime(y, [m, d, h, mi, s, ms], tz, [amb]) -> DateTime
+    ZonedDateTime(y, [m, d, h, mi, s, ms], tz, [amb]) -> ZonedDateTime
 
 Construct a `ZonedDateTime` type by parts. Arguments `y, m, ..., ms` must be convertible to
-`Int64` and `tz` must be a `TimeZone`. If the given `DateTime` is ambiguous in the given
-`TimeZone` then `amb` can be supplied to resolve ambiguity.
+`Int64` and `tz` must be a `TimeZone`. If the given provided local time is ambiguous in the
+given `TimeZone` then `amb` can be supplied to resolve ambiguity.
 """ ZonedDateTime
 
 @optional function ZonedDateTime(y::Integer, m::Integer=1, d::Integer=1, h::Integer=0, mi::Integer=0, s::Integer=0, ms::Integer=0, tz::VariableTimeZone, amb::Union{Integer,Bool})
@@ -150,8 +150,65 @@ function ZonedDateTime(parts::Union{Period,TimeZone}...)
     return ZonedDateTime(DateTime(periods...), tz)
 end
 
+"""
+    ZonedDateTime(date::Date, ...)
+    ZonedDateTime(date::Date, time::Time, ...)
+
+Construct a `ZonedDateTime` from `Date` and `Time` arguments.
+"""
+ZonedDateTime(::Date, ::Vararg)
+
+function ZonedDateTime(date::Date, time::Time, args...; kwargs...)
+    return ZonedDateTime(DateTime(date, time), args...; kwargs...)
+end
+
 function ZonedDateTime(date::Date, args...; kwargs...)
     return ZonedDateTime(DateTime(date), args...; kwargs...)
+end
+
+# Parsing constructors
+
+"""
+    ZonedDateTime(str::AbstractString)
+
+Construct a `ZonedDateTime` by parsing `str`. This method is designed so that
+`zdt == ZonedDateTime(string(zdt))` where `zdt` can be any `ZonedDateTime`
+object. Take note that this method will always create a `ZonedDateTime` with a
+`FixedTimeZone` which can result in different results with date/time arithmetic.
+
+## Examples
+```jltest
+julia> zdt = ZonedDateTime(2025, 3, 8, 9, tz"America/New_York")
+2025-03-08T09:00:00-05:00
+
+julia> timezone(zdt)
+America/New_York (UTC-5/UTC-4)
+
+julia> zdt + Day(1)
+2025-03-09T09:00:00-04:00
+
+julia> pzdt = ZonedDateTime(string(zdt))
+2025-03-08T09:00:00-05:00
+
+julia> timezone(pzdt)
+UTC-05:00
+
+julia> pzdt + Day(1)
+2025-03-09T09:00:00-05:00
+```
+"""
+ZonedDateTime(str::AbstractString) = parse(ZonedDateTime, str)
+
+"""
+    ZonedDateTime(str::AbstractString, df::DateFormat)
+
+Construct a `ZonedDateTime` by parsing `str` according to the format specified
+in `df`.
+"""
+ZonedDateTime(str::AbstractString, df::DateFormat) = parse(ZonedDateTime, str, df)
+
+function ZonedDateTime(str::AbstractString, format::AbstractString; locale::AbstractString="english")
+    return parse(ZonedDateTime, str, DateFormat(format, locale))
 end
 
 # Promotion

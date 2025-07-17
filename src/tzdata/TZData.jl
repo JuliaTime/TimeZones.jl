@@ -1,15 +1,14 @@
 module TZData
 
 using Dates: Dates, DateTime
-using LazyArtifacts
 using Printf
 using ...TimeZones: TZJFile, _scratch_dir
+using TZJData: TZJData
+using p7zip_jll: p7zip_jll
 
 # Note: The tz database is made up of two parts: code and data. TimeZones.jl only requires
 # the "tzdata" archive or more specifically the "tz source" files within the archive
 # (africa, australasia, ...)
-
-const ARTIFACT_TOML = joinpath(@__DIR__, "..", "..", "Artifacts.toml")
 
 const _LATEST_FILE_PATH = Ref{String}()
 const _LATEST = Ref{Tuple{AbstractString, DateTime}}()
@@ -25,8 +24,10 @@ end
 
 include("timeoffset.jl")
 include("version.jl")
+include("archive.jl")
 include("download.jl")
 include("compile.jl")
 include("build.jl")
+include("deprecated.jl")
 
 end

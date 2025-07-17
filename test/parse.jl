@@ -1,4 +1,4 @@
-using Dates: parse_components, default_format
+using Dates: parse_components
 using TimeZones: ParseNextError, _parsesub_tzabbr, _parsesub_offset, _parsesub_time, _parsesub_tzdate, _parsesub_tz
 
 @testset "parse" begin
@@ -21,7 +21,6 @@ using TimeZones: ParseNextError, _parsesub_tzabbr, _parsesub_offset, _parsesub_t
         parse(ZonedDateTime, Test.GenericString("2018-01-01 00:00 UTC"), dateformat"yyyy-mm-dd HH:MM ZZZ"),
         ZonedDateTime(2018, 1, 1, 0, tz"UTC"),
     )
-
 end
 
 @testset "tryparse" begin
@@ -49,10 +48,6 @@ end
     @test parse_components(test...) == expected
 end
 
-@testset "default format" begin
-    @test default_format(ZonedDateTime) === TimeZones.ISOZonedDateTimeFormat
-end
-
 @testset "parse constructor" begin
     @test isequal(
         ZonedDateTime("2000-01-02T03:04:05.006+0700"),
@@ -66,15 +61,195 @@ end
         ZonedDateTime("2018-11-01-0600", dateformat"yyyy-mm-ddzzzz"),
         ZonedDateTime(2018, 11, 1, tz"UTC-06"),
     )
+end
 
-    # Validate that error message contains the original string and the format used
+@testset "self parseable" begin
+    zdt_args = Iterators.product(
+        [0, 1, 10, 100, 1000, 2025, 10000],  # Year
+        [1, 12],  # Month
+        [3, 31],  # Day
+        [0, 4, 23],  # Hour
+        [0, 5, 55],  # Minute
+        [0, 6, 56],  # Seconds
+        [0, 7, 50, 77, 777],  # Milliseconds
+        [tz"UTC-06", tz"UTC", tz"UTC+08:45", tz"UTC+14"],  # Time zones
+    )
+    for args in zdt_args
+        zdt = ZonedDateTime(args...)
+        @test zdt == parse(ZonedDateTime, string(zdt))
+        @test zdt == ZonedDateTime(string(zdt))
+    end
+end
+
+# Validate that error message contains the original string and the format used
+@testset "contextual error" begin
     str = "2018-11-01"
+
     try
-        ZonedDateTime(str)
+        parse(ZonedDateTime, str)
+        @test false
     catch e
         @test e isa ArgumentError
         @test occursin(str, e.msg)
-        @test occursin(string(TimeZones.ISOZonedDateTimeFormat), e.msg)
+        @test occursin(string(TimeZones.ISOZonedDateTimeNoMillisecondFormat), e.msg)
+    end
+
+    try
+        ZonedDateTime(str)
+        @test false
+    catch e
+        @test e isa ArgumentError
+        @test occursin(str, e.msg)
+        @test occursin(string(TimeZones.ISOZonedDateTimeNoMillisecondFormat), e.msg)
+    end
+end
+
+@testset "tryparsenext_fixedtz" begin
+    using TimeZones: tryparsenext_fixedtz
+
+    @testset "valid" begin
+        @test tryparsenext_fixedtz("9959", 1, 4) == ("9959", 5)
+        @test tryparsenext_fixedtz("99:59", 1, 5) == ("99:59", 6)
+
+        @test tryparsenext_fixedtz("-99", 1, 3) == ("-99", 4)
+        @test tryparsenext_fixedtz("-99:59", 1, 6) == ("-99:59", 7)
+
+        @test tryparsenext_fixedtz("+99", 1, 3) == ("+99", 4)
+        @test tryparsenext_fixedtz("+9959", 1, 5) == ("+9959", 6)
+        @test tryparsenext_fixedtz("+99:59", 1, 6) == ("+99:59", 7)
+    end
+
+    @testset "automatic stop" begin
+        @test tryparsenext_fixedtz("1230abc", 1, 7) == ("1230", 5)
+        @test_broken tryparsenext_fixedtz("12300", 1, 5) == ("1230", 5)
+        @test_broken tryparsenext_fixedtz("12:300", 1, 6) == ("12:30", 6)
+
+        @test tryparsenext_fixedtz("-1230abc", 1, 7) == ("-1230", 6)
+        @test_broken tryparsenext_fixedtz("-12300", 1, 6) == ("-1230", 6)
+        @test_broken tryparsenext_fixedtz("-12:300", 1, 7) == ("-12:30", 7)
+        @test_broken tryparsenext_fixedtz("-123", 1, 4) == ("-12", 4)
+        @test_broken tryparsenext_fixedtz("-12:3", 1, 5) == ("-12", 4)
+
+        @test tryparsenext_fixedtz("+1230abc", 1, 7) == ("+1230", 6)
+        @test_broken tryparsenext_fixedtz("+12300", 1, 6) == ("+1230", 6)
+        @test_broken tryparsenext_fixedtz("+12:300", 1, 7) == ("+12:30", 6)
+        @test_broken tryparsenext_fixedtz("+123", 1, 4) == ("+12", 4)
+        @test_broken tryparsenext_fixedtz("+12:3", 1, 5) == ("+12", 4)
+    end
+
+    @testset "min width" begin
+        @test tryparsenext_fixedtz("1230", 1, 4, 5, 0) === nothing
+        @test_broken tryparsenext_fixedtz("+1230", 1, 5, 5, 0) == ("+1230", 6)
+    end
+
+    @testset "max width" begin
+        @test_broken tryparsenext_fixedtz("+12301999", 1, 9, 1, 5) == ("+1230", 6)
+        @test_broken tryparsenext_fixedtz("+12301999", 1, 9, 1, 3) == ("+12", 4)
+    end
+
+    @testset "invalid" begin
+        @test tryparsenext_fixedtz("1", 1, 1) === nothing
+        @test_broken tryparsenext_fixedtz("12", 1, 2) === nothing
+        @test_broken tryparsenext_fixedtz("123", 1, 3) === nothing
+        @test_broken tryparsenext_fixedtz("9999", 1, 4) === nothing
+        @test_broken tryparsenext_fixedtz("1:", 1, 2) === nothing
+        @test_broken tryparsenext_fixedtz("1:30", 1, 4) === nothing
+        @test_broken tryparsenext_fixedtz("12:", 1, 3) === nothing
+        @test_broken tryparsenext_fixedtz("12:3", 1, 4) === nothing
+        @test_broken tryparsenext_fixedtz("99:99", 1, 5) === nothing
+        @test_broken tryparsenext_fixedtz("12::30", 1, 4) === nothing
+
+        @test tryparsenext_fixedtz("-", 1, 1) === nothing
+        @test_broken tryparsenext_fixedtz("-1", 1, 2) === nothing
+        @test_broken tryparsenext_fixedtz("-1:", 1, 3) === nothing
+        @test_broken tryparsenext_fixedtz("-1:30", 1, 5) === nothing
+        @test_broken tryparsenext_fixedtz("-99:99", 1, 6) === nothing
+        @test tryparsenext_fixedtz("--12", 1, 4) === nothing
+
+        @test tryparsenext_fixedtz("+", 1, 1) === nothing
+        @test_broken tryparsenext_fixedtz("+1", 1, 2) === nothing
+        @test_broken tryparsenext_fixedtz("+1:", 1, 3) === nothing
+        @test_broken tryparsenext_fixedtz("+1:30", 1, 5) === nothing
+        @test_broken tryparsenext_fixedtz("+99:99", 1, 6) === nothing
+        @test tryparsenext_fixedtz("++12", 1, 4) === nothing
+    end
+end
+
+@testset "tryparsenext_tz" begin
+    using TimeZones: tryparsenext_tz
+
+    @testset "valid" begin
+        @test tryparsenext_tz("Europe/Warsaw", 1, 13) == ("Europe/Warsaw", 14)
+        @test tryparsenext_tz("America/New_York", 1, 16) == ("America/New_York", 17)
+        @test_broken tryparsenext_tz("America/Port-au-Prince", 1, 22) == ("America/Port-au-Prince", 23)
+        @test tryparsenext_tz("America/Argentina/Buenos_Aires", 1, 30) == ("America/Argentina/Buenos_Aires", 31)
+        @test tryparsenext_tz("Antarctica/McMurdo", 1, 18) == ("Antarctica/McMurdo", 19)
+        @test tryparsenext_tz("Europe/Isle_of_Man", 1, 18) == ("Europe/Isle_of_Man", 19)
+        @test_broken tryparsenext_tz("Etc/GMT-14", 1, 10) == ("Etc/GMT-14", 11)
+        @test_broken tryparsenext_tz("Etc/GMT+9", 1, 9) == ("Etc/GMT+9", 10)
+        @test tryparsenext_tz("UTC", 1, 3) == ("UTC", 4)
+        @test tryparsenext_tz("GMT", 1, 3) == ("GMT", 4)
+    end
+
+    @testset "automatic stop" begin
+        @test tryparsenext_tz("Europe/Warsaw:Extra", 1, 19) == ("Europe/Warsaw", 14)
+        @test_broken tryparsenext_tz("Europe/Warsaw//Extra", 1, 20) == ("Europe/Warsaw", 14)
+
+        # Maximum of two sequential digits
+        @test_broken tryparsenext_tz("Etc/GMT-100", 1, 11) == ("Etc/GMT-10", 11)
+    end
+
+    @testset "min width" begin
+        @test_broken tryparsenext_tz("UTC", 1, 3, 6, 0) === nothing
+        @test tryparsenext_tz("Europe/Warsaw", 1, 13, 6, 0) == ("Europe/Warsaw", 14)
+    end
+
+    @testset "max width" begin
+        @test_broken tryparsenext_tz("Europe/Warsaw/Extra", 1, 19, 1, 13) == ("Europe/Warsaw", 14)
+    end
+
+    @testset "invalid" begin
+        @test_broken tryparsenext_tz("//", 1, 1) === nothing
+        @test tryparsenext_tz("__", 1, 2) === nothing
+        @test tryparsenext_tz("--", 1, 2) === nothing
+        @test tryparsenext_tz("123", 1, 2) === nothing  # Cannot contain only numbers
+
+        # Treat most abbreviations as invalid since they are often ambiguous
+        @test tryparsenext_tz("MST", 1, 3) === nothing
+    end
+
+    # Validate we can parse all of the supported time zone names.
+    @testset "all time zone names" begin
+        function test_tryparsenext_tz(tz_name)
+            expected = if startswith(tz_name, "Etc/GMT")
+                ("Etc/GMT", 8)
+            elseif startswith(tz_name, "GMT")
+                ("GMT", 4)
+            elseif startswith(tz_name, "UTC")
+                ("UTC", 4)
+            elseif contains(tz_name, '-') && contains(tz_name, '/')
+                i = findfirst('-', tz_name)
+                (SubString(tz_name, 1, prevind(tz_name, i)), i)
+            elseif contains(tz_name, '/')
+                (tz_name, length(tz_name) + 1)
+            else
+                nothing
+            end
+
+            @test tryparsenext_tz(tz_name, 1, length(tz_name)) == expected
+        end
+
+        for tz_name in timezone_names()
+            @static if VERSION >= v"1.9"
+                @testset let tz_name = tz_name
+                    test_tryparsenext_tz(tz_name)
+                end
+            else
+                @testset "$tz_name" begin
+                    test_tryparsenext_tz(tz_name)
+                end
+            end
+        end
     end
 end
 

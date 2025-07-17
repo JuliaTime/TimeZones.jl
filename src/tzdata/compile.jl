@@ -1,9 +1,8 @@
 using Dates
 using Dates: parse_components
 
-using ...TimeZones: _tz_cache, _tz_source_dir, _compiled_dir
 using ...TimeZones: TimeZones, TimeZone, FixedTimeZone, VariableTimeZone, Transition, Class
-using ...TimeZones: rename
+using ...TimeZones: rename, _scratch_dir
 using ..TZData: TimeOffset, ZERO, MIN_GMT_OFFSET, MAX_GMT_OFFSET, MIN_SAVE, MAX_SAVE,
     ABS_DIFF_OFFSET
 
@@ -298,7 +297,7 @@ function Base.parse(::Type{Rule}, str::AbstractString)
     from = from_str != "min" ? parse(Int, from_str) : nothing
     to = to_str == "only" ? from : (to_str != "max" ? parse(Int, to_str) : nothing)
     type_str == "-" || throw(ArgumentError("Unhandled rule type: \"$type_str\""))
-    month = MONTHS[month_str]
+    month = MONTHS[month_str[1:3]]
 
     # Now we need to get the right anonymous function
     # for determining the right day for transitioning
@@ -691,16 +690,7 @@ end
 
 function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
     results = compile(tz_source; kwargs...)
-
     isdir(dest_dir) || error("Destination directory doesn't exist")
-    # When we recompile the TimeZones from a new source, we clear all the existing cached
-    # TimeZone objects, so that newly constructed objects pick up the newly compiled rules.
-    # Since we use thread-local caches, we spawn a task on _each thread_ to clear that
-    # thread's local cache.
-    Threads.@threads :static for i in 1:Threads.nthreads()
-        @assert Threads.threadid() === i "TimeZones.TZData.compile() must be called from the main, top-level Task."
-        empty!(_tz_cache())
-    end
 
     for (tz, class) in results
         parts = split(TimeZones.name(tz), '/')
@@ -719,9 +709,16 @@ end
 
 # TODO: Deprecate?
 function compile(
-    tz_source_dir::AbstractString=_tz_source_dir(tzdata_version()),
-    dest_dir::AbstractString=_compiled_dir(tzdata_version());
+    tz_source_dir::AbstractString=joinpath(_scratch_dir(), _tz_source_relative_dir(tzdata_version())),
+    dest_dir::AbstractString=joinpath(_scratch_dir(), _compiled_relative_dir(tzdata_version()));
     kwargs...
 )
-    compile(TZSource(readdir(tz_source_dir; join=true)), dest_dir; kwargs...)
+    results = compile(TZSource(readdir(tz_source_dir; join=true)), dest_dir; kwargs...)
+
+    # TimeZones 1.0 has supported automatic flushing of the cache when calling `compile`
+    # (e.g. `compile(max_year=2200)`). We'll keep this behaviour to ensure we are not
+    # breaking our API but the low-level `compile` function should ideally be cache unaware.
+    TimeZones._reload_tz_cache(dest_dir)
+
+    return results
 end

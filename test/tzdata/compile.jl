@@ -68,6 +68,19 @@ end
 @test parse_date("2019 Mar Sun>=8 3:00") == (DateTime(2019,3,10,3), 'w')  # America/Metlakatla (2018h)
 @test parse_date("2006 Apr Fri<=1 2:00") == (DateTime(2006,3,31,2), 'w')  # Asia/Jerusalem (2019b)
 
+@testset "parse Rule" begin
+    # tzdata 2024b introduced the use of a non-three letter month: April
+    # https://github.com/JuliaTime/TimeZones.jl/issues/471
+    rule = parse(Rule, "1931    only    -   April   30  0:00    1:00    D")
+    @test rule.from == 1931
+    @test rule.to == 1931
+    @test rule.month == 4
+    @test rule.on(rule.from, rule.month) == Date(1931, 4, 30)
+    @test rule.at == TimeOffset(0)
+    @test rule.at_flag == 'w'
+    @test rule.save == TimeOffset(3600)
+    @test rule.letter == "D"
+end
 
 ### order_rules ###
 

@@ -66,7 +66,7 @@ Base.show(io::IO, t::TimeOffset) = print(io, t)
 
 # min/max offsets across all zones and all time.
 # Note: A warning is given when we find an Olson zone that exceeds these values.
-const MIN_GMT_OFFSET = TimeOffset("-15:56:00")  # Asia/Manilla
+const MIN_GMT_OFFSET = TimeOffset("-15:56:08")  # Asia/Manilla as of 2025a
 const MAX_GMT_OFFSET = TimeOffset("15:13:42")   # America/Metlakatla
 
 # min/max save across all zones/rules and all time.

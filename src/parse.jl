@@ -1,6 +1,61 @@
 using Dates: DateFormat, DatePart, min_width, max_width, tryparsenext_base10
 using TimeZones.TZData: MIN_YEAR, MAX_YEAR
 
+function init_dates_extension()
+    Dates.CONVERSION_SPECIFIERS['z'] = TimeZone
+    Dates.CONVERSION_SPECIFIERS['Z'] = TimeZone
+    Dates.CONVERSION_DEFAULTS[TimeZone] = ""
+    Dates.CONVERSION_TRANSLATIONS[ZonedDateTime] = (
+        Year, Month, Day, Hour, Minute, Second, Millisecond, TimeZone,
+    )
+end
+
+begin
+    # Needs to be initialized to construct formats
+    init_dates_extension()
+
+    # Follows the ISO 8601 standard for date and time with an offset. See
+    # `Dates.ISODateTimeFormat` for the `DateTime` equivalent.
+    const ISOZonedDateTimeFormat = DateFormat("yyyy-mm-dd\\THH:MM:SS.ssszzz")
+    const ISOZonedDateTimeNoMillisecondFormat = DateFormat("yyyy-mm-dd\\THH:MM:SSzzz")
+end
+
+@doc """
+    DateFormat(format::AbstractString, locale="english") --> DateFormat
+
+When the `TimeZones` package is loaded, 2 extra character codes are available
+for constructing the `format` string:
+
+| Code       | Matches            | Comment                                               |
+|:-----------|:-------------------|:------------------------------------------------------|
+| `z`        | +02:00, -0100, +14 | Parsing matches a fixed numeric UTC offset `±hh:mm`, `±hhmm`, or `±hh`. Formatting outputs `±hh:mm` |
+| `Z`        | UTC, GMT, America/New_York | Name of a time zone as specified in the IANA tz database |
+""" DateFormat
+
+function Base.parse(::Type{ZonedDateTime}, str::AbstractString)
+    # Works as the format should only contain a period when milliseconds are included
+    return if contains(str, '.')
+        parse(ZonedDateTime, str, ISOZonedDateTimeFormat)
+    else
+        parse(ZonedDateTime, str, ISOZonedDateTimeNoMillisecondFormat)
+    end
+end
+
+function Base.parse(::Type{ZonedDateTime}, str::AbstractString, df::DateFormat)
+    argtypes = Tuple{Type{<:TimeType},AbstractString,DateFormat}
+    try
+        invoke(parse, argtypes, ZonedDateTime, str, df)
+    catch e
+        if e isa ArgumentError
+            rethrow(ArgumentError(
+                "Unable to parse string \"$str\" using format $df. $(e.msg)"
+            ))
+        else
+            rethrow()
+        end
+    end
+end
+
 function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
     i == len && str[i] === 'Z' && return ("Z", i+1)
 
@@ -81,29 +136,6 @@ function Dates.format(io::IO, d::DatePart{'Z'}, zdt, locale)
     write(io, string(zdt.zone))  # In most cases will be an abbreviation.
 end
 
-# Note: ISOZonedDateTimeFormat is defined in the module __init__ which means that this
-# function can not be called from within this module. TODO: Ignore linting for this line
-function ZonedDateTime(str::AbstractString, df::DateFormat=ISOZonedDateTimeFormat)
-    try
-        parse(ZonedDateTime, str, df)
-    catch e
-        if e isa ArgumentError
-            rethrow(ArgumentError(
-                "Unable to parse string \"$str\" using format $df. $(e.msg)"
-            ))
-        else
-            rethrow()
-        end
-    end
-end
-
-function ZonedDateTime(str::AbstractString, format::AbstractString; locale::AbstractString="english")
-    ZonedDateTime(str, DateFormat(format, locale))
-end
-
-Dates.default_format(::Type{ZonedDateTime}) = ISOZonedDateTimeFormat
-
-
 """
     _parsesub_tzabbr(str, [i, len]) -> Union{Tuple{AbstractString, Integer}, Exception}
 
@@ -113,12 +145,12 @@ the less-than (<) and greater-than (>) signs the character set is expanded to in
 plus (+) sign, the minus (-) sign, and digits.
 
 # Examples
-```jldoctest
+```jldoctest; setup = :(using TimeZones: _parsesub_tzabbr)
 julia> _parsesub_tzabbr("ABC+1")
 ("ABC", 4)
 
 julia> _parsesub_tzabbr("<ABC+1>+2")
-("ABC+1", 6)
+("ABC+1", 8)
 ```
 """
 function _parsesub_tzabbr(
@@ -182,12 +214,12 @@ between 0 and 24, and the minutes and seconds 00 and 59. This follows specificat
 offsets as defined in the tzset(3) man page.
 
 # Example
-```jldoctest
+```jldoctest; setup = :(using TimeZones: _parsesub_offset)
 julia> _parsesub_offset("1:0:0")
-(3600, 5)
+(3600, 6)
 
 julia> _parsesub_offset("-0:1:2")
-(-62, 6)
+(-62, 7)
 ```
 """
 function _parsesub_offset(
@@ -280,23 +312,25 @@ includes an anonymous function which takes the argument `year::Integer` and retu
           the last week in which day `d` occurs. Day 0 is a Sunday.
 
 # Example
-```jldoctest
+```jldoctest; setup = :(using TimeZones: _parsesub_tzdate)
 julia> f, i = _parsesub_tzdate("J60");
 
 julia> f.(2019:2020)
-2-element Array{Date,1}:
+2-element Vector{Date}:
  2019-03-01
  2020-03-01
 
 julia> f, i = _parsesub_tzdate("60");
-2-element Array{Date,1}:
+
+julia> f.(2019:2020)
+2-element Vector{Date}:
  2019-03-02
  2020-03-01
 
 julia> f, i = _parsesub_tzdate("M3.3.0");  # Third Sunday in March
 
 julia> f.(2019:2020)
-2-element Array{Date,1}:
+2-element Vector{Date}:
  2019-03-17
  2020-03-15
 ```
@@ -449,7 +483,7 @@ end
 Parse a direct representation of a time zone as specified by the tzset(3) man page.
 
 # Examples
-```jldoctest
+```jldoctest; setup = :(using TimeZones: _parsesub_tz)
 julia> first(_parsesub_tz("EST+5"))
 EST (UTC-5)
 

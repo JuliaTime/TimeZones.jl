@@ -1,11 +1,12 @@
 module TimeZones
 
+using Artifacts: Artifacts
 using Dates
 using Printf
-using Scratch
-using RecipesBase: RecipesBase, @recipe
+using Scratch: @get_scratch!
 using Unicode
 using InlineStrings: InlineString15
+using TZJData: TZJData
 
 import Dates: TimeZone, UTC
 
@@ -32,10 +33,6 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
     guess
 
 _scratch_dir() = @get_scratch!("build")
-_tz_source_dir(version::AbstractString) = joinpath(_scratch_dir(), "tzsource", version)
-function _compiled_dir(version::AbstractString)
-    joinpath(_scratch_dir(), "compiled", "tzjf", "v$(TZJFile.DEFAULT_VERSION)", version)
-end
 
 const _COMPILED_DIR = Ref{String}()
 
@@ -44,21 +41,26 @@ const _COMPILED_DIR = Ref{String}()
 abstract type Local <: TimeZone end
 
 function __init__()
-    # Write out our compiled tzdata representations into a scratchspace
-    _COMPILED_DIR[] = _compiled_dir(tzdata_version())
+    # Set at runtime to ensure relocatability
+    _COMPILED_DIR[] = @static if isdefined(TZJData, :artifact_dir)
+        TZJData.artifact_dir()
+    else
+        # Backwards compatibility for TZJData versions below v1.3.1. The portion of the
+        # code which determines the `pkg_dir` could be replaced by `pkgdir(TZJData)` however
+        # the `pkgdir` function doesn't work well with relocated system images.
+        pkg = Base.identify_package(TZJData, "TZJData")
+        pkg_dir = dirname(dirname(Base.locate_package(pkg)))
+        artifact_dict = Artifacts.parse_toml(joinpath(pkg_dir, "Artifacts.toml"))
+        hash = Base.SHA1(artifact_dict["tzjdata"]["git-tree-sha1"])
+        Artifacts.artifact_path(hash)
+    end
 
-    # Initialize the thread-local TimeZone cache (issue #342)
-    _reset_tz_cache()
+    # Dates extension needs to happen everytime the module is loaded (issue #24)
+    init_dates_extension()
 
-    # Base extension needs to happen everytime the module is loaded (issue #24)
-    Dates.CONVERSION_SPECIFIERS['z'] = TimeZone
-    Dates.CONVERSION_SPECIFIERS['Z'] = TimeZone
-    Dates.CONVERSION_DEFAULTS[TimeZone] = ""
-    Dates.CONVERSION_TRANSLATIONS[ZonedDateTime] = (
-        Year, Month, Day, Hour, Minute, Second, Millisecond, TimeZone,
-    )
-
-    global ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
+    if haskey(ENV, "JULIA_TZ_VERSION")
+        @info "Using tzdata $(TZData.tzdata_version())"
+    end
 end
 
 include("utils.jl")
@@ -69,12 +71,13 @@ include("utcoffset.jl")
 include(joinpath("types", "timezone.jl"))
 include(joinpath("types", "fixedtimezone.jl"))
 include(joinpath("types", "variabletimezone.jl"))
+include(joinpath("types", "timezonecache.jl"))
 include(joinpath("types", "zoneddatetime.jl"))
 include(joinpath("tzfile", "TZFile.jl"))
 include(joinpath("tzjfile", "TZJFile.jl"))
 include("exceptions.jl")
 include(joinpath("tzdata", "TZData.jl"))
-Sys.iswindows() && include(joinpath("winzone", "WindowsTimeZoneIDs.jl"))
+include("windows_zones.jl")
 include("build.jl")
 include("interpret.jl")
 include("accessors.jl")
@@ -87,7 +90,11 @@ include("ranges.jl")
 include("discovery.jl")
 include("rounding.jl")
 include("parse.jl")
-include("plotting.jl")
 include("deprecated.jl")
+
+# Required to support Julia `VERSION < v"1.9"`
+if !isdefined(Base, :get_extension)
+    include("../ext/TimeZonesRecipesBaseExt.jl")
+end
 
 end # module

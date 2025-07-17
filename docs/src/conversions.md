@@ -6,14 +6,15 @@ DocTestSetup = quote
 end
 ```
 
-## Converting Date/Time without time zone information
+## Accessing components of a `ZonedDateTime`
 
-To convert from a `ZonedDateTime` into a vanilla `DateTime`, one can use the `DateTime` constructor.
-Just passing in the `ZonedDateTime` will directly drop the time zone, and passing in `UTC` as the second argument will extract the time as UTC instead.
-Note: The canonical way to represent datetimes is generally in `UTC`, as this is a requirement to correctly compute the [Unix Timestamp](https://en.wikipedia.org/wiki/Unix_time).
+To get a timezone unaware `DateTime` from a `ZonedDateTime`, one can use the `DateTime` constructor.
+Passing a single `ZonedDateTime` argument will provide a "local time" `DateTime` while additionally passing in `UTC` as the second argument provide UTC `DateTime` instead.
+
+Note: Some `DateTime` functions implicitly assume UTC, like `Dates.datetime2unix`, which assumes UTC to compute a [Unix Timestamp](https://en.wikipedia.org/wiki/Unix_time).
 
 ```jldoctest
-julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
+julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"America/New_York")
 2014-05-30T21:00:00-04:00
 
 julia> DateTime(zdt)
@@ -23,10 +24,10 @@ julia> DateTime(zdt, UTC)
 2014-05-31T01:00:00
 ```
 
-Similar can be done for `Date` and `Time`:
+Similar methods exist for `Date` and `Time`:
 
 ```jldoctest
-julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"UTC-4")
+julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"America/New_York")
 2014-05-30T21:00:00-04:00
 
 julia> Date(zdt)
@@ -40,6 +41,44 @@ julia> Time(zdt)
 
 julia> Time(zdt, UTC)
 01:00:00
+```
+
+Similar methods exist for `Date` and `Time`:
+
+```jldoctest
+julia> zdt = ZonedDateTime(2014, 5, 30, 21, tz"America/New_York")
+2014-05-30T21:00:00-04:00
+
+julia> Date(zdt)
+2014-05-30
+
+julia> Date(zdt, UTC)
+2014-05-31
+
+julia> Time(zdt)
+21:00:00
+
+julia> Time(zdt, UTC)
+01:00:00
+```
+
+You can also use `FixedTimeZone` to access the UTC offset used at the given "local time" and `TimeZone` to access the timezone passed into the `ZonedDateTime` constructor:
+
+```jldoctest
+julia> zdt1 = ZonedDateTime(2014, 5, 30, 21, tz"America/New_York")
+2014-05-30T21:00:00-04:00
+
+julia> FixedTimeZone(zdt1)
+EDT (UTC-4)
+
+julia> zdt2 = ZonedDateTime(2014, 2, 18, 6, tz"America/New_York")
+2014-02-18T06:00:00-05:00
+
+julia> FixedTimeZone(zdt2)
+EST (UTC-5)
+
+julia> TimeZone(zdt1)
+America/New_York (UTC-5/UTC-4)
 ```
 
 ## Switching Time Zones

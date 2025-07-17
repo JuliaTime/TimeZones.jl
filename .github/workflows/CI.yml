@@ -13,6 +13,15 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/master' || github.run_number }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+env:
+  # Only download the tzdata version used in TimeZones.jl's tests to avoid unnecessary
+  # load on IANA's servers.
+  JULIA_TZ_VERSION: 2016j  # Matches tzdata version used in tests
+
+  # The HEAD commit which triggered this workflow. By default PRs use a merge commit
+  SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
 jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
@@ -25,50 +34,144 @@ jobs:
           - "1.6"  # LTS / Oldest supported version
           - "1"    # Latest release
           - nightly
+        # https://github.com/actions/runner-images#available-images
         os:
           - ubuntu-latest
-          - macOS-latest
+          - macos-14  # Apple silicon
           - windows-latest
         arch:
           - x64
           - x86
+          - aarch64
         exclude:
           # Test 32-bit only on Linux
-          - os: macOS-latest
+          - os: macos-14
             arch: x86
           - os: windows-latest
             arch: x86
+          # Test ARM64 only on macOS
+          - os: ubuntu-latest
+            arch: aarch64
+          - os: windows-latest
+            arch: aarch64
+          # Prefer testing against Apple Silicon
+          - os: macos-14
+            arch: x64
+          - version: "1.6"
+            os: macos-14
+            arch: aarch64
+          # Disable Windows tests on Julia 1.6 as it's particularly slow
+          - version: "1.6"
+            os: windows-latest
+        include:
+          # Apple silicon isn't supported by Julia 1.6
+          - version: "1.6"
+            os: macos-13  # Intel
+            arch: x64
     steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
-      - uses: julia-actions/cache@v1
-      # Only download the tzdata version used in TimeZones.jl's tests to avoid unnecessary
-      # load on IANA's servers. However, if the DEFAULT_TZDATA_VERSION constant was
-      # changed we need to also build the version specified by the constant to ensure it can be
-      # compiled.
-      # Note: The `git diff` command has a `--quiet` flag that will suppress output but doesn't
-      # catch all changes.
-      #
-      # https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-environment-variable
-      - run: |
-          git fetch origin +:refs/remotes/origin/HEAD
-          if git diff --exit-code -G"^const DEFAULT_TZDATA_VERSION" origin/HEAD..HEAD > /dev/null; then
-            echo "JULIA_TZ_VERSION=$TZDATA_VERSION" >> $GITHUB_ENV
-          fi
-        shell: bash
-        env:
-          TZDATA_VERSION: 2016j  # Matches tzdata version used in tests
-      - uses: julia-actions/julia-buildpkg@latest
-      - uses: julia-actions/julia-runtest@latest
-        env:
-          JULIA_NUM_THREADS: "8"  # Can probably use "auto" here instead
+      - uses: julia-actions/cache@v2
+      - uses: julia-actions/julia-buildpkg@v1
+      - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v5
         with:
           files: lcov.info
+
+  # https://pkgdocs.julialang.org/v1/creating-packages/#Transition-from-normal-dependency-to-extension
+  weakdeps:
+    name: Weakdeps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: "1.6"  # LTS / Oldest support version
+      - uses: julia-actions/cache@v2
+      - shell: julia --color=yes --project=weakdeps {0}
+        run: |
+          using Pkg
+          Pkg.add(PackageSpec(name="TimeZones", rev=ENV["SHA"]))
+          using TimeZones
+
+  # TODO: Use shared project environments when the minimum version of Julia is 1.8 (e.g. `@sysimage`)
+  sysimage:
+    name: System Image - Julia ${{ matrix.version }} - TZJData ${{ matrix.tzjdata-version }} - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - "1.6"  # LTS / Oldest supported version
+          - "1"    # Latest release
+        os:
+          - ubuntu-latest
+        tzjdata-version:
+          - "1.3.0"  # Version which does not support `artifact_dir`
+          - "1"
+    env:
+      JULIA_DEPOT_PATH: build-depot
+      TZJDATA_VERSION: ${{ matrix.tzjdata-version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: ${{ matrix.version }}
+      - uses: julia-actions/cache@v2
+      - name: Add TimeZones
+        shell: julia --color=yes --project=sysimage {0}
+        run: |
+          using Pkg
+          Pkg.add(PackageSpec(name="TZJData", version=ENV["TZJDATA_VERSION"]))
+          Pkg.add(PackageSpec(name="TimeZones", rev=ENV["SHA"]))
+      - name: Create sysimage
+        shell: julia --color=yes {0}
+        run: |
+          using Pkg
+          Pkg.add(PackageSpec(name="PackageCompiler", version="2"))
+          using PackageCompiler
+          create_sysimage(; project="sysimage", sysimage_path="sysimage.so")
+          # create_sysimage(; project=joinpath(first(DEPOT_PATH), "environments", "sysimage"), sysimage_path="sysimage.so")
+      - name: Validate sysimage works
+        shell: julia --color=yes --project=sysimage -Jsysimage.so {0}
+        run: |
+          using TimeZones
+          println(TimeZones._COMPILED_DIR[])
+      - name: Relocate Julia depot
+        run: mv build-depot sysimage-depot
+      - name: Validate sysimage works with relocated depot
+        shell: julia --color=yes --project=sysimage -Jsysimage.so {0}
+        run: |
+          using TimeZones
+          println(TimeZones._COMPILED_DIR[])
+        env:
+          JULIA_DEPOT_PATH: sysimage-depot
+
+  force-latest-compatible:
+    name: Force Latest Compatible - Julia ${{ matrix.version }} - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - "1.7"
+        os:
+          - windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: ${{ matrix.version }}
+      - uses: julia-actions/cache@v2
+      - name: Test
+        shell: julia --color=yes --project {0}
+        run: |
+          using Pkg
+          Pkg.test(; allow_reresolve=true, force_latest_compatible_version=true)
 
   benchmarks:
     name: Benchmarks
@@ -76,63 +179,51 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
         with:
           version: "1"
-      - uses: julia-actions/julia-buildpkg@latest
+      - uses: julia-actions/cache@v2
+      - uses: julia-actions/julia-buildpkg@v1
       - run: |
           git fetch origin +:refs/remotes/origin/HEAD
           julia --project=benchmark/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd()))'
           julia --project=benchmark/ -e 'using PkgBenchmark, TimeZones; export_markdown(stdout, judge(TimeZones, "origin/HEAD", verbose=false))'
-        env:
-          TZDATA_VERSION: 2016j  # Matches tzdata version used in tests
 
   doctest:
-    name: Documentation - Julia ${{ matrix.version }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: true
-      matrix:
-        version:
-          - "1.6"
-          - nightly
-        os:
-          - ubuntu-latest
-        arch:
-          - x64
-    steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
-        with:
-          version: ${{ matrix.version }}
-          arch: ${{ matrix.arch }}
-      - uses: julia-actions/julia-buildpkg@latest
-      - run: |
-          julia --project=docs -e '
-            using Pkg
-            Pkg.develop(PackageSpec(path=pwd()))
-            Pkg.instantiate()'
-      - run: julia --project=docs docs/make.jl
-
-  # TODO: Previously on Travis CI was conditional on running on `master` or a tag:
-  # `if: (branch = master AND type != pull_request) OR tag =~ ^v`
-  docs:
-    name: Documentation Deploy
+    name: Documentation - DocTests
     runs-on: ubuntu-latest
-    needs: doctest
     steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
         with:
-          version: "1"
-      - uses: julia-actions/julia-buildpkg@latest
-      - run: |
-          julia --project=docs -e '
-            using Pkg
-            Pkg.develop(PackageSpec(path=pwd()))
-            Pkg.instantiate()'
-      - run: julia --project=docs docs/deploy.jl
+          version: "1.9"
+      - uses: julia-actions/cache@v2
+      - uses: julia-actions/julia-buildpkg@v1
+      - shell: julia --color=yes --project=docs {0}
+        run: |
+          using Pkg
+          Pkg.instantiate()
+      - run: julia --color=yes --project=docs docs/make.jl
+        env:
+          DOCTESTS: "true"
+
+  docs:
+    name: Documentation - Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: "1.9"
+      - uses: julia-actions/cache@v2
+      - uses: julia-actions/julia-buildpkg@v1
+      - shell: julia --color=yes --project=docs {0}
+        run: |
+          using Pkg
+          Pkg.instantiate()
+      - run: julia --color=yes --project=docs docs/make.jl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+          DEPLOY_DOCS: "true"

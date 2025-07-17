@@ -1,20 +1,23 @@
 using TimeZones.TZData: parse_components
 using TimeZones: Transition
 
+cache = TimeZones.TimeZoneCache()
+cache.initialized[] = true
+
 dt = DateTime(1942,12,25,1,23,45)
 custom_dt = DateTime(1800,1,1)
 
 utc = FixedTimeZone("UTC")
-gmt = FixedTimeZone("GMT", 0)
+gmt = add!(cache, FixedTimeZone("GMT", 0))
 foo = FixedTimeZone("FOO", 0)
 null = FixedTimeZone("", 10800)
 fixed = FixedTimeZone("UTC+01:00")
-est = FixedTimeZone("EST", -18000)
-warsaw = first(compile("Europe/Warsaw", tzdata["europe"]))
-apia = cache_tz(compile("Pacific/Apia", tzdata["australasia"]))
-honolulu = cache_tz(compile("Pacific/Honolulu", tzdata["northamerica"]))  # Uses cutoff
-ulyanovsk = first(compile("Europe/Ulyanovsk", tzdata["europe"]))  # No named abbreviations
-new_york = first(compile("America/New_York", tzdata["northamerica"]))  # Underscore in name
+est = add!(cache, FixedTimeZone("EST", -18000))
+warsaw = add!(cache, compile("Europe/Warsaw", tzdata["europe"]))
+apia = add!(cache, compile("Pacific/Apia", tzdata["australasia"]))
+honolulu = add!(cache, compile("Pacific/Honolulu", tzdata["northamerica"]))  # Uses cutoff
+ulyanovsk = add!(cache, compile("Europe/Ulyanovsk", tzdata["europe"]))  # No named abbreviations
+new_york = add!(cache, compile("America/New_York", tzdata["northamerica"]))  # Underscore in name
 custom = VariableTimeZone("Test/Custom", [Transition(custom_dt, utc)])  # Non-cached variable time zone
 
 @test sprint(print, utc) == "UTC"
@@ -29,29 +32,31 @@ custom = VariableTimeZone("Test/Custom", [Transition(custom_dt, utc)])  # Non-ca
 @test sprint(print, ulyanovsk) == "Europe/Ulyanovsk"
 @test sprint(print, custom) == "Test/Custom"
 
-@test sprint(show_compact, utc) == "tz\"UTC\""
-@test sprint(show_compact, gmt) == "tz\"GMT\""
-@test sprint(show_compact, foo) == "FixedTimeZone(\"FOO\", 0)"
-@test sprint(show_compact, null) == "FixedTimeZone(\"\", 10800)"
-@test sprint(show_compact, fixed) == "tz\"UTC+01:00\""
-@test sprint(show_compact, est) == "tz\"EST\""
-@test sprint(show_compact, warsaw) == "tz\"Europe/Warsaw\""
-@test sprint(show_compact, apia) == "tz\"Pacific/Apia\""
-@test sprint(show_compact, honolulu) == "tz\"Pacific/Honolulu\""
-@test sprint(show_compact, ulyanovsk) == "tz\"Europe/Ulyanovsk\""
-@test sprint(show_compact, custom) == "VariableTimeZone(\"Test/Custom\", ...)"
+with_tz_cache(cache) do
+    @test sprint(show_compact, utc) == "tz\"UTC\""
+    @test sprint(show_compact, gmt) == "tz\"GMT\""
+    @test sprint(show_compact, foo) == "FixedTimeZone(\"FOO\", 0)"
+    @test sprint(show_compact, null) == "FixedTimeZone(\"\", 10800)"
+    @test sprint(show_compact, fixed) == "tz\"UTC+01:00\""
+    @test sprint(show_compact, est) == "tz\"EST\""
+    @test sprint(show_compact, warsaw) == "tz\"Europe/Warsaw\""
+    @test sprint(show_compact, apia) == "tz\"Pacific/Apia\""
+    @test sprint(show_compact, honolulu) == "tz\"Pacific/Honolulu\""
+    @test sprint(show_compact, ulyanovsk) == "tz\"Europe/Ulyanovsk\""
+    @test sprint(show_compact, custom) == "VariableTimeZone(\"Test/Custom\", ...)"
 
-@test sprint(show, utc) == "tz\"UTC\""
-@test sprint(show, gmt) == "tz\"GMT\""
-@test sprint(show, foo) == "FixedTimeZone(\"FOO\", 0)"
-@test sprint(show, null) == "FixedTimeZone(\"\", 10800)"
-@test sprint(show, fixed) == "tz\"UTC+01:00\""
-@test sprint(show, est) == "tz\"EST\""
-@test sprint(show, warsaw) == "tz\"Europe/Warsaw\""
-@test sprint(show, apia) == "tz\"Pacific/Apia\""
-@test sprint(show, honolulu) == "tz\"Pacific/Honolulu\""
-@test sprint(show, ulyanovsk) == "tz\"Europe/Ulyanovsk\""
-@test sprint(show, custom) == "VariableTimeZone(\"Test/Custom\", Transition[Transition($(repr(custom_dt)), tz\"UTC\")], nothing)"
+    @test sprint(show, utc) == "tz\"UTC\""
+    @test sprint(show, gmt) == "tz\"GMT\""
+    @test sprint(show, foo) == "FixedTimeZone(\"FOO\", 0)"
+    @test sprint(show, null) == "FixedTimeZone(\"\", 10800)"
+    @test sprint(show, fixed) == "tz\"UTC+01:00\""
+    @test sprint(show, est) == "tz\"EST\""
+    @test sprint(show, warsaw) == "tz\"Europe/Warsaw\""
+    @test sprint(show, apia) == "tz\"Pacific/Apia\""
+    @test sprint(show, honolulu) == "tz\"Pacific/Honolulu\""
+    @test sprint(show, ulyanovsk) == "tz\"Europe/Ulyanovsk\""
+    @test sprint(show, custom) == "VariableTimeZone(\"Test/Custom\", Transition[Transition($(repr(custom_dt)), tz\"UTC\")], nothing)"
+end
 
 @test sprint(show, MIME("text/plain"), utc) == "UTC"
 @test sprint(show, MIME("text/plain"), gmt) == "GMT"

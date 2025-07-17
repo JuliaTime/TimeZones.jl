@@ -387,6 +387,16 @@ using Dates: Hour, Second, UTM, @dateformat_str
         zdt = ZonedDateTime(DateTime(2200, 1, 1), perth, from_utc=true)
     end
 
+    @testset "Date / Time constructors" begin
+        zdt = ZonedDateTime(Date(2010), utc)
+        @test zdt.utc_datetime == DateTime(2010, 1, 1, 0, 0, 0)
+        @test zdt.timezone === utc
+
+        zdt = ZonedDateTime(Date(2010), Time(4, 5, 6), utc)
+        @test zdt.utc_datetime == DateTime(2010, 1, 1, 4, 5, 6)
+        @test zdt.timezone === utc
+    end
+
     @testset "convenience constructors" begin
         # Convenience constructors for making a DateTime on-the-fly
         digits = [2010, 1, 2, 3, 4, 5, 6]
