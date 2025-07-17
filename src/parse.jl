@@ -63,30 +63,33 @@ function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
     min_pos = min_width <= 0 ? i : i + min_width - 1
     max_pos = max_width <= 0 ? len : min(nextind(str, 0, length(str, 1, i) + max_width - 1), len)
     state = 1
+    num_digits = 0
     @inbounds while i <= max_pos
         c, ii = iterate(str, i)::Tuple{Char, Int}
         if state == 1 && (c === '-' || c === '+')
             state = 2
-            tz_end = i
         elseif (state == 1 || state == 2) && '0' <= c <= '9'
             state = 3
+            num_digits += 1
             tz_end = i
+            num_digits >= 4 && break
         elseif state == 3 && c === ':'
             state = 4
-            tz_end = i
         elseif (state == 3 || state == 4) && '0' <= c <= '9'
+            num_digits += 1
             tz_end = i
+            num_digits >= 4 && break
         else
             break
         end
         i = ii
     end
 
-    if tz_end < min_pos
+    if tz_end < min_pos || num_digits != 2 && num_digits != 4
         return nothing
     else
         tz = SubString(str, tz_start, tz_end)
-        return tz, i
+        return tz, nextind(str, tz_end)
     end
 end
 
