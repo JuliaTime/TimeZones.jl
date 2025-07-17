@@ -82,7 +82,7 @@ function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
         i = ii
     end
 
-    if tz_end <= min_pos
+    if tz_end < min_pos
         return nothing
     else
         tz = SubString(str, tz_start, tz_end)
