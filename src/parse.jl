@@ -94,9 +94,27 @@ function tryparsenext_tz(str, i, len, min_width::Int=1, max_width::Int=0)
     tz_start, tz_end = i, 0
     min_pos = min_width <= 0 ? i : i + min_width - 1
     max_pos = max_width <= 0 ? len : min(nextind(str, 0, length(str, 1, i) + max_width - 1), len)
+    state = :uppercase
+    num_seq_digits = 0
     @inbounds while i <= max_pos
         c, ii = iterate(str, i)::Tuple{Char, Int}
-        if c === '/' || c === '_' || isletter(c)
+        if state === :uppercase && isuppercase(c)
+            state = :letter_or_symbol
+            tz_end = i
+        elseif (state === :letter_or_digit || state === :digit) && '0' <= c <= '9' && num_seq_digits < 2
+            state = :digit
+            num_seq_digits += 1  # Reset not required as we cannot leave the `:digit` state
+            tz_end = i
+        elseif state === :letter_or_symbol && c === '/'
+            state = :uppercase
+        elseif state === :letter_or_symbol && c === '_'
+            state = :letter
+        elseif state === :letter_or_symbol && c === '-'
+            state = :letter_or_digit
+        elseif state === :letter_or_symbol && c === '+'
+            state = :digit
+        elseif state in (:letter, :letter_or_digit, :letter_or_symbol) && isletter(c)
+            state = :letter_or_symbol
             tz_end = i
         else
             break
@@ -104,7 +122,7 @@ function tryparsenext_tz(str, i, len, min_width::Int=1, max_width::Int=0)
         i = ii
     end
 
-    if tz_end == 0
+    if tz_end < min_pos
         return nothing
     else
         name = SubString(str, tz_start, tz_end)
@@ -113,7 +131,7 @@ function tryparsenext_tz(str, i, len, min_width::Int=1, max_width::Int=0)
         # purposes we'll treat all abbreviations except for UTC and GMT as ambiguous.
         # e.g. "MST": "Mountain Standard Time" (UTC-7) or "Moscow Summer Time" (UTC+3:31).
         if name == "UTC" || name == "GMT" || '/' in name
-            return name, i
+            return name, nextind(str, tz_end)
         else
             return nothing
         end
