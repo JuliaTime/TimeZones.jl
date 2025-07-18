@@ -61,7 +61,7 @@ function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
 
     tz_start, tz_end = i, 0
     min_pos = min_width <= 0 ? i : i + min_width - 1
-    max_pos = max_width <= 0 ? len : min(chr2ind(str, ind2chr(str,i) + max_width - 1), len)
+    max_pos = max_width <= 0 ? len : min(nextind(str, 0, length(str, 1, i) + max_width - 1), len)
     state = 1
     @inbounds while i <= max_pos
         c, ii = iterate(str, i)::Tuple{Char, Int}
@@ -93,7 +93,7 @@ end
 function tryparsenext_tz(str, i, len, min_width::Int=1, max_width::Int=0)
     tz_start, tz_end = i, 0
     min_pos = min_width <= 0 ? i : i + min_width - 1
-    max_pos = max_width <= 0 ? len : min(chr2ind(str, ind2chr(str,i) + max_width - 1), len)
+    max_pos = max_width <= 0 ? len : min(nextind(str, 0, length(str, 1, i) + max_width - 1), len)
     @inbounds while i <= max_pos
         c, ii = iterate(str, i)::Tuple{Char, Int}
         if c === '/' || c === '_' || isletter(c)
