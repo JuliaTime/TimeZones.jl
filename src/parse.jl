@@ -56,6 +56,19 @@ function Base.parse(::Type{ZonedDateTime}, str::AbstractString, df::DateFormat)
     end
 end
 
+# Supported fixed offset formats from UTC include. Most of these are ISO8601 time zone
+# designators:
+#
+# - `Z`
+# - `±hh:mm`
+# - `±hhmm`
+# - `±hh`
+# - `hh:mm`
+# - `hhmm`
+#
+# Normally the the `FixedTimeZone(::AbstractString)` constructor is responsible for
+# converting the string output produced here into the Julia representation of a fixed time
+# zone. Any further restrictions imposed by that constructor maybe should be reflected here.
 function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
     i == len && str[i] === 'Z' && return ("Z", i+1)
 
