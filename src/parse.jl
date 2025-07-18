@@ -26,10 +26,10 @@ end
 When the `TimeZones` package is loaded, 2 extra character codes are available
 for constructing the `format` string:
 
-| Code       | Matches            | Comment                                               |
-|:-----------|:-------------------|:------------------------------------------------------|
-| `z`        | +02:00, -0100, +14 | Parsing matches a fixed numeric UTC offset `±hh:mm`, `±hhmm`, or `±hh`. Formatting outputs `±hh:mm` |
-| `Z`        | UTC, GMT, America/New_York | Name of a time zone as specified in the IANA tz database |
+| Code | Matches                    | Comment                                               |
+|:-----|:---------------------------|:------------------------------------------------------|
+| `z`  | +02:00, -0100, +14         | Parsing matches a fixed numeric UTC offset `±hh:mm`, `±hhmm`, or `±hh`. Formatting outputs `±hh:mm` |
+| `Z`  | UTC, GMT, America/New_York | Name of a time zone as specified in the IANA tz database |
 """ DateFormat
 
 function Base.parse(::Type{ZonedDateTime}, str::AbstractString)
@@ -56,37 +56,63 @@ function Base.parse(::Type{ZonedDateTime}, str::AbstractString, df::DateFormat)
     end
 end
 
+# Supported fixed offset formats from UTC include. Most of these are ISO8601 time zone
+# designators:
+#
+# - `Z`
+# - `±hh:mm`
+# - `±hhmm`
+# - `±hh`
+# - `hh:mm`
+# - `hhmm`
+#
+# Normally the the `FixedTimeZone(::AbstractString)` constructor is responsible for
+# converting the string output produced here into the Julia representation of a fixed time
+# zone. Any further restrictions imposed by that constructor maybe should be reflected here.
 function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
-    i == len && str[i] === 'Z' && return ("Z", i+1)
-
     tz_start, tz_end = i, 0
     min_pos = min_width <= 0 ? i : i + min_width - 1
     max_pos = max_width <= 0 ? len : min(nextind(str, 0, length(str, 1, i) + max_width - 1), len)
-    state = 1
+    state = :start
+    has_sign = false
+    num_digits = 0
     @inbounds while i <= max_pos
         c, ii = iterate(str, i)::Tuple{Char, Int}
-        if state == 1 && (c === '-' || c === '+')
-            state = 2
+        if state === :start && c === 'Z'
             tz_end = i
-        elseif (state == 1 || state == 2) && '0' <= c <= '9'
-            state = 3
-            tz_end = i
-        elseif state == 3 && c === ':'
-            state = 4
-            tz_end = i
-        elseif (state == 3 || state == 4) && '0' <= c <= '9'
-            tz_end = i
+            break
+        elseif state === :start && (c === '-' || c === '+')
+            state = :hour
+            has_sign = true
+        elseif (state === :start || state === :hour) && '0' <= c <= '9'
+            num_digits += 1
+            if num_digits == 2
+                state = :minute_or_colon
+                has_sign && (tz_end = i)
+            else
+                state = :hour
+            end
+        elseif state === :minute_or_colon && c === ':'
+            state = :minute
+        elseif (state === :minute_or_colon || state === :minute) && '0' <= c <= '9'
+            num_digits += 1
+            if num_digits == 4
+                tz_end = i
+                break
+            else
+                state = :minute
+            end
         else
             break
         end
         i = ii
     end
 
-    if tz_end <= min_pos
+    if tz_end < min_pos
         return nothing
     else
         tz = SubString(str, tz_start, tz_end)
-        return tz, i
+        return tz, nextind(str, tz_end)
     end
 end
 
@@ -94,9 +120,27 @@ function tryparsenext_tz(str, i, len, min_width::Int=1, max_width::Int=0)
     tz_start, tz_end = i, 0
     min_pos = min_width <= 0 ? i : i + min_width - 1
     max_pos = max_width <= 0 ? len : min(nextind(str, 0, length(str, 1, i) + max_width - 1), len)
+    state = :uppercase
+    num_seq_digits = 0
     @inbounds while i <= max_pos
         c, ii = iterate(str, i)::Tuple{Char, Int}
-        if c === '/' || c === '_' || isletter(c)
+        if state === :uppercase && isuppercase(c)
+            state = :letter_or_symbol
+            tz_end = i
+        elseif (state === :letter_or_digit || state === :digit) && '0' <= c <= '9' && num_seq_digits < 2
+            state = :digit
+            num_seq_digits += 1  # Reset not required as we cannot leave the `:digit` state
+            tz_end = i
+        elseif state === :letter_or_symbol && c === '/'
+            state = :uppercase
+        elseif state === :letter_or_symbol && c === '_'
+            state = :letter
+        elseif state === :letter_or_symbol && c === '-'
+            state = :letter_or_digit
+        elseif state === :letter_or_symbol && c === '+'
+            state = :digit
+        elseif state in (:letter, :letter_or_digit, :letter_or_symbol) && isletter(c)
+            state = :letter_or_symbol
             tz_end = i
         else
             break
@@ -104,7 +148,7 @@ function tryparsenext_tz(str, i, len, min_width::Int=1, max_width::Int=0)
         i = ii
     end
 
-    if tz_end == 0
+    if tz_end < min_pos
         return nothing
     else
         name = SubString(str, tz_start, tz_end)
@@ -113,7 +157,7 @@ function tryparsenext_tz(str, i, len, min_width::Int=1, max_width::Int=0)
         # purposes we'll treat all abbreviations except for UTC and GMT as ambiguous.
         # e.g. "MST": "Mountain Standard Time" (UTC-7) or "Moscow Summer Time" (UTC+3:31).
         if name == "UTC" || name == "GMT" || '/' in name
-            return name, i
+            return name, nextind(str, tz_end)
         else
             return nothing
         end
