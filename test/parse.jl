@@ -117,6 +117,8 @@ end
         @test tryparsenext_fixedtz("+99", 1, 3) == ("+99", 4)
         @test tryparsenext_fixedtz("+9959", 1, 5) == ("+9959", 6)
         @test tryparsenext_fixedtz("+99:59", 1, 6) == ("+99:59", 7)
+
+        @test tryparsenext_fixedtz("Z", 1, 1) == ("Z", 2)
     end
 
     @testset "automatic stop" begin
@@ -135,16 +137,21 @@ end
         @test_broken tryparsenext_fixedtz("+12:300", 1, 7) == ("+12:30", 6)
         @test_broken tryparsenext_fixedtz("+123", 1, 4) == ("+12", 4)
         @test_broken tryparsenext_fixedtz("+12:3", 1, 5) == ("+12", 4)
+
+        @test tryparsenext_fixedtz("Zabc", 1, 4) == ("Z", 2)
+        @test tryparsenext_fixedtz("Z+12:30", 1, 7) == ("Z", 2)
     end
 
     @testset "min width" begin
         @test tryparsenext_fixedtz("1230", 1, 4, 5, 0) === nothing
         @test tryparsenext_fixedtz("+1230", 1, 5, 5, 0) == ("+1230", 6)
+        @test tryparsenext_fixedtz("Z+12:30", 1, 7, 2, 0) === nothing
     end
 
     @testset "max width" begin
         @test tryparsenext_fixedtz("+12301999", 1, 9, 1, 5) == ("+1230", 6)
         @test tryparsenext_fixedtz("+12301999", 1, 9, 1, 3) == ("+12", 4)
+        @test tryparsenext_fixedtz("Z+12:30", 1, 7, 1, 5) == ("Z", 2)
     end
 
     @testset "invalid" begin

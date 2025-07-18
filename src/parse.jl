@@ -70,8 +70,6 @@ end
 # converting the string output produced here into the Julia representation of a fixed time
 # zone. Any further restrictions imposed by that constructor maybe should be reflected here.
 function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
-    i == len && str[i] === 'Z' && return ("Z", i+1)
-
     tz_start, tz_end = i, 0
     min_pos = min_width <= 0 ? i : i + min_width - 1
     max_pos = max_width <= 0 ? len : min(nextind(str, 0, length(str, 1, i) + max_width - 1), len)
@@ -79,7 +77,10 @@ function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
     num_digits = 0
     @inbounds while i <= max_pos
         c, ii = iterate(str, i)::Tuple{Char, Int}
-        if state == 1 && (c === '-' || c === '+')
+        if state == 1 && c === 'Z'
+            state = -1
+            tz_end = i
+        elseif state == 1 && (c === '-' || c === '+')
             state = 2
         elseif (state == 1 || state == 2) && '0' <= c <= '9'
             state = 3
@@ -98,7 +99,7 @@ function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
         i = ii
     end
 
-    if tz_end < min_pos || num_digits != 2 && num_digits != 4
+    if tz_end < min_pos || state > 0 && num_digits != 2 && num_digits != 4
         return nothing
     else
         tz = SubString(str, tz_start, tz_end)
