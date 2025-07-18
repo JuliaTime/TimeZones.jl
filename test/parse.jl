@@ -121,6 +121,16 @@ end
         @test tryparsenext_fixedtz("Z", 1, 1) == ("Z", 2)
     end
 
+    # We should probably restrict minute to be between "00" and "59" but if we do these
+    # should still parse to `UTC+99:00` (truncating minutes). As truncating could lead to
+    # more confusion we'll allow "99:99" which translates to `UTC+100:39`.
+    @testset "99 minutes" begin
+        @test tryparsenext_fixedtz("9999", 1, 4) == ("9999", 5)
+        @test tryparsenext_fixedtz("99:99", 1, 5) == ("99:99", 6)
+        @test tryparsenext_fixedtz("-99:99", 1, 6) == ("-99:99", 7)
+        @test tryparsenext_fixedtz("+99:99", 1, 6) == ("+99:99", 7)
+    end
+
     @testset "automatic stop" begin
         @test tryparsenext_fixedtz("1230abc", 1, 7) == ("1230", 5)
         @test tryparsenext_fixedtz("12300", 1, 5) == ("1230", 5)
@@ -158,26 +168,23 @@ end
         @test tryparsenext_fixedtz("1", 1, 1) === nothing
         @test tryparsenext_fixedtz("12", 1, 2) === nothing
         @test tryparsenext_fixedtz("123", 1, 3) === nothing
-        @test_broken tryparsenext_fixedtz("9999", 1, 4) === nothing
+
         @test tryparsenext_fixedtz("1:", 1, 2) === nothing
         @test tryparsenext_fixedtz("1:30", 1, 4) === nothing
         @test tryparsenext_fixedtz("12:", 1, 3) === nothing
         @test tryparsenext_fixedtz("12:3", 1, 4) === nothing
-        @test_broken tryparsenext_fixedtz("99:99", 1, 5) === nothing
         @test tryparsenext_fixedtz("12::30", 1, 4) === nothing
 
         @test tryparsenext_fixedtz("-", 1, 1) === nothing
         @test tryparsenext_fixedtz("-1", 1, 2) === nothing
         @test tryparsenext_fixedtz("-1:", 1, 3) === nothing
         @test tryparsenext_fixedtz("-1:30", 1, 5) === nothing
-        @test_broken tryparsenext_fixedtz("-99:99", 1, 6) === nothing
         @test tryparsenext_fixedtz("--12", 1, 4) === nothing
 
         @test tryparsenext_fixedtz("+", 1, 1) === nothing
         @test tryparsenext_fixedtz("+1", 1, 2) === nothing
         @test tryparsenext_fixedtz("+1:", 1, 3) === nothing
         @test tryparsenext_fixedtz("+1:30", 1, 5) === nothing
-        @test_broken tryparsenext_fixedtz("+99:99", 1, 6) === nothing
         @test tryparsenext_fixedtz("++12", 1, 4) === nothing
     end
 end
