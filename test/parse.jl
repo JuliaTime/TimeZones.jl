@@ -226,7 +226,7 @@ end
     end
 
     @testset "invalid" begin
-        @test tryparsenext_tz("//", 1, 1) === nothing
+        @test tryparsenext_tz("//", 1, 2) === nothing
         @test tryparsenext_tz("__", 1, 2) === nothing
         @test tryparsenext_tz("--", 1, 2) === nothing
         @test tryparsenext_tz("123", 1, 2) === nothing  # Cannot contain only numbers
