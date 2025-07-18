@@ -131,7 +131,7 @@ end
         @test_broken tryparsenext_fixedtz("-12:3", 1, 5) == ("-12", 4)
 
         @test tryparsenext_fixedtz("+1230abc", 1, 7) == ("+1230", 6)
-        @test_broken tryparsenext_fixedtz("+12300", 1, 6) == ("+1230", 6)
+        @test tryparsenext_fixedtz("+12300", 1, 6) == ("+1230", 6)
         @test_broken tryparsenext_fixedtz("+12:300", 1, 7) == ("+12:30", 6)
         @test_broken tryparsenext_fixedtz("+123", 1, 4) == ("+12", 4)
         @test_broken tryparsenext_fixedtz("+12:3", 1, 5) == ("+12", 4)
