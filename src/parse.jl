@@ -73,33 +73,42 @@ function tryparsenext_fixedtz(str, i, len, min_width::Int=1, max_width::Int=0)
     tz_start, tz_end = i, 0
     min_pos = min_width <= 0 ? i : i + min_width - 1
     max_pos = max_width <= 0 ? len : min(nextind(str, 0, length(str, 1, i) + max_width - 1), len)
-    state = 1
+    state = :start
+    has_sign = false
     num_digits = 0
     @inbounds while i <= max_pos
         c, ii = iterate(str, i)::Tuple{Char, Int}
-        if state == 1 && c === 'Z'
-            state = -1
+        if state === :start && c === 'Z'
             tz_end = i
-        elseif state == 1 && (c === '-' || c === '+')
-            state = 2
-        elseif (state == 1 || state == 2) && '0' <= c <= '9'
-            state = 3
+            break
+        elseif state === :start && (c === '-' || c === '+')
+            state = :hour
+            has_sign = true
+        elseif (state === :start || state === :hour) && '0' <= c <= '9'
             num_digits += 1
-            tz_end = i
-            num_digits >= 4 && break
-        elseif state == 3 && c === ':'
-            state = 4
-        elseif (state == 3 || state == 4) && '0' <= c <= '9'
+            if num_digits == 2
+                state = :minute_or_colon
+                has_sign && (tz_end = i)
+            else
+                state = :hour
+            end
+        elseif state === :minute_or_colon && c === ':'
+            state = :minute
+        elseif (state === :minute_or_colon || state === :minute) && '0' <= c <= '9'
             num_digits += 1
-            tz_end = i
-            num_digits >= 4 && break
+            if num_digits == 4
+                tz_end = i
+                break
+            else
+                state = :minute
+            end
         else
             break
         end
         i = ii
     end
 
-    if tz_end < min_pos || state > 0 && num_digits != 2 && num_digits != 4
+    if tz_end < min_pos
         return nothing
     else
         tz = SubString(str, tz_start, tz_end)

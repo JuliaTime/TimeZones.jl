@@ -129,14 +129,14 @@ end
         @test tryparsenext_fixedtz("-1230abc", 1, 7) == ("-1230", 6)
         @test tryparsenext_fixedtz("-12300", 1, 6) == ("-1230", 6)
         @test tryparsenext_fixedtz("-12:300", 1, 7) == ("-12:30", 7)
-        @test_broken tryparsenext_fixedtz("-123", 1, 4) == ("-12", 4)
-        @test_broken tryparsenext_fixedtz("-12:3", 1, 5) == ("-12", 4)
+        @test tryparsenext_fixedtz("-123", 1, 4) == ("-12", 4)
+        @test tryparsenext_fixedtz("-12:3", 1, 5) == ("-12", 4)
 
         @test tryparsenext_fixedtz("+1230abc", 1, 7) == ("+1230", 6)
         @test tryparsenext_fixedtz("+12300", 1, 6) == ("+1230", 6)
-        @test_broken tryparsenext_fixedtz("+12:300", 1, 7) == ("+12:30", 6)
-        @test_broken tryparsenext_fixedtz("+123", 1, 4) == ("+12", 4)
-        @test_broken tryparsenext_fixedtz("+12:3", 1, 5) == ("+12", 4)
+        @test tryparsenext_fixedtz("+12:300", 1, 7) == ("+12:30", 7)
+        @test tryparsenext_fixedtz("+123", 1, 4) == ("+12", 4)
+        @test tryparsenext_fixedtz("+12:3", 1, 5) == ("+12", 4)
 
         @test tryparsenext_fixedtz("Zabc", 1, 4) == ("Z", 2)
         @test tryparsenext_fixedtz("Z+12:30", 1, 7) == ("Z", 2)
@@ -156,15 +156,15 @@ end
 
     @testset "invalid" begin
         @test tryparsenext_fixedtz("1", 1, 1) === nothing
-        @test_broken tryparsenext_fixedtz("12", 1, 2) === nothing
+        @test tryparsenext_fixedtz("12", 1, 2) === nothing
         @test tryparsenext_fixedtz("123", 1, 3) === nothing
         @test_broken tryparsenext_fixedtz("9999", 1, 4) === nothing
         @test tryparsenext_fixedtz("1:", 1, 2) === nothing
         @test tryparsenext_fixedtz("1:30", 1, 4) === nothing
-        @test_broken tryparsenext_fixedtz("12:", 1, 3) === nothing
+        @test tryparsenext_fixedtz("12:", 1, 3) === nothing
         @test tryparsenext_fixedtz("12:3", 1, 4) === nothing
         @test_broken tryparsenext_fixedtz("99:99", 1, 5) === nothing
-        @test_broken tryparsenext_fixedtz("12::30", 1, 4) === nothing
+        @test tryparsenext_fixedtz("12::30", 1, 4) === nothing
 
         @test tryparsenext_fixedtz("-", 1, 1) === nothing
         @test tryparsenext_fixedtz("-1", 1, 2) === nothing
