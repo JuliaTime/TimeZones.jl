@@ -168,7 +168,6 @@ end
         @test tryparsenext_fixedtz("1", 1, 1) === nothing
         @test tryparsenext_fixedtz("12", 1, 2) === nothing
         @test tryparsenext_fixedtz("123", 1, 3) === nothing
-
         @test tryparsenext_fixedtz("1:", 1, 2) === nothing
         @test tryparsenext_fixedtz("1:30", 1, 4) === nothing
         @test tryparsenext_fixedtz("12:", 1, 3) === nothing
