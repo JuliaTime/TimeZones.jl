@@ -20,6 +20,10 @@ begin
     const ISOZonedDateTimeNoMillisecondFormat = DateFormat("yyyy-mm-dd\\THH:MM:SSzzz")
 end
 
+# Should be defined for subtypes of `TimeType`. Primarily for use with `Dates.format` as
+# parsing works better with `parse(ZonedDateTime, str)`.
+Dates.default_format(::Type{ZonedDateTime}) = ISOZonedDateTimeFormat
+
 @doc """
     DateFormat(format::AbstractString, locale="english") --> DateFormat
 

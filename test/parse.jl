@@ -34,6 +34,10 @@ end
     )
 end
 
+@testset "default format" begin
+    @test Dates.default_format(ZonedDateTime) === TimeZones.ISOZonedDateTimeFormat
+end
+
 @testset "parse components" begin
     local test = ("2017-11-14 11:03:53 +0100", dateformat"yyyy-mm-dd HH:MM:SS zzzzz")
     local expected = [

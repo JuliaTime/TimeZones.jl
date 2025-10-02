@@ -21,14 +21,4 @@ const TransitionTimeInfo = TZFile.TransitionTimeInfo
 
 @deprecate build(; force=false) build(TZJData.TZDATA_VERSION; force)
 
-function Dates.default_format(::Type{ZonedDateTime})
-    depwarn(
-        "`Dates.default_format(ZonedDateTime)` is deprecated and has no direct " *
-        "replacement. Consider using refactoring to use " *
-        "`parse(::Type{ZonedDateTime}, ::AbstractString)` as an alternative.",
-        :default_format,
-    )
-    return ISOZonedDateTimeFormat
-end
-
 # END TimeZones 1.0 deprecations
