@@ -115,7 +115,7 @@ jobs:
         os:
           - ubuntu-latest
         tzjdata-version:
-          - "1.3.0"  # Version which does not support `artifact_dir`
+          - "1.3.0"  # Version which does not support `artifact_dir()` (https://github.com/JuliaTime/TimeZones.jl/pull/479)
           - "1"
     env:
       JULIA_DEPOT_PATH: build-depot
@@ -146,14 +146,11 @@ jobs:
       # Ensure that TimeZones.jl doesn't require write access to the depot with typical usage (i.e. no tzdata compiling tzdata)
       - name: Make depot immutable
         run: |
-          set -x
-          whoami
-          ls -l "${JULIA_DEPOT_PATH:?}"/*
-          mkdir -p "${JULIA_DEPOT_PATH:?}/artifacts"
-          touch "${JULIA_DEPOT_PATH:?}/artifacts/Overrides.toml"
-          sudo chmod -R ugo-w "${JULIA_DEPOT_PATH:?}"
-          sudo chmod u+w "${JULIA_DEPOT_PATH:?}/artifacts/Overrides.toml"
-          ls -l "${JULIA_DEPOT_PATH:?}"/*
+          # mkdir -p build-depot/artifacts
+          # touch build-depot/artifacts/Overrides.toml
+          sudo chmod -R ugo-w build-depot
+          # sudo chmod u+w "build-depot/artifacts/Overrides.toml"
+        env:
       - name: Validate sysimage works
         shell: julia --color=yes --project=sysimage -Jsysimage.so {0}
         run: |
@@ -161,7 +158,6 @@ jobs:
           println(TimeZones._COMPILED_DIR[])
       - name: Relocate Julia depot
         run: |
-          cat "${JULIA_DEPOT_PATH:?}/artifacts/Overrides.toml"
           mv build-depot sysimage-depot
       - name: Validate sysimage works with relocated depot
         shell: julia --color=yes --project=sysimage -Jsysimage.so {0}
