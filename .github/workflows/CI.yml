@@ -78,7 +78,7 @@ jobs:
             os: macos-14
             arch: aarch64
           # Disable Windows tests on Julia 1.6 as it's particularly slow
-          - version: "1.6"
+          - version: "1.6.0"
             os: windows-latest
         include:
           # Apple silicon isn't supported by Julia 1.6
@@ -142,7 +142,12 @@ jobs:
         with:
           version: ${{ matrix.version }}
       # Skipping using `julia-actions/cache` for this job as it slows things down too much here
-      - name: Add TimeZones
+      - name: Install PackageCompiler
+        shell: julia --color=yes {0}
+        run: |
+          using Pkg
+          Pkg.add(PackageSpec(name="PackageCompiler", version="2"))
+      - name: Create sysimage project
         shell: julia --color=yes --project=sysimage {0}
         run: |
           using Pkg
@@ -151,11 +156,8 @@ jobs:
       - name: Create sysimage
         shell: julia --color=yes {0}
         run: |
-          using Pkg
-          Pkg.add(PackageSpec(name="PackageCompiler", version="2"))
           using PackageCompiler
           create_sysimage(; project="sysimage", sysimage_path="sysimage.so")
-          # create_sysimage(; project=joinpath(first(DEPOT_PATH), "environments", "sysimage"), sysimage_path="sysimage.so")
       - name: Validate sysimage works
         shell: julia --color=yes --project=sysimage -Jsysimage.so {0}
         run: |
