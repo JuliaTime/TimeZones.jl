@@ -196,15 +196,11 @@ jobs:
   benchmarks:
     name: Benchmarks
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
     steps:
       - uses: actions/checkout@v6
-        with:
-          ref: ${{ env.SHA }}  # Always checkout HEAD commit to ensure PkgBenchmark doesn't complain about a dirty repo
       - uses: julia-actions/setup-julia@v2
         with:
-          version: "1"
+          version: "1.11"  # TODO: Updates to "1"
       - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
       - run: |
