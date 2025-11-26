@@ -142,7 +142,7 @@ jobs:
       - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
-      - uses: julia-actions/cache@v2
+      # Skipping using `julia-actions/cache` for this job as it slows things down too much here
       - name: Add TimeZones
         shell: julia --color=yes --project=sysimage {0}
         run: |
