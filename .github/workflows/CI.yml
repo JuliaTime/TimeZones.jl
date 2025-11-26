@@ -173,6 +173,7 @@ jobs:
         env:
           JULIA_DEPOT_PATH: sysimage-depot
 
+  # See: https://github.com/JuliaTime/TimeZones.jl/pull/485
   force-latest-compatible:
     name: Force Latest Compatible - Julia ${{ matrix.version }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -180,7 +181,7 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - "1"
+          - "1.7"
         os:
           - windows-latest
     steps:
