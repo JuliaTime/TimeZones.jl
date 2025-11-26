@@ -150,7 +150,6 @@ jobs:
           # touch build-depot/artifacts/Overrides.toml
           sudo chmod -R ugo-w build-depot
           # sudo chmod u+w "build-depot/artifacts/Overrides.toml"
-        env:
       - name: Validate sysimage works
         shell: julia --color=yes --project=sysimage -Jsysimage.so {0}
         run: |
