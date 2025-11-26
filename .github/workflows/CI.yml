@@ -15,10 +15,6 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 env:
-  # Only download the tzdata version used in TimeZones.jl's tests to avoid unnecessary
-  # load on IANA's servers.
-  JULIA_TZ_VERSION: 2016j  # Matches tzdata version used in tests
-
   # The HEAD commit which triggered this workflow. By default PRs use a merge commit
   SHA: ${{ github.event.pull_request.head.sha || github.sha }}
 
@@ -89,6 +85,10 @@ jobs:
           - version: nightly
             os: ubuntu-latest
             arch: x64
+    env:
+      # Only download the tzdata version used in TimeZones.jl's tests to avoid unnecessary
+      # load on IANA's servers.
+      JULIA_TZ_VERSION: 2016j  # Matches tzdata version used in tests
     steps:
       - uses: actions/checkout@v6
       - uses: julia-actions/setup-julia@v2
