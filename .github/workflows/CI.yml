@@ -132,13 +132,13 @@ jobs:
         run: |
           using Pkg
           Pkg.add(PackageSpec(name="PackageCompiler", version="2"))
-      - name: Create sysimage project
+      - name: Create project
         shell: julia --color=yes --project=sysimage {0}
         run: |
           using Pkg
           Pkg.add(PackageSpec(name="TZJData", version=ENV["TZJDATA_VERSION"]))
           Pkg.add(PackageSpec(name="TimeZones", rev=ENV["SHA"]))
-      - name: Create sysimage
+      - name: Create system image
         shell: julia --color=yes {0}
         run: |
           using PackageCompiler
