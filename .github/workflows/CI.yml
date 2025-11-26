@@ -128,6 +128,16 @@ jobs:
           using Pkg
           Pkg.add(PackageSpec(name="TZJData", version=ENV["TZJDATA_VERSION"]))
           Pkg.add(PackageSpec(name="TimeZones", rev=ENV["SHA"]))
+      - name: Make depot immutable
+        run: |
+          set -x
+          whoami
+          ls -l "${JULIA_DEPOT_PATH:?}"/*
+          mkdir -p "${JULIA_DEPOT_PATH:?}/artifacts"
+          touch "${JULIA_DEPOT_PATH:?}/artifacts/Overrides.toml"
+          sudo chmod -R 400 "${JULIA_DEPOT_PATH:?}"
+          sudo chmod 600 "${JULIA_DEPOT_PATH:?}/artifacts/Overrides.toml"
+          ls -l "${JULIA_DEPOT_PATH:?}"/*
       - name: Create sysimage
         shell: julia --color=yes {0}
         run: |
@@ -136,19 +146,17 @@ jobs:
           using PackageCompiler
           create_sysimage(; project="sysimage", sysimage_path="sysimage.so")
           # create_sysimage(; project=joinpath(first(DEPOT_PATH), "environments", "sysimage"), sysimage_path="sysimage.so")
-      # Ensure that TimeZones.jl doesn't require write access to the depot upon typical usage (i.e. not compiling tzdata)
+      # Ensure that TimeZones.jl doesn't require write access to the depot with typical usage (i.e. no tzdata compiling tzdata)
       - name: Make depot immutable
         run: |
           set -x
           whoami
+          ls -l "${JULIA_DEPOT_PATH:?}"/*
           mkdir -p "${JULIA_DEPOT_PATH:?}/artifacts"
-          ls -l "${JULIA_DEPOT_PATH:?}"
-          ls -l "${JULIA_DEPOT_PATH:?}/artifacts"
           touch "${JULIA_DEPOT_PATH:?}/artifacts/Overrides.toml"
-          sudo chmod -R 400 ${JULIA_DEPOT_PATH:?}
-          sudo chown "$(whoami)" "${JULIA_DEPOT_PATH:?}/artifacts/Overrides.toml"
+          sudo chmod -R 400 "${JULIA_DEPOT_PATH:?}"
           sudo chmod 600 "${JULIA_DEPOT_PATH:?}/artifacts/Overrides.toml"
-          ls -l "${JULIA_DEPOT_PATH:?}/artifacts"
+          ls -l "${JULIA_DEPOT_PATH:?}"/*
       - name: Validate sysimage works
         shell: julia --color=yes --project=sysimage -Jsysimage.so {0}
         run: |
