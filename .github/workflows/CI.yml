@@ -122,13 +122,12 @@ jobs:
   # TODO: Use shared project environments when the minimum version of Julia is 1.8 (e.g. `@sysimage`)
   sysimage:
     name: System Image - Julia ${{ matrix.version }} - TZJData ${{ matrix.tzjdata-version }} - ${{ matrix.os }}
+    needs: version
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        version:
-          - "lts"  # Long-Term Stable
-          - "1"    # Latest release
+        version: ${{ fromJSON(needs.version.outputs.json) }}
         os:
           - ubuntu-latest
         tzjdata-version:
