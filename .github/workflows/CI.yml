@@ -23,17 +23,34 @@ env:
   SHA: ${{ github.event.pull_request.head.sha || github.sha }}
 
 jobs:
+  version:
+    name: Resolve Julia Versions
+    # These permissions are needed to:
+    # - Checkout the Git repository (`contents: read`)
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    outputs:
+      json: ${{ steps.julia-version.outputs.resolved-json }}
+    steps:
+      - uses: actions/checkout@v6 # Needed for "min" to access the Project.toml
+      - uses: julia-actions/julia-version@v0.1.0
+        id: julia-version
+        with:
+          versions: |
+            - min  # Project's oldest supported version
+            - lts  # Long-Term Stable
+            - 1    # Latest release
+
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
+    needs: version
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.version == 'nightly' }}
     strategy:
       fail-fast: false
       matrix:
-        version:
-          - "1.6"  # LTS / Oldest supported version
-          - "1"    # Latest release
-          - nightly
+        version: ${{ fromJSON(needs.version.outputs.json) }}
         # https://github.com/actions/runner-images#available-images
         os:
           - ubuntu-latest
@@ -57,19 +74,23 @@ jobs:
           # Prefer testing against Apple Silicon
           - os: macos-14
             arch: x64
-          - version: "1.6"
+          - version: "1.6.0"  # min
             os: macos-14
             arch: aarch64
           # Disable Windows tests on Julia 1.6 as it's particularly slow
-          - version: "1.6"
+          - version: "1.6.0"
             os: windows-latest
         include:
           # Apple silicon isn't supported by Julia 1.6
-          - version: "1.6"
+          - version: "1.6.0"  # min
             os: macos-13  # Intel
             arch: x64
+          # Test nightly only on Linux 64-bit
+          - version: nightly
+            os: ubuntu-latest
+            arch: x64
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
@@ -82,32 +103,15 @@ jobs:
         with:
           files: lcov.info
 
-  # https://pkgdocs.julialang.org/v1/creating-packages/#Transition-from-normal-dependency-to-extension
-  weakdeps:
-    name: Weakdeps
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: julia-actions/setup-julia@v2
-        with:
-          version: "1.6"  # LTS / Oldest support version
-      - uses: julia-actions/cache@v2
-      - shell: julia --color=yes --project=weakdeps {0}
-        run: |
-          using Pkg
-          Pkg.add(PackageSpec(name="TimeZones", rev=ENV["SHA"]))
-          using TimeZones
-
   # TODO: Use shared project environments when the minimum version of Julia is 1.8 (e.g. `@sysimage`)
   sysimage:
     name: System Image - Julia ${{ matrix.version }} - TZJData ${{ matrix.tzjdata-version }} - ${{ matrix.os }}
+    needs: version
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        version:
-          - "1.6"  # LTS / Oldest supported version
-          - "1"    # Latest release
+        version: ${{ fromJSON(needs.version.outputs.json) }}
         os:
           - ubuntu-latest
         tzjdata-version:
@@ -117,12 +121,18 @@ jobs:
       JULIA_DEPOT_PATH: build-depot
       TZJDATA_VERSION: ${{ matrix.tzjdata-version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: julia-actions/setup-julia@v2
         with:
-          version: ${{ matrix.version }}
+          version: ${{ matrix.version }}=
+      # Caching here slows things down more than it helps
       # - uses: julia-actions/cache@v2
-      - name: Add TimeZones
+      - name: Install PackageCompiler
+        shell: julia --color=yes {0}
+        run: |
+          using Pkg
+          Pkg.add(PackageSpec(name="PackageCompiler", version="2"))
+      - name: Create sysimage project
         shell: julia --color=yes --project=sysimage {0}
         run: |
           using Pkg
@@ -141,11 +151,8 @@ jobs:
       - name: Create sysimage
         shell: julia --color=yes {0}
         run: |
-          using Pkg
-          Pkg.add(PackageSpec(name="PackageCompiler", version="2"))
           using PackageCompiler
           create_sysimage(; project="sysimage", sysimage_path="sysimage.so")
-          # create_sysimage(; project=joinpath(first(DEPOT_PATH), "environments", "sysimage"), sysimage_path="sysimage.so")
       # Ensure that TimeZones.jl doesn't require write access to the depot with typical usage (i.e. no tzdata compiling tzdata)
       - name: Make depot immutable
         run: |
@@ -174,6 +181,23 @@ jobs:
         env:
           JULIA_DEPOT_PATH: sysimage-depot
 
+  # https://pkgdocs.julialang.org/v1/creating-packages/#Transition-from-normal-dependency-to-extension
+  weakdeps:
+    name: Weakdeps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: "lts"  # Long-Term Stable
+      - uses: julia-actions/cache@v2
+      - shell: julia --color=yes --project=weakdeps {0}
+        run: |
+          using Pkg
+          Pkg.add(PackageSpec(name="TimeZones", rev=ENV["SHA"]))
+          using TimeZones
+
+  # See: https://github.com/JuliaTime/TimeZones.jl/pull/485
   force-latest-compatible:
     name: Force Latest Compatible - Julia ${{ matrix.version }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -185,7 +209,7 @@ jobs:
         os:
           - windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
@@ -199,13 +223,11 @@ jobs:
   benchmarks:
     name: Benchmarks
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: julia-actions/setup-julia@v2
         with:
-          version: "1"
+          version: "1.11"  # TODO: Updates to "1"
       - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
       - run: |
@@ -217,10 +239,10 @@ jobs:
     name: Documentation - DocTests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: julia-actions/setup-julia@v2
         with:
-          version: "1.9"
+          version: "lts"
       - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
       - shell: julia --color=yes --project=docs {0}
@@ -235,10 +257,10 @@ jobs:
     name: Documentation - Deploy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: julia-actions/setup-julia@v2
         with:
-          version: "1.9"
+          version: "lts"
       - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
       - shell: julia --color=yes --project=docs {0}
