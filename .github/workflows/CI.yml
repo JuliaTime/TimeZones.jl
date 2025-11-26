@@ -146,10 +146,8 @@ jobs:
       # Ensure that TimeZones.jl doesn't require write access to the depot with typical usage (i.e. no tzdata compiling tzdata)
       - name: Make depot immutable
         run: |
-          # mkdir -p build-depot/artifacts
-          # touch build-depot/artifacts/Overrides.toml
-          sudo chmod -R ugo-w build-depot
-          # sudo chmod u+w "build-depot/artifacts/Overrides.toml"
+          chmod -R ugo-w build-depot
+          find build-depot -perm /u+w,g+w,o+w  # List directories/files with any of these permission bits
       - name: Validate sysimage works
         shell: julia --color=yes --project=sysimage -Jsysimage.so {0}
         run: |
