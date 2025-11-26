@@ -115,7 +115,7 @@ jobs:
         os:
           - ubuntu-latest
         tzjdata-version:
-          - "1.3.0"  # Version which does not support `artifact_dir`
+          - "1.3.0"  # Version which does not support `artifact_dir()` (https://github.com/JuliaTime/TimeZones.jl/pull/479)
           - "1"
     env:
       JULIA_DEPOT_PATH: build-depot
@@ -132,25 +132,34 @@ jobs:
         run: |
           using Pkg
           Pkg.add(PackageSpec(name="PackageCompiler", version="2"))
-      - name: Create sysimage project
+      - name: Create project
         shell: julia --color=yes --project=sysimage {0}
         run: |
           using Pkg
           Pkg.add(PackageSpec(name="TZJData", version=ENV["TZJDATA_VERSION"]))
           Pkg.add(PackageSpec(name="TimeZones", rev=ENV["SHA"]))
-      - name: Create sysimage
+      - name: Create system image
         shell: julia --color=yes {0}
         run: |
           using PackageCompiler
           create_sysimage(; project="sysimage", sysimage_path="sysimage.so")
-      - name: Validate sysimage works
+      # Ensure that TimeZones.jl doesn't require write access to the depot with typical usage (i.e. no tzdata compiling tzdata)
+      - name: Make depot immutable
+        run: |
+          chmod -R ugo-w build-depot
+          if touch build-depot/write-test 2>/dev/null; then
+              echo "Supposedly immutable Julia depot still allows write access" >&2
+              exit 1
+          fi
+      - name: Validate system image works
         shell: julia --color=yes --project=sysimage -Jsysimage.so {0}
         run: |
           using TimeZones
           println(TimeZones._COMPILED_DIR[])
       - name: Relocate Julia depot
-        run: mv build-depot sysimage-depot
-      - name: Validate sysimage works with relocated depot
+        run: |
+          mv build-depot sysimage-depot
+      - name: Validate system image works with relocated depot
         shell: julia --color=yes --project=sysimage -Jsysimage.so {0}
         run: |
           using TimeZones

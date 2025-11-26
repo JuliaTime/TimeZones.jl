@@ -1,5 +1,6 @@
 using Downloads: download
 
+const _LATEST = Ref{Tuple{AbstractString, DateTime}}()
 const LATEST_FORMAT = Dates.DateFormat("yyyy-mm-ddTHH:MM:SS")
 const LATEST_DELAY = Hour(1)  # In 1996 a correction to a release was made an hour later
 
@@ -21,14 +22,27 @@ function write_latest(io::IO, version::AbstractString, retrieved_utc::DateTime=n
     write(io, Dates.format(retrieved_utc, LATEST_FORMAT))
 end
 
+# Not using a `const` as `_scratch_dir()` will also make the directory and we want to defer
+# writes to disk unless they are required.
+_latest_file_path() = joinpath(_scratch_dir(), "latest")
+
 function set_latest_cached(version::AbstractString, retrieved_utc::DateTime=now(Dates.UTC))
     _LATEST[] = version, retrieved_utc
-    open(_LATEST_FILE_PATH[], "w") do io
+    open(_latest_file_path(), "w") do io
         write_latest(io, version, retrieved_utc)
     end
 end
 
 function latest_cached(now_utc::DateTime=now(Dates.UTC))
+    # Load the latest cached tzdata version from disk if available
+    if !isassigned(_LATEST)
+        path = _latest_file_path()
+
+        if isfile(path)
+            _LATEST[] = read_latest(path)
+        end
+    end
+
     if isassigned(_LATEST)
         latest_version, latest_retrieved_utc = _LATEST[]
 
