@@ -125,7 +125,8 @@ jobs:
       - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
-      - uses: julia-actions/cache@v2
+      # Caching here slows things down more than it helps
+      # - uses: julia-actions/cache@v2
       - name: Install PackageCompiler
         shell: julia --color=yes {0}
         run: |
