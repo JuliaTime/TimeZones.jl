@@ -103,22 +103,6 @@ jobs:
         with:
           files: lcov.info
 
-  # https://pkgdocs.julialang.org/v1/creating-packages/#Transition-from-normal-dependency-to-extension
-  weakdeps:
-    name: Weakdeps
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: julia-actions/setup-julia@v2
-        with:
-          version: "lts"  # Long-Term Stable
-      - uses: julia-actions/cache@v2
-      - shell: julia --color=yes --project=weakdeps {0}
-        run: |
-          using Pkg
-          Pkg.add(PackageSpec(name="TimeZones", rev=ENV["SHA"]))
-          using TimeZones
-
   # TODO: Use shared project environments when the minimum version of Julia is 1.8 (e.g. `@sysimage`)
   sysimage:
     name: System Image - Julia ${{ matrix.version }} - TZJData ${{ matrix.tzjdata-version }} - ${{ matrix.os }}
@@ -172,6 +156,22 @@ jobs:
           println(TimeZones._COMPILED_DIR[])
         env:
           JULIA_DEPOT_PATH: sysimage-depot
+
+  # https://pkgdocs.julialang.org/v1/creating-packages/#Transition-from-normal-dependency-to-extension
+  weakdeps:
+    name: Weakdeps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: "lts"  # Long-Term Stable
+      - uses: julia-actions/cache@v2
+      - shell: julia --color=yes --project=weakdeps {0}
+        run: |
+          using Pkg
+          Pkg.add(PackageSpec(name="TimeZones", rev=ENV["SHA"]))
+          using TimeZones
 
   # See: https://github.com/JuliaTime/TimeZones.jl/pull/485
   force-latest-compatible:
