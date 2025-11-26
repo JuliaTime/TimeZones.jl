@@ -100,7 +100,7 @@ jobs:
 
   # TODO: Use shared project environments when the minimum version of Julia is 1.8 (e.g. `@sysimage`)
   sysimage:
-    name: System Image - Julia ${{ matrix.version }} - TZJData ${{ matrix.tzjdata-version }} - ${{ matrix.immutable && 'Immutable' || 'Mutable' }} - ${{ matrix.os }}
+    name: System Image - Julia ${{ matrix.version }} - TZJData ${{ matrix.tzjdata-version }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -113,8 +113,6 @@ jobs:
         tzjdata-version:
           - "1.3.0"  # Version which does not support `artifact_dir`
           - "1"
-        immutable:
-          - true
     env:
       JULIA_DEPOT_PATH: build-depot
       TZJDATA_VERSION: ${{ matrix.tzjdata-version }}
@@ -139,11 +137,9 @@ jobs:
           create_sysimage(; project="sysimage", sysimage_path="sysimage.so")
           # create_sysimage(; project=joinpath(first(DEPOT_PATH), "environments", "sysimage"), sysimage_path="sysimage.so")
       - name: Make depot immutable
-        if: ${{ matrix.immutable }}
-        shell: julia --color=yes {0}
         run: |
-          @show first(DEPOT_PATH)
-          chmod(first(DEPOT_PATH), 0o400; recursive=true)
+          ls -l ${JULIA_DEPOT_PATH:?}
+          chmod -R 400 ${JULIA_DEPOT_PATH:?}
       - name: Validate sysimage works
         shell: julia --color=yes --project=sysimage -Jsysimage.so {0}
         run: |
