@@ -200,6 +200,8 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.SHA }}  # Always checkout HEAD commit to ensure PkgBenchmark doesn't complain about a dirty repo
       - uses: julia-actions/setup-julia@v2
         with:
           version: "1"
