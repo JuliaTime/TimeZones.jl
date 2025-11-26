@@ -41,7 +41,6 @@ jobs:
             - min  # Project's oldest supported version
             - lts  # Long-Term Stable
             - 1    # Latest release
-            - nightly
 
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
@@ -74,6 +73,21 @@ jobs:
             arch: aarch64
           # Prefer testing against Apple Silicon
           - os: macos-14
+            arch: x64
+          - version: "1.6.0"  # min
+            os: macos-14
+            arch: aarch64
+          # Disable Windows tests on Julia 1.6 as it's particularly slow
+          - version: "1.6"
+            os: windows-latest
+        include:
+          # Apple silicon isn't supported by Julia 1.6
+          - version: "1.6.0"  # min
+            os: macos-13  # Intel
+            arch: x64
+          # Test nightly only on Linux 64-bit
+          - version: nightly
+            os: ubuntu-latest
             arch: x64
     steps:
       - uses: actions/checkout@v4
