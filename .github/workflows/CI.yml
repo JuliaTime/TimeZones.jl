@@ -139,7 +139,7 @@ jobs:
       - name: Make depot immutable
         run: |
           ls -l ${JULIA_DEPOT_PATH:?}
-          chmod -R 400 ${JULIA_DEPOT_PATH:?}
+          sudo chmod -R 400 ${JULIA_DEPOT_PATH:?}
       - name: Validate sysimage works
         shell: julia --color=yes --project=sysimage -Jsysimage.so {0}
         run: |
