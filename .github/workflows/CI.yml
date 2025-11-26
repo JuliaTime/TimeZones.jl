@@ -23,7 +23,7 @@ env:
   SHA: ${{ github.event.pull_request.head.sha || github.sha }}
 
 jobs:
-   version:
+  version:
     name: Resolve Julia Versions
     # These permissions are needed to:
     # - Checkout the Git repository (`contents: read`)
