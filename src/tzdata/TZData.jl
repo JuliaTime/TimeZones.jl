@@ -12,11 +12,6 @@ using p7zip_jll: p7zip_jll
 
 export REGIONS, LEGACY_REGIONS
 
-const FOO = Ref{String}()
-function __init__()
-    FOO[] = _scratch_dir()
-end
-
 include("timeoffset.jl")
 include("version.jl")
 include("archive.jl")

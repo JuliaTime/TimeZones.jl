@@ -147,9 +147,8 @@ jobs:
       - name: Make depot immutable
         run: |
           chmod -R ugo-w build-depot
-          find build-depot -perm /u+w,g+w,o+w  # List directories/files with any of these permission bits
           if touch build-depot/write-test 2>/dev/null; then
-              echo "Depot is not immutable" >&2
+              echo "Supposedly immutable Julia depot still allows write access" >&2
               exit 1
           fi
       - name: Validate system image works
