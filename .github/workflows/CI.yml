@@ -136,12 +136,12 @@ jobs:
           using PackageCompiler
           create_sysimage(; project="sysimage", sysimage_path="sysimage.so")
           # create_sysimage(; project=joinpath(first(DEPOT_PATH), "environments", "sysimage"), sysimage_path="sysimage.so")
-      # Simulate using the sysimage in an immutable environment
+      # Ensure that TimeZones.jl doesn't require write access to the depot upon typical usage (i.e. not compiling tzdata)
       - name: Make depot immutable
         run: |
           ls -l ${JULIA_DEPOT_PATH:?}
+          touch "${JULIA_DEPOT_PATH:?}/artifacts/Overrides.toml"
           sudo chmod -R 400 ${JULIA_DEPOT_PATH:?}
-          cat "${JULIA_DEPOT_PATH:?}/artifacts/Overrides.toml"
           sudo chmod 600 "${JULIA_DEPOT_PATH:?}/artifacts/Overrides.toml"
       - name: Validate sysimage works
         shell: julia --color=yes --project=sysimage -Jsysimage.so {0}
@@ -149,7 +149,9 @@ jobs:
           using TimeZones
           println(TimeZones._COMPILED_DIR[])
       - name: Relocate Julia depot
-        run: mv build-depot sysimage-depot
+        run: |
+          cat "${JULIA_DEPOT_PATH:?}/artifacts/Overrides.toml"
+          mv build-depot sysimage-depot
       - name: Validate sysimage works with relocated depot
         shell: julia --color=yes --project=sysimage -Jsysimage.so {0}
         run: |
