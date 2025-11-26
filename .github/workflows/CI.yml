@@ -138,16 +138,6 @@ jobs:
           using Pkg
           Pkg.add(PackageSpec(name="TZJData", version=ENV["TZJDATA_VERSION"]))
           Pkg.add(PackageSpec(name="TimeZones", rev=ENV["SHA"]))
-      - name: Make depot immutable
-        run: |
-          set -x
-          whoami
-          ls -l "${JULIA_DEPOT_PATH:?}"/*
-          mkdir -p "${JULIA_DEPOT_PATH:?}/artifacts"
-          touch "${JULIA_DEPOT_PATH:?}/artifacts/Overrides.toml"
-          sudo chmod -R ugo-w "${JULIA_DEPOT_PATH:?}"
-          sudo chmod u+w "${JULIA_DEPOT_PATH:?}/artifacts/Overrides.toml"
-          ls -l "${JULIA_DEPOT_PATH:?}"/*
       - name: Create sysimage
         shell: julia --color=yes {0}
         run: |
