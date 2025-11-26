@@ -141,8 +141,9 @@ jobs:
         run: |
           set -x
           whoami
+          mkdir "${JULIA_DEPOT_PATH:?}/artifacts"
           ls -l ${JULIA_DEPOT_PATH:?}
-          ls -l ${JULIA_DEPOT_PATH:?}/aritfacts
+          ls -l ${JULIA_DEPOT_PATH:?}/artifacts
           touch "${JULIA_DEPOT_PATH:?}/artifacts/Overrides.toml"
           sudo chmod -R 400 ${JULIA_DEPOT_PATH:?}
           sudo chown "$(whoami)" "${JULIA_DEPOT_PATH:?}/artifacts/Overrides.toml"
