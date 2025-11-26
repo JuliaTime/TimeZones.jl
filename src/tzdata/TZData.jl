@@ -10,17 +10,7 @@ using p7zip_jll: p7zip_jll
 # the "tzdata" archive or more specifically the "tz source" files within the archive
 # (africa, australasia, ...)
 
-const _LATEST_FILE_PATH = Ref{String}()
-const _LATEST = Ref{Tuple{AbstractString, DateTime}}()
-
 export REGIONS, LEGACY_REGIONS
-
-function __init__()
-    _LATEST_FILE_PATH[] = joinpath(_scratch_dir(), "latest")
-    if isfile(_LATEST_FILE_PATH[])
-        _LATEST[] = read_latest(_LATEST_FILE_PATH[])
-    end
-end
 
 include("timeoffset.jl")
 include("version.jl")
