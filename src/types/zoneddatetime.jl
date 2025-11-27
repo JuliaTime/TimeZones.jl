@@ -32,9 +32,9 @@ keyword is true the given `DateTime` is assumed to be in UTC instead of in local
 converted to the specified `TimeZone`.  Note that when `from_utc` is true the given
 `DateTime` will always exists and is never ambiguous.
 """
-function ZonedDateTime(dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
-    # Note: Using a function barrier which reduces allocations
-    function construct(T::Type{<:Union{Local,UTC}})
+@inline function ZonedDateTime(dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
+    # Note: Using a function barrier to reduce allocations
+    @inline function construct(T::Type{<:Union{Local,UTC}})
         possible = interpret(dt, tz, T)
 
         num = length(possible)
@@ -62,7 +62,7 @@ Construct a `ZonedDateTime` by applying a `TimeZone` to a `DateTime`. If the `Da
 ambiguous within the given time zone you can set `occurrence` to a positive integer to
 resolve the ambiguity.
 """
-function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, occurrence::Integer)
+@inline function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, occurrence::Integer)
     possible = interpret(dt, tz, Local)
 
     num = length(possible)
@@ -83,7 +83,7 @@ end
 Construct a `ZonedDateTime` by applying a `TimeZone` to a `DateTime`. If the `DateTime` is
 ambiguous within the given time zone you can set `is_dst` to resolve the ambiguity.
 """
-function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
+@inline function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
     possible = interpret(dt, tz, Local)
 
     num = length(possible)
@@ -97,8 +97,8 @@ function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
         # Mask is expected to be unambiguous.
         !xor(mask...) && throw(AmbiguousTimeError(dt, tz))
 
-        occurrence = findfirst(d -> d == is_dst, mask)
-        return possible[occurrence]
+        # Since the mask is unambiguous we can pick the ZonedDateTime which matches `is_dst`
+        return mask[1] == is_dst ? possible[1] : possible[2]
     else
         throw(AmbiguousTimeError(dt, tz))
     end
