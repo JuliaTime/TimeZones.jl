@@ -7,13 +7,14 @@ using Dates: Hour, Second, UTM, @dateformat_str
 
     # Allocations may change from version-to-version but may also differ on the same version
     # between these tests and the REPL.
-    allocated = if v"1.12" <= VERSION < v"1.13"
+    allocated = if VERSION >= v"1.12"
         Int == Int64 ? 48 : 32
     else
         0
     end
 
-    # Older versions of Julia created allocations just from using keywords
+    # On older versions of Julia calling a function with keywords would created additional
+    # allocations.
     kw_allocated = if VERSION < v"1.10"
         Int == Int64 ? 48 : 32
     else
