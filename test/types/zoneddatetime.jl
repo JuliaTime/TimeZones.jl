@@ -93,13 +93,16 @@ using Dates: Hour, Second, UTM, @dateformat_str
         @test ZonedDateTime(local_dt, warsaw, false).utc_datetime == utc_dt
         @test ZonedDateTime(utc_dt, warsaw, from_utc=true).utc_datetime == utc_dt
 
-        @test (@allocated ZonedDateTime(local_dt, warsaw)) == 48
-        @test (@allocated ZonedDateTime(local_dt, warsaw, 0)) == 48
-        @test (@allocated ZonedDateTime(local_dt, warsaw, 1)) == 48
-        @test (@allocated ZonedDateTime(local_dt, warsaw, 2)) == 48
-        @test (@allocated ZonedDateTime(local_dt, warsaw, true)) == 48
-        @test (@allocated ZonedDateTime(local_dt, warsaw, false)) == 48
-        @test (@allocated ZonedDateTime(utc_dt, warsaw, from_utc=true)) == 48
+        # Allocations may change from version-to-version but may also differ on the same version
+        # between these tests and the REPL.
+        allocated = v"1.12" <= VERSION < v"1.13" ? 48 : 0
+        @test (@allocated ZonedDateTime(local_dt, warsaw)) == allocated
+        @test (@allocated ZonedDateTime(local_dt, warsaw, 0)) == allocated
+        @test (@allocated ZonedDateTime(local_dt, warsaw, 1)) == allocated
+        @test (@allocated ZonedDateTime(local_dt, warsaw, 2)) == allocated
+        @test (@allocated ZonedDateTime(local_dt, warsaw, true)) == allocated
+        @test (@allocated ZonedDateTime(local_dt, warsaw, false)) == allocated
+        @test (@allocated ZonedDateTime(utc_dt, warsaw, from_utc=true)) == allocated
     end
 
     @testset "daylight saving time" begin
@@ -123,13 +126,16 @@ using Dates: Hour, Second, UTM, @dateformat_str
         @test ZonedDateTime(local_dt, warsaw, false).utc_datetime == utc_dt
         @test ZonedDateTime(utc_dt, warsaw, from_utc=true).utc_datetime == utc_dt
 
-        @test (@allocated ZonedDateTime(local_dt, warsaw)) == 48
-        @test (@allocated ZonedDateTime(local_dt, warsaw, 0)) == 48
-        @test (@allocated ZonedDateTime(local_dt, warsaw, 1)) == 48
-        @test (@allocated ZonedDateTime(local_dt, warsaw, 2)) == 48
-        @test (@allocated ZonedDateTime(local_dt, warsaw, true)) == 48
-        @test (@allocated ZonedDateTime(local_dt, warsaw, false)) == 48
-        @test (@allocated ZonedDateTime(utc_dt, warsaw, from_utc=true)) == 48
+        # Allocations may change from version-to-version but may also differ on the same version
+        # between these tests and the REPL.
+        allocated = v"1.12" <= VERSION < v"1.13" ? 48 : 0
+        @test (@allocated ZonedDateTime(local_dt, warsaw)) == allocated
+        @test (@allocated ZonedDateTime(local_dt, warsaw, 0)) == allocated
+        @test (@allocated ZonedDateTime(local_dt, warsaw, 1)) == allocated
+        @test (@allocated ZonedDateTime(local_dt, warsaw, 2)) == allocated
+        @test (@allocated ZonedDateTime(local_dt, warsaw, true)) == allocated
+        @test (@allocated ZonedDateTime(local_dt, warsaw, false)) == allocated
+        @test (@allocated ZonedDateTime(utc_dt, warsaw, from_utc=true)) == allocated
     end
 
     @testset "spring-forward" begin
@@ -159,10 +165,13 @@ using Dates: Hour, Second, UTM, @dateformat_str
         @test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).utc_datetime == utc_dts[1]
         @test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).utc_datetime == utc_dts[2]
 
-        @test (@allocated ZonedDateTime(local_dts[1], warsaw)) == 48
-        @test (@allocated ZonedDateTime(local_dts[3], warsaw)) == 48
-        @test (@allocated ZonedDateTime(utc_dts[1], warsaw, from_utc=true)) == 48
-        @test (@allocated ZonedDateTime(utc_dts[2], warsaw, from_utc=true)) == 48
+        # Allocations may change from version-to-version but may also differ on the same
+        # version between these tests and the REPL.
+        allocated = v"1.12" <= VERSION < v"1.13" ? 48 : 0
+        @test (@allocated ZonedDateTime(local_dts[1], warsaw)) == allocated
+        @test (@allocated ZonedDateTime(local_dts[3], warsaw)) == allocated
+        @test (@allocated ZonedDateTime(utc_dts[1], warsaw, from_utc=true)) == allocated
+        @test (@allocated ZonedDateTime(utc_dts[2], warsaw, from_utc=true)) == allocated
     end
 
     @testset "fall-back" begin
@@ -187,12 +196,15 @@ using Dates: Hour, Second, UTM, @dateformat_str
         @test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).utc_datetime == utc_dts[1]
         @test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).utc_datetime == utc_dts[2]
 
-        @test (@allocated ZonedDateTime(local_dt, warsaw, 1)) == 48
-        @test (@allocated ZonedDateTime(local_dt, warsaw, 2)) == 48
-        @test (@allocated ZonedDateTime(local_dt, warsaw, true)) == 320
-        @test (@allocated ZonedDateTime(local_dt, warsaw, false)) == 320
-        @test (@allocated ZonedDateTime(utc_dts[1], warsaw, from_utc=true)) == 48
-        @test (@allocated ZonedDateTime(utc_dts[2], warsaw, from_utc=true)) == 48
+        # Allocations may change from version-to-version but may also differ on the same version
+        # between these tests and the REPL.
+        allocated = v"1.12" <= VERSION < v"1.13" ? 48 : 0
+        @test (@allocated ZonedDateTime(local_dt, warsaw, 1)) == allocated
+        @test (@allocated ZonedDateTime(local_dt, warsaw, 2)) == allocated
+        @test (@allocated ZonedDateTime(local_dt, warsaw, true)) > allocated
+        @test (@allocated ZonedDateTime(local_dt, warsaw, false)) > allocated
+        @test (@allocated ZonedDateTime(utc_dts[1], warsaw, from_utc=true)) == allocated
+        @test (@allocated ZonedDateTime(utc_dts[2], warsaw, from_utc=true)) == allocated
     end
 
     @testset "standard offset reduced" begin

@@ -32,9 +32,9 @@ keyword is true the given `DateTime` is assumed to be in UTC instead of in local
 converted to the specified `TimeZone`.  Note that when `from_utc` is true the given
 `DateTime` will always exists and is never ambiguous.
 """
-function ZonedDateTime(dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
-    # Note: Using a function barrier which reduces allocations
-    function construct(T::Type{<:Union{Local,UTC}})
+@inline function ZonedDateTime(dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
+    # Note: Using a function barrier to reduces allocations
+    @inline function construct(T::Type{<:Union{Local,UTC}})
         possible = interpret(dt, tz, T)
 
         num = length(possible)
@@ -62,7 +62,7 @@ Construct a `ZonedDateTime` by applying a `TimeZone` to a `DateTime`. If the `Da
 ambiguous within the given time zone you can set `occurrence` to a positive integer to
 resolve the ambiguity.
 """
-function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, occurrence::Integer)
+@inline function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, occurrence::Integer)
     possible = interpret(dt, tz, Local)
 
     num = length(possible)
