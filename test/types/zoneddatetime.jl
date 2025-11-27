@@ -92,6 +92,14 @@ using Dates: Hour, Second, UTM, @dateformat_str
         @test ZonedDateTime(local_dt, warsaw, true).utc_datetime == utc_dt
         @test ZonedDateTime(local_dt, warsaw, false).utc_datetime == utc_dt
         @test ZonedDateTime(utc_dt, warsaw, from_utc=true).utc_datetime == utc_dt
+
+        @test (@allocated ZonedDateTime(local_dt, warsaw)) == 48
+        @test (@allocated ZonedDateTime(local_dt, warsaw, 0)) == 48
+        @test (@allocated ZonedDateTime(local_dt, warsaw, 1)) == 48
+        @test (@allocated ZonedDateTime(local_dt, warsaw, 2)) == 48
+        @test (@allocated ZonedDateTime(local_dt, warsaw, true)) == 48
+        @test (@allocated ZonedDateTime(local_dt, warsaw, false)) == 48
+        @test (@allocated ZonedDateTime(utc_dt, warsaw, from_utc=true)) == 48
     end
 
     @testset "daylight saving time" begin
@@ -114,6 +122,14 @@ using Dates: Hour, Second, UTM, @dateformat_str
         @test ZonedDateTime(local_dt, warsaw, true).utc_datetime == utc_dt
         @test ZonedDateTime(local_dt, warsaw, false).utc_datetime == utc_dt
         @test ZonedDateTime(utc_dt, warsaw, from_utc=true).utc_datetime == utc_dt
+
+        @test (@allocated ZonedDateTime(local_dt, warsaw)) == 48
+        @test (@allocated ZonedDateTime(local_dt, warsaw, 0)) == 48
+        @test (@allocated ZonedDateTime(local_dt, warsaw, 1)) == 48
+        @test (@allocated ZonedDateTime(local_dt, warsaw, 2)) == 48
+        @test (@allocated ZonedDateTime(local_dt, warsaw, true)) == 48
+        @test (@allocated ZonedDateTime(local_dt, warsaw, false)) == 48
+        @test (@allocated ZonedDateTime(utc_dt, warsaw, from_utc=true)) == 48
     end
 
     @testset "spring-forward" begin
@@ -142,6 +158,11 @@ using Dates: Hour, Second, UTM, @dateformat_str
         @test ZonedDateTime(local_dts[3], warsaw).utc_datetime == utc_dts[2]
         @test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).utc_datetime == utc_dts[1]
         @test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).utc_datetime == utc_dts[2]
+
+        @test (@allocated ZonedDateTime(local_dts[1], warsaw)) == 48
+        @test (@allocated ZonedDateTime(local_dts[3], warsaw)) == 48
+        @test (@allocated ZonedDateTime(utc_dts[1], warsaw, from_utc=true)) == 48
+        @test (@allocated ZonedDateTime(utc_dts[2], warsaw, from_utc=true)) == 48
     end
 
     @testset "fall-back" begin
@@ -164,6 +185,13 @@ using Dates: Hour, Second, UTM, @dateformat_str
         @test ZonedDateTime(local_dt, warsaw, false).utc_datetime == utc_dts[2]
         @test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).utc_datetime == utc_dts[1]
         @test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).utc_datetime == utc_dts[2]
+
+        @test (@allocated ZonedDateTime(local_dt, warsaw, 1)) == 48
+        @test (@allocated ZonedDateTime(local_dt, warsaw, 2)) == 48
+        @test (@allocated ZonedDateTime(local_dt, warsaw, true)) == 320
+        @test (@allocated ZonedDateTime(local_dt, warsaw, false)) == 320
+        @test (@allocated ZonedDateTime(utc_dts[1], warsaw, from_utc=true)) == 48
+        @test (@allocated ZonedDateTime(utc_dts[2], warsaw, from_utc=true)) == 48
     end
 
     @testset "standard offset reduced" begin
