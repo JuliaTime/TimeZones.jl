@@ -171,6 +171,7 @@ using Dates: Hour, Second, UTM, @dateformat_str
 
         @test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw)
         @test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw, 0)
+        @test_throws BoundsError ZonedDateTime(local_dt, warsaw, 3)
 
         @test ZonedDateTime(local_dt, warsaw, 1).zone.name == "CEST"
         @test ZonedDateTime(local_dt, warsaw, 2).zone.name == "CET"
