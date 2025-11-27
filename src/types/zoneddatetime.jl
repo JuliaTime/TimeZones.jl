@@ -83,7 +83,7 @@ end
 Construct a `ZonedDateTime` by applying a `TimeZone` to a `DateTime`. If the `DateTime` is
 ambiguous within the given time zone you can set `is_dst` to resolve the ambiguity.
 """
-function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
+@inline function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
     possible = interpret(dt, tz, Local)
 
     num = length(possible)
@@ -92,13 +92,13 @@ function ZonedDateTime(dt::DateTime, tz::VariableTimeZone, is_dst::Bool)
     elseif num == 0
         throw(NonExistentTimeError(dt, tz))
     elseif num == 2
+        possible = [first(possible), last(possible)]
         mask = [isdst(zdt.zone.offset) for zdt in possible]
 
         # Mask is expected to be unambiguous.
         !xor(mask...) && throw(AmbiguousTimeError(dt, tz))
 
-        occurrence = findfirst(d -> d == is_dst, mask)
-        return possible[occurrence]
+        return mask[1] == is_dst ? possible[1] : possible[2]
     else
         throw(AmbiguousTimeError(dt, tz))
     end
