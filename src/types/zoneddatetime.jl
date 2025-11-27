@@ -33,7 +33,7 @@ converted to the specified `TimeZone`.  Note that when `from_utc` is true the gi
 `DateTime` will always exists and is never ambiguous.
 """
 @inline function ZonedDateTime(dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
-    # Note: Using a function barrier to reduces allocations
+    # Note: Using a function barrier to reduce allocations
     @inline function construct(T::Type{<:Union{Local,UTC}})
         possible = interpret(dt, tz, T)
 

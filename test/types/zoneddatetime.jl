@@ -5,6 +5,21 @@ using Dates: Hour, Second, UTM, @dateformat_str
     utc = FixedTimeZone("UTC", 0, 0)
     warsaw = first(compile("Europe/Warsaw", tzdata["europe"]))
 
+    # Allocations may change from version-to-version but may also differ on the same version
+    # between these tests and the REPL.
+    allocated = if v"1.12" <= VERSION < v"1.13"
+        Int == Int64 ? 48 : 32
+    else
+        0
+    end
+
+    # Older versions of Julia created allocations just from using keywords
+    kw_allocated = if VERSION < v"1.10"
+        Int == Int64 ? 48 : 32
+    else
+        allocated
+    end
+
     @testset "dateformat parsing" begin
         @testset "successful parsing: $f" for f in (parse, tryparse)
             # Make sure all dateformat codes parse correctly
@@ -93,16 +108,13 @@ using Dates: Hour, Second, UTM, @dateformat_str
         @test ZonedDateTime(local_dt, warsaw, false).utc_datetime == utc_dt
         @test ZonedDateTime(utc_dt, warsaw, from_utc=true).utc_datetime == utc_dt
 
-        # Allocations may change from version-to-version but may also differ on the same version
-        # between these tests and the REPL.
-        allocated = v"1.12" <= VERSION < v"1.13" ? 48 : 0
         @test (@allocated ZonedDateTime(local_dt, warsaw)) == allocated
         @test (@allocated ZonedDateTime(local_dt, warsaw, 0)) == allocated
         @test (@allocated ZonedDateTime(local_dt, warsaw, 1)) == allocated
         @test (@allocated ZonedDateTime(local_dt, warsaw, 2)) == allocated
         @test (@allocated ZonedDateTime(local_dt, warsaw, true)) == allocated
         @test (@allocated ZonedDateTime(local_dt, warsaw, false)) == allocated
-        @test (@allocated ZonedDateTime(utc_dt, warsaw, from_utc=true)) == allocated
+        @test (@allocated ZonedDateTime(utc_dt, warsaw, from_utc=true)) == kw_allocated
     end
 
     @testset "daylight saving time" begin
@@ -126,16 +138,13 @@ using Dates: Hour, Second, UTM, @dateformat_str
         @test ZonedDateTime(local_dt, warsaw, false).utc_datetime == utc_dt
         @test ZonedDateTime(utc_dt, warsaw, from_utc=true).utc_datetime == utc_dt
 
-        # Allocations may change from version-to-version but may also differ on the same version
-        # between these tests and the REPL.
-        allocated = v"1.12" <= VERSION < v"1.13" ? 48 : 0
         @test (@allocated ZonedDateTime(local_dt, warsaw)) == allocated
         @test (@allocated ZonedDateTime(local_dt, warsaw, 0)) == allocated
         @test (@allocated ZonedDateTime(local_dt, warsaw, 1)) == allocated
         @test (@allocated ZonedDateTime(local_dt, warsaw, 2)) == allocated
         @test (@allocated ZonedDateTime(local_dt, warsaw, true)) == allocated
         @test (@allocated ZonedDateTime(local_dt, warsaw, false)) == allocated
-        @test (@allocated ZonedDateTime(utc_dt, warsaw, from_utc=true)) == allocated
+        @test (@allocated ZonedDateTime(utc_dt, warsaw, from_utc=true)) == kw_allocated
     end
 
     @testset "spring-forward" begin
@@ -165,13 +174,10 @@ using Dates: Hour, Second, UTM, @dateformat_str
         @test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).utc_datetime == utc_dts[1]
         @test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).utc_datetime == utc_dts[2]
 
-        # Allocations may change from version-to-version but may also differ on the same
-        # version between these tests and the REPL.
-        allocated = v"1.12" <= VERSION < v"1.13" ? 48 : 0
         @test (@allocated ZonedDateTime(local_dts[1], warsaw)) == allocated
         @test (@allocated ZonedDateTime(local_dts[3], warsaw)) == allocated
-        @test (@allocated ZonedDateTime(utc_dts[1], warsaw, from_utc=true)) == allocated
-        @test (@allocated ZonedDateTime(utc_dts[2], warsaw, from_utc=true)) == allocated
+        @test (@allocated ZonedDateTime(utc_dts[1], warsaw, from_utc=true)) == kw_allocated
+        @test (@allocated ZonedDateTime(utc_dts[2], warsaw, from_utc=true)) == kw_allocated
     end
 
     @testset "fall-back" begin
@@ -180,6 +186,8 @@ using Dates: Hour, Second, UTM, @dateformat_str
 
         @test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw)
         @test_throws AmbiguousTimeError ZonedDateTime(local_dt, warsaw, 0)
+
+        # TODO: May want to change this to a different exception type
         @test_throws BoundsError ZonedDateTime(local_dt, warsaw, 3)
 
         @test ZonedDateTime(local_dt, warsaw, 1).zone.name == "CEST"
@@ -196,15 +204,12 @@ using Dates: Hour, Second, UTM, @dateformat_str
         @test ZonedDateTime(utc_dts[1], warsaw, from_utc=true).utc_datetime == utc_dts[1]
         @test ZonedDateTime(utc_dts[2], warsaw, from_utc=true).utc_datetime == utc_dts[2]
 
-        # Allocations may change from version-to-version but may also differ on the same version
-        # between these tests and the REPL.
-        allocated = v"1.12" <= VERSION < v"1.13" ? 48 : 0
         @test (@allocated ZonedDateTime(local_dt, warsaw, 1)) == allocated
         @test (@allocated ZonedDateTime(local_dt, warsaw, 2)) == allocated
         @test (@allocated ZonedDateTime(local_dt, warsaw, true)) > allocated
         @test (@allocated ZonedDateTime(local_dt, warsaw, false)) > allocated
-        @test (@allocated ZonedDateTime(utc_dts[1], warsaw, from_utc=true)) == allocated
-        @test (@allocated ZonedDateTime(utc_dts[2], warsaw, from_utc=true)) == allocated
+        @test (@allocated ZonedDateTime(utc_dts[1], warsaw, from_utc=true)) == kw_allocated
+        @test (@allocated ZonedDateTime(utc_dts[2], warsaw, from_utc=true)) == kw_allocated
     end
 
     @testset "standard offset reduced" begin
