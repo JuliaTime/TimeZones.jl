@@ -92,12 +92,12 @@ ambiguous within the given time zone you can set `is_dst` to resolve the ambigui
     elseif num == 0
         throw(NonExistentTimeError(dt, tz))
     elseif num == 2
-        possible = [first(possible), last(possible)]
         mask = [isdst(zdt.zone.offset) for zdt in possible]
 
         # Mask is expected to be unambiguous.
         !xor(mask...) && throw(AmbiguousTimeError(dt, tz))
 
+        # Since the mask is unambiguous we can pick the ZonedDateTime which matches `is_dst`
         return mask[1] == is_dst ? possible[1] : possible[2]
     else
         throw(AmbiguousTimeError(dt, tz))
