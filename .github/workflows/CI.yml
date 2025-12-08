@@ -50,7 +50,7 @@ jobs:
         # https://github.com/actions/runner-images#available-images
         os:
           - ubuntu-latest
-          - macos-14  # Apple silicon
+          - macos-15  # Apple silicon
           - windows-latest
         arch:
           - x64
@@ -58,7 +58,7 @@ jobs:
           - aarch64
         exclude:
           # Test 32-bit only on Linux
-          - os: macos-14
+          - os: macos-15
             arch: x86
           - os: windows-latest
             arch: x86
@@ -67,11 +67,11 @@ jobs:
             arch: aarch64
           - os: windows-latest
             arch: aarch64
-          # Prefer testing against Apple Silicon
-          - os: macos-14
+          # Prefer testing against Apple Silicon when possible
+          - os: macos-15
             arch: x64
           - version: "1.6.0"  # min
-            os: macos-14
+            os: macos-15
             arch: aarch64
           # Disable Windows tests on Julia 1.6 as it's particularly slow
           - version: "1.6.0"
@@ -79,7 +79,7 @@ jobs:
         include:
           # Apple silicon isn't supported by Julia 1.6
           - version: "1.6.0"  # min
-            os: macos-13  # Intel
+            os: macos-15-intel  # Will be retired in fall 2027
             arch: x64
           # Test nightly only on Linux 64-bit
           - version: nightly
