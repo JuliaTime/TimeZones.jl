@@ -79,7 +79,7 @@ jobs:
         include:
           # Apple silicon isn't supported by Julia 1.6
           - version: "1.6.0"  # min
-            os: macos-13  # Intel
+            os: macos-15-intel
             arch: x64
           # Test nightly only on Linux 64-bit
           - version: nightly
