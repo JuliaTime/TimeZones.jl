@@ -1,4 +1,4 @@
-function write(io::IO, tz::VariableTimeZone; class::Class, version::Integer=DEFAULT_VERSION, link_target::Union{String,Nothing}=nothing)
+function write(io::IO, tz::VariableTimeZone; class::Class, version::Integer=DEFAULT_VERSION, link::Union{String,Nothing}=nothing)
     combined_designation, designation_indices = combine_designations(t.zone.name for t in tz.transitions)
 
     # TODO: Sorting provides us a way to avoid checking for the sentinel on each loop
@@ -25,11 +25,11 @@ function write(io::IO, tz::VariableTimeZone; class::Class, version::Integer=DEFA
         transition_types,
         cutoff,
         combined_designation,
-        link_target,
+        link,
     )
 end
 
-function write(io::IO, tz::FixedTimeZone; class::Class, version::Integer=DEFAULT_VERSION, link_target::Union{String,Nothing}=nothing)
+function write(io::IO, tz::FixedTimeZone; class::Class, version::Integer=DEFAULT_VERSION, link::Union{String,Nothing}=nothing)
     combined_designation, designation_indices = combine_designations([tz.name])
 
     transition_times = Vector{Int64}()
@@ -54,7 +54,7 @@ function write(io::IO, tz::FixedTimeZone; class::Class, version::Integer=DEFAULT
         transition_types,
         cutoff,
         combined_designation,
-        link_target,
+        link,
     )
 end
 
@@ -73,7 +73,7 @@ function write_content(
     transition_types::Vector{TZJTransition},
     cutoff::Int64,
     combined_designation::AbstractString,
-    link_target::Union{String,Nothing}=nothing,  # Ignored in v1 for compatibility
+    link::Union{String,Nothing}=nothing,  # Ignored in v1 for compatibility
 )
     if length(transition_times) > 0
         unique_transition_types = unique(transition_types)
@@ -123,7 +123,7 @@ function write_content(
     transition_types::Vector{TZJTransition},
     cutoff::Int64,
     combined_designation::AbstractString,
-    link_target::Union{String,Nothing}=nothing,
+    link::Union{String,Nothing}=nothing,
 )
     # Write v1 content first (reuse existing implementation)
     write_content(
@@ -136,13 +136,13 @@ function write_content(
         combined_designation,
     )
 
-    # Version 2 extension: write link_target information
-    if link_target === nothing
+    # Version 2 extension: write link information
+    if link === nothing
         Base.write(io, hton(UInt8(0)))  # No link target
     else
         Base.write(io, hton(UInt8(1)))  # Has link target
-        Base.write(io, hton(UInt16(length(link_target))))
-        for char in link_target
+        Base.write(io, hton(UInt16(length(link))))
+        for char in link
             Base.write(io, hton(UInt8(char)))
         end
     end

@@ -17,7 +17,7 @@ Mocking.activate()
 
 const TZDATA_VERSION = "2016j"
 const TZFILE_DIR = joinpath(@__DIR__, "tzfile", "data")
-const TEST_REGIONS = ["asia", "australasia", "europe", "northamerica"]
+const TEST_REGIONS = ["asia", "australasia", "europe", "northamerica", "backward"]
 const TEST_TZ_SOURCE_DIR = joinpath(_scratch_dir(), _tz_source_relative_dir(TZDATA_VERSION))
 
 # By default use a specific version of tzdata so we just testing for TimeZones.jl code

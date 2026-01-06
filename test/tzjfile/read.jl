@@ -65,10 +65,10 @@ end
 end
 
 @testset "v2 format" begin
-    @testset "with link_target" begin
+    @testset "with link" begin
         warsaw, class = compile("Europe/Warsaw", tzdata["europe"])
         io = IOBuffer()
-        TZJFile.write(io, warsaw; class, version=2, link_target="Poland")
+        TZJFile.write(io, warsaw; class, version=2, link="Poland")
         tzj_warsaw, tzj_class, tzj_link = TZJFile.read(seekstart(io))("Europe/Warsaw")
 
         @test tzj_warsaw == warsaw
@@ -79,7 +79,7 @@ end
     @testset "without link_target" begin
         warsaw, class = compile("Europe/Warsaw", tzdata["europe"])
         io = IOBuffer()
-        TZJFile.write(io, warsaw; class, version=2, link_target=nothing)
+        TZJFile.write(io, warsaw; class, version=2, link=nothing)
         tzj_warsaw, tzj_class, tzj_link = TZJFile.read(seekstart(io))("Europe/Warsaw")
 
         @test tzj_warsaw == warsaw

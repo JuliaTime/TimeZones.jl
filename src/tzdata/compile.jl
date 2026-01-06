@@ -643,6 +643,11 @@ end
 function compile(name::AbstractString, tz_source::TZSource; kwargs...)
     ordered = OrderedRuleDict()
 
+    # Get the direct link target if this is a link (no chain resolution needed)
+    # Note: We don't need to handle link chains (A→B→C) because the IANA tzdata
+    # backward file explicitly avoids them, as stated in the backward file header.
+    link = get(tz_source.links, name, nothing)
+
     if haskey(tz_source.links, name)
         # When the name is a link we'll generate a time zone from the link's target and
         # rename the time zone with the link name.
@@ -650,17 +655,17 @@ function compile(name::AbstractString, tz_source::TZSource; kwargs...)
         tz = compile!(zone_name, tz_source, ordered; kwargs...)
         class = Class(name, associated_regions(tz_source, name))
 
-        return rename(tz, name), class
+        return rename(tz, name), class, link
     else
         tz = compile!(name, tz_source, ordered; kwargs...)
         class = Class(name, associated_regions(tz_source, name))
 
-        return tz, class
+        return tz, class, link
     end
 end
 
 function compile(tz_source::TZSource; kwargs...)
-    results = Vector{Tuple{TimeZone,Class}}()
+    results = Vector{Tuple{TimeZone,Class,Union{String,Nothing}}}()
     ordered = OrderedRuleDict()
     lookup = Dict{String,TimeZone}()
 
@@ -668,7 +673,7 @@ function compile(tz_source::TZSource; kwargs...)
         tz = compile!(zone_name, tz_source, ordered; kwargs...)
         class = Class(zone_name, associated_regions(tz_source, zone_name))
 
-        push!(results, (tz, class))
+        push!(results, (tz, class, nothing))
         lookup[zone_name] = tz
     end
 
@@ -678,8 +683,10 @@ function compile(tz_source::TZSource; kwargs...)
             target_tz = lookup[target]
             tz = rename(target_tz, link_name)
             class = Class(link_name, associated_regions(tz_source, link_name))
+            # Only store link target for LEGACY timezones to save memory
+            link = class == Class(:LEGACY) ? target : nothing
 
-            push!(results, (tz, class))
+            push!(results, (tz, class, link))
         elseif !haskey(lookup, target)
             error("Unable to resolve link \"$link_name\" referencing \"$target\"")
         end
@@ -692,7 +699,7 @@ function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
     results = compile(tz_source; kwargs...)
     isdir(dest_dir) || error("Destination directory doesn't exist")
 
-    for (tz, class) in results
+    for (tz, class, link) in results
         parts = split(TimeZones.name(tz), '/')
         tz_path = joinpath(dest_dir, parts...)
         tz_dir = dirname(tz_path)
@@ -700,7 +707,7 @@ function compile(tz_source::TZSource, dest_dir::AbstractString; kwargs...)
         isdir(tz_dir) || mkpath(tz_dir)
 
         open(tz_path, "w") do fp
-            TZJFile.write(fp, tz; class)
+            TZJFile.write(fp, tz; class, link)
         end
     end
 

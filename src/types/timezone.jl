@@ -39,9 +39,9 @@ US/Pacific (UTC-8/UTC-7)
 TimeZone(::AbstractString, ::Class)
 
 function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
-    tz, class = get(_TZ_CACHE, str) do
+    tz, class, link = get(_TZ_CACHE, str) do
         if occursin(FIXED_TIME_ZONE_REGEX, str)
-            FixedTimeZone(str), Class(:FIXED)
+            FixedTimeZone(str), Class(:FIXED), InlineString31("")
         else
             throw(ArgumentError("Unknown time zone \"$str\""))
         end
@@ -83,7 +83,7 @@ function istimezone(str::AbstractString, mask::Class=Class(:DEFAULT))
         return true
     end
 
-    # Checks against pre-compiled time zones
-    class = get(() -> (UTC_ZERO, Class(:NONE)), _TZ_CACHE, str)[2]
+    # Checks against pre-compiled time zones (3-tuple now: tz, class, link)
+    class = get(() -> (UTC_ZERO, Class(:NONE), InlineString31("")), _TZ_CACHE, str)[2]
     return mask & class != Class(:NONE)
 end

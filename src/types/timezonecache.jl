@@ -1,8 +1,10 @@
 # Use a separate cache for FixedTimeZone (which is `isbits`) so the container is concretely
 # typed and we avoid allocating a FixedTimeZone every time we get one from the cache.
+# Note: link uses InlineString31 (not Union{InlineString31,Nothing}) to keep tuples isbits.
+# An empty string "" is used as a sentinel value for "no link target".
 struct TimeZoneCache
-    ftz::Dict{String,Tuple{FixedTimeZone,Class}}
-    vtz::Dict{String,Tuple{VariableTimeZone,Class}}
+    ftz::Dict{String,Tuple{FixedTimeZone,Class,InlineString31}}
+    vtz::Dict{String,Tuple{VariableTimeZone,Class,InlineString31}}
     lock::ReentrantLock
     initialized::Threads.Atomic{Bool}
 end
@@ -28,12 +30,16 @@ function reload!(cache::TimeZoneCache, compiled_dir::AbstractString=_COMPILED_DI
     empty!(cache.vtz)
 
     walk_tz_dir(compiled_dir) do name, path
-        tz, class = open(TZJFile.read, path, "r")(name)
+        tz, class, link = open(TZJFile.read, path, "r")(name)
+
+        # Convert link to InlineString31 to keep tuples isbits
+        # Use empty string as sentinel for "no link target"
+        entry = (tz, class, link === nothing ? InlineString31("") : InlineString31(link))
 
         if tz isa FixedTimeZone
-            cache.ftz[name] = (tz, class)
+            cache.ftz[name] = entry
         elseif tz isa VariableTimeZone
-            cache.vtz[name] = (tz, class)
+            cache.vtz[name] = entry
         else
             error("Unhandled TimeZone class encountered: $(typeof(tz))")
         end

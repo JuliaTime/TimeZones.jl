@@ -5,7 +5,7 @@ using Dates
 using Printf
 using Scratch: @get_scratch!
 using Unicode
-using InlineStrings: InlineString15
+using InlineStrings: InlineString15, InlineString31
 using TZJData: TZJData
 
 import Dates: TimeZone, UTC
