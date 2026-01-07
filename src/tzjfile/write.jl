@@ -1,4 +1,4 @@
-function write(io::IO, tz::VariableTimeZone; class::Class, version::Integer=DEFAULT_VERSION, link::Union{String,Nothing}=nothing)
+function write(io::IO, tz::VariableTimeZone; class::Class, version::Integer=tzjfile_version(), link::Union{String,Nothing}=nothing)
     combined_designation, designation_indices = combine_designations(t.zone.name for t in tz.transitions)
 
     # TODO: Sorting provides us a way to avoid checking for the sentinel on each loop
@@ -29,7 +29,7 @@ function write(io::IO, tz::VariableTimeZone; class::Class, version::Integer=DEFA
     )
 end
 
-function write(io::IO, tz::FixedTimeZone; class::Class, version::Integer=DEFAULT_VERSION, link::Union{String,Nothing}=nothing)
+function write(io::IO, tz::FixedTimeZone; class::Class, version::Integer=tzjfile_version(), link::Union{String,Nothing}=nothing)
     combined_designation, designation_indices = combine_designations([tz.name])
 
     transition_times = Vector{Int64}()

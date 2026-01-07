@@ -69,10 +69,17 @@ function Base.get(body::Function, cache::TimeZoneCache, name::AbstractString)
 end
 
 # Build specific tzdata version if specified by `JULIA_TZ_VERSION`
-function _build()
-    desired_version = TZData.tzdata_version()
-    if desired_version != TZJData.TZDATA_VERSION
-        _COMPILED_DIR[] = TZData.build(desired_version, _scratch_dir())
+# Also rebuilds if the TZJFile format version doesn't match the expected version
+function _build(tzjf_version::Integer=TZJFile.tzjfile_version())
+    expected_dir = TZData.compiled_dir()
+
+    # Rebuild if the expected directory doesn't exist
+    # TODO: I believe this currently avoids using TZJData.jl and forces a rebuild, but makes testing V1 vs V2 behaviour easier
+    if !isdir(expected_dir)
+        _COMPILED_DIR[] = TZData.build(TZData.tzdata_version(), _scratch_dir(); tzjf_version)
+    elseif _COMPILED_DIR[] != expected_dir
+        # Expected directory exists but we're pointing to wrong location (e.g., artifact)
+        _COMPILED_DIR[] = expected_dir
     end
 
     return nothing

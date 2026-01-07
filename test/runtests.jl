@@ -9,6 +9,7 @@ using TimeZones
 using TimeZones: _scratch_dir
 using TimeZones.TZData: TZSource, compile, build, tzdata_url, unpack,
     _tz_source_relative_dir, _archive_relative_dir, _compiled_relative_dir
+using TimeZones.TZJFile: TZJFile
 using TZJData: TZJData
 using Unicode
 
@@ -21,8 +22,9 @@ const TEST_REGIONS = ["asia", "australasia", "europe", "northamerica", "backward
 const TEST_TZ_SOURCE_DIR = joinpath(_scratch_dir(), _tz_source_relative_dir(TZDATA_VERSION))
 
 # By default use a specific version of tzdata so we just testing for TimeZones.jl code
-# changes and not changes to the dataa.
-build(TZDATA_VERSION, _scratch_dir())
+# changes and not changes to the data. Build with the current tzjfile_version() so that
+# tests always use the format version being tested (controlled by JULIA_TZJ_VERSION env var).
+build(TZDATA_VERSION, _scratch_dir(); tzjf_version=TZJFile.tzjfile_version())
 
 # For testing we'll reparse the tzdata every time to instead of using the compiled data.
 # This should make interactive development/testing cycles simplier since you won't be forced

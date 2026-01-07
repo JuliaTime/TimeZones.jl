@@ -47,6 +47,19 @@ function TimeZone(str::AbstractString, mask::Class=Class(:DEFAULT))
         end
     end
 
+    # Auto-redirect LEGACY timezones to their modern equivalents
+    # Only when user hasn't explicitly opted in to LEGACY class
+    if !isempty(link) && class == Class(:LEGACY) && mask & Class(:LEGACY) == Class(:NONE)
+        # Note: Using depwarn here allows users to control behavior via --depwarn flag.
+        # With --depwarn=error, this becomes an error (strict mode).
+        # This matches the behavior requested in issue #469 https://github.com/JuliaTime/TimeZones.jl/issues/469#issuecomment-2341741754.
+        Base.depwarn(
+            "The time zone \"$str\" is deprecated, using \"$link\" instead.",
+            :TimeZone
+        )
+        return TimeZone(String(link), mask)
+    end
+
     if mask & class == Class(:NONE)
         throw(ArgumentError(
             "The time zone \"$str\" is of class `$(repr(class))` which is " *
@@ -84,6 +97,9 @@ function istimezone(str::AbstractString, mask::Class=Class(:DEFAULT))
     end
 
     # Checks against pre-compiled time zones (3-tuple now: tz, class, link)
-    class = get(() -> (UTC_ZERO, Class(:NONE), InlineString31("")), _TZ_CACHE, str)[2]
+    _, class, link = get(() -> (UTC_ZERO, Class(:NONE), InlineString31("")), _TZ_CACHE, str)
+
+    # Allow linked legacy timezones to auto-redirect
+    !isempty(link) && class == Class(:LEGACY) && mask & Class(:LEGACY) == Class(:NONE) && return true
     return mask & class != Class(:NONE)
 end
