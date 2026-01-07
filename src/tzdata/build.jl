@@ -21,12 +21,25 @@ const REGIONS = [STANDARD_REGIONS; LEGACY_REGIONS]
 
 _archive_relative_dir() = "archive"
 _tz_source_relative_dir(version::AbstractString) = joinpath("tzsource", version)
-_compiled_relative_dir(version::AbstractString) = joinpath("compiled", "tzjf", "v$(TZJFile.DEFAULT_VERSION)", version)
+_compiled_relative_dir(version::AbstractString, tzjf_version::Integer) = joinpath("compiled", "tzjf", "v$tzjf_version", version)
 
-function build(version::AbstractString, working_dir::AbstractString)
+"""
+    compiled_dir() -> String
+
+Returns the expected compiled directory path for the current tzdata and TZJFile versions.
+This is where TimeZones.jl will look for compiled timezone data.
+"""
+function compiled_dir()
+    return joinpath(
+        _scratch_dir(),
+        _compiled_relative_dir(tzdata_version(), TZJFile.tzjfile_version())
+    )
+end
+
+function build(version::AbstractString, working_dir::AbstractString; tzjf_version::Integer=TZJFile.tzjfile_version())
     tzdata_archive_dir = joinpath(working_dir, _archive_relative_dir())
     tz_source_dir = joinpath(working_dir, _tz_source_relative_dir(version))
-    compiled_dir = joinpath(working_dir, _compiled_relative_dir(version))
+    compiled_dir = joinpath(working_dir, _compiled_relative_dir(version, tzjf_version))
 
     url = tzdata_url(version)
     tzdata_archive_file = joinpath(tzdata_archive_dir, basename(url))
@@ -63,10 +76,10 @@ function build(version::AbstractString, working_dir::AbstractString)
     return compiled_dir
 end
 
-function cleanup(version::AbstractString, working_dir::AbstractString)
+function cleanup(version::AbstractString, working_dir::AbstractString; tzjf_version::Integer=TZJFile.tzjfile_version())
     tzdata_archive_file = joinpath(working_dir, _archive_relative_dir(), basename(tzdata_url(version)))
     tz_source_dir = joinpath(working_dir, _tz_source_relative_dir(version))
-    compiled_dir = joinpath(working_dir, _compiled_relative_dir(version))
+    compiled_dir = joinpath(working_dir, _compiled_relative_dir(version, tzjf_version))
 
     isfile(tzdata_archive_file) && rm(tzdata_archive_file)
     isdir(tz_source_dir) && rm(tz_source_dir; recursive=true)

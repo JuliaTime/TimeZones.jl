@@ -5,7 +5,7 @@ using Dates
 using Printf
 using Scratch: @get_scratch!
 using Unicode
-using InlineStrings: InlineString15
+using InlineStrings: InlineString15, InlineString31
 using TZJData: TZJData
 
 import Dates: TimeZone, UTC
@@ -42,7 +42,12 @@ abstract type Local <: TimeZone end
 
 function __init__()
     # Set at runtime to ensure relocatability
-    _COMPILED_DIR[] = @static if isdefined(TZJData, :artifact_dir)
+    # Prefer scratch-compiled directory with matching versions, fall back to artifact
+    expected_dir = TZData.compiled_dir()
+
+    _COMPILED_DIR[] = if isdir(expected_dir)
+        expected_dir
+    elseif isdefined(TZJData, :artifact_dir)
         TZJData.artifact_dir()
     else
         # Backwards compatibility for TZJData versions below v1.3.1. The portion of the

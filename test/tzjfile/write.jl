@@ -42,4 +42,14 @@ end
         @test tzj_moscow == moscow
         @test tzj_class == class
     end
+
+    @testset "v2" begin
+        moscow, class = compile("Europe/Moscow", tzdata["europe"])
+        io = IOBuffer()
+        TZJFile.write(io, moscow; class, version=2)
+        tzj_moscow, tzj_class = TZJFile.read(seekstart(io))("Europe/Moscow")
+
+        @test tzj_moscow == moscow
+        @test tzj_class == class
+    end
 end
