@@ -2,6 +2,7 @@ module TimeZones
 
 using Artifacts: Artifacts
 using Dates
+using PrecompileTools: @compile_workload, @setup_workload
 using Printf
 using Scratch: @get_scratch!
 using Unicode
@@ -40,20 +41,22 @@ const _COMPILED_DIR = Ref{String}()
 # abstract type UTC <: TimeZone end  # Already defined in the Dates stdlib
 abstract type Local <: TimeZone end
 
+# Resolve the TZJData artifact directory using direct function calls that the
+# juliac trimmer can trace. We intentionally avoid TZJData.artifact_dir() which
+# uses the @artifact_str macro — that macro expands to Base.invokelatest(...),
+# an opaque dynamic dispatch barrier the trimmer cannot follow through, causing
+# the callee to be removed from trimmed binaries.
+function _resolve_tzjdata_dir()
+    pkg = Base.identify_package(TZJData, "TZJData")
+    pkg_dir = dirname(dirname(Base.locate_package(pkg)))
+    artifact_dict = Artifacts.parse_toml(joinpath(pkg_dir, "Artifacts.toml"))
+    hash = Base.SHA1(artifact_dict["tzjdata"]["git-tree-sha1"])
+    return Artifacts.artifact_path(hash)
+end
+
 function __init__()
     # Set at runtime to ensure relocatability
-    _COMPILED_DIR[] = @static if isdefined(TZJData, :artifact_dir)
-        TZJData.artifact_dir()
-    else
-        # Backwards compatibility for TZJData versions below v1.3.1. The portion of the
-        # code which determines the `pkg_dir` could be replaced by `pkgdir(TZJData)` however
-        # the `pkgdir` function doesn't work well with relocated system images.
-        pkg = Base.identify_package(TZJData, "TZJData")
-        pkg_dir = dirname(dirname(Base.locate_package(pkg)))
-        artifact_dict = Artifacts.parse_toml(joinpath(pkg_dir, "Artifacts.toml"))
-        hash = Base.SHA1(artifact_dict["tzjdata"]["git-tree-sha1"])
-        Artifacts.artifact_path(hash)
-    end
+    _COMPILED_DIR[] = _resolve_tzjdata_dir()
 
     # Dates extension needs to happen everytime the module is loaded (issue #24)
     init_dates_extension()
@@ -95,6 +98,22 @@ include("deprecated.jl")
 # Required to support Julia `VERSION < v"1.9"`
 if !isdefined(Base, :get_extension)
     include("../ext/TimeZonesRecipesBaseExt.jl")
+end
+
+# Ensure methods used in __init__ are preserved by juliac --trim.
+# The trimmer only keeps methods reachable from @ccallable entry points and
+# precompiled methods. This workload exercises the __init__ code paths so
+# the trimmer retains them.
+@setup_workload begin
+    @compile_workload begin
+        # Preserve artifact resolution methods needed by __init__.
+        # Also sets _COMPILED_DIR so the TimeZone("UTC") call below can load tzdata.
+        _COMPILED_DIR[] = _resolve_tzjdata_dir()
+
+        # Exercise core timezone functionality so timezone loading methods
+        # are also preserved.
+        TimeZone("UTC")
+    end
 end
 
 end # module
