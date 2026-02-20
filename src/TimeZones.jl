@@ -100,19 +100,23 @@ if !isdefined(Base, :get_extension)
     include("../ext/TimeZonesRecipesBaseExt.jl")
 end
 
-# Ensure methods used in __init__ are preserved by juliac --trim.
-# The trimmer only keeps methods reachable from @ccallable entry points and
-# precompiled methods. This workload exercises the __init__ code paths so
-# the trimmer retains them.
+# Ensure methods used in __init__ are preserved by juliac --trim (requires Julia >= 1.12).
+# The trimmer only keeps methods reachable from @ccallable entry points and precompiled
+# methods. This workload exercises the __init__ code paths so the trimmer retains them.
+# On Julia < 1.9, @compile_workload still executes the code but doesn't cache native code
 @setup_workload begin
     @compile_workload begin
         # Preserve artifact resolution methods needed by __init__.
-        # Also sets _COMPILED_DIR so the TimeZone("UTC") call below can load tzdata.
-        _COMPILED_DIR[] = _resolve_tzjdata_dir()
+        _resolve_tzjdata_dir()
 
-        # Exercise core timezone functionality so timezone loading methods
-        # are also preserved.
-        TimeZone("UTC")
+        @static if VERSION >= v"1.9"
+            # Also sets _COMPILED_DIR so the TimeZone("UTC") call below can load tzdata.
+            _COMPILED_DIR[] = _resolve_tzjdata_dir()
+
+            # Exercise core timezone functionality so timezone loading methods
+            # are also preserved.
+            TimeZone("UTC")
+        end
     end
 end
 
