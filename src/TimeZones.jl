@@ -116,6 +116,13 @@ end
             # Exercise core timezone functionality so timezone loading methods
             # are also preserved.
             TimeZone("UTC")
+
+            # Reset the cache so it doesn't persist into the loaded module with
+            # stale data from the precompilation environment. Without this, the
+            # cache's `initialized` flag stays true and `_build()` is never called
+            # at runtime — breaking `JULIA_TZ_VERSION` overrides and any scenario
+            # where the compiled tzdata differs from what was available here.
+            copy!(_TZ_CACHE, TimeZoneCache())
         end
     end
 end
