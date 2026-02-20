@@ -13,3 +13,6 @@ benchmark/tune.json
 # Pkg
 deps/build.log
 /Manifest.toml
+
+# VSCode settings
+.vscode/settings.json
