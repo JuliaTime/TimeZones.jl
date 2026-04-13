@@ -116,6 +116,7 @@ function walk_tz_dir(f, dir)
         partial_name, dir = popfirst!(check)
 
         for filename in readdir(dir)
+            startswith(filename, r"\.") && continue # ignore system dotfiles such as .DS_Store
             name = isempty(partial_name) ? filename : "$partial_name/$filename"
             path = joinpath(dir, filename)
 
