@@ -28,9 +28,10 @@ end
     ZonedDateTime(dt::DateTime, tz::TimeZone; from_utc=false) -> ZonedDateTime
 
 Construct a `ZonedDateTime` by applying a `TimeZone` to a `DateTime`. When the `from_utc`
-keyword is true the given `DateTime` is assumed to be in UTC instead of in local time and is
-converted to the specified `TimeZone`.  Note that when `from_utc` is true the given
-`DateTime` will always exists and is never ambiguous.
+keyword is true the given `DateTime` is assumed to be in UTC and is converted to the specified
+`TimeZone`.  When `from_utc` is false the given `DateTime` is assumed to already be in the
+specified `TimeZone`. Note that when `from_utc` is true the given `DateTime` will always exist
+and is never ambiguous.
 """
 @inline function ZonedDateTime(dt::DateTime, tz::VariableTimeZone; from_utc::Bool=false)
     # Note: Using a function barrier to reduce allocations
