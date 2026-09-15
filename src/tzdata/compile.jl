@@ -713,7 +713,8 @@ function compile(
     dest_dir::AbstractString=joinpath(_scratch_dir(), _compiled_relative_dir(tzdata_version()));
     kwargs...
 )
-    results = compile(TZSource(readdir(tz_source_dir; join=true)), dest_dir; kwargs...)
+    regions = filter(f -> !startswith(f, "."), readdir(tz_source_dir))
+    results = compile(TZSource(joinpath.(tz_source_dir, regions)), dest_dir; kwargs...)
 
     # TimeZones 1.0 has supported automatic flushing of the cache when calling `compile`
     # (e.g. `compile(max_year=2200)`). We'll keep this behaviour to ensure we are not
