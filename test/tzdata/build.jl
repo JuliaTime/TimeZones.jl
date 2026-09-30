@@ -58,32 +58,37 @@ end
     # `walk_tz_dir` ignores dotfiles, so a macOS `.DS_Store` must not count as
     # compiled tz data here either: if it does, the cache is left empty and
     # re-running `build` can never repair it.
-    function seed(entries)
-        working_dir = mktempdir()
-        version = TZDATA_VERSION
-        tz_source_dir = joinpath(working_dir, _tz_source_relative_dir(version))
-        mkpath(tz_source_dir)
-        cp(joinpath(@__DIR__, "..", "..", "deps", "tzsource_custom", "utc"),
-           joinpath(tz_source_dir, "utc"))
-        archive_dir = joinpath(working_dir, "tzarchive")
-        mkpath(archive_dir)
-        touch(joinpath(archive_dir, "$version.tar.gz"))
+    function seed(f, entries)
+        mktempdir() do working_dir
+            version = TZDATA_VERSION
+            tz_source_dir = joinpath(working_dir, _tz_source_relative_dir(version))
+            mkpath(tz_source_dir)
+            cp(joinpath(@__DIR__, "..", "..", "deps", "tzsource_custom", "utc"),
+               joinpath(tz_source_dir, "utc"))
 
-        compiled_dir = joinpath(working_dir, TZData._compiled_relative_dir(version))
-        mkpath(compiled_dir)
-        for entry in entries
-            write(joinpath(compiled_dir, entry), "")
+            # Skip archive download
+            archive_dir = joinpath(working_dir, "tzarchive")
+            mkpath(archive_dir)
+            touch(joinpath(archive_dir, "$version.tar.gz"))
+
+            compiled_dir = joinpath(working_dir, TZData._compiled_relative_dir(version))
+            mkpath(compiled_dir)
+            for entry in entries
+                touch(joinpath(compiled_dir, entry))
+            end
+            f(version, working_dir, compiled_dir)
         end
-        return version, working_dir, compiled_dir
     end
 
     # A dotfile alone is not compiled data: the build must still run.
-    version, working_dir, compiled_dir = seed([".DS_Store"])
-    TZData.build(version, working_dir)
-    @test "UTC" in readdir(compiled_dir)
+    seed([".DS_Store"]) do version, working_dir, compiled_dir
+        TZData.build(version, working_dir)
+        @test "UTC" in readdir(compiled_dir)
+    end
 
     # Real compiled data still short-circuits the rebuild, as of #474.
-    version, working_dir, compiled_dir = seed([".DS_Store", "SENTINEL"])
-    TZData.build(version, working_dir)
-    @test !("UTC" in readdir(compiled_dir))
+    seed([".DS_Store", "SENTINEL"]) do version, working_dir, compiled_dir
+        TZData.build(version, working_dir)
+        @test !("UTC" in readdir(compiled_dir))
+    end
 end
