@@ -1,4 +1,5 @@
 # Utility functions for testing
+using InlineStrings
 
 if VERSION < v"1.9.0-DEV.1744"  # https://github.com/JuliaLang/julia/pull/47367
     macro allocations(ex)
@@ -50,7 +51,21 @@ show_compact = (io, args...) -> show(IOContext(io, :compact => true), args...)
 function add!(dict::Dict, t::Tuple{TimeZone,TimeZones.Class})
     tz, class = t
     name = TimeZones.name(tz)
-    push!(dict, name => t)
+    push!(dict, name => (tz, class, InlineString31("")))
+    return tz
+end
+
+function add!(dict::Dict, t::Tuple{TimeZone,TimeZones.Class,InlineString31})
+    tz, class, link = t
+    name = TimeZones.name(tz)
+    push!(dict, name => (tz, class, link))
+    return tz
+end
+
+function add!(dict::Dict, t::Tuple{TimeZone,TimeZones.Class,Nothing})
+    tz, class, _ = t
+    name = TimeZones.name(tz)
+    push!(dict, name => (tz, class, InlineString31("")))
     return tz
 end
 
@@ -59,16 +74,26 @@ function add!(cache::TimeZones.TimeZoneCache, t::Tuple{T,TimeZones.Class}) where
     return add!(dict, t)
 end
 
+function add!(cache::TimeZones.TimeZoneCache, t::Tuple{T,TimeZones.Class,InlineString31}) where {T<:TimeZone}
+    dict = T == FixedTimeZone ? cache.ftz : cache.vtz
+    return add!(dict, t)
+end
+
+function add!(cache::TimeZones.TimeZoneCache, t::Tuple{T,TimeZones.Class,Nothing}) where {T<:TimeZone}
+    dict = T == FixedTimeZone ? cache.ftz : cache.vtz
+    return add!(dict, t)
+end
+
 function add!(cache::TimeZones.TimeZoneCache, tz::VariableTimeZone)
     # Not all `VariableTimeZone`s are the STANDARD class. However, for testing purposes
     # the class doesn't need to be precise.
     class = TimeZones.Class(:STANDARD)
-    return add!(cache.vtz, (tz, class))
+    return add!(cache.vtz, (tz, class, InlineString31("")))
 end
 
 function add!(cache::TimeZones.TimeZoneCache, tz::FixedTimeZone)
     class = TimeZones.Class(:FIXED)
-    return add!(cache.ftz, (tz, class))
+    return add!(cache.ftz, (tz, class, InlineString31("")))
 end
 
 function with_tz_cache(f, cache::TimeZones.TimeZoneCache)

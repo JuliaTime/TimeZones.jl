@@ -51,3 +51,39 @@ end
         end
     end
 end
+
+@testset "v1 backward compatibility" begin
+    @testset "Existing v1 files from disk read correctly" begin
+        # The pre-compiled test data files are in v1 format
+        tzj_utc, tzj_class, tzj_link = open(joinpath(TZJFILE_DIR, "UTC"), "r") do fp
+            TZJFile.read(fp)("UTC")
+        end
+        @test tzj_utc == FixedTimeZone("UTC", 0)
+        @test tzj_class == Class(:FIXED)
+        @test tzj_link === nothing
+    end
+end
+
+@testset "v2 format" begin
+    @testset "with link" begin
+        warsaw, class = compile("Europe/Warsaw", tzdata["europe"])
+        io = IOBuffer()
+        TZJFile.write(io, warsaw; class, version=2, link="Poland")
+        tzj_warsaw, tzj_class, tzj_link = TZJFile.read(seekstart(io))("Europe/Warsaw")
+
+        @test tzj_warsaw == warsaw
+        @test tzj_class == class
+        @test tzj_link == "Poland"
+    end
+
+    @testset "without link_target" begin
+        warsaw, class = compile("Europe/Warsaw", tzdata["europe"])
+        io = IOBuffer()
+        TZJFile.write(io, warsaw; class, version=2, link=nothing)
+        tzj_warsaw, tzj_class, tzj_link = TZJFile.read(seekstart(io))("Europe/Warsaw")
+
+        @test tzj_warsaw == warsaw
+        @test tzj_class == class
+        @test tzj_link === nothing
+    end
+end

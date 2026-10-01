@@ -51,7 +51,7 @@ function read_content(io::IO, version::Val{1})
     # Now build the time zone transitions
     tz_constructor = if tzh_timecnt == 0 || (tzh_timecnt == 1 && transition_types[1] == TIMESTAMP_MIN)
         tzj_info = transition_types[1]
-        name -> (FixedTimeZone(name, tzj_info.utc_offset, tzj_info.dst_offset), class)
+        name -> (FixedTimeZone(name, tzj_info.utc_offset, tzj_info.dst_offset), class, nothing)
     else
         transitions = Transition[]
         cutoff = timestamp2datetime(cutoff_time, nothing)
@@ -75,8 +75,32 @@ function read_content(io::IO, version::Val{1})
             prev_zone = zone
         end
 
-        name -> (VariableTimeZone(name, transitions, cutoff), class)
+        name -> (VariableTimeZone(name, transitions, cutoff), class, nothing)
     end
 
     return tz_constructor
+end
+
+function read_content(io::IO, version::Val{2})
+    # Read v1 content first (reuse existing implementation)
+    tz_constructor_v1 = read_content(io, Val(1))
+
+    # Read version 2 extension: link information
+    has_link = ntoh(Base.read(io, UInt8)) != 0
+    link = if has_link
+        length = ntoh(Base.read(io, UInt16))
+        chars = Vector{UInt8}(undef, length)
+        for i in eachindex(chars)
+            chars[i] = ntoh(Base.read(io, UInt8))
+        end
+        String(chars)
+    else
+        nothing
+    end
+
+    # Return constructor that adds link to v1 result
+    return function(name)
+        tz, class, _ = tz_constructor_v1(name)
+        return (tz, class, link)
+    end
 end

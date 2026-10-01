@@ -395,6 +395,24 @@ dates, ordered = order_rules([rule_post, rule_endless, rule_overlap, rule_pre], 
         @test longyearbyen.cutoff == oslo.cutoff
     end
 
+    @testset "Link targets saved for LEGACY only" begin
+        # Combine backward with northamerica to test LEGACY links
+        # backward file only has links, needs zones from other regions
+        tz_source_combined = TZSource(
+            joinpath.(TEST_TZ_SOURCE_DIR, ["northamerica", "backward"])
+        )
+
+        # US/Pacific is a LEGACY link (from backward file)
+        tz, class, link = compile("US/Pacific", tz_source_combined)
+        @test class == Class(:LEGACY)
+        @test link == "America/Los_Angeles"  # Link target stored for LEGACY
+
+        # America/Los_Angeles is STANDARD (not a link)
+        tz2, class2, link2 = compile("America/Los_Angeles", tz_source_combined)
+        @test class2 == Class(:STANDARD)
+        @test link2 === nothing  # Not a link, so no link target
+    end
+
     # Zones that don't include multiple lines and no rules should be treated as a FixedTimeZone.
     @testset "FixedTimeZone" begin
         tz = first(compile("MST", tzdata["northamerica"]))
