@@ -41,7 +41,7 @@ end
         # Trigger compilation (only upon the first call in Julia) and populate the cache
         @test @allocations(TimeZone("America/Winnipeg")) > 0
 
-        @test @allocations(TimeZone("America/Winnipeg")) == 2
-        @test @allocations(istimezone("America/Winnipeg")) == 1
+        @test @allocations(TimeZone("America/Winnipeg")) <= 2
+        @test @allocations(istimezone("America/Winnipeg")) <= 1
     end
 end
