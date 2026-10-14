@@ -37,6 +37,21 @@ end
 
 @test_throws ArgumentError TZFile.read(IOBuffer())
 
+@testset "Slim TZif footer" begin
+    # Default zic output from tzdata 2026e, with footer EST5EDT,M3.2.0,M11.1.0.
+    tz = open(TZFile.read, joinpath(TZFILE_DIR, "America", "New_York (Slim)"))("America/New_York")
+    @test string(tz) == "America/New_York"
+    @test DateTime(ZonedDateTime(2025, 1, 1, tz), UTC) == DateTime(2025, 1, 1, 5)
+    @test DateTime(ZonedDateTime(DateTime(2025, 1, 1, 5), tz; from_utc=true)) == DateTime(2025, 1, 1)
+    @test DateTime(ZonedDateTime(2025, 7, 1, tz), UTC) == DateTime(2025, 7, 1, 4)
+
+    # Preserve the explicit history before the footer's rules took effect in 2007.
+    @test DateTime(ZonedDateTime(2006, 3, 20, tz), UTC) == DateTime(2006, 3, 20, 5)
+    @test_throws NonExistentTimeError ZonedDateTime(2025, 3, 9, 2, 30, tz)
+    @test_throws AmbiguousTimeError ZonedDateTime(2025, 11, 2, 1, 30, tz)
+    @test_throws UnhandledTimeError ZonedDateTime(2039, 1, 1, tz)
+end
+
 # Compare tzfile transitions with those we resolved directly from the Olson zones/rules
 
 # Ensure that `TZFile.read` returns a `FixedTimeZone` with the right data
