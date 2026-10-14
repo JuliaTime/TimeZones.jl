@@ -104,7 +104,7 @@ function read_content(io::IO; version::Char)
         is_ut[i] = ntoh(Base.read(io, Int8))
     end
 
-    # POSIX TZ variable string used for transistions after the last ttinfo (unused)
+    # POSIX TZ variable string used for transitions after the last ttinfo
     if version != '\0'
         readline(io)
         posix_tz_str = chomp(readline(io))
@@ -157,6 +157,19 @@ function read_content(io::IO; version::Char)
         cutoff = nothing
         if DateTime(2037) <= last(transitions).utc_datetime < TZFILE_CUTOFF
             cutoff = TZFILE_CUTOFF
+        end
+
+        # Extend slim files using the rules supported by our POSIX TZ parser.
+        if version != '\0' && !isempty(posix_tz_str)
+            footer_tz = TimeZones.tryparse_tz_format(posix_tz_str)
+            if footer_tz isa VariableTimeZone
+                last_datetime = timestamp2datetime(last(transition_times))
+                future_transitions = filter(t -> t.utc_datetime > last_datetime, footer_tz.transitions)
+                if !isempty(future_transitions)
+                    append!(transitions, future_transitions)
+                    cutoff = footer_tz.cutoff
+                end
+            end
         end
 
         name -> VariableTimeZone(name, transitions, cutoff)
