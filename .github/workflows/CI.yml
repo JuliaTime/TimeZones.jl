@@ -191,7 +191,7 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - "1.7"
+          - "lts"  # InlineStrings 2 requires Julia 1.10 or later
         os:
           - windows-latest
     steps:
