@@ -117,6 +117,11 @@ given `TimeZone` then `amb` can be supplied to resolve ambiguity.
     ZonedDateTime(DateTime(y,m,d,h,mi,s,ms), tz, amb)
 end
 
+# Constructors that accept and discard the `amb` argument for FixedTimeZone since a caller may not always know whether they have a fixed or variable time zone and multiple-dispatch is a better way to handle that.
+@optional function ZonedDateTime(y::Integer, m::Integer=1, d::Integer=1, h::Integer=0, mi::Integer=0, s::Integer=0, ms::Integer=0, tz::FixedTimeZone, amb::Union{Integer,Bool})
+    ZonedDateTime(DateTime(y,m,d,h,mi,s,ms), tz)
+end
+
 @optional function ZonedDateTime(y::Integer, m::Integer=1, d::Integer=1, h::Integer=0, mi::Integer=0, s::Integer=0, ms::Integer=0, tz::TimeZone)
     ZonedDateTime(DateTime(y,m,d,h,mi,s,ms), tz)
 end
